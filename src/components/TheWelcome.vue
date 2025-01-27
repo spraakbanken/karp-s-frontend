@@ -1,5 +1,5 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>Välkommen till Karp-S!</p>
+  <h1>{{ $t('welcome') }}</h1>
 </template>
