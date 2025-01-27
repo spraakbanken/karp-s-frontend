@@ -1,9 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import LanguageSwitcher from './LanguageSwitcher.vue'
+</script>
 
 <template>
   <nav>
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/about">About</RouterLink>
+    <LanguageSwitcher />
   </nav>
 </template>
 
