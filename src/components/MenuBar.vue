@@ -4,8 +4,8 @@ import LanguageSwitcher from './LanguageSwitcher.vue'
 
 <template>
   <nav>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
+    <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
+    <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
     <LanguageSwitcher />
   </nav>
 </template>

@@ -1,3 +1,5 @@
 {
-  "welcome": "Welcome!"
+  "welcome": "Welcome!",
+  "menu.home": "Home",
+  "menu.about": "About"
 }

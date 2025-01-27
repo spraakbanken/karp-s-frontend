@@ -6,7 +6,22 @@ import MenuBar from './MenuBar.vue'
   <div class="header-area">
     <div class="left-area">
       <div class="logo-box">
-        <img alt="Karp-S logo" src="@/assets/karps_slogan_sv_light_theme.svg" width="300" />
+        <div v-if="$i18n.locale == 'sv'">
+          <img
+            class="logo"
+            alt="Karp-S logo"
+            src="@/assets/karps_slogan_sv_light_theme.svg"
+            width="300"
+          />
+        </div>
+        <div v-else>
+          <img
+            class="logo"
+            alt="Karp-S logo"
+            src="@/assets/karps_slogan_en_light_theme.svg"
+            width="300"
+          />
+        </div>
       </div>
     </div>
 
@@ -54,6 +69,7 @@ import MenuBar from './MenuBar.vue'
   .header-area .logo-box {
     box-sizing: border-box;
     margin-right: 1rem;
+    vertical-align: bottom;
   }
 
   .header-area .right-area {
@@ -78,13 +94,6 @@ import MenuBar from './MenuBar.vue'
     justify-content: flex-end;
     text-align: right;
     box-sizing: border-box;
-  }
-
-  .sb-box img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    width: 14rem;
   }
 
   .header-area .choices-area {
