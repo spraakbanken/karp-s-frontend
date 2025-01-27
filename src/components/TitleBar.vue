@@ -6,7 +6,7 @@ import MenuBar from './MenuBar.vue'
   <div class="header-area">
     <div class="left-area">
       <div class="logo-box">
-        <img alt="Karp-S logo" src="@/assets/karps_slogan_sv.svg" width="300" />
+        <img alt="Karp-S logo" src="@/assets/karps_slogan_sv_light_theme.svg" width="300" />
       </div>
     </div>
 
@@ -14,7 +14,7 @@ import MenuBar from './MenuBar.vue'
       <div class="middle-area">
         <div class="sb-box">
           <a href="https://spraakbanken.gu.se/">
-            <img src="@/assets/sprakbanken_text_slogan_sv.svg" alt="Språkbanken Text" />
+            <img src="@/assets/sprakbanken_text_light_theme.svg" alt="Språkbanken Text" />
           </a>
         </div>
         <div class="choices-area">
