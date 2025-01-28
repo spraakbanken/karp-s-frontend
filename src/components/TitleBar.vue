@@ -1,20 +1,44 @@
 <script setup lang="ts">
 import MenuBar from './MenuBar.vue'
+import { ref, onMounted } from 'vue';
+
+const logoKarp = ref('');
+const logoSB = ref('');
+const logoGU = ref('');
+const logoKarpEn = ref('');
+
+const updateTheme = async () => {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const isDarkMode = theme === 'dark';
+  logoKarp.value = isDarkMode ? (await import('@/assets/karps_slogan_sv_dark_theme.svg')).default : (await import('@/assets/karps_slogan_sv_light_theme.svg')).default;
+  logoSB.value = isDarkMode ? (await import('@/assets/sprakbanken_text_dark_theme.svg')).default : (await import('@/assets/sprakbanken_text_light_theme.svg')).default;
+  logoGU.value = isDarkMode ? (await import('@/assets/gu-sv.svg')).default : (await import('@/assets/gu-sv.svg')).default;
+  logoKarpEn.value = isDarkMode ? (await import('@/assets/karps_slogan_en_dark_theme.svg')).default : (await import('@/assets/karps_slogan_en_light_theme.svg')).default;
+};
+
+onMounted(() => {
+  updateTheme();
+  const observer = new MutationObserver(updateTheme);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });});
 </script>
 
 <template>
   <div class="header-area">
     <div class="left-area">
       <div class="logo-box">
-        <img alt="Karp-S logo" src="@/assets/karps_slogan_sv_light_theme.svg" width="300" />
+        <div v-if="$i18n.locale == 'sv'">
+          <img :src="logoKarp" alt="Karp-S logo" width="300" />
+        </div>
+        <div v-else>
+          <img :src="logoKarpEn" alt="Karp-S logo" width="300" />
       </div>
     </div>
-
+  </div>
     <div class="right-area">
       <div class="middle-area">
         <div class="sb-box">
           <a href="https://spraakbanken.gu.se/">
-            <img src="@/assets/sprakbanken_text_light_theme.svg" alt="Språkbanken Text" />
+            <img :src="logoSB" alt="Språkbanken Text" />
           </a>
         </div>
         <div class="choices-area">
@@ -23,7 +47,7 @@ import MenuBar from './MenuBar.vue'
       </div>
       <div class="gu-box">
         <a href="https://gu.se/">
-          <img src="@/assets/gu-sv.svg" alt="Göteborgs universitet" />
+          <img :src="logoGU" alt="Göteborgs universitet" />
         </a>
       </div>
     </div>
@@ -41,7 +65,7 @@ import MenuBar from './MenuBar.vue'
     padding-left: 2rem;
     margin-left: auto;
     margin-right: auto;
-    background-color: white;
+    background-color: var(--color-bg);
     box-sizing: border-box;
     width: 100%;
   }

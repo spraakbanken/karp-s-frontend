@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <iframe src="../assets/karp-s.pdf" width="100%" height="1000px"></iframe>
   </div>
 </template>
 

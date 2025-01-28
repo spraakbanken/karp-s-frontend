@@ -1,35 +1,144 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+
+const changeLanguage = (lang: string) => {
+  locale.value = lang
+}
+
+const themeCurrent = ref('light')
+
+onMounted(() => {
+  const themeToggle = document.getElementById('theme-toggle')
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      if (document.documentElement.getAttribute('data-theme') === 'dark') {
+        themeCurrent.value = 'light'
+        document.documentElement.setAttribute('data-theme', 'light')
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        themeCurrent.value = 'dark'
+      }
+    })
+  }
+})
+</script>
 
 <template>
   <nav>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
+    <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
+    <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
+    <button id="theme-toggle" class="nav-button button-mode">
+      <span class="material-icons theme-icon" v-if="themeCurrent === 'light'">light_mode</span>
+      <span class="material-icons theme-icon" v-else>dark_mode</span>
+    </button>
+    <div class="dropdown">
+      <div class="dropdown-toggle">
+        <span class="material-icons">language</span>
+        <button class="nav-button">{{ $t('menu.'+locale) }}</button>
+      </div>
+      <div class="dropdown-content">
+        <a href="#" @click.prevent="changeLanguage('en')">{{ $t('menu.en') }}</a>
+        <a href="#" @click.prevent="changeLanguage('sv')">{{ $t('menu.sv') }}</a>
+      </div>
+    </div>
   </nav>
 </template>
 
 <style scoped>
 nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  font-size: 12px;
-  text-align: left;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 1rem;
 }
 
-nav a.router-link-exact-active {
-  color: #f0581a;
+nav a,
+nav button.nav-button {
+  color: var(--color-text);
+  text-decoration: none;
+  /* padding: 0.5rem 1rem; */
+  transition: color 0.3s, background-color 0.3s;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+nav a.router-link-exact-active,
+nav button.nav-button-active {
+  color: #ff7f50;
+}
+
+nav a.router-link-exact-inactive {
+  color: var(--color-text);
 }
 
 nav a.router-link-exact-active:hover {
   background-color: transparent;
-  color: black;
 }
 
 nav a {
   display: inline-block;
-  padding: 0 0.5rem 0 0;
-  color: black;
+  padding: 0 1rem;
+  /* border-left: 1px solid var(--color-border); */
 }
 
 nav a:first-of-type {
   border: 0;
+}
+
+nav button.button-mode {
+  margin-top: 2px;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--color-background);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a {
+  color: var(--color-text);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: hsla(160, 100%, 37%, 0.2);
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+}
+
+.material-icons {
+  font-size: 20px;
+}
+
+.theme-icon {
+  color: var(--color-icon-mode);
 }
 </style>
