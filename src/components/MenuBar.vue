@@ -39,7 +39,7 @@ onMounted(() => {
     <div class="dropdown">
       <div class="dropdown-toggle">
         <span class="material-icons">language</span>
-        <button class="nav-button">{{ $t('menu.'+locale) }}</button>
+        <button class="nav-button">{{ $t('menu.' + locale) }}</button>
       </div>
       <div class="dropdown-content">
         <a href="#" @click.prevent="changeLanguage('en')">{{ $t('menu.en') }}</a>
@@ -65,7 +65,9 @@ nav button.nav-button {
   color: var(--color-text);
   text-decoration: none;
   /* padding: 0.5rem 1rem; */
-  transition: color 0.3s, background-color 0.3s;
+  transition:
+    color 0.3s,
+    background-color 0.3s;
   border: none;
   background: none;
   cursor: pointer;
@@ -74,7 +76,7 @@ nav button.nav-button {
 
 nav a.router-link-exact-active,
 nav button.nav-button-active {
-  color: #ff7f50;
+  color: var(--sb-orange);
 }
 
 nav a.router-link-exact-inactive {
@@ -109,7 +111,7 @@ nav button.button-mode {
   position: absolute;
   background-color: var(--color-background);
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 

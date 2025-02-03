@@ -1,7 +1,11 @@
 {
-    "welcome": "Welcome!",
-    "menu.home": "Home",
-    "menu.about": "About",
-    "menu.sv": "Swedish",
-    "menu.en": "English"
+  "welcome": "Welcome!",
+  "menu.home": "Home",
+  "menu.about": "About",
+  "menu.sv": "Swedish",
+  "menu.en": "English",
+  "footer.help": "Contact",
+  "Footer.about.title": "Other resources",
+  "footer.about": "Språkbanken's growing collection of research data can be browsed on the {0} section of our website. At a larger scale, Språkbanken forms a part of the CLARIN ERIC, whose collected assortment of data can be browsed in the {1}.",
+  "footer.about.sbdata.title": "Språkbanken Text: Language resources"
 }

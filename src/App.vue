@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import TitleBar from './components/TitleBar.vue'
+import FooterView from './components/FooterView.vue'
 </script>
 
 <template>
@@ -9,10 +10,19 @@ import TitleBar from './components/TitleBar.vue'
   </header>
 
   <RouterView />
+
+  <footer>
+    <FooterView />
+  </footer>
 </template>
 
 <style scoped>
 header {
+  line-height: 1.5;
+  max-height: 100vh;
+}
+
+footer {
   line-height: 1.5;
   max-height: 100vh;
 }

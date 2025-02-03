@@ -1,58 +1,6 @@
-<template>
-  <div v-if="activeTab === 'table'">
-    <table v-if="filteredDataset.length" class="fancy-table">
-      <thead>
-        <tr>
-          <th v-for="(value, key) in filteredDataset[0]" :key="key" @click="sortTable(String(key))">
-            <div class="header-content">
-              <span>{{ key }}</span>
-              <span v-if="sortKey === key">
-                <i class="material-icons">{{
-                  sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'
-                }}</i>
-              </span>
-              <span v-else>
-                <i class="material-icons">sort</i>
-              </span>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
-          <td v-for="(value, key) in item" :key="key">
-            {{ Array.isArray(value) ? value.join(', ') : value }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div v-if="filteredDataset.length" class="pagination">
-      <button @click="firstPage" :disabled="currentPage === 1">
-        <i class="material-icons">first_page</i>
-      </button>
-      <button @click="prevPage" :disabled="currentPage === 1">
-        <i class="material-icons">chevron_left</i>
-      </button>
-      <span>{{ currentPage }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">
-        <i class="material-icons">chevron_right</i>
-      </button>
-      <button @click="lastPage" :disabled="currentPage === totalPages">
-        <i class="material-icons">last_page</i>
-      </button>
-      <label for="itemsPerPage">Items per page:</label>
-      <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-        <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
-          {{ option }}
-        </option>
-      </select>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { selectedDataset, searchQuery, activeTab } from '@/stores/store'
+import { selectedDataset, searchQuery } from '@/stores/store'
 
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
@@ -131,6 +79,56 @@ const sortTable = (key: string) => {
   }
 }
 </script>
+
+<template>
+  <table v-if="filteredDataset.length" class="fancy-table">
+    <thead>
+      <tr>
+        <th v-for="(value, key) in filteredDataset[0]" :key="key" @click="sortTable(String(key))">
+          <div class="header-content">
+            <span>{{ key }}</span>
+            <span v-if="sortKey === key">
+              <i class="material-icons">{{
+                sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'
+              }}</i>
+            </span>
+            <span v-else>
+              <i class="material-icons">sort</i>
+            </span>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
+        <td v-for="(value, key) in item" :key="key">
+          {{ Array.isArray(value) ? value.join(', ') : value }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div v-if="filteredDataset.length" class="pagination">
+    <button @click="firstPage" :disabled="currentPage === 1">
+      <i class="material-icons">first_page</i>
+    </button>
+    <button @click="prevPage" :disabled="currentPage === 1">
+      <i class="material-icons">chevron_left</i>
+    </button>
+    <span>{{ currentPage }} of {{ totalPages }}</span>
+    <button @click="nextPage" :disabled="currentPage === totalPages">
+      <i class="material-icons">chevron_right</i>
+    </button>
+    <button @click="lastPage" :disabled="currentPage === totalPages">
+      <i class="material-icons">last_page</i>
+    </button>
+    <label for="itemsPerPage">Items per page:</label>
+    <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
+      <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
+        {{ option }}
+      </option>
+    </select>
+  </div>
+</template>
 
 <style scoped>
 .fancy-table {

@@ -1,57 +1,3 @@
-<template>
-  <div>
-    <h4>Statistics for {{ selectedParams[0] }}</h4>
-    <table v-if="frequencyData.length" class="fancy-table">
-      <thead>
-        <tr>
-          <th v-for="(value, key) in frequencyData[0]" :key="key" @click="sortTable(String(key))">
-            <div class="header-content">
-              <span>{{ key }}</span>
-              <span v-if="sortKey === key">
-                <i class="material-icons">{{
-                  sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'
-                }}</i>
-              </span>
-              <span v-else>
-                <i class="material-icons">sort</i>
-              </span>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
-          <td v-for="(value, key) in item" :key="key">
-            {{ Array.isArray(value) ? value.join(', ') : value }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p v-else>No data available. Please select a parameter.</p>
-    <div v-if="frequencyData.length" class="pagination">
-      <button @click="firstPage" :disabled="currentPage === 1">
-        <i class="material-icons">first_page</i>
-      </button>
-      <button @click="prevPage" :disabled="currentPage === 1">
-        <i class="material-icons">chevron_left</i>
-      </button>
-      <span>{{ currentPage }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">
-        <i class="material-icons">chevron_right</i>
-      </button>
-      <button @click="lastPage" :disabled="currentPage === totalPages">
-        <i class="material-icons">last_page</i>
-      </button>
-      <label for="itemsPerPage">Items per page:</label>
-      <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-        <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
-          {{ option }}
-        </option>
-      </select>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { selectedDataset, selectedParams } from '@/stores/store'
@@ -144,15 +90,68 @@ const sortTable = (key: string) => {
 
 const sortedData = computed(() => {
   return frequencyData.value.slice().sort((a, b) => {
-    const aValue = a[sortKey.value as keyof typeof a];
-    const bValue = b[sortKey.value as keyof typeof b];
-    if (aValue < bValue) return sortOrder.value === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortOrder.value === 'asc' ? 1 : -1;
-    return 0;
-  });
-});
-
+    const aValue = a[sortKey.value as keyof typeof a]
+    const bValue = b[sortKey.value as keyof typeof b]
+    if (aValue < bValue) return sortOrder.value === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortOrder.value === 'asc' ? 1 : -1
+    return 0
+  })
+})
 </script>
+
+<template>
+  <div>
+    <h4>Statistics for {{ selectedParams[0] }}</h4>
+    <table v-if="frequencyData.length" class="fancy-table">
+      <thead>
+        <tr>
+          <th v-for="(value, key) in frequencyData[0]" :key="key" @click="sortTable(String(key))">
+            <div class="header-content">
+              <span>{{ key }}</span>
+              <span v-if="sortKey === key">
+                <i class="material-icons">{{
+                  sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'
+                }}</i>
+              </span>
+              <span v-else>
+                <i class="material-icons">sort</i>
+              </span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
+          <td v-for="(value, key) in item" :key="key">
+            {{ Array.isArray(value) ? value.join(', ') : value }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p v-else>No data available. Please select a parameter.</p>
+    <div v-if="frequencyData.length" class="pagination">
+      <button @click="firstPage" :disabled="currentPage === 1">
+        <i class="material-icons">first_page</i>
+      </button>
+      <button @click="prevPage" :disabled="currentPage === 1">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <span>{{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        <i class="material-icons">chevron_right</i>
+      </button>
+      <button @click="lastPage" :disabled="currentPage === totalPages">
+        <i class="material-icons">last_page</i>
+      </button>
+      <label for="itemsPerPage">Items per page:</label>
+      <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
+        <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .fancy-table {

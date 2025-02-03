@@ -1,45 +1,12 @@
-<template>
-  <div  ref="dropdownContainer">
-    <div class="data-selection">
-      <span>Select Datasets</span>
-      <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
-        <div class="dropdown-toggle" @click="toggleDropdown">
-          {{ selectedKeys.length === 1 ? 'Dataset' : 'Datasets' }} selected ({{
-            selectedKeys.length
-          }}
-          of {{ totalDatasets }})
-        </div>
-        <div class="dropdown-menu" v-if="isDropdownOpen">
-          <label v-for="(dataset, key, index) in datasets" :key="key + index" class="dropdown-item">
-            <input type="checkbox" :value="key" v-model="selectedKeys" @change="selectDataset" />
-            {{ key }}
-          </label>
-        </div>
-      </div>
-    </div>
-    <div class="search-container">
-      <span>Search</span>
-      <input type="text" v-model="searchQuery" placeholder="Search data..." class="search-input" />
-    </div>
-    <div class="dropdown" :class="{ 'dropdown-open': isDropdownKeysOpen }">
-      <span>Select parameter for Statistics</span>
-      <div class="dropdown-toggle" @click="toggleDropdownKeys">
-        <span v-if="selectedParams.length === 0">No parameters selected</span>
-        <span v-else>{{ selectedParams.join(', ') }}</span>
-      </div>
-      <div class="dropdown-menu" v-if="isDropdownKeysOpen">
-        <label v-for="(value, key) in selectedDataset[0]" :key="key" class="dropdown-item">
-          <input type="checkbox" :value="key" v-model="selectedParams" />
-          {{ key }}
-        </label>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue'
-import { selectedDataset, datasets, searchQuery, selectedParams, datasetKeys } from '../stores/store'
+import {
+  selectedDataset,
+  datasets,
+  searchQuery,
+  selectedParams,
+  datasetKeys,
+} from '../stores/store'
 
 const selectedKeys = ref<(keyof typeof datasets)[]>([])
 const isDropdownOpen = ref(false)
@@ -84,6 +51,45 @@ const selectDataset = () => {
   updateSelectedDataset()
 }
 </script>
+
+<template>
+  <div ref="dropdownContainer">
+    <div class="data-selection">
+      <span>Select Datasets</span>
+      <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
+        <div class="dropdown-toggle" @click="toggleDropdown">
+          {{ selectedKeys.length === 1 ? 'Dataset' : 'Datasets' }} selected ({{
+            selectedKeys.length
+          }}
+          of {{ totalDatasets }})
+        </div>
+        <div class="dropdown-menu" v-if="isDropdownOpen">
+          <label v-for="(dataset, key, index) in datasets" :key="key + index" class="dropdown-item">
+            <input type="checkbox" :value="key" v-model="selectedKeys" @change="selectDataset" />
+            {{ key }}
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="search-container">
+      <span>Search</span>
+      <input type="text" v-model="searchQuery" placeholder="Search data..." class="search-input" />
+    </div>
+    <div class="dropdown" :class="{ 'dropdown-open': isDropdownKeysOpen }">
+      <span>Select parameter for Statistics</span>
+      <div class="dropdown-toggle" @click="toggleDropdownKeys">
+        <span v-if="selectedParams.length === 0">No parameters selected</span>
+        <span v-else>{{ selectedParams.join(', ') }}</span>
+      </div>
+      <div class="dropdown-menu" v-if="isDropdownKeysOpen">
+        <label v-for="(value, key) in selectedDataset[0]" :key="key" class="dropdown-item">
+          <input type="checkbox" :value="key" v-model="selectedParams" />
+          {{ key }}
+        </label>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .search-container {

@@ -1,34 +1,33 @@
 <script setup lang="ts">
-import { activeTab, selectedDataset } from '../stores/store'
+import { activeTab, selectedDataset, datasetKeys } from '../stores/store'
 import DataSelection from '@/components/DataSelection.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import GraphView from '@/components/GraphView.vue'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { datasetKeys } from '../stores/store'
 
 const setActiveTab = (tab: string) => {
   activeTab.value = tab
 }
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
 onMounted(() => {
-  const dataset = route.query.lex as string;
+  const dataset = route.query.lex as string
   if (dataset) {
-    datasetKeys.value = dataset.split(',');
+    datasetKeys.value = dataset.split(',')
   }
-});
+})
 
 watch(datasetKeys, (newDataset) => {
   if (newDataset.length === 0) {
-    router.push({ query: {} });
-  } else  {
-  router.push({ query: { lex: newDataset.join(',') } });
+    router.push({ query: {} })
+  } else {
+    router.push({ query: { lex: newDataset.join(',') } })
   }
-});
+})
 </script>
 
 <template>
@@ -48,7 +47,7 @@ watch(datasetKeys, (newDataset) => {
           Graph
         </button>
       </div>
-      <TableView />
+      <TableView v-if="activeTab === 'table'" />
       <StatisticsView v-if="activeTab === 'statistics'" />
       <GraphView v-if="activeTab === 'graph'" />
     </div>
