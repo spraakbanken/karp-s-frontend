@@ -5,7 +5,15 @@
   "menu.sv": "Svenska",
   "menu.en": "Engelska",
   "footer.help": "Kontakt",
-  "Footer.about.title": "Fler resurser",
+  "footer.about.title": "Fler resurser",
   "footer.about": "Språkbankens växande samling av forskningsdata kan du se på sidan {0} på vår webbplats. I ett större perspektiv bildar Språkbanken en del av CLARIN ERIC, vars samlade data kan utforskas i {1}.",
-  "footer.about.sbdata.title": "Språkbanken Text: Data"
+  "footer.about.sbdata.title": "Språkbanken Text: Datamängder",
+  "about.about.title": "Om",
+  "about.about.text": "Karp-S är Språkbankens datapubliceringsplatform.",
+  "about.examples.title": "Sökexempel",
+  "about.examples.text": "Exampel kommer snart.",
+  "about.additions.title": "Senaste tillägg",
+  "about.additions.text": "Senaste tillägg:",
+  "about.news.title": "Nyheter",
+  "about.news.text": "Senaste nytt:"
 }

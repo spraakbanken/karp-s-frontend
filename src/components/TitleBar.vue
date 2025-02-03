@@ -1,25 +1,34 @@
 <script setup lang="ts">
 import MenuBar from './MenuBar.vue'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 
-const logoKarp = ref('');
-const logoSB = ref('');
-const logoGU = ref('');
-const logoKarpEn = ref('');
+const logoKarp = ref('')
+const logoSB = ref('')
+const logoGU = ref('')
+const logoKarpEn = ref('')
 
 const updateTheme = async () => {
-  const theme = document.documentElement.getAttribute('data-theme');
-  const isDarkMode = theme === 'dark';
-  logoKarp.value = isDarkMode ? (await import('@/assets/karps_slogan_sv_dark_theme.svg')).default : (await import('@/assets/karps_slogan_sv_light_theme.svg')).default;
-  logoSB.value = isDarkMode ? (await import('@/assets/sprakbanken_text_dark_theme.svg')).default : (await import('@/assets/sprakbanken_text_light_theme.svg')).default;
-  logoGU.value = isDarkMode ? (await import('@/assets/gu-sv.svg')).default : (await import('@/assets/gu-sv.svg')).default;
-  logoKarpEn.value = isDarkMode ? (await import('@/assets/karps_slogan_en_dark_theme.svg')).default : (await import('@/assets/karps_slogan_en_light_theme.svg')).default;
-};
+  const theme = document.documentElement.getAttribute('data-theme')
+  const isDarkMode = theme === 'dark'
+  logoKarp.value = isDarkMode
+    ? (await import('@/assets/karps_slogan_sv_dark_theme.svg')).default
+    : (await import('@/assets/karps_slogan_sv_light_theme.svg')).default
+  logoSB.value = isDarkMode
+    ? (await import('@/assets/sprakbanken_text_dark_theme.svg')).default
+    : (await import('@/assets/sprakbanken_text_light_theme.svg')).default
+  logoGU.value = isDarkMode
+    ? (await import('@/assets/gu-sv.svg')).default
+    : (await import('@/assets/gu-sv.svg')).default
+  logoKarpEn.value = isDarkMode
+    ? (await import('@/assets/karps_slogan_en_dark_theme.svg')).default
+    : (await import('@/assets/karps_slogan_en_light_theme.svg')).default
+}
 
 onMounted(() => {
-  updateTheme();
-  const observer = new MutationObserver(updateTheme);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });});
+  updateTheme()
+  const observer = new MutationObserver(updateTheme)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+})
 </script>
 
 <template>
@@ -31,9 +40,9 @@ onMounted(() => {
         </div>
         <div v-else>
           <img :src="logoKarpEn" alt="Karp-S logo" width="300" />
+        </div>
       </div>
     </div>
-  </div>
     <div class="right-area">
       <div class="middle-area">
         <div class="sb-box">

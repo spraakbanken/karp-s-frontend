@@ -11,8 +11,8 @@
     </div>
     <div>
       <p>
-        <strong>{{ $t('footer.otherdata.title') }}</strong>
-        {{ ' ' }}
+        <strong>{{ $t('footer.about.title') }}</strong>
+        {{ '. ' }}
         <i18n-t keypath="footer.about" scope="global">
           <a href="https://spraakbanken.gu.se/en/resources" :title="$t('footer.about.sbdata.title')"
             >Data</a
@@ -55,6 +55,11 @@
     padding: 2rem;
     box-sizing: border-box;
   }
+}
+
+strong {
+  font-weight: bold;
+  float: left;
 }
 
 .footer-area a {
