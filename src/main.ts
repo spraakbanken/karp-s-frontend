@@ -31,7 +31,8 @@ const app = createApp(App)
 // Use the Matomo plugin only if configured in env.
 if (import.meta.env.VITE_MATOMO_URL && import.meta.env.VITE_MATOMO_ID) {
   app.use(VueMatomo, {
-    host: import.meta.env.VITE_MATOMO_URL,
+    // URL expected without trailing slash
+    host: import.meta.env.VITE_MATOMO_URLL.replace(/\/$/, ""),
     siteId: import.meta.env.VITE_MATOMO_ID,
     router: router,
   })

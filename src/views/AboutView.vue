@@ -1,5 +1,6 @@
 <script lang="ts">
 import AdditionsList from '@/components/AdditionsList.vue'
+
 import NewsList from '@/components/NewsList.vue'
 </script>
 
