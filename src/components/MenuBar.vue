@@ -3,10 +3,15 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
+import { useUser } from '@/stores/store'
+
+// sync locale in usestore and i18n
+const userStore = useUser()
 const { locale } = useI18n()
 
-const changeLanguage = (lang: string) => {
-  locale.value = lang
+function ChangeLocale(aLocale: string) {
+  userStore.setLocale(aLocale)
+  locale.value = aLocale
 }
 
 const themeCurrent = ref('light')
@@ -42,8 +47,8 @@ onMounted(() => {
         <button class="nav-button">{{ $t('menu.' + locale) }}</button>
       </div>
       <div class="dropdown-content">
-        <a href="#" @click.prevent="changeLanguage('en')">{{ $t('menu.en') }}</a>
-        <a href="#" @click.prevent="changeLanguage('sv')">{{ $t('menu.sv') }}</a>
+        <a href="#" @click.prevent="ChangeLocale('en')">{{ $t('menu.en') }}</a>
+        <a href="#" @click.prevent="ChangeLocale('sv')">{{ $t('menu.sv') }}</a>
       </div>
     </div>
   </nav>

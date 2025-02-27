@@ -1,6 +1,5 @@
-<script lang="ts">
+<script setup lang="ts">
 import AdditionsList from '@/components/AdditionsList.vue'
-
 import NewsList from '@/components/NewsList.vue'
 </script>
 
@@ -37,7 +36,6 @@ import NewsList from '@/components/NewsList.vue'
         <!-- News -->
         <div>
           <h2>{{ $t('about.news.title') }}</h2>
-          <p>{{ $t('about.news.text') }}</p>
           <div class="news">
             <NewsList />
           </div>
@@ -73,7 +71,6 @@ import NewsList from '@/components/NewsList.vue'
   }
 
   .news {
-    margin-top: 1rem;
   }
 }
 </style>

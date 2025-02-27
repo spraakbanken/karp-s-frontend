@@ -1,7 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { useUser } from '@/stores/store'
+
+// update activeLocale in store
+const userStore = useUser()
+const { activeLocale } = storeToRefs(userStore)
+</script>
 
 <template>
   <div class="language-switcher">
+    current locale: {{ activeLocale }}
     <select v-model="$i18n.locale">
       <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">
         {{ locale }}

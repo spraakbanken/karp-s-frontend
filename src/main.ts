@@ -32,7 +32,7 @@ const app = createApp(App)
 if (import.meta.env.VITE_MATOMO_URL && import.meta.env.VITE_MATOMO_ID) {
   app.use(VueMatomo, {
     // URL expected without trailing slash
-    host: import.meta.env.VITE_MATOMO_URLL.replace(/\/$/, ""),
+    host: import.meta.env.VITE_MATOMO_URL.replace(/\/$/, ''),
     siteId: import.meta.env.VITE_MATOMO_ID,
     router: router,
   })

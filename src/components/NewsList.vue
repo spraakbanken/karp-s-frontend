@@ -1,48 +1,66 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-//import useLocale from '@/i18n/locale.composable'
 import { fetchNews, type NewsItem } from '@/api/news.service'
-import LayoutSection from '@/components/LayoutSection.vue'
+import type { ByLang } from '@/util.types'
+import { useI18n } from 'vue-i18n'
 
-//const { locale, th } = useLocale()
+const { locale } = useI18n()
 const items = reactive<NewsItem[]>([])
 
+// Get news from newsdesk repository
 onMounted(async () => {
   try {
     const items_ = await fetchNews(false)
-    items.push(...items_.filter((item) => !item.tags?.includes('featured')))
+    items.push(...items_)
   } catch (error) {
     console.error('Could not fetch and parse news', error)
   }
 })
 
+// Format date according to locale
 function getDate(date: Date) {
-  return date.toLocaleDateString('sv', { dateStyle: 'long' })
-  //  return date.toLocaleDateString(locale.value, { dateStyle: 'long' })
+  return date.toLocaleDateString(locale.value, { dateStyle: 'long' })
+}
+
+// Return propeer text according to locale
+function th(x?: ByLang | string): string | undefined {
+  if (typeof x == 'string') return x
+  if (locale.value == 'en') {
+    return x['eng']
+  } else {
+    return x['swe']
+  }
 }
 </script>
 
 <template>
-  <p>test</p>
-  <LayoutSection v-if="items.length" :title="$t('news')" class="text-center">
-    <div v-if="items.length" class="flex flex-wrap justify-center gap-4 text-sm text-start">
-      <article
-        v-for="(item, i) in items"
-        :key="i"
-        class="w-96 bg-white dark:bg-zinc-800 shadow-sm p-2 px-3 my-2"
-      >
-        <header class="mb-2">
-          <!--           <h3 class="font-semibold">{{ th(item.title) }}</h3>
- -->
-          <h3 class="font-semibold">{{ item.title }}</h3>
-          <time :datetime="item.created.toString()" class="block text-sm italic">
-            {{ getDate(item.created) }}
-          </time>
-        </header>
-
-        <!-- <div class="prose" v-html="th(item.body)"></div> -->
-        <div class="prose" v-html="item.body"></div>
-      </article>
-    </div>
-  </LayoutSection>
+  <div v-if="items.length">
+    <article v-for="(item, i) in items" :key="i" class="newsarticle">
+      <header class="">
+        <h3 class="newstitle">{{ th(item.title) }}</h3>
+        <time :datetime="item.created.toString()" class="newsdate">
+          {{ getDate(item.created) }}
+        </time>
+      </header>
+      <div class="newsbody" v-html="th(item.body)"></div>
+    </article>
+  </div>
 </template>
+
+<style scoped>
+@media (min-width: 1024px) {
+  .newsarticle {
+    margin-bottom: 0.5rem;
+  }
+
+  .newstitle {
+  }
+
+  .newsdate {
+    font-style: italic;
+  }
+
+  .newsbody {
+  }
+}
+</style>
