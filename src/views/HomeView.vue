@@ -60,7 +60,6 @@ watch(datasetKeys, (newDataset) => {
   grid-template-columns: 350px 1fr;
   gap: 1rem;
   padding: 0 1rem;
-  height: 100vh;
 }
 
 .column {

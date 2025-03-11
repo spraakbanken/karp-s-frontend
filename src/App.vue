@@ -5,15 +5,18 @@ import FooterView from './components/FooterView.vue'
 </script>
 
 <template>
-  <header>
-    <TitleBar />
-  </header>
+  <div class="wrapper">
+    <header>
+      <TitleBar />
+    </header>
 
-  <RouterView />
-
-  <footer>
-    <FooterView />
-  </footer>
+    <div class="main">
+      <RouterView />
+    </div>
+    <footer>
+      <FooterView />
+    </footer>
+  </div>
 </template>
 
 <style scoped>
@@ -23,15 +26,19 @@ header {
 }
 
 footer {
-  line-height: 1.5;
-  max-height: 100vh;
+  height: 150px;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+.main {
+  flex: 1;
+}
+/*
 @media (min-width: 1024px) {
   header {
     display: flex;
@@ -58,4 +65,5 @@ footer {
     margin-top: 1rem;
   }
 }
+*/
 </style>
