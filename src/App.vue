@@ -23,6 +23,7 @@ import FooterView from './components/FooterView.vue'
 header {
   line-height: 1.5;
   max-height: 100vh;
+  border-bottom: 2px solid var(--border-color);
 }
 
 footer {
