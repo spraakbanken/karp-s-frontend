@@ -1,61 +1,38 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { selectedDataset, selectedParams } from '@/stores/store'
+import { computed, ref, watch } from 'vue'
+import { lexicalStore } from '@/stores/store'
+import type { Dataset } from '@/types/datasetConfig'
+import { getStatisticsData } from '@/api/apiService'
+import type { paramConfig } from '@/types/parameterPosition'
 
-const dataset = computed(() => selectedDataset.value)
+const lexicalStorage = lexicalStore()
 
+const currentResult = ref<Dataset[]>([])
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 
-const selectedParam = computed(() => selectedParams.value[0])
-
-const paramValues = computed(() => {
-  if (dataset.value.length === 0 || !selectedParam.value) {
-    return []
-  }
-
-  return dataset.value.flatMap((item) => {
-    const value = item[selectedParam.value]
-    if (Array.isArray(value)) {
-      return value
-    } else if (value) {
-      return [value]
+watch(
+  () => [lexicalStorage.activeParameters, lexicalStorage.selectedColumns],
+  async ([newParams, newColumns]) => {
+    if (newParams || newColumns) {
+      try {
+        const data = await getStatisticsData(newParams as Record<string, paramConfig>, newColumns as string[]);
+        currentResult.value = data;
+        // console.log('currentResult', currentResult.value);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     } else {
-      return []
+      currentResult.value = [];
     }
-  })
-})
-
-const calculateFrequency = (arr: string[]) => {
-  const frequencyMap = arr.reduce(
-    (acc, item) => {
-      acc[item] = (acc[item] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
-
-  return Object.entries(frequencyMap).map(([value, frequency]) => ({ value, frequency }))
-}
-
-const frequencyData = computed(() => {
-  if (paramValues.value.length === 0) {
-    return []
-  }
-
-  return calculateFrequency(paramValues.value)
-})
-
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return sortedData.value.slice(start, end)
-})
+  },
+  { deep: true }
+);
 
 const totalPages = computed(() => {
-  return Math.ceil(frequencyData.value.length / itemsPerPage.value)
+  return Math.ceil(currentResult.value.length / itemsPerPage.value)
 })
 
 const prevPage = () => {
@@ -88,24 +65,14 @@ const sortTable = (key: string) => {
   }
 }
 
-const sortedData = computed(() => {
-  return frequencyData.value.slice().sort((a, b) => {
-    const aValue = a[sortKey.value as keyof typeof a]
-    const bValue = b[sortKey.value as keyof typeof b]
-    if (aValue < bValue) return sortOrder.value === 'asc' ? -1 : 1
-    if (aValue > bValue) return sortOrder.value === 'asc' ? 1 : -1
-    return 0
-  })
-})
 </script>
 
 <template>
   <div>
-    <h4>Statistics for {{ selectedParams[0] }}</h4>
-    <table v-if="frequencyData.length" class="fancy-table">
+    <table v-if="currentResult.length" class="fancy-table">
       <thead>
         <tr>
-          <th v-for="(value, key) in frequencyData[0]" :key="key" @click="sortTable(String(key))">
+          <th v-for="(value, key) in currentResult[0]" :key="key" @click="sortTable(String(key))">
             <div class="header-content">
               <span>{{ key }}</span>
               <span v-if="sortKey === key">
@@ -121,7 +88,7 @@ const sortedData = computed(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
+        <tr v-for="(item, index) in currentResult" :key="item + '-' + index">
           <td v-for="(value, key) in item" :key="key">
             {{ Array.isArray(value) ? value.join(', ') : value }}
           </td>
@@ -129,7 +96,7 @@ const sortedData = computed(() => {
       </tbody>
     </table>
     <p v-else>No data available. Please select a parameter.</p>
-    <div v-if="frequencyData.length" class="pagination">
+    <div v-if="currentResult.length" class="pagination">
       <button @click="firstPage" :disabled="currentPage === 1">
         <i class="material-icons">first_page</i>
       </button>

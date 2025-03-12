@@ -3,10 +3,10 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
-import { useUser } from '@/stores/store'
+import { lexicalStore } from '@/stores/store'
 
 // sync locale in usestore and i18n
-const userStore = useUser()
+const userStore = lexicalStore()
 const { locale } = useI18n()
 
 function ChangeLocale(aLocale: string) {
