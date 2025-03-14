@@ -48,9 +48,11 @@ export const lexicalStore = defineStore('dataset', {
   actions: {
     setDefault(config: KarpsConfig[]) {
       this.datasetKeys = config.map((c) => c.resourceId)
-      this.lexicalLabels = config.map((c) => ({ [c.resourceId]: c.label })).reduce((acc, obj) => {
-        return { ...acc, ...obj }
-      }, {})
+      this.lexicalLabels = config
+        .map((c) => ({ [c.resourceId]: c.label }))
+        .reduce((acc, obj) => {
+          return { ...acc, ...obj }
+        }, {})
       // console.log('lexicalLabels', this.lexicalLabels)
       this.totalDatasets = config.length
       this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
@@ -83,10 +85,10 @@ export const lexicalStore = defineStore('dataset', {
       if (keys.length === 1) {
         this.currentParams = keys.flatMap((k) => this.paramsInDatasets[k])
       } else {
-        const allParamsArray = keys.map((key) => this.paramsInDatasets[key]);
+        const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
         this.currentParams = allParamsArray.reduce((acc, params) => {
-          return acc.filter((param) => params.includes(param));
-        });
+          return acc.filter((param) => params.includes(param))
+        })
       }
       // console.log('currentParams', this.currentParams)
     },
@@ -95,6 +97,10 @@ export const lexicalStore = defineStore('dataset', {
     },
     setParameters(params: Record<string, paramConfig>) {
       this.activeParameters = params
-    }
+    },
+    setEmpty() {
+      this.selectedDatasets = []
+      this.setActiveTab('table')
+    },
   },
 })

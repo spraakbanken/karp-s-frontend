@@ -67,17 +67,17 @@ const updateColumns = () => {
 watch(selectedParams, (newParams) => {
   newParams.forEach((param) => {
     if (!parameters.value[param]) {
-      parameters.value[param] = { value: '', position: 'equals' };
+      parameters.value[param] = { value: '', position: 'equals' }
     }
-  });
+  })
 
   Object.keys(parameters.value).forEach((param) => {
     if (!newParams.includes(param)) {
-      delete parameters.value[param];
+      delete parameters.value[param]
     }
-  });
+  })
   // console.log('parameters', parameters.value)
-});
+})
 </script>
 
 <template>
@@ -124,23 +124,27 @@ watch(selectedParams, (newParams) => {
     <div v-for="param in selectedParams" :key="param" class="search-container">
       <span :for="param">{{ param }}</span>
       <div class="input-group">
-      <select v-model="parameters[param].position">
-        <option value="" disabled>Select position</option>
-        <option v-for="position in ParameterPosition" :key="position" :value="position">
-          {{ position }}
-        </option>
-      </select>
-      <input
-      class="search-input"
-        type="text"
-        :id="param"
-        v-model="parameters[param].value"
-        placeholder="Enter value"
-        @change="updateData"
-      />
+        <select v-model="parameters[param].position">
+          <option value="" disabled>Select position</option>
+          <option v-for="position in ParameterPosition" :key="position" :value="position">
+            {{ position }}
+          </option>
+        </select>
+        <input
+          class="search-input"
+          type="text"
+          :id="param"
+          v-model="parameters[param].value"
+          placeholder="Enter value"
+          @change="updateData"
+        />
       </div>
     </div>
-    <div class="dropdown" v-if="lexicalStorage.activeTab === 'statistics'" :class="{ 'dropdown-open': isDropdownColumns }">
+    <div
+      class="dropdown"
+      v-if="lexicalStorage.activeTab === 'statistics'"
+      :class="{ 'dropdown-open': isDropdownColumns }"
+    >
       <span>Select columns for Statistics</span>
       <div class="dropdown-toggle" @click="toggleDropdownColumns">
         <span v-if="selectedColumns.length === 0">No columns selected</span>
@@ -148,7 +152,7 @@ watch(selectedParams, (newParams) => {
       </div>
       <div class="dropdown-menu" v-if="isDropdownColumns">
         <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
-          <input type="checkbox" :value="param" v-model="selectedColumns" @change="updateColumns"/>
+          <input type="checkbox" :value="param" v-model="selectedColumns" @change="updateColumns" />
           {{ param }}
         </label>
       </div>

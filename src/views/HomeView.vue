@@ -4,10 +4,10 @@ import DataSelection from '@/components/DataSelection.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import GraphView from '@/components/GraphView.vue'
-import { onMounted, ref, computed} from 'vue'
+import { onMounted, ref, computed } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 
-import { getLexicalDatasets } from '@/api/apiService';
+import { getLexicalDatasets } from '@/api/apiService'
 
 const lexicalStorage = lexicalStore()
 
@@ -21,11 +21,12 @@ onMounted(async () => {
   }
 })
 
-const selectedDataset = computed(() => lexicalStorage.selectedDatasets);
+const selectedDataset = computed(() => lexicalStorage.selectedDatasets)
+
 const activeTab = ref(lexicalStorage.activeTab)
 
 const setActiveTab = (tab: string) => {
- lexicalStorage.setActiveTab(tab)
+  lexicalStorage.setActiveTab(tab)
   activeTab.value = tab
 }
 
@@ -96,7 +97,7 @@ const setActiveTab = (tab: string) => {
   margin-bottom: 0rem;
   border-bottom: 2px solid var(--border-color);
   padding-left: 1rem;
-  padding-top: 0.5rem
+  padding-top: 0.5rem;
 }
 
 .tabs button {
