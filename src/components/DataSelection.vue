@@ -83,13 +83,17 @@ watch(selectedParams, (newParams) => {
 <template>
   <div ref="dropdownContainer">
     <div class="data-selection">
-      <span>Select Datasets</span>
+      <span>{{ $t('dataselector.datasets') }}</span>
       <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
         <div class="dropdown-toggle" @click="toggleDropdown">
-          {{ selectedKeys.length === 1 ? 'Dataset' : 'Datasets' }} selected ({{
-            selectedKeys.length
+          {{
+            selectedKeys.length === 1
+              ? $t('dataselector.dataset.selected')
+              : $t('dataselector.datasets.selected')
           }}
-          of {{ totalDatasets }})
+          ({{ selectedKeys.length }}
+          {{ $t('dataselector.datasets.selected.of') }}
+          {{ totalDatasets }})
         </div>
         <div class="dropdown-menu" v-if="isDropdownOpen">
           <label v-for="dataset in currentDatasets" :key="dataset" class="dropdown-item">
@@ -109,9 +113,9 @@ watch(selectedParams, (newParams) => {
       <input type="text" v-model="searchQuery" placeholder="Search data..." class="search-input" />
     </div> -->
     <div class="dropdown" :class="{ 'dropdown-open': isDropdownParams }">
-      <span>Select parameter/parameters</span>
+      <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
-        <span v-if="selectedParams.length === 0">No parameters selected</span>
+        <span v-if="selectedParams.length === 0">{{ $t('dataselector.noparameters') }}</span>
         <span v-else>{{ selectedParams.join(', ') }}</span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
@@ -125,7 +129,7 @@ watch(selectedParams, (newParams) => {
       <span :for="param">{{ param }}</span>
       <div class="input-group">
         <select v-model="parameters[param].position">
-          <option value="" disabled>Select position</option>
+          <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
           <option v-for="position in ParameterPosition" :key="position" :value="position">
             {{ position }}
           </option>
@@ -135,7 +139,7 @@ watch(selectedParams, (newParams) => {
           type="text"
           :id="param"
           v-model="parameters[param].value"
-          placeholder="Enter value"
+          :placeholder="$t('dataselector.parameters.placeholder')"
           @change="updateData"
         />
       </div>
@@ -145,9 +149,11 @@ watch(selectedParams, (newParams) => {
       v-if="lexicalStorage.activeTab === 'statistics'"
       :class="{ 'dropdown-open': isDropdownColumns }"
     >
-      <span>Select columns for Statistics</span>
+      <span>{{ $t('dataselector.statistics.columns') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownColumns">
-        <span v-if="selectedColumns.length === 0">No columns selected</span>
+        <span v-if="selectedColumns.length === 0">{{
+          $t('dataselector.statistics.nocolumns')
+        }}</span>
         <span v-else>{{ selectedColumns.join(', ') }}</span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownColumns">

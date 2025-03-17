@@ -56,10 +56,10 @@ const setActiveTab = (tab: string) => {
     <div class="column-right">
       <div class="tabs" v-if="selectedDataset.length">
         <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
-          Tables
+          {{ $t('tab.tables') }}
         </button>
         <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
-          Statistics
+          {{ $t('tab.statistics') }}
         </button>
         <!-- <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
           Graph

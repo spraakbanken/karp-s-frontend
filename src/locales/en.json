@@ -16,5 +16,16 @@
   "about.additions.text": "Latest additions:",
   "about.news.title": "News",
   "about.news.text": "Latest news:",
+  "tab.tables": "Tables",
+  "tab.statistics": "Statistics",
+  "dataselector.datasets": "Select datasets",
+  "dataselector.dataset.selected": "Dataset selected",
+  "dataselector.datasets.selected": "Datasets selected",
+  "dataselector.datasets.selected.of": "of",
+  "dataselector.parameters": "Select parameter(s)",
+  "dataselector.parameters.placeholder": "Enter value",
+  "dataselector.noparameters": "No parameters selected",
+  "dataselector.statistics.columns": "Select columns for statistics",
+  "dataselector.statistics.nocolumns": "No columns selected",
   "statistics.exportCSV": "Export CSV"
 }

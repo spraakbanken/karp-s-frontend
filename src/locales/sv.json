@@ -16,5 +16,17 @@
   "about.additions.text": "Senaste tillägg:",
   "about.news.title": "Nyheter",
   "about.news.text": "Senaste nytt:",
+  "tab.tables": "Tabeller",
+  "tab.statistics": "Statistik",
+  "dataselector.datasets": "Välj datamängder",
+  "dataselector.dataset.selected": "Vald datamängd",
+  "dataselector.datasets.selected": "Valda datamängder",
+  "dataselector.datasets.selected.of": "av",
+  "dataselector.parameters": "Välj parameter",
+  "dataselector.parameters.position": "Välj position",
+  "dataselector.parameters.placeholder": "Ange ett värde",
+  "dataselector.noparameters": "Inga parametrar valda",
+  "dataselector.statistics.columns": "Välj kolumner för statistik",
+  "dataselector.statistics.nocolumns": "Inga kolumner valda",
   "statistics.exportCSV": "Exportera CSV"
 }
