@@ -15,5 +15,6 @@
   "about.additions.title": "Latest additions",
   "about.additions.text": "Latest additions:",
   "about.news.title": "News",
-  "about.news.text": "Latest news:"
+  "about.news.text": "Latest news:",
+  "statistics.exportCSV": "Export CSV"
 }

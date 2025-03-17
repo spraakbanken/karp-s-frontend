@@ -4,6 +4,7 @@ import { lexicalStore } from '@/stores/store'
 import type { Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import type { paramConfig } from '@/types/parameterPosition'
+import type { forEach } from 'es-toolkit/compat'
 
 const lexicalStorage = lexicalStore()
 
@@ -16,20 +17,23 @@ const sortOrder = ref<'asc' | 'desc'>('asc')
 watch(
   () => [lexicalStorage.activeParameters, lexicalStorage.selectedColumns],
   async ([newParams, newColumns]) => {
-    if (newParams || newColumns) {
+    if (newParams || newColumns) {
       try {
-        const data = await getStatisticsData(newParams as Record<string, paramConfig>, newColumns as string[]);
-        currentResult.value = data;
+        const data = await getStatisticsData(
+          newParams as Record<string, paramConfig>,
+          newColumns as string[],
+        )
+        currentResult.value = data
         // console.log('currentResult', currentResult.value);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       }
     } else {
-      currentResult.value = [];
+      currentResult.value = []
     }
   },
-  { deep: true }
-);
+  { deep: true },
+)
 
 const totalPages = computed(() => {
   return Math.ceil(currentResult.value.length / itemsPerPage.value)
@@ -65,10 +69,40 @@ const sortTable = (key: string) => {
   }
 }
 
+/*
+  Export current statistics to CSV with header
+*/
+function exportCSV() {
+  let csv = ''
+
+  // write headers
+  for (const title in currentResult.value[0]) {
+    csv += title + ','
+  }
+  csv += '\n'
+  // write data
+  for (const row in currentResult.value) {
+    const value = currentResult.value[row]
+    //{{ Array.isArray(value) ? value.join(', ') : value }}
+    for (const key in value) {
+      csv += value[key] + ','
+    }
+    csv += '\n'
+  }
+  // save as file
+  const anchor = document.createElement('a')
+  anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv)
+  anchor.target = '_blank'
+  anchor.download = 'karp-s-export.csv'
+  anchor.click()
+}
 </script>
 
 <template>
   <div>
+    <div v-if="currentResult.length">
+      <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
+    </div>
     <table v-if="currentResult.length" class="fancy-table">
       <thead>
         <tr>
@@ -95,7 +129,7 @@ const sortTable = (key: string) => {
         </tr>
       </tbody>
     </table>
-    <p v-else>No data available. Please select a parameter.</p>
+    <p v-else class="message">No data available. Please select a parameter.</p>
     <div v-if="currentResult.length" class="pagination">
       <button @click="firstPage" :disabled="currentPage === 1">
         <i class="material-icons">first_page</i>
@@ -152,6 +186,14 @@ th {
 .header-content span {
   display: flex;
   align-items: center;
+}
+
+.export-button {
+  margin: 0.5rem;
+}
+
+.message {
+  margin: 0.5rem;
 }
 
 tr:nth-child(even) {

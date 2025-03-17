@@ -15,5 +15,6 @@
   "about.additions.title": "Senaste tillägg",
   "about.additions.text": "Senaste tillägg:",
   "about.news.title": "Nyheter",
-  "about.news.text": "Senaste nytt:"
+  "about.news.text": "Senaste nytt:",
+  "statistics.exportCSV": "Exportera CSV"
 }
