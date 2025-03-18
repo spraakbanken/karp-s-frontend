@@ -23,6 +23,7 @@
   "dataselector.datasets.selected": "Datasets selected",
   "dataselector.datasets.selected.of": "of",
   "dataselector.parameters": "Select parameter(s)",
+  "dataselector.parameters.position": "Select position",
   "dataselector.parameters.placeholder": "Enter value",
   "dataselector.noparameters": "No parameters selected",
   "dataselector.statistics.columns": "Select columns for statistics",
