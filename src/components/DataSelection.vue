@@ -132,25 +132,18 @@ watch(
       <span>Search</span>
       <input type="text" v-model="searchQuery" placeholder="Search data..." class="search-input" />
     </div> -->
-<<<<<<< Updated upstream
-    <div class="dropdown" :class="{ 'dropdown-open': isDropdownParams }">
-      <span>{{ $t('dataselector.parameters') }}</span>
-      <div class="dropdown-toggle" @click="toggleDropdownParams">
-        <span v-if="selectedParams.length === 0">{{ $t('dataselector.noparameters') }}</span>
-=======
     <div
       class="dropdown"
       :class="{ 'dropdown-open': isDropdownParams, 'dropdown-disabled': selectedKeys.length === 0 }"
       :disabled="selectedKeys.length === 0"
     >
-      <span>Select parameter/parameters</span>
+<span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
         <span v-if="selectedKeys.length === 0">Select one or more datasets</span>
         <span v-else-if="paramsCollection.length === 0"
           >Selected dataset doesn't have parameters in common</span
         >
-        <span v-else-if="selectedParams.length === 0">No parameters selected</span>
->>>>>>> Stashed changes
+        <span v-else-if="selectedParams.length === 0">{{ $t('dataselector.noparameters') }}</span>
         <span v-else>{{ selectedParams.join(', ') }}</span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
@@ -184,10 +177,7 @@ watch(
       v-if="lexicalStorage.activeTab === 'statistics'"
       :class="{ 'dropdown-open': isDropdownColumns }"
     >
-<<<<<<< Updated upstream
-      <span>{{ $t('dataselector.statistics.columns') }}</span>
-=======
-      <span>Select parameter for Statistics</span>
+    <span>Select parameter for Statistics</span>
       <div class="dropdown-toggle" @click="toggleDropdownCompileParams">
         <span v-if="selectedCompileParams.length === 0">No columns selected</span>
         <span v-else>{{ selectedCompileParams.join(', ') }}</span>
@@ -204,8 +194,7 @@ watch(
       v-if="lexicalStorage.activeTab === 'statistics'"
       :class="{ 'dropdown-open': isDropdownColumns }"
     >
-      <span>Select columns for Statistics</span>
->>>>>>> Stashed changes
+      <span>{{ $t('dataselector.statistics.columns') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownColumns">
         <span v-if="selectedColumns.length === 0">{{
           $t('dataselector.statistics.nocolumns')

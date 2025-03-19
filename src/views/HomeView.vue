@@ -65,20 +65,6 @@ const setActiveTab = (tab: string) => {
       <DataSelection />
     </div>
     <div class="column-right">
-<<<<<<< Updated upstream
-      <div class="tabs" v-if="selectedDataset.length">
-        <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
-          {{ $t('tab.tables') }}
-        </button>
-        <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
-          {{ $t('tab.statistics') }}
-        </button>
-        <!-- <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
-          Graph
-        </button> -->
-      </div>
-=======
->>>>>>> Stashed changes
       <TableView v-if="activeTab === 'table'" />
       <StatisticsView v-if="activeTab === 'statistics'" />
       <GraphView v-if="activeTab === 'graph'" />
