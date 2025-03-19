@@ -7,14 +7,15 @@ const lexicalStorage = lexicalStore()
 
 const selectedKeys = ref(lexicalStorage.selectedDatasets)
 const currentDatasets = computed(() => lexicalStorage.datasetKeys)
-// const searchQuery = computed(() => lexicalStorage.searchQuery)
 const selectedParams = ref(lexicalStorage.selectedParams)
 const selectedColumns = ref(lexicalStorage.selectedColumns)
+const selectedCompileParams = ref(lexicalStorage.selectedCompileParams)
 const paramsCollection = computed(() => lexicalStorage.currentParams)
 const totalDatasets = computed(() => lexicalStorage.totalDatasets)
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
 const isDropdownColumns = ref(false)
+const isDropdownCompileParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
 const parameters = ref<Record<string, paramConfig>>({})
@@ -30,6 +31,10 @@ const toggleDropdownParams = () => {
 
 const toggleDropdownColumns = () => {
   isDropdownColumns.value = !isDropdownColumns.value
+}
+
+const toggleDropdownCompileParams = () => {
+  isDropdownCompileParams.value = !isDropdownCompileParams.value
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -64,6 +69,10 @@ const updateColumns = () => {
   lexicalStorage.setSelectedColumns(selectedColumns.value)
 }
 
+const updateCompileParams = () => {
+  lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
+}
+
 watch(selectedParams, (newParams) => {
   newParams.forEach((param) => {
     if (!parameters.value[param]) {
@@ -78,6 +87,17 @@ watch(selectedParams, (newParams) => {
   })
   // console.log('parameters', parameters.value)
 })
+
+watch(
+  () => paramsCollection.value,
+  (newParams) => {
+    if (newParams.length === 0) {
+      parameters.value = {}
+      selectedParams.value = []
+      updateData()
+    }
+  },
+)
 </script>
 
 <template>
@@ -112,10 +132,25 @@ watch(selectedParams, (newParams) => {
       <span>Search</span>
       <input type="text" v-model="searchQuery" placeholder="Search data..." class="search-input" />
     </div> -->
+<<<<<<< Updated upstream
     <div class="dropdown" :class="{ 'dropdown-open': isDropdownParams }">
       <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
         <span v-if="selectedParams.length === 0">{{ $t('dataselector.noparameters') }}</span>
+=======
+    <div
+      class="dropdown"
+      :class="{ 'dropdown-open': isDropdownParams, 'dropdown-disabled': selectedKeys.length === 0 }"
+      :disabled="selectedKeys.length === 0"
+    >
+      <span>Select parameter/parameters</span>
+      <div class="dropdown-toggle" @click="toggleDropdownParams">
+        <span v-if="selectedKeys.length === 0">Select one or more datasets</span>
+        <span v-else-if="paramsCollection.length === 0"
+          >Selected dataset doesn't have parameters in common</span
+        >
+        <span v-else-if="selectedParams.length === 0">No parameters selected</span>
+>>>>>>> Stashed changes
         <span v-else>{{ selectedParams.join(', ') }}</span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
@@ -149,7 +184,28 @@ watch(selectedParams, (newParams) => {
       v-if="lexicalStorage.activeTab === 'statistics'"
       :class="{ 'dropdown-open': isDropdownColumns }"
     >
+<<<<<<< Updated upstream
       <span>{{ $t('dataselector.statistics.columns') }}</span>
+=======
+      <span>Select parameter for Statistics</span>
+      <div class="dropdown-toggle" @click="toggleDropdownCompileParams">
+        <span v-if="selectedCompileParams.length === 0">No columns selected</span>
+        <span v-else>{{ selectedCompileParams.join(', ') }}</span>
+      </div>
+      <div class="dropdown-menu" v-if="isDropdownCompileParams">
+        <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
+          <input type="checkbox" :value="param" v-model="selectedCompileParams" @change="updateCompileParams" />
+          {{ param }}
+        </label>
+      </div>
+    </div>
+    <div
+      class="dropdown"
+      v-if="lexicalStorage.activeTab === 'statistics'"
+      :class="{ 'dropdown-open': isDropdownColumns }"
+    >
+      <span>Select columns for Statistics</span>
+>>>>>>> Stashed changes
       <div class="dropdown-toggle" @click="toggleDropdownColumns">
         <span v-if="selectedColumns.length === 0">{{
           $t('dataselector.statistics.nocolumns')
@@ -186,6 +242,12 @@ watch(selectedParams, (newParams) => {
 
 .dropdown-open {
   border-color: var(--color-border-open);
+}
+
+.dropdown-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .dropdown-toggle {

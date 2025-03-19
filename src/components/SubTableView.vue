@@ -1,47 +1,53 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { Dataset } from '@/types/datasetConfig'
 import { lexicalStore } from '@/stores/store'
+import { getSubTableData } from '@/api/apiService'
 
 const lexicalStorage = lexicalStore()
 
 const props = defineProps<{
-  data: Dataset[];
-  lexicalKey: string;
+  data: Dataset[]
+  lexicalKey: string
+  totalHits: number
 }>()
 
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
-const sortKey = ref('')
-const sortOrder = ref<'asc' | 'desc'>('asc')
+const newData = ref<Dataset[]>([])
+const isLoading = ref(false)
 
-const sortedDataset = computed(() => {
-  if (!sortKey.value) return props.data
+const processNewData = async (items: number) => {
+  isLoading.value = true
+  const data = await getSubTableData('baseform', items, props.lexicalKey)
+  newData.value = data
+  isLoading.value = false
+}
 
-  return [...props.data].sort((a, b) => {
-    const aValue = a[sortKey.value]
-    const bValue = b[sortKey.value]
-
-    if (aValue === bValue) return 0
-
-    const order = sortOrder.value === 'asc' ? 1 : -1
-
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return aValue.localeCompare(bValue) * order
+watch(
+  () => [currentPage.value, itemsPerPage.value],
+  ([newPage, newItemsPerPage]) => {
+    const end = newPage * newItemsPerPage
+    if (end > 10) {
+      processNewData(end)
     }
-
-    return (aValue as number) > (bValue as number) ? 1 : -1 * order
-  })
-})
+  },
+  { immediate: true },
+)
 
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
-  return sortedDataset.value.slice(start, end)
+
+  if (end < 11) {
+    return props.data
+  } else {
+    return newData.value
+  }
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(props.data.length / itemsPerPage.value)
+  return Math.ceil(props.totalHits / itemsPerPage.value)
 })
 
 const firstPage = () => {
@@ -68,59 +74,51 @@ const lastPage = () => {
 <template>
   <div class="table-wrapper">
     <div class="tab">{{ lexicalStorage.lexicalLabels[props.lexicalKey] }}</div>
-  <table v-if="props.data.length" class="fancy-table">
-    <thead>
-      <tr>
-        <th v-for="(value, key) in props.data[0]" :key="key"> <!--  @click="sortTable(String(key)) -->
-          <div class="header-content">
-            <span>{{ key }}</span>
-            <!-- <span v-if="sortKey === key">
-              <i class="material-icons">{{
-                sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'
-              }}</i>
-            </span>
-            <span v-else>
-              <i class="material-icons">sort</i>
-            </span> -->
-          </div>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
-        <td v-for="(value, key) in item" :key="key">
-          {{ Array.isArray(value) ? value.join(', ') : value }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div v-if="props.data.length && props.data.length > 10" class="pagination">
-    <button @click="firstPage" :disabled="currentPage === 1">
-      <i class="material-icons">first_page</i>
-    </button>
-    <button @click="prevPage" :disabled="currentPage === 1">
-      <i class="material-icons">chevron_left</i>
-    </button>
-    <span>{{ currentPage }} of {{ totalPages }}</span>
-    <button @click="nextPage" :disabled="currentPage === totalPages">
-      <i class="material-icons">chevron_right</i>
-    </button>
-    <button @click="lastPage" :disabled="currentPage === totalPages">
-      <i class="material-icons">last_page</i>
-    </button>
-    <label for="itemsPerPage">Items per page:</label>
-    <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-      <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
-        {{ option }}
-      </option>
-    </select>
+    <table v-if="props.data.length" class="fancy-table">
+      <thead>
+        <tr>
+          <th v-for="(value, key) in props.data[0]" :key="key">
+            <div class="header-content">
+              <span>{{ key }}</span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
+          <td v-for="(value, key) in item" :key="key">
+            {{ Array.isArray(value) ? value.join(', ') : value }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div v-if="props.data.length" class="pagination">
+      <button @click="firstPage" :disabled="currentPage === 1">
+        <i class="material-icons">first_page</i>
+      </button>
+      <button @click="prevPage" :disabled="currentPage === 1">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <span>{{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">
+        <i class="material-icons">chevron_right</i>
+      </button>
+      <button @click="lastPage" :disabled="currentPage === totalPages">
+        <i class="material-icons">last_page</i>
+      </button>
+      <label for="itemsPerPage">Items per page:</label>
+      <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
+        <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
   </div>
-  </div>
-  </template>
+</template>
 
-  <style scoped>
-  .table-wrapper {
-    display: grid;
+<style scoped>
+.table-wrapper {
+  display: grid;
   position: relative;
   /* margin-top: 2rem; */
   padding: 1rem;
@@ -129,7 +127,7 @@ const lastPage = () => {
 .tab {
   display: inline-block;
   padding: 0.7rem 1rem;
-  background-color: rgb(241, 198, 167);
+  background-color: rgb(249, 215, 168);
   color: var(--color-heading);
   font-weight: bold;
   border: 1px solid var(--color-border);
@@ -138,7 +136,7 @@ const lastPage = () => {
   position: relative;
   width: fit-content;
 }
-  .fancy-table {
+.fancy-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0 0 0 0;
@@ -155,7 +153,7 @@ td {
 }
 
 th {
-  background-color: rgb(241, 198, 167);
+  background-color: rgb(249, 215, 168);
   color: var(--color-heading);
   font-weight: bold;
   cursor: pointer;
@@ -242,4 +240,4 @@ tr:hover {
 .pagination-controls label {
   margin-right: 0.5rem;
 }
-  </style>
+</style>

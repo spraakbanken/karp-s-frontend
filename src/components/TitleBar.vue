@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MenuBar from './MenuBar.vue'
-import { lexicalStore } from '../stores/store'
+// import { lexicalStore } from '../stores/store'
 import { ref, onMounted } from 'vue'
 
 const logoKarp = ref('')
@@ -8,10 +8,11 @@ const logoSB = ref('')
 const logoGU = ref('')
 const logoKarpEn = ref('')
 
-const lexicalStorage = lexicalStore()
+// const lexicalStorage = lexicalStore()
 
 function resetApp() {
-  lexicalStorage.setEmpty()
+  window.location.href = window.location.pathname
+  // lexicalStorage.setEmpty()
 }
 
 const updateTheme = async () => {
@@ -74,7 +75,7 @@ onMounted(() => {
 .header-area {
   display: flex;
   justify-content: space-between;
-  padding-top: 1rem;
+  padding-top: 2rem;
   padding-bottom: 1rem;
   padding-right: 2rem;
   padding-left: 2rem;

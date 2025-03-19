@@ -4,26 +4,29 @@ import { lexicalStore } from '@/stores/store'
 import type { Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import type { paramConfig } from '@/types/parameterPosition'
-import type { forEach } from 'es-toolkit/compat'
 
 const lexicalStorage = lexicalStore()
 
 const currentResult = ref<Dataset[]>([])
+const tableHeaders = ref<string[]>([])
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 
 watch(
-  () => [lexicalStorage.activeParameters, lexicalStorage.selectedColumns],
-  async ([newParams, newColumns]) => {
-    if (newParams || newColumns) {
+  () => [lexicalStorage.activeParameters, lexicalStorage.selectedCompileParams, lexicalStorage.selectedColumns],
+  async ([newParams, newCompileParams, newColumns]) => {
+    if (newParams || newColumns || newCompileParams) {
       try {
-        const data = await getStatisticsData(
+        const {tableData, headers} = await getStatisticsData(
           newParams as Record<string, paramConfig>,
+          newCompileParams as string[],
           newColumns as string[],
+
         )
-        currentResult.value = data
+        currentResult.value = tableData
+        tableHeaders.value = headers
         // console.log('currentResult', currentResult.value);
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -34,6 +37,31 @@ watch(
   },
   { deep: true },
 )
+
+const sortedData = computed(() => {
+  if (!sortKey.value) return currentResult.value
+
+  return [...currentResult.value].sort((a, b) => {
+    const aValue = a[sortKey.value]
+    const bValue = b[sortKey.value]
+
+    if (aValue === bValue) return 0
+
+    const order = sortOrder.value === 'asc' ? 1 : -1
+
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return aValue.localeCompare(bValue) * order
+    }
+
+    return (aValue as number) > (bValue as number) ? order : -order
+  })
+})
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return sortedData.value.slice(start, end)
+})
 
 const totalPages = computed(() => {
   return Math.ceil(currentResult.value.length / itemsPerPage.value)
@@ -60,7 +88,7 @@ const lastPage = () => {
 }
 
 const sortTable = (key: string) => {
-  console.log(key)
+  // console.log(key)
   if (sortKey.value === key) {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
   } else {
@@ -106,23 +134,15 @@ function exportCSV() {
     <table v-if="currentResult.length" class="fancy-table">
       <thead>
         <tr>
-          <th v-for="(value, key) in currentResult[0]" :key="key" @click="sortTable(String(key))">
+          <th v-for="key in tableHeaders" :key="key" @click="sortTable(String(key))">
             <div class="header-content">
               <span>{{ key }}</span>
-              <span v-if="sortKey === key">
-                <i class="material-icons">{{
-                  sortOrder === 'asc' ? 'arrow_upward' : 'arrow_downward'
-                }}</i>
-              </span>
-              <span v-else>
-                <i class="material-icons">sort</i>
-              </span>
             </div>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in currentResult" :key="item + '-' + index">
+        <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
           <td v-for="(value, key) in item" :key="key">
             {{ Array.isArray(value) ? value.join(', ') : value }}
           </td>
@@ -171,7 +191,8 @@ td {
 }
 
 th {
-  background-color: var(--table-head-bg);
+  background-color: rgb(249, 215, 168);
+  /* background-color: var(--table-head-bg); */
   color: var(--color-heading);
   font-weight: bold;
   cursor: pointer;

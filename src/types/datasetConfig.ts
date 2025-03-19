@@ -8,6 +8,7 @@ export type Entry = {
 
 export type DatasetConfig = {
   hits: Entry[]
+  total: number
 }
 
 export type Datasets = {

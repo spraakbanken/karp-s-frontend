@@ -17,6 +17,7 @@ interface SearchRedux {
   searchQuery: string
   selectedParams: string[]
   selectedColumns: string[]
+  selectedCompileParams: string[]
   activeTab: string
   datasetKeys: string[]
   activeLocale: string
@@ -34,6 +35,7 @@ export const lexicalStore = defineStore('dataset', {
     searchQuery: '',
     selectedParams: [],
     selectedColumns: [],
+    selectedCompileParams: [],
     activeTab: 'table',
     datasetKeys: [],
     activeLocale: 'swe',
@@ -70,11 +72,16 @@ export const lexicalStore = defineStore('dataset', {
       this.searchQuery = query
     },
     setSelectedParams(params: string[]) {
+      // Not used
       this.selectedParams = params
     },
     setSelectedColumns(columns: string[]) {
       // console.log('selectedColumns', columns)
       this.selectedColumns = columns
+    },
+    setSelectedCompileParams(params: string[]) {
+      // console.log('selectedCompileParams', params)
+      this.selectedCompileParams = params
     },
     setActiveTab(tab: string) {
       this.activeTab = tab

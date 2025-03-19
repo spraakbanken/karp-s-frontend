@@ -8,6 +8,7 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 import VueMatomo from 'vue-matomo'
+import { syncStoreWithRouter } from './router/syncStoreWithRouter'
 
 // load translations
 import en from '@/locales/en.json'
@@ -41,5 +42,7 @@ if (import.meta.env.VITE_MATOMO_URL && import.meta.env.VITE_MATOMO_ID) {
 app.use(createPinia())
 app.use(i18n)
 app.use(router)
+
+syncStoreWithRouter(router)
 
 app.mount('#app')

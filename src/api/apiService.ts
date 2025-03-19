@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { processDatasets } from '@/utils/processDatasets'
+import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
 import type { paramConfig } from '@/types/parameterPosition'
 
@@ -22,16 +22,43 @@ export const getLexicalDatasets = async () => {
   }
 }
 
-export const getTableData = async (compile: string) => {
+export const getTableData = async () => {
   try {
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
     const queryParam = Object.entries(lexicalStoreData.activeParameters)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-      .join(',');
+      .join(',')
 
-    const params : Record<string, string> = {}
+    const params: Record<string, string> = {}
+    params['resources'] = resources
+    if (queryParam) {
+      params['q'] = queryParam
+    }
+    // console.log('param:', params)
+    const response = await axiosInstance.get(`/search`, {
+      params: params,
+    })
+    // console.log('Fetched data:', response.data.hits)
+    const processedData = processDatasets(response.data.hits)
+
+    return processedData
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getSubTableData = async (compile: string, pageSize: number, dataset: string) => {
+  try {
+    const lexicalStoreData = lexicalStore()
+    const datasets = lexicalStoreData.selectedDatasets
+    const resources = datasets.join(',')
+    const queryParam = Object.entries(lexicalStoreData.activeParameters)
+      .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+      .join(',')
+
+    const params: Record<string, string> = {}
     params['resources'] = resources
     if (queryParam) {
       params['q'] = queryParam
@@ -39,38 +66,48 @@ export const getTableData = async (compile: string) => {
     if (compile) {
       params['compile'] = compile
     }
+    if (pageSize > 10) {
+      params['from'] = pageSize.toString()
+    }
     // console.log('param:', params)
     const response = await axiosInstance.get(`/search`, {
-      params:
-        params
-    });
+      params: params,
+    })
     // console.log('Fetched data:', response.data.hits)
-    return processDatasets(response.data.hits)
+    const processedData = processSubDataset(response.data.hits, dataset)
+    return processedData
   } catch (error) {
     throw error
   }
 }
 
-export const getStatisticsData = async (query: Record<string, paramConfig>, columns: string[]) => {
+export const getStatisticsData = async (query: Record<string, paramConfig>, compileParams: string[], columns: string[]) => {
   try {
-    console.log('Fetching data for:', query, columns)
+    // console.log('Fetching data for:', query, columns)
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
     const queryParam = Object.entries(query)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-      .join(',');
-
+      .join(',')
+    const params: Record<string, string> = {}
+    params['resources'] = resources
+    if (queryParam) {
+      params['q'] = queryParam
+    }
+    if (compileParams.length > 0) {
+      params['compile'] = compileParams.join(',')
+    }
+    if (columns.length > 0) {
+      params['columns'] = 'resource_id=' + columns.join(',')
+    }
     const response = await axiosInstance.get(`/count`, {
-      params: {
-        resources: resources,
-        q: queryParam,
-        compile: 'baseform',
-        columns: 'partOfSpeech=resource_id'
-      },
-    });
+      params: params,
+    })
     // console.log('Fetched data:', response.data.table)
-    return response.data.table
+    const tableData = response.data.table
+    const headers = response.data.headers
+    return { tableData, headers }
   } catch (error) {
     throw error
   }

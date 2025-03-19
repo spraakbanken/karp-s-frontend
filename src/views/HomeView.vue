@@ -4,7 +4,7 @@ import DataSelection from '@/components/DataSelection.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import GraphView from '@/components/GraphView.vue'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 
 import { getLexicalDatasets } from '@/api/apiService'
@@ -21,7 +21,7 @@ onMounted(async () => {
   }
 })
 
-const selectedDataset = computed(() => lexicalStorage.selectedDatasets)
+// const selectedDataset = computed(() => lexicalStorage.selectedDatasets)
 
 const activeTab = ref(lexicalStorage.activeTab)
 
@@ -49,11 +49,23 @@ const setActiveTab = (tab: string) => {
 </script>
 
 <template>
+  <div class="tabs">
+    <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
+      Tables
+    </button>
+    <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
+      Statistics
+    </button>
+    <!-- <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
+          Graph
+        </button> -->
+  </div>
   <main class="container">
     <div class="column-left">
       <DataSelection />
     </div>
     <div class="column-right">
+<<<<<<< Updated upstream
       <div class="tabs" v-if="selectedDataset.length">
         <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
           {{ $t('tab.tables') }}
@@ -65,6 +77,8 @@ const setActiveTab = (tab: string) => {
           Graph
         </button> -->
       </div>
+=======
+>>>>>>> Stashed changes
       <TableView v-if="activeTab === 'table'" />
       <StatisticsView v-if="activeTab === 'statistics'" />
       <GraphView v-if="activeTab === 'graph'" />
@@ -98,6 +112,7 @@ const setActiveTab = (tab: string) => {
   border-bottom: 2px solid var(--border-color);
   padding-left: 1rem;
   padding-top: 0.5rem;
+  background-color: chocolate;
 }
 
 .tabs button {
@@ -112,15 +127,16 @@ const setActiveTab = (tab: string) => {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   font-size: var(--font-size);
+  font-weight: bold;
   transition:
     background-color 0.3s,
     color 0.3s;
 }
 
 .tabs button.active {
-  background-color: var(--button-active-bg-color);
+  background-color: none;
   color: var(--button-active-text-color);
-  border-bottom: 2px solid var(--button-active-bg-color);
+  border-bottom: 2px solid white;
   font-weight: bold;
 }
 </style>

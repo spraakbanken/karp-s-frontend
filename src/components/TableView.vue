@@ -7,42 +7,52 @@ import SubTableView from '@/components/SubTableView.vue'
 
 const lexicalStorage = lexicalStore()
 
-const currentResult = ref<Record<string, Dataset[]>>({})
+const currentResult = ref<Record<string, { entries: Dataset[]; total: number }>>({})
 const currentValues = ref<Dataset[]>([])
+const currentTab = ref(lexicalStorage.activeTab)
 
 const fetchData = async () => {
-  const newDatasets = lexicalStorage.selectedDatasets;
+  const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
     try {
-      const data = await getTableData('baseform');
-      currentResult.value = data;
-      // console.log('currentResult', currentResult.value);
-      currentValues.value = newDatasets.flatMap((key) => currentResult.value[key] || []) as Dataset[];
+      const data = await getTableData()
+      currentResult.value = data
+      // console.log('currentResult', currentResult.value)
+
+      currentValues.value = newDatasets.flatMap(
+        (key) => currentResult.value[key] || [],
+      ) as Dataset[]
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error)
     }
   } else {
-    currentResult.value = {};
-    currentValues.value = [];
+    currentResult.value = {}
+    currentValues.value = []
   }
-};
+}
+
+watch(() => [lexicalStorage.selectedDatasets, lexicalStorage.activeParameters], fetchData, {
+  deep: true,
+})
 
 watch(
-  () => [lexicalStorage.selectedDatasets, lexicalStorage.activeParameters],
-  fetchData,
-  { deep: true },
+  () => currentTab.value,
+  () => {
+    if (currentTab.value === 'table') {
+      fetchData()
+    }
+  },
+  { immediate: true },
 )
-
-watch(() => lexicalStorage.activeTab, async (newTab) => {
-  if (newTab === 'table') {
-    await fetchData()
-  }
-})
 </script>
 
 <template>
   <div class="table-container" v-for="(dataset, index) in currentResult" :key="index">
-    <SubTableView :data="dataset" :lexicalKey="index" />
+    <SubTableView
+      :data="currentResult[index].entries"
+      :lexicalKey="index"
+      :totalHits="currentResult[index].total"
+    />
   </div>
 </template>
 
