@@ -127,7 +127,7 @@ const lastPage = () => {
 .tab {
   display: inline-block;
   padding: 0.7rem 1rem;
-  background-color: rgb(249, 215, 168);
+  background-color: var(--sb-orange-light);
   color: var(--color-heading);
   font-weight: bold;
   border: 1px solid var(--color-border);
@@ -153,7 +153,7 @@ td {
 }
 
 th {
-  background-color: rgb(249, 215, 168);
+  background-color: var(--sb-orange-light);
   color: var(--color-heading);
   font-weight: bold;
   cursor: pointer;

@@ -146,6 +146,6 @@ nav button.button-mode {
 }
 
 .theme-icon {
-  color: var(--color-icon-mode);
+  /* color: var(--color-icon-mode); */
 }
 </style>

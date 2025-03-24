@@ -15,8 +15,10 @@ const axiosInstance = axios.create({
 export const getLexicalDatasets = async () => {
   try {
     const response = await axiosInstance.get('/config')
-    // console.log('Fetched datasets:', response)
-    return response.data
+    //console.log('Fetched datasets:', response)
+    return response.data.sort((a: { label: string }, b: { label: string }) =>
+      a.label.localeCompare(b.label),
+    )
   } catch (error) {
     throw error
   }
@@ -81,7 +83,11 @@ export const getSubTableData = async (compile: string, pageSize: number, dataset
   }
 }
 
-export const getStatisticsData = async (query: Record<string, paramConfig>, compileParams: string[], columns: string[]) => {
+export const getStatisticsData = async (
+  query: Record<string, paramConfig>,
+  compileParams: string[],
+  columns: string[],
+) => {
   try {
     // console.log('Fetching data for:', query, columns)
     const lexicalStoreData = lexicalStore()

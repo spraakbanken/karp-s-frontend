@@ -5,13 +5,14 @@ import type { paramConfig } from '@/types/parameterPosition'
 
 const lexicalStorage = lexicalStore()
 
-const selectedKeys = ref(lexicalStorage.selectedDatasets)
+const selectedDatasets = ref(lexicalStorage.selectedDatasets) // selectedKeys
 const currentDatasets = computed(() => lexicalStorage.datasetKeys)
 const selectedParams = ref(lexicalStorage.selectedParams)
 const selectedColumns = ref(lexicalStorage.selectedColumns)
 const selectedCompileParams = ref(lexicalStorage.selectedCompileParams)
 const paramsCollection = computed(() => lexicalStorage.currentParams)
 const totalDatasets = computed(() => lexicalStorage.totalDatasets)
+
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
 const isDropdownColumns = ref(false)
@@ -20,6 +21,14 @@ const dropdownContainer = ref<HTMLElement | null>(null)
 
 const parameters = ref<Record<string, paramConfig>>({})
 const ParameterPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
+const ParameterPositionText = [
+  'dataselector.parameter.position.startswith',
+  'dataselector.parameter.position.endswith',
+  'dataselector.parameter.position.contains',
+  'dataselector.parameter.position.equals',
+  'dataselector.parameter.position.regex',
+]
+const ParameterPositionEnabled = [true, false, false, true, false]
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -54,21 +63,24 @@ onBeforeUnmount(() => {
 })
 
 const updateSelectedDataset = () => {
-  lexicalStorage.setSelectedDataset(selectedKeys.value)
+  lexicalStorage.setSelectedDataset(selectedDatasets.value)
 }
 
 const selectDataset = () => {
   updateSelectedDataset()
 }
 
+// update state from URL
 const updateData = () => {
   lexicalStorage.setParameters(parameters.value)
 }
 
+// update state from URL
 const updateColumns = () => {
   lexicalStorage.setSelectedColumns(selectedColumns.value)
 }
 
+// update state from URL
 const updateCompileParams = () => {
   lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
 }
@@ -94,6 +106,21 @@ watch(
     if (newParams.length === 0) {
       parameters.value = {}
       selectedParams.value = []
+      selectedColumns.value = []
+      selectedCompileParams.value = []
+      updateData()
+    }
+  },
+)
+
+watch(
+  () => selectedDatasets.value,
+  (newKeys) => {
+    if (newKeys.length === 0) {
+      parameters.value = {}
+      selectedParams.value = []
+      selectedColumns.value = []
+      selectedCompileParams.value = []
       updateData()
     }
   },
@@ -101,17 +128,17 @@ watch(
 </script>
 
 <template>
-  <div ref="dropdownContainer">
+  <div ref="dropdownContainer" class="data-component">
     <div class="data-selection">
       <span>{{ $t('dataselector.datasets') }}</span>
       <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
         <div class="dropdown-toggle" @click="toggleDropdown">
           {{
-            selectedKeys.length === 1
+            selectedDatasets.length === 1
               ? $t('dataselector.dataset.selected')
               : $t('dataselector.datasets.selected')
           }}
-          ({{ selectedKeys.length }}
+          ({{ selectedDatasets.length }}
           {{ $t('dataselector.datasets.selected.of') }}
           {{ totalDatasets }})
         </div>
@@ -120,7 +147,7 @@ watch(
             <input
               type="checkbox"
               :value="dataset"
-              v-model="selectedKeys"
+              v-model="selectedDatasets"
               @change="selectDataset"
             />
             {{ lexicalStorage.lexicalLabels[dataset] }}
@@ -128,21 +155,21 @@ watch(
         </div>
       </div>
     </div>
-    <!-- <div class="search-container">
-      <span>Search</span>
-      <input type="text" v-model="searchQuery" placeholder="Search data..." class="search-input" />
-    </div> -->
+    <!-- Select field(s) for search -->
     <div
       class="dropdown"
-      :class="{ 'dropdown-open': isDropdownParams, 'dropdown-disabled': selectedKeys.length === 0 }"
-      :disabled="selectedKeys.length === 0"
+      :class="{
+        'dropdown-open': isDropdownParams,
+        'dropdown-disabled': selectedDatasets.length === 0,
+      }"
+      :disabled="selectedDatasets.length === 0"
     >
-<span>{{ $t('dataselector.parameters') }}</span>
+      <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
-        <span v-if="selectedKeys.length === 0">Select one or more datasets</span>
-        <span v-else-if="paramsCollection.length === 0"
-          >Selected dataset doesn't have parameters in common</span
-        >
+        <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
+        <span v-else-if="paramsCollection.length === 0">{{
+          $t('dataselector.datasets.nocommon')
+        }}</span>
         <span v-else-if="selectedParams.length === 0">{{ $t('dataselector.noparameters') }}</span>
         <span v-else>{{ selectedParams.join(', ') }}</span>
       </div>
@@ -153,13 +180,19 @@ watch(
         </label>
       </div>
     </div>
+    <!-- Sök-ruta -->
     <div v-for="param in selectedParams" :key="param" class="search-container">
-      <span :for="param">{{ param }}</span>
+      <span :for="param">{{ $t('dataselector.parameters.prefix') }}: {{ param }}</span>
       <div class="input-group">
         <select v-model="parameters[param].position">
           <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
-          <option v-for="position in ParameterPosition" :key="position" :value="position">
-            {{ position }}
+          <option
+            v-for="(position, index) in ParameterPosition"
+            :key="position"
+            :value="position"
+            :disabled="!ParameterPositionEnabled[index]"
+          >
+            {{ $t(ParameterPositionText[index]) }}
           </option>
         </select>
         <input
@@ -172,46 +205,74 @@ watch(
         />
       </div>
     </div>
-    <div
-      class="dropdown"
-      v-if="lexicalStorage.activeTab === 'statistics'"
-      :class="{ 'dropdown-open': isDropdownColumns }"
-    >
-    <span>Select parameter for Statistics</span>
-      <div class="dropdown-toggle" @click="toggleDropdownCompileParams">
-        <span v-if="selectedCompileParams.length === 0">No columns selected</span>
-        <span v-else>{{ selectedCompileParams.join(', ') }}</span>
+    <!-- Statistics -->
+    <div class="statistics">
+      <div class="statistics-header">
+        {{ $t('dataselector.statistics') }}
       </div>
-      <div class="dropdown-menu" v-if="isDropdownCompileParams">
-        <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
-          <input type="checkbox" :value="param" v-model="selectedCompileParams" @change="updateCompileParams" />
-          {{ param }}
-        </label>
+      <!-- Välj parameter för sammanställning -->
+      <div
+        class="dropdown"
+        :class="{
+          'dropdown-open': isDropdownColumns,
+          'dropdown-disabled': selectedDatasets.length === 0,
+        }"
+      >
+        <span>{{ $t('dataselector.statistics.parameter') }}</span>
+        <div class="dropdown-toggle" @click="toggleDropdownCompileParams">
+          <span v-if="selectedCompileParams.length === 0">{{
+            $t('dataselector.statistics.noparameter')
+          }}</span>
+          <span v-else>{{ selectedCompileParams.join(', ') }}</span>
+        </div>
+        <div class="dropdown-menu" v-if="isDropdownCompileParams">
+          <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
+            <input
+              type="checkbox"
+              :value="param"
+              v-model="selectedCompileParams"
+              @change="updateCompileParams"
+            />
+            {{ param }}
+          </label>
+        </div>
       </div>
-    </div>
-    <div
-      class="dropdown"
-      v-if="lexicalStorage.activeTab === 'statistics'"
-      :class="{ 'dropdown-open': isDropdownColumns }"
-    >
-      <span>{{ $t('dataselector.statistics.columns') }}</span>
-      <div class="dropdown-toggle" @click="toggleDropdownColumns">
-        <span v-if="selectedColumns.length === 0">{{
-          $t('dataselector.statistics.nocolumns')
-        }}</span>
-        <span v-else>{{ selectedColumns.join(', ') }}</span>
-      </div>
-      <div class="dropdown-menu" v-if="isDropdownColumns">
-        <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
-          <input type="checkbox" :value="param" v-model="selectedColumns" @change="updateColumns" />
-          {{ param }}
-        </label>
+      <!-- Välj kolumner för statistik -->
+      <div
+        class="dropdown"
+        :class="{
+          'dropdown-open': isDropdownColumns,
+          'dropdown-disabled': selectedDatasets.length === 0,
+        }"
+      >
+        <span>{{ $t('dataselector.statistics.columns') }}</span>
+        <div class="dropdown-toggle" @click="toggleDropdownColumns">
+          <span v-if="selectedColumns.length === 0">{{
+            $t('dataselector.statistics.nocolumns')
+          }}</span>
+          <span v-else>{{ selectedColumns.join(', ') }}</span>
+        </div>
+        <div class="dropdown-menu" v-if="isDropdownColumns">
+          <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
+            <input
+              type="checkbox"
+              :value="param"
+              v-model="selectedColumns"
+              @change="updateColumns"
+            />
+            {{ param }}
+          </label>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.data-component {
+  padding: 1rem;
+}
+
 .search-container {
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -230,7 +291,7 @@ watch(
 }
 
 .dropdown-open {
-  border-color: var(--color-border-open);
+  border-color: var(--sb-orange);
 }
 
 .dropdown-disabled {
@@ -244,6 +305,7 @@ watch(
   border: 1px solid var(--color-border);
   border-radius: 4px;
   cursor: pointer;
+  background-color: white;
 }
 
 .dropdown-menu {
@@ -290,6 +352,16 @@ watch(
   padding: 0.5rem;
   border: 1px solid var(--color-border);
   border-radius: 4px;
+}
+
+.statistics {
+  background-color: var(--sb-grey-light);
+  padding: 0.5rem;
+}
+
+.statistics-header {
+  font-size: medium;
+  font-weight: bold;
 }
 
 @media (max-width: 600px) {

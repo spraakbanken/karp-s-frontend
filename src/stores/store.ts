@@ -87,15 +87,18 @@ export const lexicalStore = defineStore('dataset', {
       this.activeTab = tab
     },
     setSelectedDataset(keys: string[]) {
-      // console.log('selectedDatasets', keys)
       this.selectedDatasets = keys
       if (keys.length === 1) {
         this.currentParams = keys.flatMap((k) => this.paramsInDatasets[k])
       } else {
         const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
-        this.currentParams = allParamsArray.reduce((acc, params) => {
-          return acc.filter((param) => params.includes(param))
-        })
+        if (allParamsArray.length > 0) {
+          this.currentParams = allParamsArray.reduce((acc, params) => {
+            return acc.filter((param) => params.includes(param))
+          })
+        } else {
+          return []
+        }
       }
       // console.log('currentParams', this.currentParams)
     },

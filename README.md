@@ -4,49 +4,63 @@ Karp-S - Språkbankens datapubliceringsplattform
 
 ## Developer documentation
 
+Initial:
+
 Sharepoint > Språkbanken > Documents > Plattformar > karp-s > development.docx
 
-## Tools/framework
+### Tools/framework
 
 Vue.js 3 with TypeScript
 
-### Recommended IDE Setup
+IDE Setup: [VSCode](https://code.visualstudio.com/) + Vue - official extension. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-[VSCode](https://code.visualstudio.com/) + Vue - official extension.
+Customize configuration: See [Vite Configuration Reference](https://vite.dev/config/).
 
-### Type Support for `.vue` Imports in TS
+### Backend
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- /dev redirectar alltid till den senaste och ska gå att använda lokalt (https://spraakbanken4.it.gu.se/karps/dev/)
 
-### Customize configuration
+- när ni deployar frontenden, använd den med en git-commit-id i namnet, inte dev, då kommer den deployade frontenden att fortsätta fungera även om jag lägger upp en ny backend (https://spraakbanken4.it.gu.se/karps/443fe07/ just nu)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- bara /karp-s försvinner (efter att ni uppdaterat frontenden att inte använda den)
 
-### Project Setup
+## Deploy
+
+Build:
+
+- `npm run build:production`
+
+Upload:
+
+- `rsync --delete --exclude ".htaccess" -r dist/ <user>@k2.spraakdata.gu.se:/var/www/html_sb/karp-s`
+
+## Vue info from installation
+
+Project Setup
 
 ```sh
 npm install
 ```
 
-#### Compile and Hot-Reload for Development
+Compile and Hot-Reload for Development
 
 ```sh
 npm run dev
 ```
 
-#### Type-Check, Compile and Minify for Production
+Type-Check, Compile and Minify for Production
 
 ```sh
 npm run build
 ```
 
-#### Run Unit Tests with [Vitest](https://vitest.dev/)
+Run Unit Tests with [Vitest](https://vitest.dev/)
 
 ```sh
 npm run test:unit
 ```
 
-#### Lint with [ESLint](https://eslint.org/)
+Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint

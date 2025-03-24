@@ -49,22 +49,23 @@ const setActiveTab = (tab: string) => {
 </script>
 
 <template>
-  <div class="tabs">
-    <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
-      Tables
-    </button>
-    <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
-      Statistics
-    </button>
-    <!-- <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
-          Graph
-        </button> -->
-  </div>
   <main class="container">
     <div class="column-left">
+      <div class="dataselection-header">{{ $t('dataselector.heading') }}</div>
       <DataSelection />
     </div>
     <div class="column-right">
+      <div class="tabs">
+        <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
+          {{ $t('tab.tables') }}
+        </button>
+        <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
+          {{ $t('tab.statistics') }}
+        </button>
+        <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
+          {{ $t('tab.graph') }}
+        </button>
+      </div>
       <TableView v-if="activeTab === 'table'" />
       <StatisticsView v-if="activeTab === 'statistics'" />
       <GraphView v-if="activeTab === 'graph'" />
@@ -81,7 +82,7 @@ const setActiveTab = (tab: string) => {
 }
 
 .column-left {
-  padding: 1rem;
+  padding: 0%;
 }
 
 .column-right {
@@ -91,24 +92,33 @@ const setActiveTab = (tab: string) => {
   border-right: 2px solid var(--border-color);
 }
 
+.dataselection-header {
+  height: 2.5rem;
+  padding-top: 0.5rem;
+  padding-left: 1rem;
+  background-color: var(--sb-orange-light);
+  font-size: medium;
+  font-weight: bold;
+}
+
 .tabs {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 0rem;
-  border-bottom: 2px solid var(--border-color);
+  /*border-bottom: 2px solid var(--border-color);*/
   padding-left: 1rem;
   padding-top: 0.5rem;
-  background-color: chocolate;
+  background-color: var(--sb-orange-light);
+  height: 2.5rem;
 }
 
 .tabs button {
   padding: 0.5rem 1rem;
   margin: 0;
   border: none;
-  /* border: 1px solid var(--border-color); */
+  border: 1px solid white;
   border-bottom: none;
-  background-color: var(--button-bg-color);
-  color: var(--button-text-color);
+  background-color: var(--sb-orange-light);
   cursor: pointer;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -121,8 +131,7 @@ const setActiveTab = (tab: string) => {
 
 .tabs button.active {
   background-color: none;
-  color: var(--button-active-text-color);
-  border-bottom: 2px solid white;
   font-weight: bold;
+  background-color: white;
 }
 </style>

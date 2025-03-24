@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "axios": "^1.7.9",
+    "d3": "^7.9.0",
     "es-toolkit": "^1.32.0",
     "js-yaml": "^4.1.0",
     "material-design-icons-iconfont": "^6.7.0",

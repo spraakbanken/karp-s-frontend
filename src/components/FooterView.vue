@@ -33,28 +33,26 @@
 </template>
 
 <style scoped>
-@media (min-width: 1024px) {
-  .footer-area {
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    padding-right: 2rem;
-    padding-left: 2rem;
-    margin-left: auto;
-    margin-right: auto;
-    background-color: black;
-    box-sizing: border-box;
-    width: 100%;
-  }
+.footer-area {
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-right: 2rem;
+  padding-left: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: black;
+  box-sizing: border-box;
+  width: 100%;
+}
 
-  .footer-area > div {
-    color: white;
-    flex: 1;
-    padding: 2rem;
-    box-sizing: border-box;
-  }
+.footer-area > div {
+  color: white;
+  flex: 1;
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 strong {

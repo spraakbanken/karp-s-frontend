@@ -13,27 +13,49 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
+const currentTab = ref(lexicalStorage.activeTab)
+
+const fetchData = async () => {
+  const newParams = lexicalStorage.activeParameters
+  const newCompileParams = lexicalStorage.selectedCompileParams
+  const newColumns = lexicalStorage.selectedColumns
+  console.log(newParams, newCompileParams, newColumns)
+  if (newParams && newCompileParams.length > 0) {
+    try {
+      const { tableData, headers } = await getStatisticsData(
+        newParams as Record<string, paramConfig>,
+        newCompileParams as string[],
+        newColumns as string[],
+      )
+      currentResult.value = tableData
+      tableHeaders.value = headers
+      // console.log('currentResult', currentResult.value);
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  } else {
+    currentResult.value = []
+  }
+}
 
 watch(
-  () => [lexicalStorage.activeParameters, lexicalStorage.selectedCompileParams, lexicalStorage.selectedColumns],
-  async ([newParams, newCompileParams, newColumns]) => {
-    if (newParams || newColumns || newCompileParams) {
-      try {
-        const {tableData, headers} = await getStatisticsData(
-          newParams as Record<string, paramConfig>,
-          newCompileParams as string[],
-          newColumns as string[],
-
-        )
-        currentResult.value = tableData
-        tableHeaders.value = headers
-        // console.log('currentResult', currentResult.value);
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
-    } else {
-      currentResult.value = []
+  () => currentTab.value,
+  () => {
+    if (currentTab.value === 'statistics') {
+      fetchData()
     }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => [
+    lexicalStorage.activeParameters,
+    lexicalStorage.selectedCompileParams,
+    lexicalStorage.selectedColumns,
+  ],
+  () => {
+    fetchData()
   },
   { deep: true },
 )
@@ -100,7 +122,7 @@ const sortTable = (key: string) => {
 /*
   Export current statistics to CSV with header
 */
-function exportCSV() {
+const exportCSV = () => {
   let csv = ''
 
   // write headers
@@ -127,7 +149,7 @@ function exportCSV() {
 </script>
 
 <template>
-  <div>
+  <div class="table-wrapper">
     <div v-if="currentResult.length">
       <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
     </div>
@@ -149,7 +171,7 @@ function exportCSV() {
         </tr>
       </tbody>
     </table>
-    <p v-else class="message">No data available. Please select a parameter.</p>
+    <p v-else class="message">{{ $t('error.nodata') }}</p>
     <div v-if="currentResult.length" class="pagination">
       <button @click="firstPage" :disabled="currentPage === 1">
         <i class="material-icons">first_page</i>
@@ -175,6 +197,13 @@ function exportCSV() {
 </template>
 
 <style scoped>
+.table-wrapper {
+  display: grid;
+  position: relative;
+  /* margin-top: 2rem; */
+  padding: 1rem;
+}
+
 .fancy-table {
   width: 100%;
   border-collapse: collapse;
@@ -191,7 +220,7 @@ td {
 }
 
 th {
-  background-color: rgb(249, 215, 168);
+  background-color: var(--sb-orange-light);
   /* background-color: var(--table-head-bg); */
   color: var(--color-heading);
   font-weight: bold;
