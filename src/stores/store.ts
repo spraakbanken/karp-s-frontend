@@ -65,8 +65,6 @@ export const lexicalStore = defineStore('dataset', {
         },
         {} as Record<string, string[]>,
       )
-      // console.log('paramsInDatasets', this.paramsInDatasets)
-      this.selectedDatasets = []
     },
     setSearchQuery(query: string) {
       this.searchQuery = query

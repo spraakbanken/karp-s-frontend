@@ -47,7 +47,8 @@ export function syncStoreWithRouter(router: Router) {
   const initializeStoreFromQuery = () => {
     const query = new URLSearchParams(window.location.search)
     if (query.has('resources')) {
-      lexicalStorage.selectedDatasets = query.get('resources')!.split(',')
+      //lexicalStorage.selectedDatasets = query.get('resources')!.split(',')
+      lexicalStorage.setSelectedDataset(query.get('resources')!.split(','))
     }
     if (query.has('q')) {
       const activeParams = query.get('q')!.split(',')

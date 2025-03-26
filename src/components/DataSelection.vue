@@ -32,18 +32,30 @@ const ParameterPositionEnabled = [true, false, false, true, false]
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
+  isDropdownParams.value = false
+  isDropdownColumns.value = false
+  isDropdownCompileParams.value = false
 }
 
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
+  isDropdownOpen.value = false
+  isDropdownColumns.value = false
+  isDropdownCompileParams.value = false
 }
 
 const toggleDropdownColumns = () => {
   isDropdownColumns.value = !isDropdownColumns.value
+  isDropdownOpen.value = false
+  isDropdownParams.value = false
+  isDropdownCompileParams.value = false
 }
 
 const toggleDropdownCompileParams = () => {
   isDropdownCompileParams.value = !isDropdownCompileParams.value
+  isDropdownOpen.value = false
+  isDropdownParams.value = false
+  isDropdownColumns.value = false
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -51,6 +63,7 @@ const handleClickOutside = (event: MouseEvent) => {
     isDropdownOpen.value = false
     isDropdownParams.value = false
     isDropdownColumns.value = false
+    isDropdownCompileParams.value = false
   }
 }
 
@@ -100,9 +113,11 @@ watch(selectedParams, (newParams) => {
   // console.log('parameters', parameters.value)
 })
 
+// paramsCollection = available fields in selected datasets
 watch(
   () => paramsCollection.value,
   (newParams) => {
+    console.log('DS WATCH1')
     if (newParams.length === 0) {
       parameters.value = {}
       selectedParams.value = []
@@ -115,13 +130,14 @@ watch(
 
 watch(
   () => selectedDatasets.value,
-  (newKeys) => {
-    if (newKeys.length === 0) {
+  (newDatasets) => {
+    console.log('DS WATCH2')
+    if (newDatasets.length === 0) {
       parameters.value = {}
       selectedParams.value = []
       selectedColumns.value = []
       selectedCompileParams.value = []
-      updateData()
+      //updateData()
     }
   },
 )
