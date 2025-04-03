@@ -5,13 +5,34 @@ import type { paramConfig } from '@/types/parameterPosition'
 
 const lexicalStorage = lexicalStore()
 
-const selectedDatasets = ref(lexicalStorage.selectedDatasets) // selectedKeys
-const currentDatasets = computed(() => lexicalStorage.datasetKeys)
-const selectedParams = ref(lexicalStorage.selectedParams)
-const selectedColumns = ref(lexicalStorage.selectedColumns)
-const selectedCompileParams = ref(lexicalStorage.selectedCompileParams)
-const paramsCollection = computed(() => lexicalStorage.currentParams)
-const totalDatasets = computed(() => lexicalStorage.totalDatasets)
+const currentDatasets = computed(() => lexicalStorage.currentDatasets)
+const selectedDatasets = computed({
+  get: () => lexicalStorage.selectedDatasets,
+  set: (value) => lexicalStorage.setSelectedDataset(value),
+})
+const selectedParameters = computed({
+  get: () => lexicalStorage.selectedParameters,
+  set: (value) => lexicalStorage.setParameters(value),
+})
+
+const selectedCompileParams = computed({
+  get: () => lexicalStorage.selectedCompileParams,
+  set: (value) => lexicalStorage.setSelectedCompileParams(value),
+})
+const selectedColumns = computed({
+  get: () => lexicalStorage.selectedColumns,
+  set: (value) => lexicalStorage.setSelectedColumns(value),
+})
+
+const currentParams = computed(() => lexicalStorage.currentParameters)
+//const totalDatasets = computed(() => lexicalStorage.totalDatasets)
+/*
+const selectedParametersArray = computed({
+  get: () => Object.keys(lexicalStorage.selectedParameters),
+  set: (value) => value,
+})
+  */
+const selectedParametersArray = ref<string[]>([])
 
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
@@ -98,7 +119,8 @@ const updateCompileParams = () => {
   lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
 }
 
-watch(selectedParams, (newParams) => {
+watch(selectedParametersArray, (newParams) => {
+  console.log(newParams)
   newParams.forEach((param) => {
     if (!parameters.value[param]) {
       parameters.value[param] = { value: '', position: 'equals' }
@@ -110,17 +132,15 @@ watch(selectedParams, (newParams) => {
       delete parameters.value[param]
     }
   })
-  // console.log('parameters', parameters.value)
 })
 
-// paramsCollection = available fields in selected datasets
 watch(
-  () => paramsCollection.value,
+  () => currentParams.value,
   (newParams) => {
-    console.log('DS WATCH1')
+    console.log('--DataSelection/watch 1', newParams)
     if (newParams.length === 0) {
       parameters.value = {}
-      selectedParams.value = []
+      selectedParameters.value = {}
       selectedColumns.value = []
       selectedCompileParams.value = []
       updateData()
@@ -130,15 +150,33 @@ watch(
 
 watch(
   () => selectedDatasets.value,
-  (newDatasets) => {
-    console.log('DS WATCH2')
+  (newDatasets, oldDatasets) => {
+    console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
     if (newDatasets.length === 0) {
       parameters.value = {}
-      selectedParams.value = []
+      selectedParameters.value = {}
       selectedColumns.value = []
       selectedCompileParams.value = []
       //updateData()
     }
+  },
+)
+
+watch(
+  () => lexicalStorage.selectedParameters,
+  (newSelectedParameters) => {
+    console.log('watch selectedParameters', newSelectedParameters)
+    selectedParametersArray.value = Object.keys(newSelectedParameters)
+    console.log('-- parameters1', parameters)
+    Object.keys(newSelectedParameters).forEach((param) => {
+      if (!parameters.value[param]) {
+        parameters.value[param] = {
+          value: newSelectedParameters[param].value,
+          position: newSelectedParameters[param].position,
+        }
+      }
+    })
+    console.log('-- parameters2', parameters)
   },
 )
 </script>
@@ -156,7 +194,7 @@ watch(
           }}
           ({{ selectedDatasets.length }}
           {{ $t('dataselector.datasets.selected.of') }}
-          {{ totalDatasets }})
+          {{ currentDatasets.length }})
         </div>
         <div class="dropdown-menu" v-if="isDropdownOpen">
           <label v-for="dataset in currentDatasets" :key="dataset" class="dropdown-item">
@@ -183,21 +221,23 @@ watch(
       <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
         <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
-        <span v-else-if="paramsCollection.length === 0">{{
+        <span v-else-if="currentParams.length === 0">{{
           $t('dataselector.datasets.nocommon')
         }}</span>
-        <span v-else-if="selectedParams.length === 0">{{ $t('dataselector.noparameters') }}</span>
-        <span v-else>{{ selectedParams.join(', ') }}</span>
+        <span v-else-if="selectedParametersArray.length === 0">{{
+          $t('dataselector.noparameters')
+        }}</span>
+        <span v-else>{{ selectedParametersArray.join(', ') }}</span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
-        <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
-          <input type="checkbox" :value="param" v-model="selectedParams" />
-          {{ param }}
+        <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
+          <input type="checkbox" :value="param" v-model="selectedParametersArray" />
+          {{ param.name }}
         </label>
       </div>
     </div>
-    <!-- Sök-ruta -->
-    <div v-for="param in selectedParams" :key="param" class="search-container">
+    <!-- Search-box -->
+    <div v-for="param in selectedParametersArray" :key="param" class="search-container">
       <span :for="param">{{ $t('dataselector.parameters.prefix') }}: {{ param }}</span>
       <div class="input-group">
         <select v-model="parameters[param].position">
@@ -226,7 +266,7 @@ watch(
       <div class="statistics-header">
         {{ $t('dataselector.statistics') }}
       </div>
-      <!-- Välj parameter för sammanställning -->
+      <!-- Chose field for compilation -->
       <div
         class="dropdown"
         :class="{
@@ -242,18 +282,18 @@ watch(
           <span v-else>{{ selectedCompileParams.join(', ') }}</span>
         </div>
         <div class="dropdown-menu" v-if="isDropdownCompileParams">
-          <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
+          <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
             <input
               type="checkbox"
               :value="param"
               v-model="selectedCompileParams"
               @change="updateCompileParams"
             />
-            {{ param }}
+            {{ param.name }}
           </label>
         </div>
       </div>
-      <!-- Välj kolumner för statistik -->
+      <!-- Select fields for statistics -->
       <div
         class="dropdown"
         :class="{
@@ -269,14 +309,14 @@ watch(
           <span v-else>{{ selectedColumns.join(', ') }}</span>
         </div>
         <div class="dropdown-menu" v-if="isDropdownColumns">
-          <label v-for="param in paramsCollection" :key="param" class="dropdown-item">
+          <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
             <input
               type="checkbox"
               :value="param"
               v-model="selectedColumns"
               @change="updateColumns"
             />
-            {{ param }}
+            {{ param.name }}
           </label>
         </div>
       </div>

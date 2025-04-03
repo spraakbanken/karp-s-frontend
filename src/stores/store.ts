@@ -14,65 +14,71 @@ interface KarpsConfig {
 }
 
 interface SearchRedux {
-  searchQuery: string
-  selectedParams: string[]
+  //allParams: string[]
+  currentDatasets: string[] // was - datasetKeys[]
+  selectedDatasets: string[]
+  //totalDatasets: number
+  paramsInDatasets: Record<string, FieldConfig[]> // resurceId - field names
+  currentParameters: FieldConfig[] // currentParams = available fields in selected datasets
+  selectedParameters: Record<string, paramConfig>
+  //selectedParams: string[]
+
   selectedColumns: string[]
   selectedCompileParams: string[]
+  searchQuery: string
   activeTab: string
-  datasetKeys: string[]
   activeLocale: string
-  selectedDatasets: string[]
-  totalDatasets: number
-  allParams: string[]
-  paramsInDatasets: Record<string, string[]>
-  currentParams: string[]
-  activeParameters: Record<string, paramConfig>
   lexicalLabels: Record<string, string>
 }
 
+// currentParams = list of available fields in selected datasets
+// selectedParams = list of selected fields
+// activeParameters
 export const lexicalStore = defineStore('dataset', {
   state: (): SearchRedux => ({
-    searchQuery: '',
-    selectedParams: [],
+    //allParams: [],
+    currentDatasets: [],
+    selectedDatasets: [],
+    //totalDatasets: 0,
+    paramsInDatasets: {},
+    currentParameters: [],
+    selectedParameters: {},
+    //selectedParams: [],
     selectedColumns: [],
     selectedCompileParams: [],
+    searchQuery: '',
     activeTab: 'table',
-    datasetKeys: [],
     activeLocale: 'swe',
-    selectedDatasets: [],
-    totalDatasets: 0,
-    allParams: [],
-    paramsInDatasets: {},
-    currentParams: [],
-    activeParameters: {},
     lexicalLabels: {},
   }),
   actions: {
     setDefault(config: KarpsConfig[]) {
-      this.datasetKeys = config.map((c) => c.resourceId)
+      console.log('--setDefault', config)
+
+      this.currentDatasets = config.map((c) => c.resourceId)
       this.lexicalLabels = config
         .map((c) => ({ [c.resourceId]: c.label }))
         .reduce((acc, obj) => {
           return { ...acc, ...obj }
         }, {})
-      // console.log('lexicalLabels', this.lexicalLabels)
-      this.totalDatasets = config.length
-      this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
+      //this.totalDatasets = config.length
+      //this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
       this.paramsInDatasets = config.reduce(
         (acc, c) => {
-          acc[c.resourceId] = c.fields.map((f) => f.name)
+          acc[c.resourceId] = c.fields.map((f) => f)
           return acc
         },
-        {} as Record<string, string[]>,
+        {} as Record<string, FieldConfig[]>,
       )
     },
     setSearchQuery(query: string) {
       this.searchQuery = query
     },
+    /*
     setSelectedParams(params: string[]) {
       // Not used
       this.selectedParams = params
-    },
+    },*/
     setSelectedColumns(columns: string[]) {
       // console.log('selectedColumns', columns)
       this.selectedColumns = columns
@@ -85,13 +91,14 @@ export const lexicalStore = defineStore('dataset', {
       this.activeTab = tab
     },
     setSelectedDataset(keys: string[]) {
+      console.log('setSelectedDataset', keys)
       this.selectedDatasets = keys
       if (keys.length === 1) {
-        this.currentParams = keys.flatMap((k) => this.paramsInDatasets[k])
+        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
       } else {
         const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
         if (allParamsArray.length > 0) {
-          this.currentParams = allParamsArray.reduce((acc, params) => {
+          this.currentParameters = allParamsArray.reduce((acc, params) => {
             return acc.filter((param) => params.includes(param))
           })
         } else {
@@ -104,7 +111,7 @@ export const lexicalStore = defineStore('dataset', {
       this.activeLocale = locale
     },
     setParameters(params: Record<string, paramConfig>) {
-      this.activeParameters = params
+      this.selectedParameters = params
     },
     setEmpty() {
       this.selectedDatasets = []

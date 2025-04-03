@@ -44,7 +44,11 @@
   "statistics.exportCSV": "Export CSV",
   "graphs.bar": "Bar diagram",
   "graphs.circle": "Circle diagram",
-  "graphs.export": "Export as image",
+  "graphs.export.svg": "Export as SVG",
+  "graphs.export.png": "Export as PNG",
   "graphs.threshold": "Threshold",
+  "graphs.barwidth": "Bar width",
+  "graphs.dots": "Dots",
+  "graphs.maxnumberofvalues": "Only the first {number} values are shown",
   "error.nodata": "No data available. Please select a parameter."
 }

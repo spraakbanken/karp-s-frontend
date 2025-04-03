@@ -9,19 +9,21 @@ import { onMounted, ref } from 'vue'
 
 import { getLexicalDatasets } from '@/api/apiService'
 
+import router from '@/router'
+import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
+
 const lexicalStorage = lexicalStore()
 
 onMounted(async () => {
   try {
-    // console.log('fetching datasets')
+    console.log('--HomeView/onMounted()')
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
+    syncStoreWithRouter(router)
   } catch (error) {
     console.error(error)
   }
 })
-
-// const selectedDataset = computed(() => lexicalStorage.selectedDatasets)
 
 const activeTab = ref(lexicalStorage.activeTab)
 
@@ -29,23 +31,6 @@ const setActiveTab = (tab: string) => {
   lexicalStorage.setActiveTab(tab)
   activeTab.value = tab
 }
-
-// const route = useRoute()
-// const router = useRouter()
-// onMounted(() => {
-//   const dataset = route.query.lex as string
-//   if (dataset) {
-//     lexicalStorage.setSelectedDataset(dataset.split(','))
-//   }
-// })
-
-// watch(lexicalStorage.datasetKeys, (newDataset) => {
-//   if (newDataset.length === 0) {
-//     router.push({ query: {} })
-//   } else {
-//     router.push({ query: { lex: newDataset.join(',') } })
-//   }
-// })
 </script>
 
 <template>

@@ -16,7 +16,7 @@ const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeTab)
 
 const fetchData = async () => {
-  const newParams = lexicalStorage.activeParameters
+  const newParams = lexicalStorage.selectedParameters
   const newCompileParams = lexicalStorage.selectedCompileParams
   const newColumns = lexicalStorage.selectedColumns
   console.log(newParams, newCompileParams, newColumns)
@@ -50,7 +50,7 @@ watch(
 
 watch(
   () => [
-    lexicalStorage.activeParameters,
+    lexicalStorage.selectedParameters,
     lexicalStorage.selectedCompileParams,
     lexicalStorage.selectedColumns,
   ],
@@ -126,19 +126,38 @@ const exportCSV = () => {
   let csv = ''
 
   // write headers
-  for (const title in currentResult.value[0]) {
-    csv += title + ','
+  //  for (const title in currentResult.value[0]) {
+  console.log()
+  for (const key in tableHeaders.value) {
+    csv += tableHeaders.value[key] + ','
   }
   csv += '\n'
+
+  // find out which columns are collections (lists of values)
+  const collectionColumn = []
+  for (const key of lexicalStorage.currentParameters) {
+    if (key.collection) {
+      collectionColumn.push(key.name)
+    }
+  }
+  console.log('CSV cc', collectionColumn, tableHeaders.value)
+
   // write data
   for (const row in currentResult.value) {
     const value = currentResult.value[row]
-    //{{ Array.isArray(value) ? value.join(', ') : value }}
+    // value could be array
+    //console.log('CurrP', lexicalStorage.currentParameters)
     for (const key in value) {
-      csv += value[key] + ','
+      console.log('CSV type', key, value[key], Object.keys(tableHeaders.value)[key])
+      if (collectionColumn.includes(tableHeaders.value[key])) {
+        csv += value[key].replace('"', '').replace('[', '').replace(']', '').replace(',', ';') + ','
+      } else {
+        csv += value[key] + ','
+      }
     }
     csv += '\n'
   }
+  console.log('CSV =', csv)
   // save as file
   const anchor = document.createElement('a')
   anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv)

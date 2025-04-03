@@ -1,5 +1,5 @@
 export type Dataset = {
-  [key: string]: unknown
+  [key: string]: string
 }
 
 export type Entry = {

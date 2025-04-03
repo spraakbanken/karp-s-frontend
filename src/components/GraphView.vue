@@ -7,18 +7,28 @@ import type { paramConfig } from '@/types/parameterPosition'
 import * as d3 from 'd3'
 
 const lexicalStorage = lexicalStore()
+const currentTab = ref(lexicalStorage.activeTab)
+
+const graph_max_number_of_values = 100
 
 const currentResult = ref<Dataset[]>([])
 const tableHeaders = ref<string[]>([])
-const currentTab = ref(lexicalStorage.activeTab)
+//const currentTab = ref(lexicalStorage.activeTab)
 
 const graph_threshold = ref<number>(5)
+const graph_textangled = ref<boolean>(false)
+const graph_barwidth = ref<number>(60)
+const graph_dots = ref<boolean>(false)
+
+const graph_value_max = ref<number>(0)
+const graph_value_count = ref<number>(0)
 
 const fetchData = async () => {
-  const newParams = lexicalStorage.activeParameters
+  const newParams = lexicalStorage.selectedParameters
   const newCompileParams = lexicalStorage.selectedCompileParams
   const newColumns = lexicalStorage.selectedColumns
-  if (newParams || newCompileParams || newColumns) {
+  if (newParams && newCompileParams.length > 0) {
+    console.log('fetchData', newCompileParams, newCompileParams)
     try {
       const { tableData, headers } = await getStatisticsData(
         newParams as Record<string, paramConfig>,
@@ -28,6 +38,7 @@ const fetchData = async () => {
       currentResult.value = tableData
       tableHeaders.value = headers
       // console.log('currentResult', currentResult.value);
+      graph_threshold.value = 1
       drawChart()
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -38,118 +49,162 @@ const fetchData = async () => {
 }
 
 const drawChart = () => {
-  const leftMargin = 30
-  const rightMargin = 20
-  const bottomMargin = 30
-  const topMargin = 30
-
-  let width = 500
-  const height = 400
-
-  const barWidth = 60
-  const barSpace = 20
-
   interface dict {
     [key: string]: string | number
   }
   const dataObj: dict = {}
-  let graph_value_max: number = 0
-  let graph_value_count: number = 0
-  //console.log('currentResult.value=', currentResult.value)
+  graph_value_max.value = 0
+  graph_value_count.value = 0
   // write data
-  for (const row2 in currentResult.value) {
-    const row = currentResult.value[row2]
-    console.log('row=', row)
-    const category: string = <string>row[0] // första
-    const value: number = <number>row[1]
-    //{{ Array.isArray(value) ? value.join(', ') : value }}
-    console.log('category=', category, 'value=', value)
-    //const key = value['baseform'] // ta alltid första
+  for (const row in currentResult.value) {
+    const row2 = currentResult.value[row]
+    const category: string = <string>row2[0] // first # is always category
+    const row2_length = row2.length
+    const value: number = <number>row2[<number>row2_length - 1] // last # is always total
+    //console.log('category=', category, 'value=', value)
     if (value >= graph_threshold.value) {
-      dataObj[category] = value // sista alltid total
-      if (value > graph_value_max) {
-        graph_value_max = value
+      if (graph_value_count.value < graph_max_number_of_values) {
+        dataObj[category] = value
+        if (value > graph_value_max.value) {
+          graph_value_max.value = value
+        }
       }
-      graph_value_count++
+      graph_value_count.value++
     }
-    console.log('Count=', graph_value_count, ' max=', graph_value_max)
-
-    // bredare
-    // hover
-    // färger
-    // legends?
   }
+  //console.log('drawChart() Dataobj len=', Object.keys(dataObj).length, graph_value_count.value)
 
-  // sort on size
+  if (graph_value_count.value > 0) {
+    // create graph
 
-  d3.selectAll('#karps_graph svg').remove()
+    const barWidth = graph_barwidth.value
+    const barSpace = 20
+    const graph_dot_r = 3
+    const leftMargin = 30
+    const rightMargin = 20
+    const bottomMargin = 120
+    const topMargin = 30
 
-  width = barWidth * graph_value_count
+    const height = 400
 
-  const svg = d3
-    .select('#karps_graph')
-    .append('svg')
-    .attr('width', width + leftMargin + rightMargin)
-    .attr('height', height + topMargin + bottomMargin) // X scale and axis
-  let xscale = d3.scaleBand().domain(Object.keys(dataObj)).range([0, width])
-  let x_axis = d3.axisBottom(xscale)
+    d3.selectAll('#karps_graph svg').remove()
 
-  svg
-    .append('g')
-    .attr('transform', `translate(${leftMargin},   ${topMargin + height})`)
-    .call(x_axis) // Y scale and axis
+    const width =
+      (barWidth + barSpace) *
+      (graph_value_count.value < graph_max_number_of_values
+        ? graph_value_count.value
+        : graph_max_number_of_values)
 
-  // Math.max(...Object.values(dataObj)))
-  let yscale = d3.scaleLinear().domain([0, graph_value_max]).range([height, 0])
-  let y_axis = d3.axisLeft(yscale)
+    const svg = d3
+      .select('#karps_graph')
+      .append('svg')
+      .attr('width', width + leftMargin + rightMargin)
+      .attr('height', height + topMargin + bottomMargin)
 
-  svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(y_axis)
+    // X scale and axis
+    const xscale = d3.scaleBand().domain(Object.keys(dataObj)).range([0, width])
+    const x_axis = d3.axisBottom(xscale)
 
-  Object.values(dataObj).forEach((element, index) => {
-    let g = svg.append('g')
-    //let barWidth = 40
-    //let x = index * barWidth + barWidth / 2
-    /*
-      let x =
-        index * (width / Object.values(dataObj).length) +
-        width / Object.values(dataObj).length / 2 -
-        barWidth / 2
-    */
-    let x = index * (barWidth + barSpace)
+    if (graph_textangled.value) {
+      svg
+        .append('g')
+        .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
+        .call(x_axis)
+        .selectAll('text')
+        .style('text-anchor', 'end')
+        .attr('dx', '-.8em')
+        .attr('dy', '.15em')
+        .attr('transform', 'rotate(-65)')
+    } else {
+      svg
+        .append('g')
+        .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
+        .call(x_axis)
+    }
 
-    g.append('rect')
-      .attr('x', x)
-      .attr('y', yscale(element))
-      .attr('height', height - yscale(element))
-      .attr('width', barWidth)
-      .attr('fill', '#F0581A')
-      .attr('transform', `translate(${leftMargin}, ${topMargin})`)
-    g.append('text')
-      .attr('x', x)
-      .attr('y', yscale(element))
-      .text(element)
-      .attr('transform', `translate(${leftMargin}, ${topMargin})`)
-  })
+    // Y scale and axis
+
+    const yscale = d3.scaleLinear().domain([0, graph_value_max.value]).range([height, 0])
+    const yAxisTicks = yscale.ticks().filter(Number.isInteger)
+    const y_axis = d3.axisLeft(yscale).tickValues(yAxisTicks).tickFormat(d3.format('d'))
+
+    svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(y_axis)
+
+    Object.values(dataObj).forEach((element, index) => {
+      const g = svg.append('g')
+
+      const x = index * (barWidth + barSpace) + leftMargin / 2
+
+      g.append('rect')
+        .attr('x', x)
+        .attr('y', yscale(element))
+        .attr('height', height - yscale(element))
+        .attr('width', barWidth)
+        .attr('fill', '#F0581A')
+        .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+
+      // dot
+      if (graph_dots.value) {
+        g.append('circle')
+          .attr('cx', x + leftMargin + barWidth / 2)
+          .attr('cy', yscale(element) + 30)
+          .attr('r', graph_dot_r)
+          .attr('fill', '#000000')
+      }
+
+      g.append('text')
+        .attr('x', x + barWidth / 2)
+        .attr('y', yscale(element) - graph_dot_r - 1)
+        .attr('text-anchor', 'middle')
+        .text(element)
+        .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+    })
+  } else {
+    d3.selectAll('#karps_graph svg').remove()
+  }
 }
 
-const exportChart = () => {}
+// Export graph as SVG
+// https://stackoverflow.com/questions/23218174/how-do-i-save-export-an-svg-file-after-creating-an-svg-with-d3-js-ie-safari-an
+const exportSVG = () => {
+  const svgEl = document.getElementById('karps_graph')
+  if (svgEl !== null) {
+    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    const svgData = svgEl.innerHTML
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+    const downloadLink = document.createElement('a')
+    downloadLink.href = svgUrl
+    downloadLink.download = 'overview.svg'
+    downloadLink.click()
+  }
+}
 
 watch(
-  () => lexicalStorage.activeTab, // currentTab.value,
-  (newTab, oldTab) => {
-    if (newTab !== oldTab) {
-      console.log('FETCH & DRAW')
-
+  () => currentTab.value,
+  () => {
+    if (currentTab.value === 'graph') {
       fetchData()
-      //  drawChart()
     }
   },
   { immediate: true },
 )
 
+/*
+watch(
+  () => lexicalStorage.activeTab,
+  (newTab, oldTab) => {
+    if (newTab !== oldTab) {
+      fetchData()
+    }
+  },
+  { immediate: true },
+)
+  */
+
 watch(
   () => [
-    lexicalStorage.activeParameters,
+    lexicalStorage.selectedParameters,
     lexicalStorage.selectedCompileParams,
     lexicalStorage.selectedColumns,
   ],
@@ -168,13 +223,31 @@ const updateData = () => {
 <template>
   <div class="table-wrapper">
     <div v-if="currentResult.length">
-      <button @click="exportChart()" class="export-button">{{ $t('graphs.export') }}</button>
-      <span>
+      <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
+      <!--
+      <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
+      -->
+      <span class="graph-parameter">
         {{ $t('graphs.threshold') }}
-        <input class="graph-count" type="number" v-model="graph_threshold" @change="updateData" />
+        <input type="number" size="5" min="0" v-model="graph_threshold" @change="updateData" />
+      </span>
+      <span class="graph-parameter">
+        <input type="checkbox" v-model="graph_textangled" @change="updateData" />
+        {{ $t('graphs.textangled') }}
+      </span>
+      <span class="graph-parameter">
+        {{ $t('graphs.barwidth') }}
+        <input type="number" size="5" min="0" v-model="graph_barwidth" @change="updateData" />
+      </span>
+      <span class="graph-parameter">
+        <input type="checkbox" v-model="graph_dots" @change="updateData" />
+        {{ $t('graphs.dots') }}
       </span>
     </div>
     <p v-else class="message">{{ $t('error.nodata') }}</p>
+    <p v-if="graph_value_count > graph_max_number_of_values">
+      {{ $t('graphs.maxnumberofvalues', { number: graph_max_number_of_values }) }}
+    </p>
 
     <div id="karps_graph"></div>
   </div>
@@ -194,5 +267,9 @@ const updateData = () => {
 
 .message {
   margin: 0.5rem;
+}
+
+.graph-parameter {
+  margin-left: 1rem;
 }
 </style>

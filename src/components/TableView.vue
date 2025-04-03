@@ -17,7 +17,7 @@ const fetchData = async () => {
     try {
       const data = await getTableData()
       currentResult.value = data
-      console.log('data=', data)
+      //console.log('data=', data)
       currentValues.value = newDatasets.flatMap(
         (key) => currentResult.value[key] || [],
       ) as Dataset[]
@@ -31,7 +31,7 @@ const fetchData = async () => {
   // console.log('FETCHDATA', currentResult.value, Object.keys(currentResult).length)
 }
 
-watch(() => [lexicalStorage.selectedDatasets, lexicalStorage.activeParameters], fetchData, {
+watch(() => [lexicalStorage.selectedDatasets, lexicalStorage.selectedParameters], fetchData, {
   deep: true,
 })
 

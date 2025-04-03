@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 export const getLexicalDatasets = async () => {
   try {
     const response = await axiosInstance.get('/config')
-    //console.log('Fetched datasets:', response)
+    console.log('AXIOS Fetched datasets:', response)
     return response.data.sort((a: { label: string }, b: { label: string }) =>
       a.label.localeCompare(b.label),
     )
@@ -29,7 +29,7 @@ export const getTableData = async () => {
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
-    const queryParam = Object.entries(lexicalStoreData.activeParameters)
+    const queryParam = Object.entries(lexicalStoreData.selectedParameters)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
       .join(',')
 
@@ -38,11 +38,11 @@ export const getTableData = async () => {
     if (queryParam) {
       params['q'] = queryParam
     }
-    // console.log('param:', params)
+    console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
-    // console.log('Fetched data:', response.data.hits)
+    console.log('AXIOS getTableData: hits:', response.data.hits)
     const processedData = processDatasets(response.data.hits)
 
     return processedData
@@ -56,7 +56,7 @@ export const getSubTableData = async (compile: string, pageSize: number, dataset
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
-    const queryParam = Object.entries(lexicalStoreData.activeParameters)
+    const queryParam = Object.entries(lexicalStoreData.selectedParameters)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
       .join(',')
 
