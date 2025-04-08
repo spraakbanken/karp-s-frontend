@@ -73,7 +73,10 @@ const lastPage = () => {
 
 <template>
   <div class="table-wrapper">
-    <div class="tab">{{ lexicalStorage.lexicalLabels[props.lexicalKey] }}</div>
+    <div class="tab">
+      {{ lexicalStorage.lexicalLabels[props.lexicalKey] }}
+      ({{ props.totalHits }})
+    </div>
     <table v-if="props.data.length" class="fancy-table">
       <thead>
         <tr>
@@ -99,7 +102,9 @@ const lastPage = () => {
       <button @click="prevPage" :disabled="currentPage === 1">
         <i class="material-icons">chevron_left</i>
       </button>
-      <span>{{ currentPage }} of {{ totalPages }}</span>
+      <span style="color: var(--color-text)"
+        >{{ currentPage }} {{ $t('table.of') }} {{ totalPages }}</span
+      >
       <button @click="nextPage" :disabled="currentPage === totalPages">
         <i class="material-icons">chevron_right</i>
       </button>
@@ -127,7 +132,7 @@ const lastPage = () => {
 .tab {
   display: inline-block;
   padding: 0.7rem 1rem;
-  background-color: var(--sb-orange-light);
+  background-color: var(--table-head-bg);
   color: var(--color-heading);
   font-weight: bold;
   border: 1px solid var(--color-border);
@@ -153,7 +158,7 @@ td {
 }
 
 th {
-  background-color: var(--sb-orange-light);
+  background-color: var(--table-head-bg);
   color: var(--color-heading);
   font-weight: bold;
   cursor: pointer;

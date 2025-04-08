@@ -177,7 +177,7 @@ const exportCSV = () => {
         <tr>
           <th v-for="key in tableHeaders" :key="key" @click="sortTable(String(key))">
             <div class="header-content">
-              <span>{{ key }}</span>
+              <span>{{ key }} - {{ currentResult.length }}</span>
             </div>
           </th>
         </tr>

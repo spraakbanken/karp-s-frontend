@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import AdditionsList from '@/components/AdditionsList.vue'
 import NewsList from '@/components/NewsList.vue'
+
+const transformLinks = (text: string) => {
+  const linkExpr = /\[\[(.*?)\]\]/gi
+  const linkValueExpr = /(\s+\|\s+)/
+  return text.replace(linkExpr, (expr, value) => {
+    const parts = value.split(linkValueExpr)
+    const link = `<a href="${parts[0]}">${parts[2]}</a>`
+
+    return link
+  })
+}
 </script>
 
 <template>
@@ -10,7 +21,7 @@ import NewsList from '@/components/NewsList.vue'
         <!-- About -->
         <div>
           <h2>{{ $t('about.about.title') }}</h2>
-          <p>{{ $t('about.about.text') }}</p>
+          <p v-html="$t('about.about.text')"></p>
         </div>
       </div>
       <div class="col">
@@ -64,6 +75,7 @@ import NewsList from '@/components/NewsList.vue'
     flex-direction: column;
     flex-basis: 100%;
     flex: 1;
+    margin-right: 2rem;
   }
 
   .additions {

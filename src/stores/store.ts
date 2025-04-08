@@ -63,6 +63,7 @@ export const lexicalStore = defineStore('dataset', {
         }, {})
       //this.totalDatasets = config.length
       //this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
+
       this.paramsInDatasets = config.reduce(
         (acc, c) => {
           acc[c.resourceId] = c.fields.map((f) => f)
@@ -97,10 +98,27 @@ export const lexicalStore = defineStore('dataset', {
         this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
       } else {
         const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
+        console.log('STORE ssd', keys, allParamsArray)
         if (allParamsArray.length > 0) {
-          this.currentParameters = allParamsArray.reduce((acc, params) => {
-            return acc.filter((param) => params.includes(param))
-          })
+          // remove duplicates
+          let intersection = allParamsArray[0]
+
+          // Find the intersection with the rest of the datasets
+          for (let i = 1; i < allParamsArray.length; i++) {
+            intersection = intersection.filter((param) =>
+              allParamsArray[i].some(
+                (otherParam) => otherParam.name === param.name && otherParam.type === param.type,
+              ),
+            )
+          }
+          this.currentParameters = intersection
+
+          /*
+          this.currentParameters = allParamsArray.filter(
+            (obj1, i, arr) => arr.findIndex((obj2) => obj2.name === obj1.name) === i,
+          )
+            */
+          //return acc.filter((param) => params.includes(param))
         } else {
           return []
         }

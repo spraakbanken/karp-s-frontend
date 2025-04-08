@@ -9,7 +9,6 @@
 
 a,
 .green {
-  text-decoration: none;
   color: var(--color-text);
   transition: 0.4s;
   padding: 3px;
@@ -17,7 +16,8 @@ a,
 
 @media (hover: hover) {
   a:hover {
-    background-color: grey;
+    /*background-color: grey;*/
+    color: var(--sb-orange);
   }
 }
 

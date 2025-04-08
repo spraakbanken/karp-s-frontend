@@ -14,7 +14,6 @@ const selectedParameters = computed({
   get: () => lexicalStorage.selectedParameters,
   set: (value) => lexicalStorage.setParameters(value),
 })
-
 const selectedCompileParams = computed({
   get: () => lexicalStorage.selectedCompileParams,
   set: (value) => lexicalStorage.setSelectedCompileParams(value),
@@ -120,8 +119,9 @@ const updateCompileParams = () => {
 }
 
 watch(selectedParametersArray, (newParams) => {
-  console.log(newParams)
+  console.log('WATCH selectedParametersArray:', newParams)
   newParams.forEach((param) => {
+    console.log('   param:', param)
     if (!parameters.value[param]) {
       parameters.value[param] = { value: '', position: 'equals' }
     }
@@ -167,7 +167,7 @@ watch(
   (newSelectedParameters) => {
     console.log('watch selectedParameters', newSelectedParameters)
     selectedParametersArray.value = Object.keys(newSelectedParameters)
-    console.log('-- parameters1', parameters)
+    console.log('-- parameters1', parameters, selectedParametersArray.value)
     Object.keys(newSelectedParameters).forEach((param) => {
       if (!parameters.value[param]) {
         parameters.value[param] = {
@@ -220,6 +220,7 @@ watch(
     >
       <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
+        {{ console.log('SELECT currentParams', currentParams) }}
         <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
         <span v-else-if="currentParams.length === 0">{{
           $t('dataselector.datasets.nocommon')
@@ -231,7 +232,7 @@ watch(
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
         <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
-          <input type="checkbox" :value="param" v-model="selectedParametersArray" />
+          <input type="checkbox" :value="param.name" v-model="selectedParametersArray" />
           {{ param.name }}
         </label>
       </div>
@@ -240,6 +241,7 @@ watch(
     <div v-for="param in selectedParametersArray" :key="param" class="search-container">
       <span :for="param">{{ $t('dataselector.parameters.prefix') }}: {{ param }}</span>
       <div class="input-group">
+        {{ console.log('Param=', param, selectedParametersArray) }}
         <select v-model="parameters[param].position">
           <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
           <option
@@ -285,7 +287,7 @@ watch(
           <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
             <input
               type="checkbox"
-              :value="param"
+              :value="param.name"
               v-model="selectedCompileParams"
               @change="updateCompileParams"
             />
@@ -312,7 +314,7 @@ watch(
           <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
             <input
               type="checkbox"
-              :value="param"
+              :value="param.name"
               v-model="selectedColumns"
               @change="updateColumns"
             />
@@ -413,6 +415,7 @@ watch(
 .statistics {
   background-color: var(--sb-grey-light);
   padding: 0.5rem;
+  color: black;
 }
 
 .statistics-header {

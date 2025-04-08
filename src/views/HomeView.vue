@@ -81,7 +81,7 @@ const setActiveTab = (tab: string) => {
   height: 2.5rem;
   padding-top: 0.5rem;
   padding-left: 1rem;
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-complement);
   font-size: medium;
   font-weight: bold;
 }
@@ -93,7 +93,7 @@ const setActiveTab = (tab: string) => {
   /*border-bottom: 2px solid var(--border-color);*/
   padding-left: 1rem;
   padding-top: 0.5rem;
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-complement);
   height: 2.5rem;
 }
 
@@ -103,7 +103,7 @@ const setActiveTab = (tab: string) => {
   border: none;
   border: 1px solid white;
   border-bottom: none;
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-complement);
   cursor: pointer;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
