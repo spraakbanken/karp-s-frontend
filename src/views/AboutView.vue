@@ -2,16 +2,9 @@
 import AdditionsList from '@/components/AdditionsList.vue'
 import NewsList from '@/components/NewsList.vue'
 
-const transformLinks = (text: string) => {
-  const linkExpr = /\[\[(.*?)\]\]/gi
-  const linkValueExpr = /(\s+\|\s+)/
-  return text.replace(linkExpr, (expr, value) => {
-    const parts = value.split(linkValueExpr)
-    const link = `<a href="${parts[0]}">${parts[2]}</a>`
-
-    return link
-  })
-}
+const ex1 = encodeURI(
+  'https://spraakbanken.gu.se/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=statistics&q=startswith|ursprungligt_ord|blom&compile=normaliserat_ord',
+)
 </script>
 
 <template>
@@ -30,10 +23,7 @@ const transformLinks = (text: string) => {
           <h2>{{ $t('about.examples.title') }}</h2>
           <ul>
             <li>
-              <a
-                href="https://spraakbanken.gu.se/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=statistics&q=startswith|ursprungligt_ord|blom&compile=normaliserat_ord"
-                >{{ $t('about.examples.ex1') }}</a
-              >
+              <a href="{{ex1}}">{{ $t('about.examples.ex1') }}</a>
             </li>
           </ul>
         </div>
