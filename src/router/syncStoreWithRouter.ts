@@ -44,11 +44,14 @@ export function syncStoreWithRouter(router: Router) {
 
   const initializeStoreFromQuery = () => {
     const query = new URLSearchParams(window.location.search)
+    //console.log('initializeStoreFromQuery: query=', query, query.get('tab'))
+
     if (query.has('resources')) {
       lexicalStorage.setSelectedDataset(query.get('resources')!.split(','))
     }
     if (query.has('q')) {
       const activeParams = query.get('q')!.split(',')
+      console.log('initializeStoreFromQuery: activeParams=', activeParams)
       //const keys = []
       const parameters: Record<string, paramConfig> = {}
       for (const param of activeParams) {
@@ -75,6 +78,7 @@ export function syncStoreWithRouter(router: Router) {
       lexicalStorage.selectedColumns = selectedColumns
     }
     if (query.has('tab')) {
+      console.log('initializeStoreFromQuery: tab=', query.get('tab'))
       lexicalStorage.setActiveTab(query.get('tab')!)
     }
   }

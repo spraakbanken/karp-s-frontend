@@ -204,7 +204,7 @@ watch(
               v-model="selectedDatasets"
               @change="selectDataset"
             />
-            {{ lexicalStorage.lexicalLabels[dataset] }}
+            {{ lexicalStorage.datasetLabels[dataset] }}
           </label>
         </div>
       </div>

@@ -74,7 +74,7 @@ const lastPage = () => {
 <template>
   <div class="table-wrapper">
     <div class="tab">
-      {{ lexicalStorage.lexicalLabels[props.lexicalKey] }}
+      {{ lexicalStorage.datasetLabels[props.lexicalKey] }}
       ({{ props.totalHits }})
     </div>
     <table v-if="props.data.length" class="fancy-table">

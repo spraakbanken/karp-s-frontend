@@ -28,7 +28,14 @@ const transformLinks = (text: string) => {
         <!-- Examples -->
         <div>
           <h2>{{ $t('about.examples.title') }}</h2>
-          <p>{{ $t('about.examples.text') }}</p>
+          <ul>
+            <li>
+              <a
+                href="https://spraakbanken.gu.se/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=statistics&q=startswith|ursprungligt_ord|blom&compile=normaliserat_ord"
+                >{{ $t('about.examples.ex1') }}</a
+              >
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -37,7 +44,7 @@ const transformLinks = (text: string) => {
         <!-- Latest lexicons/datasets -->
         <div>
           <h2>{{ $t('about.additions.title') }}</h2>
-          <p>{{ $t('about.additions.text') }}</p>
+          <!-- <p>{{ $t('about.additions.text') }}</p> -->
           <div class="additions">
             <AdditionsList />
           </div>
@@ -76,10 +83,6 @@ const transformLinks = (text: string) => {
     flex-basis: 100%;
     flex: 1;
     margin-right: 2rem;
-  }
-
-  .additions {
-    margin-top: 1rem;
   }
 
   .news {

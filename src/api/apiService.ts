@@ -16,9 +16,7 @@ export const getLexicalDatasets = async () => {
   try {
     const response = await axiosInstance.get('/config')
     console.log('AXIOS Fetched datasets:', response)
-    return response.data.sort((a: { label: string }, b: { label: string }) =>
-      a.label.localeCompare(b.label),
-    )
+    return response.data //.sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label),)
   } catch (error) {
     throw error
   }

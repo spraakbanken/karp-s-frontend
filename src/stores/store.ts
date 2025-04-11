@@ -1,39 +1,37 @@
 import type { paramConfig } from '@/types/parameterPosition'
 import { defineStore } from 'pinia'
 
-interface FieldConfig {
-  name: string
-  type: string
-  collection: boolean
-}
-
-interface KarpsConfig {
-  resourceId: string
-  label: string
-  fields: FieldConfig[]
-}
+import {
+  type FieldConfig,
+  type Label,
+  type Resource,
+  type TagLabel,
+  type Tag,
+  type FieldConfigArray,
+  type Config,
+  type DatasetDates,
+} from '@/types/datasetConfig.ts'
 
 interface SearchRedux {
   //allParams: string[]
   currentDatasets: string[] // was - datasetKeys[]
   selectedDatasets: string[]
   //totalDatasets: number
-  paramsInDatasets: Record<string, FieldConfig[]> // resurceId - field names
+  paramsInDatasets: Record<string, FieldConfig[]> // object with key: resurceId, value: FieldConfig-array
   currentParameters: FieldConfig[] // currentParams = available fields in selected datasets
   selectedParameters: Record<string, paramConfig>
   //selectedParams: string[]
-
   selectedColumns: string[]
   selectedCompileParams: string[]
   searchQuery: string
   activeTab: string
   activeLocale: string
-  lexicalLabels: Record<string, string>
+  datasetLabels: Record<string, string>
+  datasetDates: DatasetDates[]
 }
 
 // currentParams = list of available fields in selected datasets
 // selectedParams = list of selected fields
-// activeParameters
 export const lexicalStore = defineStore('dataset', {
   state: (): SearchRedux => ({
     //allParams: [],
@@ -49,24 +47,43 @@ export const lexicalStore = defineStore('dataset', {
     searchQuery: '',
     activeTab: 'table',
     activeLocale: 'swe',
-    lexicalLabels: {},
+    datasetLabels: {},
+    datasetDates: [],
   }),
   actions: {
-    setDefault(config: KarpsConfig[]) {
+    setDefault(config: Config) {
       console.log('--setDefault', config)
 
-      this.currentDatasets = config.map((c) => c.resourceId)
-      this.lexicalLabels = config
-        .map((c) => ({ [c.resourceId]: c.label }))
+      this.currentDatasets = config.resources.map((c) => c.resourceId)
+      this.datasetLabels = config.resources
+        .map((c) => ({ [c.resourceId]: c.label.eng ? c.label.eng : c.label })) // TODO
         .reduce((acc, obj) => {
           return { ...acc, ...obj }
         }, {})
-      //this.totalDatasets = config.length
+      this.datasetDates = config.resources.map((c) => ({
+        resourceId: c.resourceId,
+        label: this.datasetLabels[c.resourceId],
+        updated: c.updated,
+      }))
+      /*
+        .reduce((acc, obj) => {
+          return { ...acc, ...obj }
+        }, {})
+        */
+      this.datasetDates.sort(function (a, b) {
+        return parseInt(b.updated) - parseInt(a.updated)
+      })
+
+      console.log('datasetDates', this.datasetDates)
       //this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
 
-      this.paramsInDatasets = config.reduce(
+      // we want all fields that are in selected datasets
+      // paramsInDatasets: Record<string, FieldConfig[]>
+      // object with key: resurceId, value: FieldConfig-array
+      this.paramsInDatasets = config.resources.reduce(
         (acc, c) => {
-          acc[c.resourceId] = c.fields.map((f) => f)
+          // we want the FieldConfig for f, not f name (string)
+          acc[c.resourceId] = c.fields.map((f) => config.fields[f])
           return acc
         },
         {} as Record<string, FieldConfig[]>,
@@ -92,13 +109,11 @@ export const lexicalStore = defineStore('dataset', {
       this.activeTab = tab
     },
     setSelectedDataset(keys: string[]) {
-      console.log('setSelectedDataset', keys)
       this.selectedDatasets = keys
       if (keys.length === 1) {
         this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
       } else {
         const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
-        console.log('STORE ssd', keys, allParamsArray)
         if (allParamsArray.length > 0) {
           // remove duplicates
           let intersection = allParamsArray[0]

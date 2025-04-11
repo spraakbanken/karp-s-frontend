@@ -4,7 +4,7 @@ import DataSelection from '@/components/DataSelection.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import GraphView from '@/components/GraphView.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 
 import { getLexicalDatasets } from '@/api/apiService'
@@ -19,6 +19,7 @@ onMounted(async () => {
     console.log('--HomeView/onMounted()')
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
+    console.log('--HomeView/onMounted() prep to sync')
     syncStoreWithRouter(router)
   } catch (error) {
     console.error(error)
@@ -31,6 +32,13 @@ const setActiveTab = (tab: string) => {
   lexicalStorage.setActiveTab(tab)
   activeTab.value = tab
 }
+
+watch(
+  () => lexicalStorage.activeTab,
+  (newTab) => {
+    activeTab.value = newTab
+  },
+)
 </script>
 
 <template>

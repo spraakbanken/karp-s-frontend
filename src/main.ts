@@ -17,6 +17,9 @@ import sv from '@/locales/sv.json'
 const i18n = createI18n({
   locale: 'sv',
   fallbackLocale: 'en',
+  legacy: false,
+  warnHtmlMessage: false,
+  warnHtmlInMessage: 'off', // disable of the Detected HTML in message
   messages: {
     en: {
       ...en,

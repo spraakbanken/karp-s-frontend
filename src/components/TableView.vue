@@ -10,6 +10,8 @@ const lexicalStorage = lexicalStore()
 const currentResult = ref<Record<string, { entries: Dataset[]; total: number }>>({})
 const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeTab)
+const picBar = ref<string>('')
+const picBars = ref<number[]>([])
 
 const fetchData = async () => {
   const newDatasets = lexicalStorage.selectedDatasets
