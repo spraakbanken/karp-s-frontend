@@ -168,6 +168,7 @@ c.label.eng == c.label["eng"]
     },
     setSelectedTag(tags: string[]) {
       this.selectedTags = tags
+      this.setSelectedDataset(this.selectedDatasets)
     },
     setLocale(locale: string) {
       this.activeLocale = locale
