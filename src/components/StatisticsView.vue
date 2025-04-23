@@ -50,6 +50,7 @@ watch(
 
 watch(
   () => [
+    lexicalStorage.selectedDatasets,
     lexicalStorage.selectedParameters,
     lexicalStorage.selectedCompileParams,
     lexicalStorage.selectedColumns,

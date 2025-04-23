@@ -11,8 +11,10 @@ const logoKarpEn = ref('')
 // const lexicalStorage = lexicalStore()
 
 function resetApp() {
-  window.location.href = window.location.pathname
-  //window.location.href = '/'
+  // console.log('Pathname ', window.location.pathname)
+  // window.location.href = window.location.pathname
+  window.location.href = '/karp-s/'
+  //router.push('/')
 }
 
 const updateTheme = async () => {

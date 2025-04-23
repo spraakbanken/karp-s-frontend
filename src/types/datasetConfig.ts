@@ -14,7 +14,9 @@ export interface Resource {
   resourceId: string
   label: Label
   fields: string[] // WAS: FieldConfig[], but it isn't when we get it from the BE
+  tags: string[]
   updated: string
+  word: string
 }
 
 export interface TagLabel {

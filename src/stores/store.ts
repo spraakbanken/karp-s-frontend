@@ -11,11 +11,15 @@ import {
   type Config,
   type DatasetDates,
 } from '@/types/datasetConfig.ts'
+import { isUndefined } from 'es-toolkit'
 
 interface SearchRedux {
   //allParams: string[]
+  currentConfig: Config
   currentDatasets: string[] // was - datasetKeys[]
   selectedDatasets: string[]
+  currentTags: string[]
+  selectedTags: string[]
   //totalDatasets: number
   paramsInDatasets: Record<string, FieldConfig[]> // object with key: resurceId, value: FieldConfig-array
   currentParameters: FieldConfig[] // currentParams = available fields in selected datasets
@@ -35,8 +39,11 @@ interface SearchRedux {
 export const lexicalStore = defineStore('dataset', {
   state: (): SearchRedux => ({
     //allParams: [],
+    currentConfig: { resources: [], tags: {}, fields: {} },
     currentDatasets: [],
     selectedDatasets: [],
+    currentTags: [],
+    selectedTags: [],
     //totalDatasets: 0,
     paramsInDatasets: {},
     currentParameters: [],
@@ -46,7 +53,7 @@ export const lexicalStore = defineStore('dataset', {
     selectedCompileParams: [],
     searchQuery: '',
     activeTab: 'table',
-    activeLocale: 'swe',
+    activeLocale: 'sv',
     datasetLabels: {},
     datasetDates: [],
   }),
@@ -54,12 +61,27 @@ export const lexicalStore = defineStore('dataset', {
     setDefault(config: Config) {
       console.log('--setDefault', config)
 
+      this.currentConfig = config
       this.currentDatasets = config.resources.map((c) => c.resourceId)
-      this.datasetLabels = config.resources
-        .map((c) => ({ [c.resourceId]: c.label.eng ? c.label.eng : c.label })) // TODO
-        .reduce((acc, obj) => {
-          return { ...acc, ...obj }
-        }, {})
+      if (this.activeLocale == 'sv') {
+        this.datasetLabels = config.resources
+          .map((c) => ({ [c.resourceId]: c.label.swe ? c.label.swe : c.label }))
+          .reduce((acc, obj) => {
+            return { ...acc, ...obj }
+          }, {})
+      } else {
+        this.datasetLabels = config.resources
+          .map((c) => ({ [c.resourceId]: c.label.eng ? c.label.eng : c.label }))
+          .reduce((acc, obj) => {
+            return { ...acc, ...obj }
+          }, {})
+      }
+
+      this.currentTags = [
+        ...new Set(config.resources.flatMap((c) => (c.tags == undefined ? [] : c.tags))),
+      ]
+      // .filter((elt) => elt !== undefined))
+      console.log('CurrentTags:', this.currentTags)
       this.datasetDates = config.resources.map((c) => ({
         resourceId: c.resourceId,
         label: this.datasetLabels[c.resourceId],
@@ -139,9 +161,33 @@ export const lexicalStore = defineStore('dataset', {
         }
       }
       // console.log('currentParams', this.currentParams)
+
+      /*
+c.label.eng == c.label["eng"]
+*/
+    },
+    setSelectedTag(tags: string[]) {
+      this.selectedTags = tags
     },
     setLocale(locale: string) {
       this.activeLocale = locale
+      if (this.activeLocale == 'sv') {
+        this.datasetLabels = this.currentConfig.resources
+          .map((c) => ({
+            [c.resourceId]: c.label.swe ? c.label.swe : c.label,
+          }))
+          .reduce((acc, obj) => {
+            return { ...acc, ...obj }
+          }, {})
+      } else {
+        this.datasetLabels = this.currentConfig.resources
+          .map((c) => ({
+            [c.resourceId]: c.label.eng ? c.label.eng : c.label,
+          }))
+          .reduce((acc, obj) => {
+            return { ...acc, ...obj }
+          }, {})
+      }
     },
     setParameters(params: Record<string, paramConfig>) {
       this.selectedParameters = params

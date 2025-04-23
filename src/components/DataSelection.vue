@@ -5,10 +5,13 @@ import type { paramConfig } from '@/types/parameterPosition'
 
 const lexicalStorage = lexicalStore()
 
-const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const selectedDatasets = computed({
   get: () => lexicalStorage.selectedDatasets,
   set: (value) => lexicalStorage.setSelectedDataset(value),
+})
+const selectedTags = computed({
+  get: () => lexicalStorage.selectedTags,
+  set: (value) => lexicalStorage.setSelectedTag(value),
 })
 const selectedParameters = computed({
   get: () => lexicalStorage.selectedParameters,
@@ -23,6 +26,8 @@ const selectedColumns = computed({
   set: (value) => lexicalStorage.setSelectedColumns(value),
 })
 
+const currentDatasets = computed(() => lexicalStorage.currentDatasets)
+const currentTags = computed(() => lexicalStorage.currentTags)
 const currentParams = computed(() => lexicalStorage.currentParameters)
 //const totalDatasets = computed(() => lexicalStorage.totalDatasets)
 /*
@@ -32,7 +37,7 @@ const selectedParametersArray = computed({
 })
   */
 const selectedParametersArray = ref<string[]>([])
-
+const searchDatasets = ref('')
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
 const isDropdownColumns = ref(false)
@@ -103,6 +108,10 @@ const selectDataset = () => {
   updateSelectedDataset()
 }
 
+const selectTags = () => {
+  lexicalStorage.setSelectedTag(selectedTags.value)
+}
+
 // update state from URL
 const updateData = () => {
   lexicalStorage.setParameters(parameters.value)
@@ -117,6 +126,39 @@ const updateColumns = () => {
 const updateCompileParams = () => {
   lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
 }
+
+const filterDatasets = computed(() => {
+  if (!searchDatasets.value) {
+    return currentDatasets.value
+  }
+  //const locale = useI18n()
+  let label = ''
+
+  const arr = []
+  const currentConfig = lexicalStorage.currentConfig
+  for (const c of currentConfig.resources) {
+    if (lexicalStorage.activeLocale == 'sv') {
+      label = c.label.swe ? c.label.swe : c.label
+    } else {
+      label = c.label.eng ? c.label.eng : c.label
+    }
+    //const label: string = c.label.eng ? c.label.eng : c.label
+    if (label.indexOf(searchDatasets.value) !== -1) {
+      arr.push(c.resourceId)
+    }
+  }
+
+  /*
+  //const arr = lexicalStorage.datasetLabels
+  //const query = searchDatasets.value
+  //const x = arr.filter((element) => element.toLowerCase().indexOf(query.toLowerCase()) !== -1)
+  const x = currentDatasets.value.filter((dataset) => dataset.indexOf(searchDatasets.value) !== -1)
+  //     dataset.toLowerCase().includes(searchDatasets.value.toLowerCase()),
+  */
+  console.log('COMPUTED filterDatasets:', searchDatasets.value, currentDatasets.value, arr)
+
+  return arr
+})
 
 watch(selectedParametersArray, (newParams) => {
   console.log('WATCH selectedParametersArray:', newParams)
@@ -163,6 +205,26 @@ watch(
 )
 
 watch(
+  () => selectedTags.value,
+  (newTags) => {
+    const currentConfig = lexicalStorage.currentConfig
+    // select datasets that have one of the tags in newTags
+    selectedDatasets.value = []
+    for (const tag of newTags) {
+      for (const elt of currentConfig.resources) {
+        if (elt.tags !== undefined) {
+          if (elt.tags.includes(tag)) {
+            if (!selectedDatasets.value.includes(elt.resourceId)) {
+              selectedDatasets.value.push(elt.resourceId)
+            }
+          }
+        }
+      }
+    }
+  },
+)
+
+watch(
   () => lexicalStorage.selectedParameters,
   (newSelectedParameters) => {
     console.log('watch selectedParameters', newSelectedParameters)
@@ -197,7 +259,16 @@ watch(
           {{ currentDatasets.length }})
         </div>
         <div class="dropdown-menu" v-if="isDropdownOpen">
-          <label v-for="dataset in currentDatasets" :key="dataset" class="dropdown-item">
+          <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
+          <div v-for="tag in currentTags" :key="tag" class="dropdown-tags">
+            <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
+            {{ lexicalStorage.currentConfig.tags[tag].label }}
+          </div>
+          <div class="dropdown-group">{{ $t('dataselector.datasets.title') }}</div>
+          <div class="dropdown-filter">
+            {{ $t('dataselector.datasets.filter') }}: <input type="text" v-model="searchDatasets" />
+          </div>
+          <label v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
             <input
               type="checkbox"
               :value="dataset"
@@ -220,7 +291,6 @@ watch(
     >
       <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
-        {{ console.log('SELECT currentParams', currentParams) }}
         <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
         <span v-else-if="currentParams.length === 0">{{
           $t('dataselector.datasets.nocommon')
@@ -352,6 +422,11 @@ watch(
   border-color: var(--sb-orange);
 }
 
+.dropdown-group {
+  background-color: var(--sb-grey-light);
+  padding-left: 0.5rem;
+}
+
 .dropdown-disabled {
   pointer-events: none;
   opacity: 0.6;
@@ -373,7 +448,7 @@ watch(
   right: 0;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
-  max-height: 200px;
+  max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
 }
@@ -391,6 +466,20 @@ watch(
 
 .dropdown-item input {
   margin-right: 0.5rem;
+}
+.dropdown-tags {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: var(--color-text);
+}
+
+.dropdown-tags input {
+  margin-right: 0.5rem;
+}
+
+.dropdown-filter {
+  padding: 0.5rem 1rem;
 }
 
 .input-group {

@@ -100,7 +100,7 @@ export const getStatisticsData = async (
       params['q'] = queryParam
     }
     if (compileParams.length > 0) {
-      params['compile'] = compileParams.join(',')
+      params['compile'] = "'" + compileParams.join(',') + "'"
     }
     if (columns.length > 0) {
       params['columns'] = 'resource_id=' + columns.join(',')
