@@ -92,7 +92,10 @@ export const getStatisticsData = async (
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
     const queryParam = Object.entries(query)
-      .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+      .map(
+        ([key, value]) =>
+          `${value.position}|${encodeURIComponent(key)}|${encodeURIComponent(value.value)}`,
+      )
       .join(',')
     const params: Record<string, string> = {}
     params['resources'] = resources
@@ -100,7 +103,7 @@ export const getStatisticsData = async (
       params['q'] = queryParam
     }
     if (compileParams.length > 0) {
-      params['compile'] = "'" + compileParams.join(',') + "'"
+      params['compile'] = encodeURIComponent(compileParams.join(','))
     }
     if (columns.length > 0) {
       params['columns'] = 'resource_id=' + columns.join(',')

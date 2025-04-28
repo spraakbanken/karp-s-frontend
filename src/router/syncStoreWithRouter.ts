@@ -63,7 +63,7 @@ export function syncStoreWithRouter(router: Router) {
         //activeP.push(rec)
       }
       //lexicalStorage.setParameters(activeP)
-      lexicalStorage.setParameters(parameters)
+      lexicalStorage.setSelectedParameters(parameters)
     }
     if (query.has('compile')) {
       const selectedCompileParams = query.get('compile')!.split(',')

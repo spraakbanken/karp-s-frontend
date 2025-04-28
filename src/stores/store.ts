@@ -11,7 +11,7 @@ import {
   type Config,
   type DatasetDates,
 } from '@/types/datasetConfig.ts'
-import { isUndefined } from 'es-toolkit'
+//import { isUndefined } from 'es-toolkit'
 
 interface SearchRedux {
   //allParams: string[]
@@ -190,7 +190,7 @@ c.label.eng == c.label["eng"]
           }, {})
       }
     },
-    setParameters(params: Record<string, paramConfig>) {
+    setSelectedParameters(params: Record<string, paramConfig>) {
       this.selectedParameters = params
     },
     setEmpty() {

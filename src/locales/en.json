@@ -12,6 +12,7 @@
   "about.about.text": "Karp-S is Språkbanken's data publishing platform. Search in structured data, eg lexicons. If you are using Karp-S in your work, please <a href='https://spraakbanken.gu.se/en/about/howtocite'>cite us</a>. For questions or comments, contact us at <a href='mailto:sb-info{'@'}svenska.gu.se'>sb-info{'@'}svenska.gu.se</a>.",
   "about.examples.title": "Search examples",
   "about.examples.ex1": "Statistics for words in SAOL that begins with 'blom'",
+  "about.examples.ex2": "Overview for words in SAOL that begins with 'blom'",
   "about.additions.title": "Latest additions",
   "about.additions.text": "Latest additions:",
   "about.news.title": "News",

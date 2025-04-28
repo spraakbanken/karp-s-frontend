@@ -49,6 +49,7 @@ const fetchData = async () => {
 }
 
 const drawChart = () => {
+  console.log('drawChart()', currentResult.value[0].length)
   interface dict {
     [key: string]: string | number
   }
@@ -61,7 +62,7 @@ const drawChart = () => {
     const category: string = <string>row2[0] // first # is always category
     const row2_length = row2.length
     const value: number = <number>row2[<number>row2_length - 1] // last # is always total
-    //console.log('category=', category, 'value=', value)
+    console.log('row=', row, 'category=', category, 'value=', value)
     if (value >= graph_threshold.value) {
       if (graph_value_count.value < graph_max_number_of_values) {
         dataObj[category] = value
@@ -72,7 +73,7 @@ const drawChart = () => {
       graph_value_count.value++
     }
   }
-  //console.log('drawChart() Dataobj len=', Object.keys(dataObj).length, graph_value_count.value)
+  console.log('drawChart() Dataobj len=', Object.keys(dataObj).length, graph_value_count.value)
 
   if (graph_value_count.value > 0) {
     // create graph

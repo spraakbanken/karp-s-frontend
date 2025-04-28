@@ -15,7 +15,7 @@ const selectedTags = computed({
 })
 const selectedParameters = computed({
   get: () => lexicalStorage.selectedParameters,
-  set: (value) => lexicalStorage.setParameters(value),
+  set: (value) => lexicalStorage.setSelectedParameters(value),
 })
 const selectedCompileParams = computed({
   get: () => lexicalStorage.selectedCompileParams,
@@ -114,7 +114,7 @@ const selectTags = () => {
 
 // update state from URL
 const updateData = () => {
-  lexicalStorage.setParameters(parameters.value)
+  lexicalStorage.setSelectedParameters(parameters.value)
 }
 
 // update state from URL
