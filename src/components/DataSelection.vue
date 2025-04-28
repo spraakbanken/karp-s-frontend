@@ -53,7 +53,7 @@ const ParameterPositionText = [
   'dataselector.parameter.position.equals',
   'dataselector.parameter.position.regex',
 ]
-const ParameterPositionEnabled = [true, false, false, true, false]
+const ParameterPositionEnabled = [true, true, false, true, false]
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -429,7 +429,7 @@ watch(
 
 .dropdown-disabled {
   pointer-events: none;
-  opacity: 0.6;
+  color: var(--sb-grey-medium);
   cursor: not-allowed;
 }
 
