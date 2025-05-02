@@ -179,15 +179,13 @@ export const lexicalStore = defineStore('dataset', {
         }
       }
       // console.log('currentParams', this.currentParams)
-
-      /*
-c.label.eng == c.label["eng"]
-*/
     },
+    /*
     setSelectedTag(tags: string[]) {
       this.selectedTags = tags
       this.setSelectedDataset(this.selectedDatasets)
     },
+    */
     setLocale(locale: string) {
       console.log('setLocale()')
       this.activeLocale = locale

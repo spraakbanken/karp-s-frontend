@@ -34,7 +34,9 @@ export const getTableData = async () => {
     const params: Record<string, string> = {}
     params['resources'] = resources
     if (queryParam) {
-      params['q'] = queryParam
+      if (!queryParam.endsWith('|')) {
+        params['q'] = queryParam
+      }
     }
     console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
@@ -100,7 +102,9 @@ export const getStatisticsData = async (
     const params: Record<string, string> = {}
     params['resources'] = resources
     if (queryParam) {
-      params['q'] = queryParam
+      if (!queryParam.endsWith('|')) {
+        params['q'] = queryParam
+      }
     }
     if (compileParams.length > 0) {
       params['compile'] = encodeURIComponent(compileParams.join(','))

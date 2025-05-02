@@ -101,7 +101,7 @@ const selectTags = (tag: string) => {
   //lexicalStorage.setSelectedTag(selectedTags.value)
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
 
-  console.log('selectTags', tag, selectedDatasets.value)
+  //console.log('selectTags', tag, selectedDatasets.value)
 }
 
 const unselectTags = () => {
