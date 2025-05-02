@@ -19,7 +19,7 @@ interface SearchRedux {
   currentDatasets: string[] // was - datasetKeys[]
   selectedDatasets: string[]
   currentTags: string[]
-  selectedTags: string[]
+  //selectedTags: string[]
   //totalDatasets: number
   paramsInDatasets: Record<string, FieldConfig[]> // object with key: resurceId, value: FieldConfig-array
   currentParameters: FieldConfig[] // currentParams = available fields in selected datasets
@@ -43,7 +43,7 @@ export const lexicalStore = defineStore('dataset', {
     currentDatasets: [],
     selectedDatasets: [],
     currentTags: [],
-    selectedTags: [],
+    //selectedTags: [],
     //totalDatasets: 0,
     paramsInDatasets: {},
     currentParameters: [],
@@ -163,12 +163,6 @@ export const lexicalStore = defineStore('dataset', {
           }
           this.currentParameters = intersection
 
-          /*
-          this.currentParameters = allParamsArray.filter(
-            (obj1, i, arr) => arr.findIndex((obj2) => obj2.name === obj1.name) === i,
-          )
-            */
-          //return acc.filter((param) => params.includes(param))
           // add 'word' (ingångsord)
           this.currentParameters.unshift({
             name: 'word',

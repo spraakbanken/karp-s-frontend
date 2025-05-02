@@ -9,10 +9,12 @@ const selectedDatasets = computed({
   get: () => lexicalStorage.selectedDatasets,
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
+/*
 const selectedTags = computed({
   get: () => lexicalStorage.selectedTags,
   set: (value) => lexicalStorage.setSelectedTag(value),
 })
+  */
 const selectedParameters = computed({
   get: () => lexicalStorage.selectedParameters,
   set: (value) => lexicalStorage.setSelectedParameters(value),
@@ -70,8 +72,40 @@ const selectDataset = () => {
   updateSelectedDataset()
 }
 
+/*
 const selectTags = () => {
   lexicalStorage.setSelectedTag(selectedTags.value)
+}
+*/
+const selectTags = (tag: string) => {
+  /*
+  if (selectedTags.value.indexOf(tag) == -1) {
+    selectedTags.value.push(tag)
+  }
+*/
+  const currentConfig = lexicalStorage.currentConfig
+  // select datasets that have one of the tags in newTags
+  //selectedDatasets.value = []
+  //for (const tag of newTags) {
+  for (const elt of currentConfig.resources) {
+    if (elt.tags !== undefined) {
+      if (elt.tags.includes(tag)) {
+        if (!selectedDatasets.value.includes(elt.resourceId)) {
+          selectedDatasets.value.push(elt.resourceId)
+        }
+      }
+    }
+  }
+  //}
+
+  //lexicalStorage.setSelectedTag(selectedTags.value)
+  lexicalStorage.setSelectedDataset(selectedDatasets.value)
+
+  console.log('selectTags', tag, selectedDatasets.value)
+}
+
+const unselectTags = () => {
+  selectedDatasets.value = []
 }
 
 const filterDatasets = computed(() => {
@@ -105,14 +139,7 @@ const filterDatasets = computed(() => {
     )
   })
 
-  /*
-  //const arr = lexicalStorage.datasetLabels
-  //const query = searchDatasets.value
-  //const x = arr.filter((element) => element.toLowerCase().indexOf(query.toLowerCase()) !== -1)
-  const x = currentDatasets.value.filter((dataset) => dataset.indexOf(searchDatasets.value) !== -1)
-  //     dataset.toLowerCase().includes(searchDatasets.value.toLowerCase()),
-  */
-  console.log('COMPUTED filterDatasets:', searchDatasets.value, currentDatasets.value, arr)
+  //console.log('COMPUTED filterDatasets:', searchDatasets.value, currentDatasets.value, arr)
 
   return arr
 })
@@ -131,6 +158,7 @@ watch(
   },
 )
 
+/*
 watch(
   () => selectedTags.value,
   (newTags) => {
@@ -150,6 +178,7 @@ watch(
     }
   },
 )
+  */
 </script>
 
 <template>
@@ -167,16 +196,31 @@ watch(
           {{ $t('dataselector.datasets.selected.of') }}
           {{ currentDatasets.length }})
         </div>
+        <!-- dropdown -->
+
         <div class="dropdown-menu" v-if="isDropdownOpen">
           <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
-          <div v-for="tag in currentTags" :key="tag" class="dropdown-tags">
-            <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
-            {{ lexicalStorage.currentConfig.tags[tag].label }}
+          <!-- show tags -->
+          <div class="dropdown-tags">
+            <div v-for="tag in currentTags" :key="tag">
+              <button @click="selectTags(tag)" class="tags-button">
+                {{ lexicalStorage.currentConfig.tags[tag].label }}
+              </button>
+              <!-- show tags
+          <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
+            {{ lexicalStorage.currentConfig.tags[tag].label }} -->
+            </div>
+            <button @click="unselectTags()" class="tags-button">
+              {{ $t('dataselector.tags.unselect') }}
+            </button>
           </div>
+          <!-- dataset list -->
           <div class="dropdown-group">{{ $t('dataselector.datasets.title') }}</div>
+          <!-- filter -->
           <div class="dropdown-filter">
             {{ $t('dataselector.datasets.filter') }}: <input type="text" v-model="searchDatasets" />
           </div>
+          <!-- list datasets -->
           <label v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
             <input
               type="checkbox"
@@ -271,6 +315,9 @@ watch(
 }
 
 .dropdown-tags input {
+  margin-right: 0.5rem;
+}
+.dropdown-tags .tags-button {
   margin-right: 0.5rem;
 }
 

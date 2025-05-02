@@ -24,6 +24,7 @@
   "dataselector.heading": "Dataväljare",
   "dataselector.datasearch": "Sök",
   "dataselector.tags.title": "Samlingar",
+  "dataselector.tags.unselect": "Återställ",
   "dataselector.datasets.title": "Datamängder",
   "dataselector.datasets": "Välj datamängder",
   "dataselector.nodatasets": "Välj en eller flera datamängder",

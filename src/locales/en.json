@@ -24,6 +24,7 @@
   "dataselector.heading": "Data selector",
   "dataselector.datasearch": "Search",
   "dataselector.tags.title": "Collections",
+  "dataselector.tags.unselect": "Unselect",
   "dataselector.datasets.title": "Datasets",
   "dataselector.datasets": "Select datasets",
   "dataselector.nodatasets": "Select one or more datasets",
