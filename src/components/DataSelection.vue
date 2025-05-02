@@ -28,15 +28,7 @@ const selectedColumns = computed({
 
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
-const currentParams = computed(() => lexicalStorage.currentParameters)
-//const totalDatasets = computed(() => lexicalStorage.totalDatasets)
-/*
-const selectedParametersArray = computed({
-  get: () => Object.keys(lexicalStorage.selectedParameters),
-  set: (value) => value,
-})
-  */
-const selectedParametersArray = ref<string[]>([])
+
 const searchDatasets = ref('')
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
@@ -45,42 +37,12 @@ const isDropdownCompileParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
 const parameters = ref<Record<string, paramConfig>>({})
-const ParameterPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
-const ParameterPositionText = [
-  'dataselector.parameter.position.startswith',
-  'dataselector.parameter.position.endswith',
-  'dataselector.parameter.position.contains',
-  'dataselector.parameter.position.equals',
-  'dataselector.parameter.position.regex',
-]
-const ParameterPositionEnabled = [true, true, false, true, false]
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
   isDropdownParams.value = false
   isDropdownColumns.value = false
   isDropdownCompileParams.value = false
-}
-
-const toggleDropdownParams = () => {
-  isDropdownParams.value = !isDropdownParams.value
-  isDropdownOpen.value = false
-  isDropdownColumns.value = false
-  isDropdownCompileParams.value = false
-}
-
-const toggleDropdownColumns = () => {
-  isDropdownColumns.value = !isDropdownColumns.value
-  isDropdownOpen.value = false
-  isDropdownParams.value = false
-  isDropdownCompileParams.value = false
-}
-
-const toggleDropdownCompileParams = () => {
-  isDropdownCompileParams.value = !isDropdownCompileParams.value
-  isDropdownOpen.value = false
-  isDropdownParams.value = false
-  isDropdownColumns.value = false
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -112,29 +74,14 @@ const selectTags = () => {
   lexicalStorage.setSelectedTag(selectedTags.value)
 }
 
-// update state from URL
-const updateData = () => {
-  lexicalStorage.setSelectedParameters(parameters.value)
-}
-
-// update state from URL
-const updateColumns = () => {
-  lexicalStorage.setSelectedColumns(selectedColumns.value)
-}
-
-// update state from URL
-const updateCompileParams = () => {
-  lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
-}
-
 const filterDatasets = computed(() => {
+  /*
   if (!searchDatasets.value) {
     return currentDatasets.value
   }
-  //const locale = useI18n()
-  let label = ''
-
-  const arr = []
+*/
+  let label: string = ''
+  let arr: string[] = []
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
     if (lexicalStorage.activeLocale == 'sv') {
@@ -142,11 +89,21 @@ const filterDatasets = computed(() => {
     } else {
       label = c.label.eng ? c.label.eng : c.label
     }
-    //const label: string = c.label.eng ? c.label.eng : c.label
-    if (label.indexOf(searchDatasets.value) !== -1) {
+    if (
+      !searchDatasets.value ||
+      label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1
+    ) {
       arr.push(c.resourceId)
     }
   }
+
+  arr = arr.sort(function (a, b) {
+    return lexicalStorage.datasetLabels[a].localeCompare(
+      lexicalStorage.datasetLabels[b],
+      lexicalStorage.activeLocale,
+      { numeric: true },
+    )
+  })
 
   /*
   //const arr = lexicalStorage.datasetLabels
@@ -159,36 +116,6 @@ const filterDatasets = computed(() => {
 
   return arr
 })
-
-watch(selectedParametersArray, (newParams) => {
-  console.log('WATCH selectedParametersArray:', newParams)
-  newParams.forEach((param) => {
-    console.log('   param:', param)
-    if (!parameters.value[param]) {
-      parameters.value[param] = { value: '', position: 'equals' }
-    }
-  })
-
-  Object.keys(parameters.value).forEach((param) => {
-    if (!newParams.includes(param)) {
-      delete parameters.value[param]
-    }
-  })
-})
-
-watch(
-  () => currentParams.value,
-  (newParams) => {
-    console.log('--DataSelection/watch 1', newParams)
-    if (newParams.length === 0) {
-      parameters.value = {}
-      selectedParameters.value = {}
-      selectedColumns.value = []
-      selectedCompileParams.value = []
-      updateData()
-    }
-  },
-)
 
 watch(
   () => selectedDatasets.value,
@@ -223,30 +150,12 @@ watch(
     }
   },
 )
-
-watch(
-  () => lexicalStorage.selectedParameters,
-  (newSelectedParameters) => {
-    console.log('watch selectedParameters', newSelectedParameters)
-    selectedParametersArray.value = Object.keys(newSelectedParameters)
-    console.log('-- parameters1', parameters, selectedParametersArray.value)
-    Object.keys(newSelectedParameters).forEach((param) => {
-      if (!parameters.value[param]) {
-        parameters.value[param] = {
-          value: newSelectedParameters[param].value,
-          position: newSelectedParameters[param].position,
-        }
-      }
-    })
-    console.log('-- parameters2', parameters)
-  },
-)
 </script>
 
 <template>
   <div ref="dropdownContainer" class="data-component">
     <div class="data-selection">
-      <span>{{ $t('dataselector.datasets') }}</span>
+      <span style="font-weight: bold">{{ $t('dataselector.datasets') }}</span>
       <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
         <div class="dropdown-toggle" @click="toggleDropdown">
           {{
@@ -276,119 +185,6 @@ watch(
               @change="selectDataset"
             />
             {{ lexicalStorage.datasetLabels[dataset] }}
-          </label>
-        </div>
-      </div>
-    </div>
-    <!-- Select field(s) for search -->
-    <div
-      class="dropdown"
-      :class="{
-        'dropdown-open': isDropdownParams,
-        'dropdown-disabled': selectedDatasets.length === 0,
-      }"
-      :disabled="selectedDatasets.length === 0"
-    >
-      <span>{{ $t('dataselector.parameters') }}</span>
-      <div class="dropdown-toggle" @click="toggleDropdownParams">
-        <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
-        <span v-else-if="currentParams.length === 0">{{
-          $t('dataselector.datasets.nocommon')
-        }}</span>
-        <span v-else-if="selectedParametersArray.length === 0">{{
-          $t('dataselector.noparameters')
-        }}</span>
-        <span v-else>{{ selectedParametersArray.join(', ') }}</span>
-      </div>
-      <div class="dropdown-menu" v-if="isDropdownParams">
-        <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
-          <input type="checkbox" :value="param.name" v-model="selectedParametersArray" />
-          {{ param.name }}
-        </label>
-      </div>
-    </div>
-    <!-- Search-box -->
-    <div v-for="param in selectedParametersArray" :key="param" class="search-container">
-      <span :for="param">{{ $t('dataselector.parameters.prefix') }}: {{ param }}</span>
-      <div class="input-group">
-        {{ console.log('Param=', param, selectedParametersArray) }}
-        <select v-model="parameters[param].position">
-          <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
-          <option
-            v-for="(position, index) in ParameterPosition"
-            :key="position"
-            :value="position"
-            :disabled="!ParameterPositionEnabled[index]"
-          >
-            {{ $t(ParameterPositionText[index]) }}
-          </option>
-        </select>
-        <input
-          class="search-input"
-          type="text"
-          :id="param"
-          v-model="parameters[param].value"
-          :placeholder="$t('dataselector.parameters.placeholder')"
-          @change="updateData"
-        />
-      </div>
-    </div>
-    <!-- Statistics -->
-    <div class="statistics">
-      <div class="statistics-header">
-        {{ $t('dataselector.statistics') }}
-      </div>
-      <!-- Chose field for compilation -->
-      <div
-        class="dropdown"
-        :class="{
-          'dropdown-open': isDropdownColumns,
-          'dropdown-disabled': selectedDatasets.length === 0,
-        }"
-      >
-        <span>{{ $t('dataselector.statistics.parameter') }}</span>
-        <div class="dropdown-toggle" @click="toggleDropdownCompileParams">
-          <span v-if="selectedCompileParams.length === 0">{{
-            $t('dataselector.statistics.noparameter')
-          }}</span>
-          <span v-else>{{ selectedCompileParams.join(', ') }}</span>
-        </div>
-        <div class="dropdown-menu" v-if="isDropdownCompileParams">
-          <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
-            <input
-              type="checkbox"
-              :value="param.name"
-              v-model="selectedCompileParams"
-              @change="updateCompileParams"
-            />
-            {{ param.name }}
-          </label>
-        </div>
-      </div>
-      <!-- Select fields for statistics -->
-      <div
-        class="dropdown"
-        :class="{
-          'dropdown-open': isDropdownColumns,
-          'dropdown-disabled': selectedDatasets.length === 0,
-        }"
-      >
-        <span>{{ $t('dataselector.statistics.columns') }}</span>
-        <div class="dropdown-toggle" @click="toggleDropdownColumns">
-          <span v-if="selectedColumns.length === 0">{{
-            $t('dataselector.statistics.nocolumns')
-          }}</span>
-          <span v-else>{{ selectedColumns.join(', ') }}</span>
-        </div>
-        <div class="dropdown-menu" v-if="isDropdownColumns">
-          <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
-            <input
-              type="checkbox"
-              :value="param.name"
-              v-model="selectedColumns"
-              @change="updateColumns"
-            />
-            {{ param.name }}
           </label>
         </div>
       </div>

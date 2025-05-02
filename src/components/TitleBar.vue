@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DataSelection from './DataSelection.vue'
 import MenuBar from './MenuBar.vue'
 // import { lexicalStore } from '../stores/store'
 import { ref, onMounted } from 'vue'
@@ -52,6 +53,11 @@ onMounted(() => {
           <img :src="logoKarpEn" alt="Karp-S logo" width="300" />
         </div>
       </div>
+      <div class="middle-area">
+        <div class="data-selection">
+          <DataSelection />
+        </div>
+      </div>
     </div>
     <div class="right-area">
       <div class="middle-area">
@@ -100,14 +106,26 @@ onMounted(() => {
 
 .header-area .right-area {
   display: flex;
+
   box-sizing: border-box;
 }
 
-.header-area .middle-area {
+.header-area .right-area .middle-area {
   display: flex;
   flex-direction: column;
   align-self: stretch;
   margin-right: 1rem;
+  box-sizing: border-box;
+}
+
+.header-area .data-selection {
+  display: flex;
+  height: 3rem;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0%;
+  justify-content: flex-end;
+  text-align: left;
   box-sizing: border-box;
 }
 

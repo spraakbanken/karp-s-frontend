@@ -77,6 +77,19 @@ export const lexicalStore = defineStore('dataset', {
           }, {})
       }
 
+      // sort datasetLabels
+      /*
+      this.datasetLabels = Object.keys(this.datasetLabels)
+        .sort(function (a, b) {
+          return a.localeCompare(b, 'sv', { numeric: true })
+        })
+        .reduce((acc, key) => {
+          acc[key] = this.datasetLabels[key]
+          return acc
+        }, {})
+      console.log('SORTED', this.datasetLabels)
+      */
+
       this.currentTags = [
         ...new Set(config.resources.flatMap((c) => (c.tags == undefined ? [] : c.tags))),
       ]
@@ -156,6 +169,17 @@ export const lexicalStore = defineStore('dataset', {
           )
             */
           //return acc.filter((param) => params.includes(param))
+          // add 'word' (ingångsord)
+          this.currentParameters.unshift({
+            name: 'word',
+            type: 'text',
+            collection: false,
+            label: { swe: 'ingångsord', eng: 'word' },
+          })
+          const parameters: Record<string, paramConfig> = {}
+          parameters['word'] = { value: '', position: 'startswith' }
+          this.setSelectedParameters(parameters)
+          this.setSelectedCompileParams(['word'])
         } else {
           return []
         }
@@ -171,6 +195,7 @@ c.label.eng == c.label["eng"]
       this.setSelectedDataset(this.selectedDatasets)
     },
     setLocale(locale: string) {
+      console.log('setLocale()')
       this.activeLocale = locale
       if (this.activeLocale == 'sv') {
         this.datasetLabels = this.currentConfig.resources

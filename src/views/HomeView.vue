@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { lexicalStore } from '../stores/store'
-import DataSelection from '@/components/DataSelection.vue'
+import DataSearch from '@/components/DataSearch.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import GraphView from '@/components/GraphView.vue'
@@ -44,8 +44,8 @@ watch(
 <template>
   <main class="container">
     <div class="column-left">
-      <div class="dataselection-header">{{ $t('dataselector.heading') }}</div>
-      <DataSelection />
+      <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>
+      <DataSearch />
     </div>
     <div class="column-right">
       <div class="tabs">
@@ -85,7 +85,7 @@ watch(
   border-right: 2px solid var(--border-color);
 }
 
-.dataselection-header {
+.datasearch-header {
   height: 2.5rem;
   padding-top: 0.5rem;
   padding-left: 1rem;
