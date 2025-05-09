@@ -10,10 +10,18 @@ export interface Label {
   eng: string
 }
 
+export interface Description {
+  swe: string
+  eng: string
+}
+
 export interface Resource {
   resourceId: string
   label: Label
+  description: Description
   fields: string[] // WAS: FieldConfig[], but it isn't when we get it from the BE
+  link: string
+  size: string
   tags: string[]
   updated: string
   word: string

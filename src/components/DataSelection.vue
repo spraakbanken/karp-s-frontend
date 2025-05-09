@@ -31,6 +31,37 @@ const selectedColumns = computed({
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
 
+const dsinfo = ref({})
+const has_dsinfo = ref(false)
+const secondsToDate = (seconds: string): string => {
+  const date = new Date(parseInt(seconds) * 1000)
+  return date.toISOString().substring(0, 10)
+}
+const datasetDescription = (dataset: string) => {
+  //lexicalStorage.currentConfig.resources[0].description.swe
+  const elt = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
+  let result = {}
+  if (elt == undefined) {
+    result = {}
+  } else {
+    has_dsinfo.value = true
+    if (lexicalStorage.activeLocale == 'sv') {
+      result['label'] = elt.label.swe ? elt.label.swe : elt.label
+      result['description'] = elt.description ? elt.description.swe : ''
+    } else {
+      result['label'] = elt.label.eng ? elt.label.eng : elt.label
+      result['description'] = elt.description ? elt.description.eng : ''
+    }
+    result['size'] = elt.size
+    result['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
+    result['link'] = elt.link
+    result['word'] = elt.word
+    result['fields'] = elt.fields
+    console.log('Result ', result)
+  }
+  dsinfo.value = result
+}
+
 const searchDatasets = ref('')
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
@@ -198,7 +229,11 @@ watch(
         </div>
         <!-- dropdown -->
 
-        <div class="dropdown-menu" v-if="isDropdownOpen">
+        <div
+          class="dropdown-menu"
+          v-if="isDropdownOpen"
+          :class="{ 'datasets-list-wider': has_dsinfo }"
+        >
           <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
           <!-- show tags -->
           <div class="dropdown-tags">
@@ -221,15 +256,46 @@ watch(
             {{ $t('dataselector.datasets.filter') }}: <input type="text" v-model="searchDatasets" />
           </div>
           <!-- list datasets -->
-          <label v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
-            <input
-              type="checkbox"
-              :value="dataset"
-              v-model="selectedDatasets"
-              @change="selectDataset"
-            />
-            {{ lexicalStorage.datasetLabels[dataset] }}
-          </label>
+          <div class="datasets-group">
+            <div class="datasets-list">
+              <div v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
+                <div>
+                  <input
+                    type="checkbox"
+                    :value="dataset"
+                    v-model="selectedDatasets"
+                    @change="selectDataset"
+                  />
+                  {{ lexicalStorage.datasetLabels[dataset] }}
+                </div>
+                <img
+                  src="@/assets/sb_symbol_info.svg"
+                  @click="datasetDescription(dataset)"
+                  class="datasets-icon"
+                />
+              </div>
+            </div>
+            <div class="datasets-info">
+              <div class="datasets-info-label">{{ dsinfo.label }}</div>
+              <div class="">{{ dsinfo.description }}</div>
+              <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
+              <div class="">{{ dsinfo.updated }}</div>
+              <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
+              <div class="">{{ dsinfo.size }}</div>
+              <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
+              <div class="">
+                <a :href="dsinfo.link" target="_blank">{{ dsinfo.link }}</a>
+              </div>
+              <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
+              <div class="">{{ dsinfo.word }}</div>
+              <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
+              <div class="">
+                <div v-for="item in dsinfo.fields">
+                  {{ item }}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -307,6 +373,7 @@ watch(
 .dropdown-item input {
   margin-right: 0.5rem;
 }
+
 .dropdown-tags {
   display: flex;
   align-items: center;
@@ -342,6 +409,45 @@ watch(
   padding: 0.5rem;
   border: 1px solid var(--color-border);
   border-radius: 4px;
+}
+
+.datasets-group {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 400px;
+  align-content: flex-start;
+  background-color: var(--sb-grey-light);
+}
+
+.datasets-list {
+  overflow: auto;
+  max-height: 100%;
+  width: 200px;
+  background-color: white;
+}
+
+.datasets-list-wider {
+  width: 500px;
+}
+
+.datasets-icon {
+  float: right;
+  display: block;
+  margin-left: auto;
+  padding: 0.5rem;
+  width: 2rem;
+}
+
+.datasets-info {
+  background-color: var(--sb-grey-light);
+  padding: 0.5rem;
+  width: 200px;
+  white-space: pre-line;
+}
+
+.datasets-info-label {
+  font-weight: bold;
 }
 
 .statistics {
