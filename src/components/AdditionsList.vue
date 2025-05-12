@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { lexicalStore } from '@/stores/store'
+import { secondsToDate } from '@/utils/utils'
 
 const lexicalStorage = lexicalStore()
 const datasetDates = computed(() => lexicalStorage.datasetDates)
-
-const secondsToDate = (seconds: string): string => {
-  const date = new Date(parseInt(seconds) * 1000)
-  return date.toISOString().substring(0, 10)
-}
 </script>
 
 <template>

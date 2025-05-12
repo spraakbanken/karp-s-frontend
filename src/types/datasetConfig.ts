@@ -27,6 +27,17 @@ export interface Resource {
   word: string
 }
 
+export interface ResourceLocalized {
+  label: string
+  description: string
+  fields: string[] // WAS: FieldConfig[], but it isn't when we get it from the BE
+  link: string
+  size: string
+  tags: string[]
+  updated: string
+  word: string
+}
+
 export interface TagLabel {
   label: string
   description: Label

@@ -47,6 +47,7 @@ const ParameterPositionText = [
   'dataselector.parameter.position.regex',
 ]
 const ParameterPositionEnabled = [true, true, false, true, false]
+const searchAdvanced = ref(false)
 
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
@@ -102,9 +103,9 @@ const updateCompileParams = () => {
 }
 
 watch(selectedParametersArray, (newParams) => {
-  console.log('WATCH selectedParametersArray:', newParams)
+  console.log('WATCH: selectedParametersArray:', newParams)
   newParams.forEach((param) => {
-    console.log('   param:', param)
+    //console.log('   param:', param)
     if (!parameters.value[param]) {
       parameters.value[param] = { value: '', position: 'equals' }
     }
@@ -120,7 +121,7 @@ watch(selectedParametersArray, (newParams) => {
 watch(
   () => currentParams.value,
   (newParams) => {
-    console.log('--DataSelection/watch 1', newParams)
+    console.log('WATCH: currentParams.value', newParams)
     if (newParams.length === 0) {
       parameters.value = {}
       selectedParameters.value = {}
@@ -134,9 +135,9 @@ watch(
 watch(
   () => lexicalStorage.selectedParameters,
   (newSelectedParameters) => {
-    console.log('watch selectedParameters', newSelectedParameters)
+    console.log('WATCH: lexicalStorage.selectedParameters', newSelectedParameters)
     selectedParametersArray.value = Object.keys(newSelectedParameters)
-    console.log('-- parameters1', parameters, selectedParametersArray.value)
+    //console.log('-- parameters1', parameters, selectedParametersArray.value)
     Object.keys(newSelectedParameters).forEach((param) => {
       if (!parameters.value[param]) {
         parameters.value[param] = {
@@ -145,13 +146,40 @@ watch(
         }
       }
     })
-    console.log('-- parameters2', parameters)
+    //console.log('-- parameters2', parameters)
   },
 )
 </script>
 
 <template>
-  <div ref="dropdownContainer" class="data-component">
+  <div class="data-component">
+    <!-- Select Simple/Advanced search -->
+    <input type="checkbox" id="advancedSearchCheckbox" v-model="searchAdvanced" />
+    <label for="advancedSearchCheckbox" class="search-advanced-label">{{
+      $t('dataselector.search.advanced')
+    }}</label>
+  </div>
+
+  <!-- Simple search -->
+  <div v-if="!searchAdvanced && parameters.hasOwnProperty('word')" class="data-component">
+    <!-- Search-box -->
+    <div class="search-container">
+      <span>{{ $t('dataselector.parameters.prefix') }}:</span>
+      <div class="input-group">
+        <input
+          class="search-input"
+          type="text"
+          id="word"
+          v-model="parameters['word'].value"
+          :placeholder="$t('dataselector.parameters.placeholder')"
+          @change="updateData"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced search -->
+  <div v-if="searchAdvanced" ref="dropdownContainer" class="data-component">
     <!-- Select field(s) for search -->
     <div
       class="dropdown"
@@ -276,6 +304,10 @@ watch(
 <style scoped>
 .data-component {
   padding: 1rem;
+}
+
+.search-advanced-label {
+  padding-left: 0.5rem;
 }
 
 .search-container {

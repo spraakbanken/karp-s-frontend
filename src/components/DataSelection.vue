@@ -2,6 +2,8 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import type { paramConfig } from '@/types/parameterPosition'
+import { secondsToDate } from '@/utils/utils'
+import type { ResourceLocalized } from '@/types/datasetConfig'
 
 const lexicalStorage = lexicalStore()
 
@@ -31,35 +33,33 @@ const selectedColumns = computed({
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
 
-const dsinfo = ref({})
-const has_dsinfo = ref(false)
-const secondsToDate = (seconds: string): string => {
-  const date = new Date(parseInt(seconds) * 1000)
-  return date.toISOString().substring(0, 10)
-}
-const datasetDescription = (dataset: string) => {
+const datasetInfo = ref(<ResourceLocalized>{
+  label: '',
+  description: '',
+  fields: [],
+  link: '',
+  size: '',
+  tags: [],
+  updated: '',
+  word: '',
+})
+const datasetInfoFill = (dataset: string) => {
   //lexicalStorage.currentConfig.resources[0].description.swe
   const elt = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
-  let result = {}
-  if (elt == undefined) {
-    result = {}
-  } else {
-    has_dsinfo.value = true
+  if (elt != undefined) {
     if (lexicalStorage.activeLocale == 'sv') {
-      result['label'] = elt.label.swe ? elt.label.swe : elt.label
-      result['description'] = elt.description ? elt.description.swe : ''
+      datasetInfo.value['label'] = elt.label.swe ? elt.label.swe : (elt.label as unknown as string)
+      datasetInfo.value['description'] = elt.description ? elt.description.swe : ''
     } else {
-      result['label'] = elt.label.eng ? elt.label.eng : elt.label
-      result['description'] = elt.description ? elt.description.eng : ''
+      datasetInfo.value['label'] = elt.label.eng ? elt.label.eng : (elt.label as unknown as string)
+      datasetInfo.value['description'] = elt.description ? elt.description.eng : ''
     }
-    result['size'] = elt.size
-    result['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
-    result['link'] = elt.link
-    result['word'] = elt.word
-    result['fields'] = elt.fields
-    console.log('Result ', result)
+    datasetInfo.value['size'] = elt.size
+    datasetInfo.value['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
+    datasetInfo.value['link'] = elt.link
+    datasetInfo.value['word'] = elt.word
+    datasetInfo.value['fields'] = elt.fields
   }
-  dsinfo.value = result
 }
 
 const searchDatasets = ref('')
@@ -150,9 +150,9 @@ const filterDatasets = computed(() => {
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
     if (lexicalStorage.activeLocale == 'sv') {
-      label = c.label.swe ? c.label.swe : c.label
+      label = c.label.swe ? c.label.swe : (c.label as unknown as string)
     } else {
-      label = c.label.eng ? c.label.eng : c.label
+      label = c.label.eng ? c.label.eng : (c.label as unknown as string)
     }
     if (
       !searchDatasets.value ||
@@ -178,7 +178,7 @@ const filterDatasets = computed(() => {
 watch(
   () => selectedDatasets.value,
   (newDatasets, oldDatasets) => {
-    console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
+    //console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
     if (newDatasets.length === 0) {
       parameters.value = {}
       selectedParameters.value = {}
@@ -232,7 +232,7 @@ watch(
         <div
           class="dropdown-menu"
           v-if="isDropdownOpen"
-          :class="{ 'datasets-list-wider': has_dsinfo }"
+          :class="{ 'datasets-list-wider': datasetInfo['label'] !== '' }"
         >
           <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
           <!-- show tags -->
@@ -270,27 +270,27 @@ watch(
                 </div>
                 <img
                   src="@/assets/sb_symbol_info.svg"
-                  @click="datasetDescription(dataset)"
+                  @click="datasetInfoFill(dataset)"
                   class="datasets-icon"
                 />
               </div>
             </div>
             <div class="datasets-info">
-              <div class="datasets-info-label">{{ dsinfo.label }}</div>
-              <div class="">{{ dsinfo.description }}</div>
+              <div class="datasets-info-label">{{ datasetInfo.label }}</div>
+              <div class="">{{ datasetInfo.description }}</div>
               <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
-              <div class="">{{ dsinfo.updated }}</div>
+              <div class="">{{ datasetInfo.updated }}</div>
               <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
-              <div class="">{{ dsinfo.size }}</div>
+              <div class="">{{ datasetInfo.size }}</div>
               <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
               <div class="">
-                <a :href="dsinfo.link" target="_blank">{{ dsinfo.link }}</a>
+                <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
               </div>
               <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
-              <div class="">{{ dsinfo.word }}</div>
+              <div class="">{{ datasetInfo.word }}</div>
               <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
               <div class="">
-                <div v-for="item in dsinfo.fields">
+                <div v-for="item in datasetInfo.fields" :key="item">
                   {{ item }}
                 </div>
               </div>

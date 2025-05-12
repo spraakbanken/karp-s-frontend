@@ -1,16 +1,7 @@
 import type { paramConfig } from '@/types/parameterPosition'
 import { defineStore } from 'pinia'
 
-import {
-  type FieldConfig,
-  type Label,
-  type Resource,
-  type TagLabel,
-  type Tag,
-  type FieldConfigArray,
-  type Config,
-  type DatasetDates,
-} from '@/types/datasetConfig.ts'
+import { type FieldConfig, type Config, type DatasetDates } from '@/types/datasetConfig.ts'
 //import { isUndefined } from 'es-toolkit'
 
 interface SearchRedux {
@@ -65,13 +56,17 @@ export const lexicalStore = defineStore('dataset', {
       this.currentDatasets = config.resources.map((c) => c.resourceId)
       if (this.activeLocale == 'sv') {
         this.datasetLabels = config.resources
-          .map((c) => ({ [c.resourceId]: c.label.swe ? c.label.swe : c.label }))
+          .map((c) => ({
+            [c.resourceId]: c.label.swe ? c.label.swe : (c.label as unknown as string),
+          }))
           .reduce((acc, obj) => {
             return { ...acc, ...obj }
           }, {})
       } else {
         this.datasetLabels = config.resources
-          .map((c) => ({ [c.resourceId]: c.label.eng ? c.label.eng : c.label }))
+          .map((c) => ({
+            [c.resourceId]: c.label.eng ? c.label.eng : (c.label as unknown as string),
+          }))
           .reduce((acc, obj) => {
             return { ...acc, ...obj }
           }, {})
@@ -145,40 +140,40 @@ export const lexicalStore = defineStore('dataset', {
     },
     setSelectedDataset(keys: string[]) {
       this.selectedDatasets = keys
-      if (keys.length === 1) {
-        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
-      } else {
-        const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
-        if (allParamsArray.length > 0) {
-          // remove duplicates
-          let intersection = allParamsArray[0]
+      //      if (keys.length === 1) {
+      //        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
+      //      } else {
+      const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
+      if (allParamsArray.length > 0) {
+        // remove duplicates
+        let intersection = allParamsArray[0]
 
-          // Find the intersection with the rest of the datasets
-          for (let i = 1; i < allParamsArray.length; i++) {
-            intersection = intersection.filter((param) =>
-              allParamsArray[i].some(
-                (otherParam) => otherParam.name === param.name && otherParam.type === param.type,
-              ),
-            )
-          }
-          this.currentParameters = intersection
-
-          // add 'word' (ingångsord)
-          this.currentParameters.unshift({
-            name: 'word',
-            type: 'text',
-            collection: false,
-            label: { swe: 'ingångsord', eng: 'word' },
-          })
-          const parameters: Record<string, paramConfig> = {}
-          parameters['word'] = { value: '', position: 'startswith' }
-          this.setSelectedParameters(parameters)
-          this.setSelectedCompileParams(['word'])
-        } else {
-          return []
+        // Find the intersection with the rest of the datasets
+        for (let i = 1; i < allParamsArray.length; i++) {
+          intersection = intersection.filter((param) =>
+            allParamsArray[i].some(
+              (otherParam) => otherParam.name === param.name && otherParam.type === param.type,
+            ),
+          )
         }
+        this.currentParameters = intersection
+
+        // add 'word' (ingångsord)
+        this.currentParameters.unshift({
+          name: 'word',
+          type: 'text',
+          collection: false,
+          label: { swe: 'ingångsord', eng: 'word' },
+        })
+        const parameters: Record<string, paramConfig> = {}
+        parameters['word'] = { value: '', position: 'startswith' }
+        this.setSelectedParameters(parameters)
+        this.setSelectedCompileParams(['word'])
+      } else {
+        return []
       }
-      // console.log('currentParams', this.currentParams)
+      //}
+      //console.log('currentParams', this.currentParams)
     },
     /*
     setSelectedTag(tags: string[]) {
@@ -192,7 +187,7 @@ export const lexicalStore = defineStore('dataset', {
       if (this.activeLocale == 'sv') {
         this.datasetLabels = this.currentConfig.resources
           .map((c) => ({
-            [c.resourceId]: c.label.swe ? c.label.swe : c.label,
+            [c.resourceId]: c.label.swe ? c.label.swe : (c.label as unknown as string),
           }))
           .reduce((acc, obj) => {
             return { ...acc, ...obj }
@@ -200,7 +195,7 @@ export const lexicalStore = defineStore('dataset', {
       } else {
         this.datasetLabels = this.currentConfig.resources
           .map((c) => ({
-            [c.resourceId]: c.label.eng ? c.label.eng : c.label,
+            [c.resourceId]: c.label.eng ? c.label.eng : (c.label as unknown as string),
           }))
           .reduce((acc, obj) => {
             return { ...acc, ...obj }
