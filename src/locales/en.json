@@ -38,6 +38,7 @@
   "dataselector.parameters.prefix": "Field",
   "dataselector.parameters.position": "Select position",
   "dataselector.parameters.placeholder": "Enter value",
+  "dataselector.simplesearch.placeholder": "Search for word",
   "dataselector.noparameters": "No fields selected",
   "dataselector.statistics": "Statistics",
   "dataselector.statistics.parameter": "Compile on",

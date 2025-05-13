@@ -163,15 +163,15 @@ watch(
   <!-- Simple search -->
   <div v-if="!searchAdvanced && parameters.hasOwnProperty('word')" class="data-component">
     <!-- Search-box -->
-    <div class="search-container">
-      <span>{{ $t('dataselector.parameters.prefix') }}:</span>
+    <div class="search-container-simple">
+      <!-- <span>{{ $t('dataselector.parameters.prefix') }}:</span> -->
       <div class="input-group">
         <input
           class="search-input"
           type="text"
           id="word"
           v-model="parameters['word'].value"
-          :placeholder="$t('dataselector.parameters.placeholder')"
+          :placeholder="$t('dataselector.simplesearch.placeholder')"
           @change="updateData"
         />
       </div>
@@ -303,7 +303,9 @@ watch(
 
 <style scoped>
 .data-component {
-  padding: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1rem;
 }
 
 .search-advanced-label {
@@ -312,6 +314,11 @@ watch(
 
 .search-container {
   margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-container-simple {
+  margin-top: 0rem;
   margin-bottom: 1rem;
 }
 
