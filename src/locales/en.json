@@ -58,6 +58,7 @@
   "dataset.word": "Word",
   "dataset.fields": "Fields",
   "statistics.exportCSV": "Export CSV",
+  "statistics.showOverview": "Show overview",
   "graphs.bar": "Bar diagram",
   "graphs.circle": "Circle diagram",
   "graphs.export.svg": "Export as SVG",

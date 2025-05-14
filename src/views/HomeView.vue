@@ -3,7 +3,7 @@ import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
-import GraphView from '@/components/GraphView.vue'
+// import GraphView from '@/components/GraphView.vue'
 import { onMounted, ref, watch } from 'vue'
 // import { useRoute, useRouter } from 'vue-router'
 
@@ -55,13 +55,17 @@ watch(
         <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
           {{ $t('tab.statistics') }}
         </button>
+        <!-- moved to StatisticsView
         <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
           {{ $t('tab.graph') }}
         </button>
+        -->
       </div>
       <TableView v-if="activeTab === 'table'" />
       <StatisticsView v-if="activeTab === 'statistics'" />
+      <!-- moved to StatisticsView
       <GraphView v-if="activeTab === 'graph'" />
+        -->
     </div>
   </main>
 </template>

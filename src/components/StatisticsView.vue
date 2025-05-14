@@ -4,6 +4,7 @@ import { lexicalStore } from '@/stores/store'
 import type { Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import type { paramConfig } from '@/types/parameterPosition'
+import * as d3 from 'd3'
 
 const lexicalStorage = lexicalStore()
 
@@ -58,6 +59,9 @@ const updateCompileParams = () => {
   lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
 }
 
+// show overview switch
+const showOverview = ref(false)
+
 const fetchDataLoaded = ref(false)
 
 const fetchData = async () => {
@@ -103,6 +107,7 @@ watch(
   ],
   () => {
     fetchData()
+    updateOverview()
   },
   { deep: true },
 )
@@ -187,7 +192,7 @@ const exportCSV = () => {
       collectionColumn.push(key.name)
     }
   }
-  console.log('CSV cc', collectionColumn, tableHeaders.value)
+  //console.log('CSV cc', collectionColumn, tableHeaders.value)
 
   // write data
   for (const row in currentResult.value) {
@@ -195,7 +200,7 @@ const exportCSV = () => {
     // value could be array
     //console.log('CurrP', lexicalStorage.currentParameters)
     for (const key in value) {
-      console.log('CSV type', key, value[key], Object.keys(tableHeaders.value)[key])
+      //console.log('CSV type', key, value[key], Object.keys(tableHeaders.value)[key])
       if (collectionColumn.includes(tableHeaders.value[key])) {
         csv += value[key].replace('"', '').replace('[', '').replace(']', '').replace(',', ';') + ','
       } else {
@@ -204,13 +209,165 @@ const exportCSV = () => {
     }
     csv += '\n'
   }
-  console.log('CSV =', csv)
+  //console.log('CSV =', csv)
   // save as file
   const anchor = document.createElement('a')
   anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv)
   anchor.target = '_blank'
   anchor.download = 'karp-s-export.csv'
   anchor.click()
+}
+/*
+  Graph/Overview
+*/
+const graph_max_number_of_values = 100
+
+const graph_threshold = ref<number>(1)
+const graph_textangled = ref<boolean>(false)
+const graph_barwidth = ref<number>(60)
+const graph_dots = ref<boolean>(false)
+
+const graph_value_max = ref<number>(0)
+const graph_value_count = ref<number>(0)
+
+const drawChart = () => {
+  console.log('drawChart()', currentResult.value[0].length)
+  interface dict {
+    [key: string]: string | number
+  }
+  const dataObj: dict = {}
+  graph_value_max.value = 0
+  graph_value_count.value = 0
+  // write data
+  for (const row in currentResult.value) {
+    const row2 = currentResult.value[row]
+    const category: string = <string>row2[0] // first # is always category
+    const row2_length = row2.length
+    const value: number = <number>(<unknown>row2[<number>(<unknown>row2_length) - 1]) // last # is always total
+    // last # is always total
+    //console.log('row=', row, 'category=', category, 'value=', value)
+    if (value >= graph_threshold.value) {
+      if (graph_value_count.value < graph_max_number_of_values) {
+        dataObj[category] = value
+        if (value > graph_value_max.value) {
+          graph_value_max.value = value
+        }
+      }
+      graph_value_count.value++
+    }
+  }
+  console.log('drawChart() Dataobj len=', Object.keys(dataObj).length, graph_value_count.value)
+
+  if (graph_value_count.value > 0) {
+    // create graph
+
+    const barWidth = graph_barwidth.value
+    const barSpace = 20
+    const graph_dot_r = 3
+    const leftMargin = 30
+    const rightMargin = 20
+    const bottomMargin = 120
+    const topMargin = 30
+
+    const height = 400
+
+    d3.selectAll('#karps_graph svg').remove()
+
+    const width =
+      (barWidth + barSpace) *
+      (graph_value_count.value < graph_max_number_of_values
+        ? graph_value_count.value
+        : graph_max_number_of_values)
+
+    const svg = d3
+      .select('#karps_graph')
+      .append('svg')
+      .attr('width', width + leftMargin + rightMargin)
+      .attr('height', height + topMargin + bottomMargin)
+
+    // X scale and axis
+    const xscale = d3.scaleBand().domain(Object.keys(dataObj)).range([0, width])
+    const x_axis = d3.axisBottom(xscale)
+
+    if (graph_textangled.value) {
+      svg
+        .append('g')
+        .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
+        .call(x_axis)
+        .selectAll('text')
+        .style('text-anchor', 'end')
+        .attr('dx', '-.8em')
+        .attr('dy', '.15em')
+        .attr('transform', 'rotate(-65)')
+    } else {
+      svg
+        .append('g')
+        .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
+        .call(x_axis)
+    }
+
+    // Y scale and axis
+
+    const yscale = d3.scaleLinear().domain([0, graph_value_max.value]).range([height, 0])
+    const yAxisTicks = yscale.ticks().filter(Number.isInteger)
+    const y_axis = d3.axisLeft(yscale).tickValues(yAxisTicks).tickFormat(d3.format('d'))
+
+    svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(y_axis)
+
+    Object.values(dataObj).forEach((element, index) => {
+      const g = svg.append('g')
+
+      const x = index * (barWidth + barSpace) + leftMargin / 2
+
+      g.append('rect')
+        .attr('x', x)
+        .attr('y', yscale(element))
+        .attr('height', height - yscale(element))
+        .attr('width', barWidth)
+        .attr('fill', '#F0581A')
+        .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+
+      // dot
+      if (graph_dots.value) {
+        g.append('circle')
+          .attr('cx', x + leftMargin + barWidth / 2)
+          .attr('cy', yscale(element) + 30)
+          .attr('r', graph_dot_r)
+          .attr('fill', '#000000')
+      }
+
+      g.append('text')
+        .attr('x', x + barWidth / 2)
+        .attr('y', yscale(element) - graph_dot_r - 1)
+        .attr('text-anchor', 'middle')
+        .text(element)
+        .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+    })
+  } else {
+    d3.selectAll('#karps_graph svg').remove()
+  }
+}
+
+// Export graph as SVG
+// https://stackoverflow.com/questions/23218174/how-do-i-save-export-an-svg-file-after-creating-an-svg-with-d3-js-ie-safari-an
+const exportSVG = () => {
+  const svgEl = document.getElementById('karps_graph')
+  if (svgEl !== null) {
+    svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    const svgData = svgEl.innerHTML
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+    const downloadLink = document.createElement('a')
+    downloadLink.href = svgUrl
+    downloadLink.download = 'overview.svg'
+    downloadLink.click()
+  }
+}
+
+const updateOverview = () => {
+  if (showOverview.value) {
+    drawChart()
+  }
 }
 </script>
 
@@ -273,11 +430,51 @@ const exportCSV = () => {
     </div>
     <div v-if="currentResult.length">
       <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
+      <input
+        type="checkbox"
+        id="showOverviewCheckbox"
+        v-model="showOverview"
+        class="checkbox-showoverview"
+        @change="updateOverview()"
+      />
+      <label for="showOverviewCheckbox">
+        {{ $t('statistics.showOverview') }}
+      </label>
     </div>
   </div>
 
+  <div v-if="showOverview" class="overview-wrapper">
+    <div class="overview-settings">
+      <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
+      <!--
+      <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
+      -->
+      <span class="overview-setting">
+        {{ $t('graphs.threshold') }}
+        <input type="number" size="5" min="0" v-model="graph_threshold" @change="updateOverview" />
+      </span>
+      <span class="overview-setting">
+        <input type="checkbox" v-model="graph_textangled" @change="updateOverview" />
+        {{ $t('graphs.textangled') }}
+      </span>
+      <span class="overview-setting">
+        {{ $t('graphs.barwidth') }}
+        <input type="number" size="5" min="0" v-model="graph_barwidth" @change="updateOverview" />
+      </span>
+      <span class="overview-setting">
+        <input type="checkbox" v-model="graph_dots" @change="updateOverview" />
+        {{ $t('graphs.dots') }}
+      </span>
+    </div>
+    <div v-if="graph_value_count > graph_max_number_of_values" class="overview-max">
+      {{ $t('graphs.maxnumberofvalues', { number: graph_max_number_of_values }) }}
+    </div>
+
+    <div id="karps_graph"></div>
+  </div>
+
   <!-- show table -->
-  <div class="table-wrapper">
+  <div v-else class="table-wrapper">
     <table v-if="currentResult.length" class="fancy-table">
       <thead>
         <tr>
@@ -401,6 +598,25 @@ const exportCSV = () => {
   margin-right: 0.5rem;
 }
 
+.overview-wrapper {
+  display: grid;
+  position: relative;
+  /* margin-top: 2rem; */
+  padding: 1rem;
+}
+
+.overview-settings {
+  padding: 0;
+}
+
+.overview-setting {
+  padding-left: 1rem;
+}
+
+.overview-max {
+  margin-top: 1rem;
+}
+
 .table-wrapper {
   display: grid;
   position: relative;
@@ -443,7 +659,15 @@ th {
 }
 
 .export-button {
-  margin-top: 2rem;
+  margin-top: 1rem;
+}
+
+.overview-settings .export-button {
+  margin: 0;
+}
+
+.checkbox-showoverview {
+  margin-left: 1rem;
 }
 
 .message {
