@@ -15,6 +15,51 @@ const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeTab)
 
+const isDropdownColumns = ref(false)
+const isDropdownCompileParams = ref(false)
+
+const toggleDropdownColumns = () => {
+  isDropdownColumns.value = !isDropdownColumns.value
+  //  isDropdownOpen.value = false
+  //  isDropdownParams.value = false
+  isDropdownCompileParams.value = false
+}
+
+const toggleDropdownCompileParams = () => {
+  isDropdownCompileParams.value = !isDropdownCompileParams.value
+  //  isDropdownOpen.value = false
+  //  isDropdownParams.value = false
+  isDropdownColumns.value = false
+}
+
+const selectedDatasets = computed({
+  get: () => lexicalStorage.selectedDatasets,
+  set: (value) => lexicalStorage.setSelectedDataset(value),
+})
+
+const selectedCompileParams = computed({
+  get: () => lexicalStorage.selectedCompileParams,
+  set: (value) => lexicalStorage.setSelectedCompileParams(value),
+})
+const selectedColumns = computed({
+  get: () => lexicalStorage.selectedColumns,
+  set: (value) => lexicalStorage.setSelectedColumns(value),
+})
+
+const currentParams = computed(() => lexicalStorage.currentParameters)
+
+// update state from URL
+const updateColumns = () => {
+  lexicalStorage.setSelectedColumns(selectedColumns.value)
+}
+
+// update state from URL
+const updateCompileParams = () => {
+  lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
+}
+
+const fetchDataLoaded = ref(false)
+
 const fetchData = async () => {
   const newParams = lexicalStorage.selectedParameters
   const newCompileParams = lexicalStorage.selectedCompileParams
@@ -27,6 +72,7 @@ const fetchData = async () => {
         newCompileParams as string[],
         newColumns as string[],
       )
+      fetchDataLoaded.value = true
       currentResult.value = tableData
       tableHeaders.value = headers
       // console.log('currentResult', currentResult.value);
@@ -76,7 +122,7 @@ const sortedData = computed(() => {
       return aValue.localeCompare(bValue) * order
     }
 
-    return (aValue as number) > (bValue as number) ? order : -order
+    return (aValue as unknown as number) > (bValue as unknown as number) ? order : -order
   })
 })
 
@@ -169,10 +215,69 @@ const exportCSV = () => {
 </script>
 
 <template>
-  <div class="table-wrapper">
+  <!-- statistics settings -->
+  <div class="statistics">
+    <!-- chose field for compilation -->
+    <div
+      class="statistics-dropdown"
+      :class="{
+        'statistics-dropdown-open': isDropdownColumns,
+        'statistics-dropdown-disabled': selectedDatasets.length === 0,
+      }"
+    >
+      <span>{{ $t('dataselector.statistics.parameter') }}</span>
+      <div class="statistics-dropdown-toggle" @click="toggleDropdownCompileParams">
+        <span v-if="selectedCompileParams.length === 0">{{
+          $t('dataselector.statistics.noparameter')
+        }}</span>
+        <span v-else>{{ selectedCompileParams.join(', ') }}</span>
+      </div>
+      <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
+        <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
+          <input
+            type="checkbox"
+            :value="param.name"
+            v-model="selectedCompileParams"
+            @change="updateCompileParams"
+          />
+          {{ param.name }}
+        </label>
+      </div>
+    </div>
+    <!-- select additional fields for statistics -->
+    <div
+      class="statistics-dropdown"
+      :class="{
+        'statistics-dropdown-open': isDropdownColumns,
+        'statistics-dropdown-disabled': selectedDatasets.length === 0,
+      }"
+    >
+      <span>{{ $t('dataselector.statistics.columns') }}</span>
+      <div class="statistics-dropdown-toggle" @click="toggleDropdownColumns">
+        <span v-if="selectedColumns.length === 0">{{
+          $t('dataselector.statistics.nocolumns')
+        }}</span>
+        <span v-else>{{ selectedColumns.join(', ') }}</span>
+      </div>
+      <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
+        <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
+          <input
+            type="checkbox"
+            :value="param.name"
+            v-model="selectedColumns"
+            @change="updateColumns"
+          />
+          {{ param.name }}
+        </label>
+      </div>
+    </div>
     <div v-if="currentResult.length">
       <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
     </div>
+  </div>
+
+  <!-- show table -->
+  <div class="table-wrapper">
     <table v-if="currentResult.length" class="fancy-table">
       <thead>
         <tr>
@@ -191,7 +296,19 @@ const exportCSV = () => {
         </tr>
       </tbody>
     </table>
-    <p v-else class="message">{{ $t('error.nodata') }}</p>
+
+    <!-- show no data -->
+    <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
+      {{ $t('message.nodatasetselected') }}
+    </p>
+    <p v-else-if="!fetchDataLoaded" class="message">
+      {{ $t('message.loading') }}
+    </p>
+    <p v-else>
+      {{ $t('error.nodata') }}
+    </p>
+
+    <!-- show pagers -->
     <div v-if="currentResult.length" class="pagination">
       <button @click="firstPage" :disabled="currentPage === 1">
         <i class="material-icons">first_page</i>
@@ -217,6 +334,73 @@ const exportCSV = () => {
 </template>
 
 <style scoped>
+.statistics {
+  background-color: var(--sb-grey-light);
+  padding: 0.5rem;
+  color: black;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.statistics-header {
+  font-size: medium;
+  font-weight: bold;
+}
+
+.statistics-dropdown {
+  position: relative;
+  margin-bottom: 1rem;
+  margin-right: 1rem;
+  width: 400px;
+}
+
+.statistics-dropdown-open {
+  border-color: var(--sb-orange);
+}
+
+.statistics-dropdown-disabled {
+  pointer-events: none;
+  color: var(--sb-grey-medium);
+  cursor: not-allowed;
+}
+
+.statistics-dropdown-toggle {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.statistics-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.statistics-dropdown-open .dropdown-menu {
+  border-color: var(--color-border-open);
+}
+
+.statistics-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: var(--color-text);
+}
+
+.statistics-dropdown-item input {
+  margin-right: 0.5rem;
+}
+
 .table-wrapper {
   display: grid;
   position: relative;
@@ -259,7 +443,7 @@ th {
 }
 
 .export-button {
-  margin: 0.5rem;
+  margin-top: 2rem;
 }
 
 .message {

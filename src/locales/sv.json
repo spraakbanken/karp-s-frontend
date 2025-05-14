@@ -67,5 +67,7 @@
   "graphs.barwidth": "Stapelbredd",
   "graphs.dots": "Punkter",
   "graphs.maxnumberofvalues": "Endast de första {number} värdena visas",
-  "error.nodata": "Det finns ingen data att visa."
+  "error.nodata": "Det finns ingen data att visa.",
+  "message.loading": "Hämtar data...",
+  "message.nodatasetselected": "Ingen datamängd vald"
 }

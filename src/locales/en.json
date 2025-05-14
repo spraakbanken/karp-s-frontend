@@ -66,5 +66,7 @@
   "graphs.barwidth": "Bar width",
   "graphs.dots": "Dots",
   "graphs.maxnumberofvalues": "Only the first {number} values are shown",
-  "error.nodata": "No data available. Please select a parameter."
+  "error.nodata": "No data available. Please select a parameter.",
+  "message.loading": "Loading...",
+  "message.nodatasetselected": "No dataset selected"
 }

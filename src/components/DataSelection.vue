@@ -305,6 +305,7 @@ watch(
 <style scoped>
 .data-component {
   padding: 1rem;
+  width: 300px;
 }
 
 .search-container {
@@ -423,12 +424,12 @@ watch(
 .datasets-list {
   overflow: auto;
   max-height: 100%;
-  width: 200px;
+  width: 280px;
   background-color: white;
 }
 
 .datasets-list-wider {
-  width: 500px;
+  width: 550px;
 }
 
 .datasets-icon {
@@ -442,7 +443,7 @@ watch(
 .datasets-info {
   background-color: var(--sb-grey-light);
   padding: 0.5rem;
-  width: 200px;
+  width: 260px;
   white-space: pre-line;
 }
 

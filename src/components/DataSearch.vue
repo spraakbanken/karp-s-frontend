@@ -13,14 +13,6 @@ const selectedParameters = computed({
   get: () => lexicalStorage.selectedParameters,
   set: (value) => lexicalStorage.setSelectedParameters(value),
 })
-const selectedCompileParams = computed({
-  get: () => lexicalStorage.selectedCompileParams,
-  set: (value) => lexicalStorage.setSelectedCompileParams(value),
-})
-const selectedColumns = computed({
-  get: () => lexicalStorage.selectedColumns,
-  set: (value) => lexicalStorage.setSelectedColumns(value),
-})
 
 const currentParams = computed(() => lexicalStorage.currentParameters)
 //const totalDatasets = computed(() => lexicalStorage.totalDatasets)
@@ -33,8 +25,6 @@ const selectedParametersArray = computed({
 const selectedParametersArray = ref<string[]>([])
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
-const isDropdownColumns = ref(false)
-const isDropdownCompileParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
 const parameters = ref<Record<string, paramConfig>>({})
@@ -52,30 +42,16 @@ const searchAdvanced = ref(false)
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
   isDropdownOpen.value = false
-  isDropdownColumns.value = false
-  isDropdownCompileParams.value = false
-}
-
-const toggleDropdownColumns = () => {
-  isDropdownColumns.value = !isDropdownColumns.value
-  isDropdownOpen.value = false
-  isDropdownParams.value = false
-  isDropdownCompileParams.value = false
-}
-
-const toggleDropdownCompileParams = () => {
-  isDropdownCompileParams.value = !isDropdownCompileParams.value
-  isDropdownOpen.value = false
-  isDropdownParams.value = false
-  isDropdownColumns.value = false
+  //isDropdownColumns.value = false
+  //isDropdownCompileParams.value = false
 }
 
 const handleClickOutside = (event: MouseEvent) => {
   if (dropdownContainer.value && !dropdownContainer.value.contains(event.target as Node)) {
     isDropdownOpen.value = false
     isDropdownParams.value = false
-    isDropdownColumns.value = false
-    isDropdownCompileParams.value = false
+    //isDropdownColumns.value = false
+    //isDropdownCompileParams.value = false
   }
 }
 
@@ -90,16 +66,6 @@ onBeforeUnmount(() => {
 // update state from URL
 const updateData = () => {
   lexicalStorage.setSelectedParameters(parameters.value)
-}
-
-// update state from URL
-const updateColumns = () => {
-  lexicalStorage.setSelectedColumns(selectedColumns.value)
-}
-
-// update state from URL
-const updateCompileParams = () => {
-  lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
 }
 
 watch(selectedParametersArray, (newParams) => {
@@ -125,8 +91,8 @@ watch(
     if (newParams.length === 0) {
       parameters.value = {}
       selectedParameters.value = {}
-      selectedColumns.value = []
-      selectedCompileParams.value = []
+      //selectedColumns.value = []
+      //selectedCompileParams.value = []
       updateData()
     }
   },
@@ -236,66 +202,6 @@ watch(
           :placeholder="$t('dataselector.parameters.placeholder')"
           @change="updateData"
         />
-      </div>
-    </div>
-    <!-- Statistics -->
-    <div class="statistics">
-      <div class="statistics-header">
-        {{ $t('dataselector.statistics') }}
-      </div>
-      <!-- Chose field for compilation -->
-      <div
-        class="dropdown"
-        :class="{
-          'dropdown-open': isDropdownColumns,
-          'dropdown-disabled': selectedDatasets.length === 0,
-        }"
-      >
-        <span>{{ $t('dataselector.statistics.parameter') }}</span>
-        <div class="dropdown-toggle" @click="toggleDropdownCompileParams">
-          <span v-if="selectedCompileParams.length === 0">{{
-            $t('dataselector.statistics.noparameter')
-          }}</span>
-          <span v-else>{{ selectedCompileParams.join(', ') }}</span>
-        </div>
-        <div class="dropdown-menu" v-if="isDropdownCompileParams">
-          <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
-            <input
-              type="checkbox"
-              :value="param.name"
-              v-model="selectedCompileParams"
-              @change="updateCompileParams"
-            />
-            {{ param.name }}
-          </label>
-        </div>
-      </div>
-      <!-- Select fields for statistics -->
-      <div
-        class="dropdown"
-        :class="{
-          'dropdown-open': isDropdownColumns,
-          'dropdown-disabled': selectedDatasets.length === 0,
-        }"
-      >
-        <span>{{ $t('dataselector.statistics.columns') }}</span>
-        <div class="dropdown-toggle" @click="toggleDropdownColumns">
-          <span v-if="selectedColumns.length === 0">{{
-            $t('dataselector.statistics.nocolumns')
-          }}</span>
-          <span v-else>{{ selectedColumns.join(', ') }}</span>
-        </div>
-        <div class="dropdown-menu" v-if="isDropdownColumns">
-          <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
-            <input
-              type="checkbox"
-              :value="param.name"
-              v-model="selectedColumns"
-              @change="updateColumns"
-            />
-            {{ param.name }}
-          </label>
-        </div>
       </div>
     </div>
   </div>
@@ -415,17 +321,6 @@ watch(
   padding: 0.5rem;
   border: 1px solid var(--color-border);
   border-radius: 4px;
-}
-
-.statistics {
-  background-color: var(--sb-grey-light);
-  padding: 0.5rem;
-  color: black;
-}
-
-.statistics-header {
-  font-size: medium;
-  font-weight: bold;
 }
 
 @media (max-width: 600px) {

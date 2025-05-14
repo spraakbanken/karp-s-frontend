@@ -10,19 +10,19 @@ const lexicalStorage = lexicalStore()
 const currentResult = ref<Record<string, { entries: Dataset[]; total: number }>>({})
 const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeTab)
-const picBar = ref<string>('')
-const picBars = ref<number[]>([])
+
+const fetchDataLoaded = ref(false)
 
 const fetchData = async () => {
   const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
     try {
       const data = await getTableData()
+      fetchDataLoaded.value = true
       currentResult.value = data
-      //console.log('data=', data)
       currentValues.value = newDatasets.flatMap(
         (key) => currentResult.value[key] || [],
-      ) as Dataset[]
+      ) as unknown as Dataset[]
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -59,6 +59,17 @@ watch(
         />
       </div>
     </div>
+
+    <!-- show no data -->
+    <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
+      {{ $t('message.nodatasetselected') }}
+    </p>
+    <p v-else-if="!fetchDataLoaded" class="message">
+      {{ $t('message.loading') }}
+    </p>
+    <p v-else>
+      {{ $t('error.nodata') }}
+    </p>
   </div>
 </template>
 
