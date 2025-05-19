@@ -50,6 +50,7 @@
   "dataselector.parameter.position.contains": "contains",
   "dataselector.parameter.position.equals": "equals",
   "dataselector.parameter.position.regex": "regex",
+  "dataselector.list.limit": "List limit",
   "dataset.label": "Title",
   "dataset.description": "Description",
   "dataset.updated": "Updated",

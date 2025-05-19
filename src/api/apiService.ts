@@ -57,7 +57,7 @@ export const getSubTableData = async (compile: string, pageSize: number, dataset
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
     const queryParam = Object.entries(lexicalStoreData.selectedParameters)
-      .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+      .map(([key, value]) => (value.value != '' ? `${value.position}|${key}|${value.value}` : ''))
       .join(',')
 
     const params: Record<string, string> = {}
@@ -71,7 +71,7 @@ export const getSubTableData = async (compile: string, pageSize: number, dataset
     if (pageSize > 10) {
       params['from'] = pageSize.toString()
     }
-    // console.log('param:', params)
+    console.log('getSubTableData - param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })

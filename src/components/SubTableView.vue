@@ -3,6 +3,9 @@ import { computed, ref, watch } from 'vue'
 import type { Dataset } from '@/types/datasetConfig'
 import { lexicalStore } from '@/stores/store'
 import { getSubTableData } from '@/api/apiService'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lexicalStorage = lexicalStore()
 
@@ -22,6 +25,31 @@ const processNewData = async (items: number) => {
   const data = await getSubTableData('baseform', items, props.lexicalKey)
   newData.value = data
   isLoading.value = false
+}
+
+const formatCell = (x: string | string[]) => {
+  let value = ''
+  //Array.isArray(x) ? x.join(', ') : x
+  if (Array.isArray(x)) {
+    x.every((item, index) => {
+      if (index > 0) {
+        value = value + '<br>' + item
+      } else {
+        value = item
+      }
+      if (index == lexicalStorage.listLimit - 1) {
+        if (index + 1 < x.length) {
+          value = value + '<br>' + '(' + x.length + ')'
+        }
+        return false
+      } else {
+        return true
+      }
+    })
+  } else {
+    value = x
+  }
+  return value
 }
 
 watch(
@@ -82,7 +110,10 @@ const lastPage = () => {
         <tr>
           <th v-for="(value, key) in props.data[0]" :key="key">
             <div class="header-content">
-              <span>{{ key }}</span>
+              <span
+                >{{ lexicalStorage.localizeParam(key) }}
+                {{ lexicalStorage.isList(key) ? '(' + t('table.header.list') + ')' : '' }}</span
+              >
             </div>
           </th>
         </tr>
@@ -90,7 +121,7 @@ const lastPage = () => {
       <tbody>
         <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
           <td v-for="(value, key) in item" :key="key">
-            {{ Array.isArray(value) ? value.join(', ') : value }}
+            <span v-html="formatCell(value)"></span>
           </td>
         </tr>
       </tbody>
@@ -111,7 +142,7 @@ const lastPage = () => {
       <button @click="lastPage" :disabled="currentPage === totalPages">
         <i class="material-icons">last_page</i>
       </button>
-      <label for="itemsPerPage">Items per page:</label>
+      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
       <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
         <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
           {{ option }}
@@ -142,13 +173,13 @@ const lastPage = () => {
   width: fit-content;
 }
 .fancy-table {
-  width: 100%;
   border-collapse: collapse;
-  margin: 0 0 0 0;
-  font-size: 1rem;
-  text-align: left;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--color-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  margin: 0 0 0 0;
+  text-align: left;
+  width: 100%;
 }
 
 th,
@@ -173,6 +204,10 @@ th {
 .header-content span {
   display: flex;
   align-items: center;
+}
+
+tr {
+  vertical-align: top;
 }
 
 tr:nth-child(even) {

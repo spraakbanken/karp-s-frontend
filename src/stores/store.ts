@@ -21,6 +21,7 @@ interface SearchRedux {
   searchQuery: string
   activeTab: string
   activeLocale: string
+  listLimit: number
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
 }
@@ -45,13 +46,12 @@ export const lexicalStore = defineStore('dataset', {
     searchQuery: '',
     activeTab: 'table',
     activeLocale: 'sv',
+    listLimit: 5,
     datasetLabels: {},
     datasetDates: [],
   }),
   actions: {
     setDefault(config: Config) {
-      console.log('--setDefault', config)
-
       this.currentConfig = config
       this.currentDatasets = config.resources.map((c) => c.resourceId)
       if (this.activeLocale == 'sv') {
@@ -145,10 +145,8 @@ export const lexicalStore = defineStore('dataset', {
       //      } else {
       const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
       if (allParamsArray.length > 0) {
-        // remove duplicates
+        // keep only fields that exist in all datasets = find the intersection
         let intersection = allParamsArray[0]
-
-        // Find the intersection with the rest of the datasets
         for (let i = 1; i < allParamsArray.length; i++) {
           intersection = intersection.filter((param) =>
             allParamsArray[i].some(
@@ -156,15 +154,16 @@ export const lexicalStore = defineStore('dataset', {
             ),
           )
         }
-        this.currentParameters = intersection
-
-        // add 'word' (ingångsord)
+        // make a copy
+        this.currentParameters = [...intersection]
+        // and add the "ingångsord"
         this.currentParameters.unshift({
           name: 'word',
           type: 'text',
           collection: false,
           label: { swe: 'ingångsord', eng: 'word' },
         })
+        // and set "ingångsord" to default for statistics
         const parameters: Record<string, paramConfig> = {}
         parameters['word'] = { value: '', position: 'startswith' }
         this.setSelectedParameters(parameters)
@@ -173,7 +172,6 @@ export const lexicalStore = defineStore('dataset', {
         return []
       }
       //}
-      //console.log('currentParams', this.currentParams)
     },
     /*
     setSelectedTag(tags: string[]) {
@@ -182,7 +180,6 @@ export const lexicalStore = defineStore('dataset', {
     },
     */
     setLocale(locale: string) {
-      console.log('setLocale()')
       this.activeLocale = locale
       if (this.activeLocale == 'sv') {
         this.datasetLabels = this.currentConfig.resources
@@ -208,6 +205,34 @@ export const lexicalStore = defineStore('dataset', {
     setEmpty() {
       this.selectedDatasets = []
       this.setActiveTab('table')
+    },
+    setListLimit(x: number) {
+      this.listLimit = x
+    },
+    localizeParam(p: string): string {
+      let label = p
+      for (const c of this.currentParameters) {
+        if (c.name === p) {
+          if (this.activeLocale == 'sv') {
+            label = c.label.swe ? c.label.swe : (c.label as unknown as string)
+          } else {
+            label = c.label.eng ? c.label.eng : (c.label as unknown as string)
+          }
+        }
+      }
+      return label
+    },
+    isList(p: string): boolean {
+      let value = false
+      this.currentParameters.every((item) => {
+        if (p == item.name) {
+          value = item.collection
+          return false
+        } else {
+          return true
+        }
+      })
+      return value
     },
   },
 })

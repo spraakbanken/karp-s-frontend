@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import type { paramConfig } from '@/types/parameterPosition'
+import type { FieldConfig } from '@/types/datasetConfig'
 
 const lexicalStorage = lexicalStore()
 
@@ -14,7 +15,12 @@ const selectedParameters = computed({
   set: (value) => lexicalStorage.setSelectedParameters(value),
 })
 
-const currentParams = computed(() => lexicalStorage.currentParameters)
+const listLimit = computed({
+  get: () => lexicalStorage.listLimit,
+  set: (value) => lexicalStorage.setListLimit(value),
+})
+
+const currentParameters = computed(() => lexicalStorage.currentParameters)
 //const totalDatasets = computed(() => lexicalStorage.totalDatasets)
 /*
 const selectedParametersArray = computed({
@@ -38,6 +44,20 @@ const ParameterPositionText = [
 ]
 const ParameterPositionEnabled = [true, true, false, true, false]
 const searchAdvanced = ref(false)
+
+const localizeParam = (p: string) => {
+  let label = p
+  for (const c of currentParameters.value) {
+    if (c.name === p) {
+      if (lexicalStorage.activeLocale == 'sv') {
+        label = c.label.swe ? c.label.swe : (c.label as unknown as string)
+      } else {
+        label = c.label.eng ? c.label.eng : (c.label as unknown as string)
+      }
+    }
+  }
+  return label
+}
 
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
@@ -69,9 +89,8 @@ const updateData = () => {
 }
 
 watch(selectedParametersArray, (newParams) => {
-  console.log('WATCH: selectedParametersArray:', newParams)
+  //console.log('WATCH: selectedParametersArray:', newParams)
   newParams.forEach((param) => {
-    //console.log('   param:', param)
     if (!parameters.value[param]) {
       parameters.value[param] = { value: '', position: 'equals' }
     }
@@ -85,9 +104,9 @@ watch(selectedParametersArray, (newParams) => {
 })
 
 watch(
-  () => currentParams.value,
+  () => currentParameters.value,
   (newParams) => {
-    console.log('WATCH: currentParams.value', newParams)
+    //console.log('WATCH: currentParams.value', newParams)
     if (newParams.length === 0) {
       parameters.value = {}
       selectedParameters.value = {}
@@ -101,7 +120,7 @@ watch(
 watch(
   () => lexicalStorage.selectedParameters,
   (newSelectedParameters) => {
-    console.log('WATCH: lexicalStorage.selectedParameters', newSelectedParameters)
+    //console.log('WATCH: lexicalStorage.selectedParameters', newSelectedParameters)
     selectedParametersArray.value = Object.keys(newSelectedParameters)
     //console.log('-- parameters1', parameters, selectedParametersArray.value)
     Object.keys(newSelectedParameters).forEach((param) => {
@@ -158,31 +177,33 @@ watch(
       <span>{{ $t('dataselector.parameters') }}</span>
       <div class="dropdown-toggle" @click="toggleDropdownParams">
         <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
-        <span v-else-if="currentParams.length === 0">{{
+        <span v-else-if="currentParameters.length === 0">{{
           $t('dataselector.datasets.nocommon')
         }}</span>
         <span v-else-if="selectedParametersArray.length === 0">{{
           $t('dataselector.noparameters')
         }}</span>
-        <span v-else>{{ selectedParametersArray.join(', ') }}</span>
+        <span v-else>{{ selectedParametersArray.map((x) => localizeParam(x)).join(', ') }}</span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
-        <label v-for="param in currentParams" :key="param.name" class="dropdown-item">
+        <label v-for="param in currentParameters" :key="param.name" class="dropdown-item">
+          {{ console.log('SÖK:', param.name) }}
           <input type="checkbox" :value="param.name" v-model="selectedParametersArray" />
           <span v-if="param.name == 'word'" style="font-weight: bold">
-            {{ param.name }}
+            {{ localizeParam(param.name) }}
           </span>
           <span v-else>
-            {{ param.name }}
+            {{ localizeParam(param.name) }}
           </span>
         </label>
       </div>
     </div>
     <!-- Search-box -->
     <div v-for="param in selectedParametersArray" :key="param" class="search-container">
-      <span :for="param">{{ $t('dataselector.parameters.prefix') }}: {{ param }}</span>
+      <span :for="param"
+        >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeParam(param) }}</span
+      >
       <div class="input-group">
-        {{ console.log('Param=', param, selectedParametersArray) }}
         <select v-model="parameters[param].position">
           <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
           <option
@@ -203,6 +224,12 @@ watch(
           @change="updateData"
         />
       </div>
+    </div>
+    <div>
+      <span class="graph-parameter">
+        {{ $t('dataselector.list.limit') }}:
+        <input type="number" size="5" min="1" v-model="listLimit" @change="updateData" />
+      </span>
     </div>
   </div>
 </template>
