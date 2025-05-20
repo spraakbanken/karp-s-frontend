@@ -58,6 +58,8 @@
   "dataset.link": "Link",
   "dataset.word": "Word",
   "dataset.fields": "Fields",
+  "table.header.list": "list",
+  "table.footer.itemsperpage": "Items per page",
   "statistics.exportCSV": "Export CSV",
   "statistics.showOverview": "Show overview",
   "graphs.bar": "Bar diagram",

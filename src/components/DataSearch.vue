@@ -2,7 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import type { paramConfig } from '@/types/parameterPosition'
-import type { FieldConfig } from '@/types/datasetConfig'
+//import type { FieldConfig } from '@/types/datasetConfig'
 
 const lexicalStorage = lexicalStore()
 

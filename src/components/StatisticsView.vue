@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import type { Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import type { paramConfig } from '@/types/parameterPosition'
 import * as d3 from 'd3'
+
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const lexicalStorage = lexicalStore()
 
@@ -18,6 +22,7 @@ const currentTab = ref(lexicalStorage.activeTab)
 
 const isDropdownColumns = ref(false)
 const isDropdownCompileParams = ref(false)
+const dropdownContainerS = ref<HTMLElement | null>(null)
 
 const toggleDropdownColumns = () => {
   isDropdownColumns.value = !isDropdownColumns.value
@@ -31,6 +36,13 @@ const toggleDropdownCompileParams = () => {
   //  isDropdownOpen.value = false
   //  isDropdownParams.value = false
   isDropdownColumns.value = false
+}
+
+const handleClickOutsideS = (event: MouseEvent) => {
+  if (dropdownContainerS.value && !dropdownContainerS.value.contains(event.target as Node)) {
+    isDropdownColumns.value = false
+    isDropdownCompileParams.value = false
+  }
 }
 
 const selectedDatasets = computed({
@@ -65,10 +77,12 @@ const showOverview = ref(false)
 const fetchDataLoaded = ref(false)
 
 const fetchData = async () => {
+  fetchDataLoaded.value = false
+
   const newParams = lexicalStorage.selectedParameters
   const newCompileParams = lexicalStorage.selectedCompileParams
   const newColumns = lexicalStorage.selectedColumns
-  console.log(newParams, newCompileParams, newColumns)
+  console.log('fetchData', newParams, newCompileParams, newColumns)
   if (newParams && newCompileParams.length > 0) {
     try {
       const { tableData, headers } = await getStatisticsData(
@@ -78,6 +92,7 @@ const fetchData = async () => {
       )
       fetchDataLoaded.value = true
       currentResult.value = tableData
+      console.log('fetchData result ', currentResult.value.length, currentResult.value)
       tableHeaders.value = headers
       // console.log('currentResult', currentResult.value);
     } catch (error) {
@@ -105,13 +120,22 @@ watch(
     lexicalStorage.selectedCompileParams,
     lexicalStorage.selectedColumns,
   ],
-  () => {
-    fetchData()
-    updateOverview()
+  async () => {
+    await fetchData()
+    updateOverview() // draw graph
   },
   { deep: true },
 )
-
+/*
+watch(
+  () => fetchDataLoaded.value,
+  () => {
+    if (fetchDataLoaded.value) {
+      updateOverview()
+    }
+  },
+)
+  */
 const sortedData = computed(() => {
   if (!sortKey.value) return currentResult.value
 
@@ -170,6 +194,14 @@ const sortTable = (key: string) => {
     sortOrder.value = 'asc'
   }
 }
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutsideS)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutsideS)
+})
 
 /*
   Export current statistics to CSV with header
@@ -231,7 +263,7 @@ const graph_value_max = ref<number>(0)
 const graph_value_count = ref<number>(0)
 
 const drawChart = () => {
-  console.log('drawChart()', currentResult.value[0].length)
+  console.log('drawChart() ', currentResult.value.length)
   interface dict {
     [key: string]: string | number
   }
@@ -373,7 +405,7 @@ const updateOverview = () => {
 
 <template>
   <!-- statistics settings -->
-  <div class="statistics">
+  <div class="statistics" ref="dropdownContainerS">
     <!-- chose field for compilation -->
     <div
       class="statistics-dropdown"
@@ -387,7 +419,9 @@ const updateOverview = () => {
         <span v-if="selectedCompileParams.length === 0">{{
           $t('dataselector.statistics.noparameter')
         }}</span>
-        <span v-else>{{ selectedCompileParams.join(', ') }}</span>
+        <span v-else>{{
+          selectedCompileParams.map((x) => lexicalStorage.localizeParam(x)).join(', ')
+        }}</span>
       </div>
       <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
         <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
@@ -397,7 +431,7 @@ const updateOverview = () => {
             v-model="selectedCompileParams"
             @change="updateCompileParams"
           />
-          {{ param.name }}
+          {{ lexicalStorage.localizeParam(param.name) }}
         </label>
       </div>
     </div>
@@ -424,7 +458,7 @@ const updateOverview = () => {
             v-model="selectedColumns"
             @change="updateColumns"
           />
-          {{ param.name }}
+          {{ lexicalStorage.localizeParam(param.name) }}
         </label>
       </div>
     </div>
@@ -480,7 +514,10 @@ const updateOverview = () => {
         <tr>
           <th v-for="key in tableHeaders" :key="key" @click="sortTable(String(key))">
             <div class="header-content">
-              <span>{{ key }}</span>
+              <span
+                >{{ lexicalStorage.localizeParam(key) }}
+                {{ lexicalStorage.isList(key) ? '(' + t('table.header.list') + ')' : '' }}</span
+              >
             </div>
           </th>
         </tr>
@@ -488,7 +525,7 @@ const updateOverview = () => {
       <tbody>
         <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
           <td v-for="(value, key) in item" :key="key">
-            {{ Array.isArray(value) ? value.join(', ') : value }}
+            <span v-html="lexicalStorage.formatCell(value)"></span>
           </td>
         </tr>
       </tbody>
@@ -520,7 +557,7 @@ const updateOverview = () => {
       <button @click="lastPage" :disabled="currentPage === totalPages">
         <i class="material-icons">last_page</i>
       </button>
-      <label for="itemsPerPage">Items per page:</label>
+      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
       <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
         <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
           {{ option }}

@@ -234,5 +234,29 @@ export const lexicalStore = defineStore('dataset', {
       })
       return value
     },
+    formatCell(x: string | string[]): string {
+      let value = ''
+      //Array.isArray(x) ? x.join(', ') : x
+      if (Array.isArray(x)) {
+        x.every((item, index) => {
+          if (index > 0) {
+            value = value + '<br>' + item
+          } else {
+            value = item
+          }
+          if (index == this.listLimit - 1) {
+            if (index + 1 < x.length) {
+              value = value + '<br>' + '(' + x.length + ')'
+            }
+            return false
+          } else {
+            return true
+          }
+        })
+      } else {
+        value = x
+      }
+      return value
+    },
   },
 })

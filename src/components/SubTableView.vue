@@ -27,31 +27,6 @@ const processNewData = async (items: number) => {
   isLoading.value = false
 }
 
-const formatCell = (x: string | string[]) => {
-  let value = ''
-  //Array.isArray(x) ? x.join(', ') : x
-  if (Array.isArray(x)) {
-    x.every((item, index) => {
-      if (index > 0) {
-        value = value + '<br>' + item
-      } else {
-        value = item
-      }
-      if (index == lexicalStorage.listLimit - 1) {
-        if (index + 1 < x.length) {
-          value = value + '<br>' + '(' + x.length + ')'
-        }
-        return false
-      } else {
-        return true
-      }
-    })
-  } else {
-    value = x
-  }
-  return value
-}
-
 watch(
   () => [currentPage.value, itemsPerPage.value],
   ([newPage, newItemsPerPage]) => {
@@ -121,7 +96,7 @@ const lastPage = () => {
       <tbody>
         <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
           <td v-for="(value, key) in item" :key="key">
-            <span v-html="formatCell(value)"></span>
+            <span v-html="lexicalStorage.formatCell(value)"></span>
           </td>
         </tr>
       </tbody>
