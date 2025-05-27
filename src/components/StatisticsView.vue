@@ -74,15 +74,14 @@ const updateCompileParams = () => {
 // show overview switch
 const showOverview = ref(false)
 
-const fetchDataLoaded = ref(false)
+const isLoading = ref(false)
 
 const fetchData = async () => {
-  fetchDataLoaded.value = false
-
+  isLoading.value = true
   const newParams = lexicalStorage.selectedParameters
   const newCompileParams = lexicalStorage.selectedCompileParams
   const newColumns = lexicalStorage.selectedColumns
-  console.log('fetchData', newParams, newCompileParams, newColumns)
+  //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (newParams && newCompileParams.length > 0) {
     try {
       const { tableData, headers } = await getStatisticsData(
@@ -90,9 +89,9 @@ const fetchData = async () => {
         newCompileParams as string[],
         newColumns as string[],
       )
-      fetchDataLoaded.value = true
+      isLoading.value = false
       currentResult.value = tableData
-      console.log('fetchData result ', currentResult.value.length, currentResult.value)
+      //console.log('fetchData result ', currentResult.value.length, currentResult.value)
       tableHeaders.value = headers
       // console.log('currentResult', currentResult.value);
     } catch (error) {
@@ -126,23 +125,18 @@ watch(
   },
   { deep: true },
 )
-/*
-watch(
-  () => fetchDataLoaded.value,
-  () => {
-    if (fetchDataLoaded.value) {
-      updateOverview()
-    }
-  },
-)
-  */
+
 const sortedData = computed(() => {
+  //console.log('Recalc!', sortKey.value)
   if (!sortKey.value) return currentResult.value
 
   return [...currentResult.value].sort((a, b) => {
-    const aValue = a[sortKey.value]
-    const bValue = b[sortKey.value]
-
+    //const aValue = a[sortKey.value]
+    //const bValue = b[sortKey.value]
+    // data is of format a[0] = "name", a[1] = number
+    const aValue = a[1]
+    const bValue = b[1]
+    //console.log('Sort', aValue, bValue, a, b)
     if (aValue === bValue) return 0
 
     const order = sortOrder.value === 'asc' ? 1 : -1
@@ -156,6 +150,8 @@ const sortedData = computed(() => {
 })
 
 const paginatedData = computed(() => {
+  //console.log('paginatedData!')
+
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
   return sortedData.value.slice(start, end)
@@ -211,7 +207,7 @@ const exportCSV = () => {
 
   // write headers
   //  for (const title in currentResult.value[0]) {
-  console.log()
+  //console.log()
   for (const key in tableHeaders.value) {
     csv += tableHeaders.value[key] + ','
   }
@@ -509,6 +505,11 @@ const updateOverview = () => {
 
   <!-- show table -->
   <div v-else class="table-wrapper">
+    <div class="tab" v-if="!isLoading">
+      {{ $t('statistics.numberOfHits') }}:
+      {{ currentResult.length }}
+    </div>
+
     <table v-if="currentResult.length" class="fancy-table">
       <thead>
         <tr>
@@ -535,7 +536,7 @@ const updateOverview = () => {
     <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
       {{ $t('message.nodatasetselected') }}
     </p>
-    <p v-else-if="!fetchDataLoaded" class="message">
+    <p v-else-if="isLoading" class="message">
       {{ $t('message.loading') }}
     </p>
     <p v-else>
@@ -654,6 +655,19 @@ const updateOverview = () => {
   margin-top: 1rem;
 }
 
+.tab {
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  width: fit-content;
+}
+
 .table-wrapper {
   display: grid;
   position: relative;
@@ -664,7 +678,7 @@ const updateOverview = () => {
 .fancy-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1rem 0;
+  margin: 0;
   font-size: 1rem;
   text-align: left;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

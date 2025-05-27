@@ -11,7 +11,7 @@ const lexicalStorage = lexicalStore()
 
 const props = defineProps<{
   data: Dataset[]
-  lexicalKey: string
+  dataset: string
   totalHits: number
 }>()
 
@@ -20,34 +20,30 @@ const itemsPerPage = ref(10)
 const newData = ref<Dataset[]>([])
 const isLoading = ref(false)
 
-const processNewData = async (items: number) => {
+const processNewData = async () => {
+  console.log('processNewData')
   isLoading.value = true
-  const data = await getSubTableData('baseform', items, props.lexicalKey)
+  const data = await getSubTableData(
+    'baseform',
+    currentPage.value,
+    itemsPerPage.value,
+    props.dataset,
+  )
   newData.value = data
   isLoading.value = false
 }
 
 watch(
-  () => [currentPage.value, itemsPerPage.value],
+  () => [currentPage.value, itemsPerPage.value, props.data],
   ([newPage, newItemsPerPage]) => {
-    const end = newPage * newItemsPerPage
-    if (end > 10) {
-      processNewData(end)
-    }
+    //const end = newPage * newItemsPerPage
+    //itemsPerPage.value = newItemsPerPage
+    // if (end > 10) {
+    processNewData()
+    // }
   },
   { immediate: true },
 )
-
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-
-  if (end < 11) {
-    return props.data
-  } else {
-    return newData.value
-  }
-})
 
 const totalPages = computed(() => {
   return Math.ceil(props.totalHits / itemsPerPage.value)
@@ -77,7 +73,7 @@ const lastPage = () => {
 <template>
   <div class="table-wrapper">
     <div class="tab">
-      {{ lexicalStorage.datasetLabels[props.lexicalKey] }}
+      {{ lexicalStorage.datasetLabels[props.dataset] }}
       ({{ props.totalHits }})
     </div>
     <table v-if="props.data.length" class="fancy-table">
@@ -94,7 +90,7 @@ const lastPage = () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in paginatedData" :key="item.rank + '-' + index">
+        <tr v-for="(item, index) in newData" :key="item.rank + '-' + index">
           <td v-for="(value, key) in item" :key="key">
             <span v-html="lexicalStorage.formatCell(value)"></span>
           </td>
@@ -147,6 +143,7 @@ const lastPage = () => {
   position: relative;
   width: fit-content;
 }
+
 .fancy-table {
   border-collapse: collapse;
   border: 1px solid var(--color-border);

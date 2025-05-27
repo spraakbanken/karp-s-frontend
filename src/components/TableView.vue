@@ -11,14 +11,16 @@ const currentResult = ref<Record<string, { entries: Dataset[]; total: number }>>
 const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeTab)
 
-const fetchDataLoaded = ref(false)
+const isLoading = ref(false)
 
 const fetchData = async () => {
+  isLoading.value = true
+
   const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
     try {
       const data = await getTableData()
-      fetchDataLoaded.value = true
+      isLoading.value = false
       currentResult.value = data
       currentValues.value = newDatasets.flatMap(
         (key) => currentResult.value[key] || [],
@@ -50,26 +52,27 @@ watch(
 
 <template>
   <div class="table-wrapper">
-    <div v-if="Object.keys(currentResult).length > 0">
+    <!-- show no data -->
+    <p v-if="lexicalStorage.selectedDatasets.length == 0">
+      {{ $t('message.nodatasetselected') }}
+    </p>
+    <p v-else-if="isLoading" class="message">
+      {{ $t('message.loading') }}
+    </p>
+    <p v-else-if="Object.keys(currentResult).length == 0">
+      {{ $t('error.nodata') }}
+    </p>
+
+    <!-- show table -->
+    <div v-else>
       <div class="table-container" v-for="(dataset, index) in currentResult" :key="index">
         <SubTableView
           :data="currentResult[index].entries"
-          :lexicalKey="index"
+          :dataset="index"
           :totalHits="currentResult[index].total"
         />
       </div>
     </div>
-
-    <!-- show no data -->
-    <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
-      {{ $t('message.nodatasetselected') }}
-    </p>
-    <p v-else-if="!fetchDataLoaded" class="message">
-      {{ $t('message.loading') }}
-    </p>
-    <p v-else>
-      {{ $t('error.nodata') }}
-    </p>
   </div>
 </template>
 

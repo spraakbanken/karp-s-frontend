@@ -62,6 +62,7 @@
   "table.footer.itemsperpage": "Items per page",
   "statistics.exportCSV": "Export CSV",
   "statistics.showOverview": "Show overview",
+  "statistics.numberOfHits": "Number of hits",
   "graphs.bar": "Bar diagram",
   "graphs.circle": "Circle diagram",
   "graphs.export.svg": "Export as SVG",

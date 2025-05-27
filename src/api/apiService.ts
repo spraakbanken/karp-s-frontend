@@ -51,7 +51,12 @@ export const getTableData = async () => {
   }
 }
 
-export const getSubTableData = async (compile: string, pageSize: number, dataset: string) => {
+export const getSubTableData = async (
+  compile: string,
+  pageStart: number,
+  pageSize: number,
+  dataset: string,
+) => {
   try {
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
@@ -68,9 +73,12 @@ export const getSubTableData = async (compile: string, pageSize: number, dataset
     if (compile) {
       params['compile'] = compile
     }
-    if (pageSize > 10) {
-      params['from'] = pageSize.toString()
-    }
+    //    if (pageSize > 10) {
+    params['size'] = pageSize.toString()
+    //    }
+    //    if (pageSize > 10) {
+    params['from'] = ((pageStart - 1) * pageSize).toString()
+    //    }
     console.log('getSubTableData - param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
