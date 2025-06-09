@@ -5,6 +5,7 @@ import type { paramConfig } from '@/types/parameterPosition'
 import { secondsToDate } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
 
+const previousDataset = ref('')
 const lexicalStorage = lexicalStore()
 
 const selectedDatasets = computed({
@@ -43,22 +44,42 @@ const datasetInfo = ref(<ResourceLocalized>{
   updated: '',
   word: '',
 })
+
 const datasetInfoFill = (dataset: string) => {
-  //lexicalStorage.currentConfig.resources[0].description.swe
-  const elt = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
-  if (elt != undefined) {
-    if (lexicalStorage.activeLocale == 'sv') {
-      datasetInfo.value['label'] = elt.label.swe ? elt.label.swe : (elt.label as unknown as string)
-      datasetInfo.value['description'] = elt.description ? elt.description.swe : ''
-    } else {
-      datasetInfo.value['label'] = elt.label.eng ? elt.label.eng : (elt.label as unknown as string)
-      datasetInfo.value['description'] = elt.description ? elt.description.eng : ''
+  if (dataset !== previousDataset.value) {
+    //lexicalStorage.currentConfig.resources[0].description.swe
+    const elt = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
+    if (elt != undefined) {
+      //    if (datasetInfo.value['label'])
+      if (lexicalStorage.activeLocale == 'sv') {
+        datasetInfo.value['label'] = elt.label.swe
+          ? elt.label.swe
+          : (elt.label as unknown as string)
+        datasetInfo.value['description'] = elt.description ? elt.description.swe : ''
+      } else {
+        datasetInfo.value['label'] = elt.label.eng
+          ? elt.label.eng
+          : (elt.label as unknown as string)
+        datasetInfo.value['description'] = elt.description ? elt.description.eng : ''
+      }
+      datasetInfo.value['size'] = elt.size
+      datasetInfo.value['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
+      datasetInfo.value['link'] = elt.link
+      datasetInfo.value['word'] = elt.word
+      datasetInfo.value['fields'] = elt.fields
+      //}
+
+      previousDataset.value = dataset
     }
-    datasetInfo.value['size'] = elt.size
-    datasetInfo.value['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
-    datasetInfo.value['link'] = elt.link
-    datasetInfo.value['word'] = elt.word
-    datasetInfo.value['fields'] = elt.fields
+  } else {
+    datasetInfo.value['label'] = ''
+    datasetInfo.value['description'] = ''
+    datasetInfo.value['size'] = ''
+    datasetInfo.value['updated'] = ''
+    datasetInfo.value['link'] = ''
+    datasetInfo.value['word'] = ''
+    datasetInfo.value['fields'] = []
+    previousDataset.value = ''
   }
 }
 
@@ -275,7 +296,7 @@ watch(
                 />
               </div>
             </div>
-            <div class="datasets-info">
+            <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
               <div class="datasets-info-label">{{ datasetInfo.label }}</div>
               <div class="">{{ datasetInfo.description }}</div>
               <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>

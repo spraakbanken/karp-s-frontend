@@ -62,16 +62,12 @@ const localizeParam = (p: string) => {
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
   isDropdownOpen.value = false
-  //isDropdownColumns.value = false
-  //isDropdownCompileParams.value = false
 }
 
 const handleClickOutside = (event: MouseEvent) => {
   if (dropdownContainer.value && !dropdownContainer.value.contains(event.target as Node)) {
     isDropdownOpen.value = false
     isDropdownParams.value = false
-    //isDropdownColumns.value = false
-    //isDropdownCompileParams.value = false
   }
 }
 
