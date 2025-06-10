@@ -8,6 +8,7 @@ const searchProps = defineProps<{
   searchExtended: boolean
 }>()
 
+/*
 watch(
   () => [searchProps.searchExtended],
   ([newValue, newItemsPerPage]) => {
@@ -15,6 +16,7 @@ watch(
   },
   { immediate: true },
 )
+*/
 
 const lexicalStorage = lexicalStore()
 
@@ -153,6 +155,10 @@ watch(
     }}</label>
   </div>
   -->
+
+  <p v-if="selectedDatasets.length == 0" style="padding: 1rem">
+    {{ $t('message.nodatasetselected') }}
+  </p>
 
   <!-- Simple search -->
   <div
