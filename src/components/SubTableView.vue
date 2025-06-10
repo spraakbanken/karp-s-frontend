@@ -128,7 +128,7 @@ const lastPage = () => {
   display: grid;
   position: relative;
   /* margin-top: 2rem; */
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .tab {
@@ -156,7 +156,10 @@ const lastPage = () => {
 
 th,
 td {
-  padding: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
   border: 1px solid var(--color-border);
 }
 
@@ -198,7 +201,13 @@ tr:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1rem;
+
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 0 0 4px 4px;
 }
 
 .pagination button,

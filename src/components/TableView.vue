@@ -81,7 +81,8 @@ watch(
   display: grid;
   position: relative;
   /* margin-top: 2rem; */
-  padding: 1rem;
+  padding-left: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .table-container {
