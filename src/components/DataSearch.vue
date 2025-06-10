@@ -4,6 +4,18 @@ import { lexicalStore } from '@/stores/store'
 import type { paramConfig } from '@/types/parameterPosition'
 //import type { FieldConfig } from '@/types/datasetConfig'
 
+const searchProps = defineProps<{
+  searchExtended: boolean
+}>()
+
+watch(
+  () => [searchProps.searchExtended],
+  ([newValue, newItemsPerPage]) => {
+    console.log('searchProps.searchExtended', searchProps.searchExtended)
+  },
+  { immediate: true },
+)
+
 const lexicalStorage = lexicalStore()
 
 const selectedDatasets = computed({
@@ -43,7 +55,7 @@ const ParameterPositionText = [
   'dataselector.parameter.position.regex',
 ]
 const ParameterPositionEnabled = [true, true, false, true, false]
-const searchAdvanced = ref(false)
+//const searchExtended = ref(false)
 
 const localizeParam = (p: string) => {
   let label = p
@@ -133,16 +145,20 @@ watch(
 </script>
 
 <template>
+  <!-- Select Simple/Advanced search
   <div class="data-component">
-    <!-- Select Simple/Advanced search -->
-    <input type="checkbox" id="advancedSearchCheckbox" v-model="searchAdvanced" />
+    <input type="checkbox" id="advancedSearchCheckbox" v-model="searchExtended" />
     <label for="advancedSearchCheckbox" class="search-advanced-label">{{
       $t('dataselector.search.advanced')
     }}</label>
   </div>
+  -->
 
   <!-- Simple search -->
-  <div v-if="!searchAdvanced && parameters.hasOwnProperty('word')" class="data-component">
+  <div
+    v-if="!searchProps.searchExtended && parameters.hasOwnProperty('word')"
+    class="data-component"
+  >
     <!-- Search-box -->
     <div class="search-container-simple">
       <!-- <span>{{ $t('dataselector.parameters.prefix') }}:</span> -->
@@ -160,7 +176,7 @@ watch(
   </div>
 
   <!-- Advanced search -->
-  <div v-if="searchAdvanced" ref="dropdownContainer" class="data-component">
+  <div v-if="searchProps.searchExtended" ref="dropdownContainer" class="data-component">
     <!-- Select field(s) for search -->
     <div
       class="dropdown"
@@ -170,7 +186,7 @@ watch(
       }"
       :disabled="selectedDatasets.length === 0"
     >
-      <span>{{ $t('dataselector.parameters') }}</span>
+      {{ $t('dataselector.parameters') }}
       <div class="dropdown-toggle" @click="toggleDropdownParams">
         <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
         <span v-else-if="currentParameters.length === 0">{{
@@ -183,7 +199,6 @@ watch(
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
         <label v-for="param in currentParameters" :key="param.name" class="dropdown-item">
-          {{ console.log('SÖK:', param.name) }}
           <input type="checkbox" :value="param.name" v-model="selectedParametersArray" />
           <span v-if="param.name == 'word'" style="font-weight: bold">
             {{ localizeParam(param.name) }}
@@ -196,9 +211,12 @@ watch(
     </div>
     <!-- Search-box -->
     <div v-for="param in selectedParametersArray" :key="param" class="search-container">
+      <!-- Search-box
+
       <span :for="param"
         >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeParam(param) }}</span
       >
+       -->
       <div class="input-group">
         <select v-model="parameters[param].position">
           <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
@@ -221,11 +239,10 @@ watch(
         />
       </div>
     </div>
-    <div>
-      <span class="graph-parameter">
-        {{ $t('dataselector.list.limit') }}:
-        <input type="number" size="5" min="1" v-model="listLimit" @change="updateData" />
-      </span>
+    <div class="graph-parameter">
+      {{ $t('dataselector.list.limit') }}:
+
+      <input type="number" size="5" min="1" v-model="listLimit" @change="updateData" />
     </div>
   </div>
 </template>
@@ -234,21 +251,21 @@ watch(
 .data-component {
   padding-left: 1rem;
   padding-right: 1rem;
-  padding-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .search-advanced-label {
   padding-left: 0.5rem;
 }
 
-.search-container {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.search-container-simple {
-  margin-top: 0rem;
-  margin-bottom: 1rem;
+.search-container-simple,
+.search-container,
+.graph-parameter {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-right: 1rem;
 }
 
 .search-input {
@@ -260,7 +277,10 @@ watch(
 
 .dropdown {
   position: relative;
-  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-right: 1rem;
+  min-width: 200px;
 }
 
 .dropdown-open {
@@ -279,6 +299,7 @@ watch(
 }
 
 .dropdown-toggle {
+  display: inline;
   padding: 0.5rem;
   border: 1px solid var(--color-border);
   border-radius: 4px;

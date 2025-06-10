@@ -18,7 +18,7 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
-const currentTab = ref(lexicalStorage.activeTab)
+const currentTab = ref(lexicalStorage.activeResultTab)
 
 const isDropdownColumns = ref(false)
 const isDropdownCompileParams = ref(false)

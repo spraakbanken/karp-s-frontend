@@ -19,7 +19,8 @@ interface SearchRedux {
   selectedColumns: string[]
   selectedCompileParams: string[]
   searchQuery: string
-  activeTab: string
+  activeSearchTab: string
+  activeResultTab: string
   activeLocale: string
   listLimit: number
   datasetLabels: Record<string, string>
@@ -44,7 +45,8 @@ export const lexicalStore = defineStore('dataset', {
     selectedColumns: [],
     selectedCompileParams: [],
     searchQuery: '',
-    activeTab: 'table',
+    activeSearchTab: 'simple',
+    activeResultTab: 'table',
     activeLocale: 'sv',
     listLimit: 5,
     datasetLabels: {},
@@ -135,8 +137,11 @@ export const lexicalStore = defineStore('dataset', {
       // console.log('selectedCompileParams', params)
       this.selectedCompileParams = params
     },
-    setActiveTab(tab: string) {
-      this.activeTab = tab
+    setActiveSearchTab(tab: string) {
+      this.activeSearchTab = tab
+    },
+    setActiveResultTab(tab: string) {
+      this.activeResultTab = tab
     },
     setSelectedDataset(keys: string[]) {
       this.selectedDatasets = keys
@@ -204,7 +209,8 @@ export const lexicalStore = defineStore('dataset', {
     },
     setEmpty() {
       this.selectedDatasets = []
-      this.setActiveTab('table')
+      this.setActiveSearchTab('simple')
+      this.setActiveResultTab('table')
     },
     setListLimit(x: number) {
       this.listLimit = x

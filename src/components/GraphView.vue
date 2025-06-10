@@ -7,7 +7,7 @@ import type { paramConfig } from '@/types/parameterPosition'
 import * as d3 from 'd3'
 
 const lexicalStorage = lexicalStore()
-const currentTab = ref(lexicalStorage.activeTab)
+const currentTab = ref(lexicalStorage.activeResultTab)
 
 const graph_max_number_of_values = 100
 

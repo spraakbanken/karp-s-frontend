@@ -16,7 +16,7 @@ export function syncStoreWithRouter(router: Router) {
         .join(','),
       compile: lexicalStorage.selectedCompileParams.join(','),
       columns: lexicalStorage.selectedColumns.join(','),
-      tab: lexicalStorage.activeTab,
+      tab: lexicalStorage.activeResultTab,
     }
 
     const filteredQuery = Object.fromEntries(
@@ -36,7 +36,7 @@ export function syncStoreWithRouter(router: Router) {
       q: lexicalStorage.selectedParameters,
       compile: lexicalStorage.selectedCompileParams,
       columns: lexicalStorage.selectedColumns,
-      tab: lexicalStorage.activeTab,
+      tab: lexicalStorage.activeResultTab,
     }),
     updateRouterQuery,
     { deep: true },
@@ -79,7 +79,7 @@ export function syncStoreWithRouter(router: Router) {
     }
     if (query.has('tab')) {
       console.log('initializeStoreFromQuery: tab=', query.get('tab'))
-      lexicalStorage.setActiveTab(query.get('tab')!)
+      lexicalStorage.setActiveResultTab(query.get('tab')!)
     }
   }
 

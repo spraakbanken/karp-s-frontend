@@ -9,7 +9,7 @@ const lexicalStorage = lexicalStore()
 
 const currentResult = ref<Record<string, { entries: Dataset[]; total: number }>>({})
 const currentValues = ref<Dataset[]>([])
-const currentTab = ref(lexicalStorage.activeTab)
+const currentTab = ref(lexicalStorage.activeResultTab)
 
 const isLoading = ref(false)
 

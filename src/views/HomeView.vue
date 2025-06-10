@@ -26,56 +26,69 @@ onMounted(async () => {
   }
 })
 
-const activeTab = ref(lexicalStorage.activeTab)
+const activeSearchTab = ref(lexicalStorage.activeSearchTab)
+const setActiveSearchTab = (tab: string) => {
+  lexicalStorage.setActiveSearchTab(tab)
+  activeSearchTab.value = tab
+}
 
-const setActiveTab = (tab: string) => {
-  lexicalStorage.setActiveTab(tab)
-  activeTab.value = tab
+const activeResultTab = ref(lexicalStorage.activeResultTab)
+const setActiveResultTab = (tab: string) => {
+  lexicalStorage.setActiveResultTab(tab)
+  activeResultTab.value = tab
 }
 
 watch(
-  () => lexicalStorage.activeTab,
+  () => lexicalStorage.activeResultTab,
   (newTab) => {
-    activeTab.value = newTab
+    activeResultTab.value = newTab
   },
 )
 </script>
 
 <template>
   <main class="container">
-    <div class="column-left">
-      <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>
-      <DataSearch />
+    <!-- <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>-->
+    <div class="searchTabs">
+      <button
+        :class="{ active: activeSearchTab === 'simple' }"
+        @click="setActiveSearchTab('simple')"
+      >
+        {{ $t('tab.search.simple') }}
+      </button>
+      <button
+        :class="{ active: activeSearchTab === 'extended' }"
+        @click="setActiveSearchTab('extended')"
+      >
+        {{ $t('tab.search.extended') }}
+      </button>
     </div>
-    <div class="column-right">
-      <div class="tabs">
-        <button :class="{ active: activeTab === 'table' }" @click="setActiveTab('table')">
-          {{ $t('tab.tables') }}
-        </button>
-        <button :class="{ active: activeTab === 'statistics' }" @click="setActiveTab('statistics')">
-          {{ $t('tab.statistics') }}
-        </button>
-        <!-- moved to StatisticsView
-        <button :class="{ active: activeTab === 'graph' }" @click="setActiveTab('graph')">
-          {{ $t('tab.graph') }}
-        </button>
-        -->
-      </div>
-      <TableView v-if="activeTab === 'table'" />
-      <StatisticsView v-if="activeTab === 'statistics'" />
-      <!-- moved to StatisticsView
-      <GraphView v-if="activeTab === 'graph'" />
-        -->
+    <DataSearch :searchExtended="activeSearchTab === 'extended'" />
+    <div class="tabs">
+      <button :class="{ active: activeResultTab === 'table' }" @click="setActiveResultTab('table')">
+        {{ $t('tab.tables') }}
+      </button>
+      <button
+        :class="{ active: activeResultTab === 'statistics' }"
+        @click="setActiveResultTab('statistics')"
+      >
+        {{ $t('tab.statistics') }}
+      </button>
     </div>
+    <TableView v-if="activeResultTab === 'table'" />
+    <StatisticsView v-if="activeResultTab === 'statistics'" />
   </main>
 </template>
 
 <style scoped>
 .container {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 0rem;
   padding: 0;
+}
+
+.container .search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .column-left {
@@ -98,6 +111,7 @@ watch(
   font-weight: bold;
 }
 
+.searchTabs,
 .tabs {
   display: flex;
   justify-content: flex-start;
@@ -109,6 +123,7 @@ watch(
   height: 2.5rem;
 }
 
+.searchTabs button,
 .tabs button {
   padding: 0.5rem 1rem;
   margin: 0;
@@ -126,6 +141,7 @@ watch(
     color 0.3s;
 }
 
+.searchTabs button.active,
 .tabs button.active {
   background-color: none;
   font-weight: bold;

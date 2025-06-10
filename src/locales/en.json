@@ -20,6 +20,8 @@
   "tab.tables": "Tables",
   "tab.statistics": "Statistics",
   "tab.graph": "Overview",
+  "tab.search.simple": "Simple",
+  "tab.search.extended": "Extended",
   "table.of": "of",
   "dataselector.heading": "Data selector",
   "dataselector.search.advanced": "Advanced search",

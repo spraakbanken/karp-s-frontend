@@ -20,6 +20,8 @@
   "tab.tables": "Tabeller",
   "tab.statistics": "Statistik",
   "tab.graph": "Översikt",
+  "tab.search.simple": "Enkel",
+  "tab.search.extended": "Utökad",
   "table.of": "av",
   "dataselector.heading": "Dataväljare",
   "dataselector.search.advanced": "Avancerad sökning",
