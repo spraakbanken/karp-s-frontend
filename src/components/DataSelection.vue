@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import type { paramConfig } from '@/types/parameterPosition'
+import type { SelectedFieldConfig } from '@/types/datasetConfig'
 import { secondsToDate } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
 
@@ -18,13 +18,13 @@ const selectedTags = computed({
   set: (value) => lexicalStorage.setSelectedTag(value),
 })
   */
-const selectedParameters = computed({
-  get: () => lexicalStorage.selectedParameters,
-  set: (value) => lexicalStorage.setSelectedParameters(value),
+const selectedFields = computed({
+  get: () => lexicalStorage.selectedFields,
+  set: (value) => lexicalStorage.setSelectedFields(value),
 })
 const selectedCompileParams = computed({
-  get: () => lexicalStorage.selectedCompileParams,
-  set: (value) => lexicalStorage.setSelectedCompileParams(value),
+  get: () => lexicalStorage.selectedCompileFields,
+  set: (value) => lexicalStorage.setSelectedCompileFields(value),
 })
 const selectedColumns = computed({
   get: () => lexicalStorage.selectedColumns,
@@ -46,8 +46,8 @@ const datasetInfo = ref(<ResourceLocalized>{
 })
 
 const datasetInfoFill = (dataset: string) => {
+  console.log('DSI: ', dataset, previousDataset.value)
   if (dataset !== previousDataset.value) {
-    //lexicalStorage.currentConfig.resources[0].description.swe
     const elt = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
     if (elt != undefined) {
       //    if (datasetInfo.value['label'])
@@ -90,7 +90,7 @@ const isDropdownColumns = ref(false)
 const isDropdownCompileParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
-const parameters = ref<Record<string, paramConfig>>({})
+const fields = ref<Record<string, SelectedFieldConfig>>({})
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -116,12 +116,14 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-const updateSelectedDataset = () => {
-  lexicalStorage.setSelectedDataset(selectedDatasets.value)
-}
-
 const selectDataset = () => {
-  updateSelectedDataset()
+  console.log('selectDataset:', selectedDatasets.value.length)
+  lexicalStorage.setSelectedDataset(selectedDatasets.value)
+  // do not search if we select a dataset (with none previously)
+  // as we don't have anything to search for yet
+  if (selectedDatasets.value.length > 1) {
+    lexicalStorage.setIsSearch(true)
+  }
 }
 
 /*
@@ -199,13 +201,20 @@ const filterDatasets = computed(() => {
 watch(
   () => selectedDatasets.value,
   (newDatasets, oldDatasets) => {
-    //console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
+    if (oldDatasets.length === 0) {
+      // set "ingångsord" to default, also for statistics
+      const fields: Record<string, SelectedFieldConfig> = {}
+      fields['word'] = { value: '', position: 'equals' }
+      lexicalStorage.setSelectedFields(fields)
+      lexicalStorage.setSelectedCompileFields(['word'])
+    }
+    // console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
     if (newDatasets.length === 0) {
-      parameters.value = {}
-      selectedParameters.value = {}
+      fields.value = {}
+      selectedFields.value = {}
       selectedColumns.value = []
       selectedCompileParams.value = []
-      //updateData()
+      lexicalStorage.setIsSearch(true)
     }
   },
 )
@@ -235,85 +244,85 @@ watch(
 
 <template>
   <div ref="dropdownContainer" class="data-component">
-    <div class="data-selection">
-      <span style="font-weight: bold">{{ $t('dataselector.datasets') }}</span>
-      <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
-        <div class="dropdown-toggle" @click="toggleDropdown">
-          {{
-            selectedDatasets.length === 1
-              ? $t('dataselector.dataset.selected')
-              : $t('dataselector.datasets.selected')
-          }}
-          ({{ selectedDatasets.length }}
-          {{ $t('dataselector.datasets.selected.of') }}
-          {{ currentDatasets.length }})
-        </div>
-        <!-- dropdown -->
+    <!-- <span style="font-weight: bold">{{ $t('dataselector.datasets') }}</span> -->
+    <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
+      <div class="dropdown-toggle" @click="toggleDropdown">
+        {{
+          selectedDatasets.length === 1
+            ? $t('dataselector.dataset.selected')
+            : $t('dataselector.datasets.selected')
+        }}
+        ({{ selectedDatasets.length }}
+        {{ $t('dataselector.datasets.selected.of') }}
+        {{ currentDatasets.length }})
+        <i class="arrow-down"></i>
+      </div>
 
-        <div
-          class="dropdown-menu"
-          v-if="isDropdownOpen"
-          :class="{ 'datasets-list-wider': datasetInfo['label'] !== '' }"
-        >
-          <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
-          <!-- show tags -->
-          <div class="dropdown-tags">
-            <div v-for="tag in currentTags" :key="tag">
-              <button @click="selectTags(tag)" class="tags-button">
-                {{ lexicalStorage.currentConfig.tags[tag].label }}
-              </button>
-              <!-- show tags
+      <!-- dropdown -->
+      <div
+        class="dropdown-menu"
+        v-if="isDropdownOpen"
+        :class="{ 'datasets-list-wider': datasetInfo['label'] !== '' }"
+      >
+        <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
+        <!-- show tags -->
+        <div class="dropdown-tags">
+          <div v-for="tag in currentTags" :key="tag">
+            <button @click="selectTags(tag)" class="tags-button">
+              {{ lexicalStorage.currentConfig.tags[tag].label }}
+            </button>
+            <!-- show tags
           <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
             {{ lexicalStorage.currentConfig.tags[tag].label }} -->
-            </div>
-            <button @click="unselectTags()" class="tags-button">
-              {{ $t('dataselector.tags.unselect') }}
-            </button>
           </div>
-          <!-- dataset list -->
-          <div class="dropdown-group">{{ $t('dataselector.datasets.title') }}</div>
-          <!-- filter -->
-          <div class="dropdown-filter">
-            {{ $t('dataselector.datasets.filter') }}: <input type="text" v-model="searchDatasets" />
-          </div>
-          <!-- list datasets -->
-          <div class="datasets-group">
-            <div class="datasets-list">
-              <div v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
-                <div>
-                  <input
-                    type="checkbox"
-                    :value="dataset"
-                    v-model="selectedDatasets"
-                    @change="selectDataset"
-                  />
-                  {{ lexicalStorage.datasetLabels[dataset] }}
-                </div>
-                <img
-                  src="@/assets/sb_symbol_info.svg"
-                  @click="datasetInfoFill(dataset)"
-                  class="datasets-icon"
+          <button @click="unselectTags()" class="tags-button">
+            {{ $t('dataselector.tags.unselect') }}
+          </button>
+        </div>
+        <!-- dataset list -->
+        <div class="dropdown-group">{{ $t('dataselector.datasets.title') }}</div>
+        <!-- filter -->
+        <div class="dropdown-filter">
+          {{ $t('dataselector.datasets.filter') }}: <input type="text" v-model="searchDatasets" />
+        </div>
+        <!-- list datasets -->
+        <div class="datasets-group">
+          <div class="datasets-list">
+            <div v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
+              <div>
+                <input
+                  type="checkbox"
+                  :value="dataset"
+                  v-model="selectedDatasets"
+                  @change="selectDataset"
                 />
+                {{ lexicalStorage.datasetLabels[dataset] }}
               </div>
+              <img
+                src="@/assets/sb_symbol_info.svg"
+                @click="datasetInfoFill(dataset)"
+                class="datasets-icon"
+              />
             </div>
-            <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
-              <div class="datasets-info-label">{{ datasetInfo.label }}</div>
-              <div class="">{{ datasetInfo.description }}</div>
-              <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
-              <div class="">{{ datasetInfo.updated }}</div>
-              <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
-              <div class="">{{ datasetInfo.size }}</div>
-              <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
-              <div class="">
-                <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
-              </div>
-              <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
-              <div class="">{{ datasetInfo.word }}</div>
-              <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
-              <div class="">
-                <div v-for="item in datasetInfo.fields" :key="item">
-                  {{ item }}
-                </div>
+          </div>
+
+          <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
+            <div class="datasets-info-label">{{ datasetInfo.label }}</div>
+            <div class="">{{ datasetInfo.description }}</div>
+            <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
+            <div class="">{{ datasetInfo.updated }}</div>
+            <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
+            <div class="">{{ datasetInfo.size }}</div>
+            <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
+            <div class="">
+              <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
+            </div>
+            <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
+            <div class="">{{ datasetInfo.word }}</div>
+            <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
+            <div class="">
+              <div v-for="item in datasetInfo.fields" :key="item">
+                {{ item }}
               </div>
             </div>
           </div>
@@ -325,25 +334,17 @@ watch(
 
 <style scoped>
 .data-component {
-  padding: 1rem;
+  padding: 0rem;
   width: 300px;
 }
 
-.search-container {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-}
-
 .dropdown {
-  position: relative;
+  border: 1px solid var(--sb-orange-light);
+  background-color: var(--sb-orange-light);
+  border-radius: 4px;
   margin-bottom: 1rem;
+  position: relative;
+  color: black;
 }
 
 .dropdown-open {
@@ -352,20 +353,25 @@ watch(
 
 .dropdown-group {
   background-color: var(--sb-grey-light);
+  color: black;
   padding-left: 0.5rem;
 }
 
 .dropdown-disabled {
-  pointer-events: none;
   color: var(--sb-grey-medium);
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .dropdown-toggle {
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
   cursor: pointer;
+  margin: auto;
+  padding: 0.5rem;
+  width: 90%;
+  text-align: center;
+}
+
+.dropdown:hover {
   background-color: white;
 }
 
@@ -377,7 +383,8 @@ watch(
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   max-height: 400px;
-  overflow-y: auto;
+  scrollbar-width: 0;
+  overflow-y: visible;
   z-index: 1000;
 }
 
@@ -414,39 +421,20 @@ watch(
   padding: 0.5rem 1rem;
 }
 
-.input-group {
-  display: flex;
-  align-items: center;
-}
-
-.input-group select {
-  margin-right: 0.5rem;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-}
-
-.input-group input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-}
-
 .datasets-group {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  height: 400px;
+  max-height: 400px;
   align-content: flex-start;
-  background-color: var(--sb-grey-light);
+  color: var(--color-text);
 }
 
 .datasets-list {
-  overflow: auto;
   max-height: 100%;
   width: 280px;
-  background-color: white;
+  background-color: var(--color-background);
+  overflow-y: auto;
 }
 
 .datasets-list-wider {
@@ -462,7 +450,7 @@ watch(
 }
 
 .datasets-info {
-  background-color: var(--sb-grey-light);
+  background-color: var(--color-background);
   padding: 0.5rem;
   width: 260px;
   white-space: pre-line;
@@ -470,37 +458,5 @@ watch(
 
 .datasets-info-label {
   font-weight: bold;
-}
-
-.statistics {
-  background-color: var(--sb-grey-light);
-  padding: 0.5rem;
-  color: black;
-}
-
-.statistics-header {
-  font-size: medium;
-  font-weight: bold;
-}
-
-@media (max-width: 600px) {
-  .search-input,
-  .input-group select {
-    height: 30px;
-  }
-}
-
-@media (min-width: 601px) and (max-width: 1200px) {
-  .search-input,
-  .input-group select {
-    height: 35px;
-  }
-}
-
-@media (min-width: 1201px) {
-  .search-input,
-  .input-group select {
-    height: 40px;
-  }
 }
 </style>

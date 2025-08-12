@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import DataSelection from './DataSelection.vue'
 import MenuBar from './MenuBar.vue'
 // import { lexicalStore } from '../stores/store'
 import { ref, onMounted } from 'vue'
@@ -53,14 +52,14 @@ onMounted(() => {
           <img :src="logoKarpEn" alt="Karp-S logo" width="300" />
         </div>
       </div>
-      <div class="middle-area">
-        <div class="data-selection">
-          <DataSelection />
-        </div>
+    </div>
+    <div class="middle-area">
+      <div class="version">
+        {{ $t('titlebar.version') }}
       </div>
     </div>
     <div class="right-area">
-      <div class="middle-area">
+      <div class="middle-right">
         <div class="sb-box">
           <a href="https://spraakbanken.gu.se/" target="_new">
             <img :src="logoSB" alt="Språkbanken Text" />
@@ -82,6 +81,8 @@ onMounted(() => {
 <style scoped>
 .header-area {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   padding-top: 2rem;
   padding-bottom: 1rem;
@@ -104,28 +105,21 @@ onMounted(() => {
   margin-right: 1rem;
 }
 
-.header-area .right-area {
+.header-area .middle-area {
   display: flex;
-
   box-sizing: border-box;
 }
 
-.header-area .right-area .middle-area {
+.header-area .right-area {
+  display: flex;
+  box-sizing: border-box;
+}
+
+.header-area .right-area .middle-right {
   display: flex;
   flex-direction: column;
   align-self: stretch;
   margin-right: 1rem;
-  box-sizing: border-box;
-}
-
-.header-area .data-selection {
-  display: flex;
-  height: 3rem;
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 0%;
-  justify-content: flex-end;
-  text-align: left;
   box-sizing: border-box;
 }
 
@@ -172,6 +166,26 @@ onMounted(() => {
   cursor: pointer;
 }
 
-@media (min-width: 1024px) {
+.middle-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 6rem;
+}
+
+.middle-area .version {
+  font-style: italic;
+}
+
+@media (max-width: 800px) {
+  .header-area {
+    flex-direction: column;
+    justify-content: left;
+  }
+  .middle-area,
+  .right-area {
+    justify-content: left;
+  }
 }
 </style>

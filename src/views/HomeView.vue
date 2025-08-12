@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
 import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
-// import GraphView from '@/components/GraphView.vue'
-import { onMounted, ref, watch } from 'vue'
-// import { useRoute, useRouter } from 'vue-router'
+import DataSelection from '@/components/DataSelection.vue'
 
 import { getLexicalDatasets } from '@/api/apiService'
 
@@ -26,57 +26,55 @@ onMounted(async () => {
   }
 })
 
-const activeSearchTab = ref(lexicalStorage.activeSearchTab)
-const setActiveSearchTab = (tab: string) => {
-  lexicalStorage.setActiveSearchTab(tab)
-  activeSearchTab.value = tab
-}
-
 const activeResultTab = ref(lexicalStorage.activeResultTab)
 const setActiveResultTab = (tab: string) => {
   lexicalStorage.setActiveResultTab(tab)
   activeResultTab.value = tab
 }
 
+/*
 watch(
   () => lexicalStorage.activeResultTab,
   (newTab) => {
     activeResultTab.value = newTab
   },
 )
+*/
 </script>
 
 <template>
-  <main class="container">
+  <main
+    class="container"
+    :class="{
+      'container-center': lexicalStorage.isStart,
+    }"
+  >
     <!-- <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>-->
-    <div class="searchTabs">
-      <button
-        :class="{ active: activeSearchTab === 'simple' }"
-        @click="setActiveSearchTab('simple')"
-      >
-        {{ $t('tab.search.simple') }}
-      </button>
-      <button
-        :class="{ active: activeSearchTab === 'extended' }"
-        @click="setActiveSearchTab('extended')"
-      >
-        {{ $t('tab.search.extended') }}
-      </button>
+    <div class="search">
+      <DataSearch />
+      <DataSelection />
     </div>
-    <DataSearch :searchExtended="activeSearchTab === 'extended'" />
-    <div class="tabs">
-      <button :class="{ active: activeResultTab === 'table' }" @click="setActiveResultTab('table')">
-        {{ $t('tab.tables') }}
-      </button>
-      <button
-        :class="{ active: activeResultTab === 'statistics' }"
-        @click="setActiveResultTab('statistics')"
-      >
-        {{ $t('tab.statistics') }}
-      </button>
+    <template v-if="lexicalStorage.isData">
+      <div class="tabs">
+        <button
+          :class="{ active: activeResultTab === 'table' }"
+          @click="setActiveResultTab('table')"
+        >
+          {{ $t('tab.tables') }}
+        </button>
+        <button
+          :class="{ active: activeResultTab === 'statistics' }"
+          @click="setActiveResultTab('statistics')"
+        >
+          {{ $t('tab.statistics') }}
+        </button>
+      </div>
+    </template>
+
+    <div>
+      <TableView v-if="activeResultTab === 'table'" />
+      <StatisticsView v-if="activeResultTab === 'statistics'" />
     </div>
-    <TableView v-if="activeResultTab === 'table'" />
-    <StatisticsView v-if="activeResultTab === 'statistics'" />
   </main>
 </template>
 
@@ -85,10 +83,23 @@ watch(
   padding: 0;
 }
 
+/*
+.container-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+*/
 .container .search {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100vw;
 }
 
 .column-left {
@@ -100,6 +111,10 @@ watch(
 }
 .column-left:nth-child(1) {
   border-right: 2px solid var(--border-color);
+}
+
+.search-container {
+  align-items: center;
 }
 
 .datasearch-header {

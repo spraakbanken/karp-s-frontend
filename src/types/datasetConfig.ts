@@ -51,6 +51,11 @@ export interface FieldConfigArray {
   [key: string]: FieldConfig
 }
 
+export type SelectedFieldConfig = {
+  value: string
+  position: string
+}
+
 export interface Config {
   resources: Resource[]
   tags: Tag

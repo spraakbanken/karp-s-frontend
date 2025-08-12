@@ -1,7 +1,7 @@
 import { watch } from 'vue'
 import type { Router } from 'vue-router'
 import { lexicalStore } from '@/stores/store'
-import type { paramConfig } from '@/types/parameterPosition'
+import type { SelectedFieldConfig } from '@/types/datasetConfig'
 
 export function syncStoreWithRouter(router: Router) {
   const lexicalStorage = lexicalStore()
@@ -11,10 +11,10 @@ export function syncStoreWithRouter(router: Router) {
     const newQuery = {
       ...currentQuery,
       resources: lexicalStorage.selectedDatasets.join(','),
-      q: Object.entries(lexicalStorage.selectedParameters)
+      q: Object.entries(lexicalStorage.selectedFields)
         .map(([key, value]) => `${value.position}|${key}|${value.value}`)
         .join(','),
-      compile: lexicalStorage.selectedCompileParams.join(','),
+      compile: lexicalStorage.selectedCompileFields.join(','),
       columns: lexicalStorage.selectedColumns.join(','),
       tab: lexicalStorage.activeResultTab,
     }
@@ -33,8 +33,8 @@ export function syncStoreWithRouter(router: Router) {
   watch(
     () => ({
       resources: lexicalStorage.selectedDatasets,
-      q: lexicalStorage.selectedParameters,
-      compile: lexicalStorage.selectedCompileParams,
+      q: lexicalStorage.selectedFields,
+      compile: lexicalStorage.selectedCompileFields,
       columns: lexicalStorage.selectedColumns,
       tab: lexicalStorage.activeResultTab,
     }),
@@ -50,32 +50,26 @@ export function syncStoreWithRouter(router: Router) {
       lexicalStorage.setSelectedDataset(query.get('resources')!.split(','))
     }
     if (query.has('q')) {
-      const activeParams = query.get('q')!.split(',')
-      console.log('initializeStoreFromQuery: activeParams=', activeParams)
-      //const keys = []
-      const parameters: Record<string, paramConfig> = {}
-      for (const param of activeParams) {
-        const [position, key, value] = param.split('|')
-        //lexicalStorage.selectedParameters[key] = { value, position }
-        //keys.push(key)
-        //const rec: Record<string, paramConfig> = {}
-        parameters[key] = { value: value, position: position }
-        //activeP.push(rec)
+      const activeFields = query.get('q')!.split(',')
+      console.log('initializeStoreFromQuery: activeParams=', activeFields)
+      const selectedFields: Record<string, SelectedFieldConfig> = {}
+      for (const field of activeFields) {
+        const [position, key, value] = field.split('|')
+        selectedFields[key] = { value: value, position: position }
       }
-      //lexicalStorage.setParameters(activeP)
-      lexicalStorage.setSelectedParameters(parameters)
+      lexicalStorage.setSelectedFields(selectedFields)
     }
     if (query.has('compile')) {
       const selectedCompileParams = query.get('compile')!.split(',')
       console.log('initializeStoreFromQuery: selectedCompileParams=', selectedCompileParams)
-      lexicalStorage.setSelectedCompileParams(selectedCompileParams)
-      lexicalStorage.selectedCompileParams = selectedCompileParams
+      lexicalStorage.setSelectedCompileFields(selectedCompileParams)
+      //lexicalStorage.selectedCompileFields = selectedCompileParams
     }
     if (query.has('columns')) {
       const selectedColumns = query.get('columns')!.split(',')
       console.log('initializeStoreFromQuery: selectedColumns=', selectedColumns)
       lexicalStorage.setSelectedColumns(selectedColumns)
-      lexicalStorage.selectedColumns = selectedColumns
+      //lexicalStorage.selectedColumns = selectedColumns
     }
     if (query.has('tab')) {
       console.log('initializeStoreFromQuery: tab=', query.get('tab'))

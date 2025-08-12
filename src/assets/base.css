@@ -3,8 +3,9 @@
 /* Define light mode variables */
 :root {
   --color-background: #ffffff;
+  --color-background-hover: var(--sb-orange);
   --color-text: #000000;
-  --color-border: #cccccc;
+  --color-border: var(--sb-orange-light);
   --color-border-open: var(--sb-orange);
   --color-border-hover: #ccc;
   --color-heading: #333;
@@ -18,13 +19,15 @@
   --button-active-bg-color: var(--sb-orange);
   --button-active-text-color: #ffffff;
   --color-complement: var(--sb-orange-light);
+  --font-size: 15px;
+  --font-size-hover: 17px;
 }
 
 /* Define dark mode variables */
 [data-theme='dark'] {
   --color-background: #302d2d; /* ##302d2d */
   --color-text: #ffffff;
-  --color-border: #444444;
+  --color-border: var(--sb-orange-light);
   --color-border-open: var(--sb-orange);
   --color-border-hover: #555;
   --color-heading: #f1f1f1;
@@ -37,6 +40,8 @@
   --button-active-bg-color: var(--sb-orange);
   --button-active-text-color: #ffffff;
   --color-complement: var(--sb-orange);
+  --font-size: 15px;
+  --font-size-hover: 17px;
 }
 
 /* Define the light mode toggle */
@@ -116,4 +121,15 @@ tr:hover {
 .material-icons {
   color: var(--color-icon);
   font-size: 20px;
+}
+
+.arrow-down {
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 2px;
+  margin-left: 5px;
+  vertical-align: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
 }

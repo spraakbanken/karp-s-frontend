@@ -1,5 +1,6 @@
 {
   "welcome": "Välkommen!",
+  "titlebar.version": "Utvecklingsversion",
   "menu.home": "Hem",
   "menu.about": "Om",
   "menu.sv": "Svenska",
@@ -50,7 +51,7 @@
   "dataselector.parameter.position.startswith": "börjar med",
   "dataselector.parameter.position.endswith": "slutar med",
   "dataselector.parameter.position.contains": "innehåller",
-  "dataselector.parameter.position.equals": "lika med",
+  "dataselector.parameter.position.equals": "är lika med",
   "dataselector.parameter.position.regex": "reg uttryck",
   "dataselector.list.limit": "Begränsa listor",
   "dataset.label": "Namn",

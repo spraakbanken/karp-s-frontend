@@ -82,8 +82,10 @@ const lastPage = () => {
           <th v-for="(value, key) in props.data[0]" :key="key">
             <div class="header-content">
               <span
-                >{{ lexicalStorage.localizeParam(key) }}
-                {{ lexicalStorage.isList(key) ? '(' + t('table.header.list') + ')' : '' }}</span
+                >{{ lexicalStorage.localizeParam(key as string) }}
+                {{
+                  lexicalStorage.isList(key as string) ? '(' + t('table.header.list') + ')' : ''
+                }}</span
               >
             </div>
           </th>

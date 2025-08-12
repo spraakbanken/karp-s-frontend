@@ -3,7 +3,7 @@ import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import type { Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
-import type { paramConfig } from '@/types/parameterPosition'
+import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
 
 import { useI18n } from 'vue-i18n'
@@ -50,16 +50,16 @@ const selectedDatasets = computed({
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
 
-const selectedCompileParams = computed({
-  get: () => lexicalStorage.selectedCompileParams,
-  set: (value) => lexicalStorage.setSelectedCompileParams(value),
+const selectedCompileFields = computed({
+  get: () => lexicalStorage.selectedCompileFields,
+  set: (value) => lexicalStorage.setSelectedCompileFields(value),
 })
 const selectedColumns = computed({
   get: () => lexicalStorage.selectedColumns,
   set: (value) => lexicalStorage.setSelectedColumns(value),
 })
 
-const currentParams = computed(() => lexicalStorage.currentParameters)
+const currentParams = computed(() => lexicalStorage.currentFields)
 
 // update state from URL
 const updateColumns = () => {
@@ -68,7 +68,7 @@ const updateColumns = () => {
 
 // update state from URL
 const updateCompileParams = () => {
-  lexicalStorage.setSelectedCompileParams(selectedCompileParams.value)
+  lexicalStorage.setSelectedCompileFields(selectedCompileFields.value)
 }
 
 // show overview switch
@@ -78,15 +78,15 @@ const isLoading = ref(false)
 
 const fetchData = async () => {
   isLoading.value = true
-  const newParams = lexicalStorage.selectedParameters
-  const newCompileParams = lexicalStorage.selectedCompileParams
+  const newFields = lexicalStorage.selectedFields
+  const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
   //console.log('fetchData', newParams, newCompileParams, newColumns)
-  if (newParams && newCompileParams.length > 0) {
+  if (newFields && newCompileFields.length > 0) {
     try {
       const { tableData, headers } = await getStatisticsData(
-        newParams as Record<string, paramConfig>,
-        newCompileParams as string[],
+        newFields as Record<string, SelectedFieldConfig>,
+        newCompileFields as string[],
         newColumns as string[],
       )
       isLoading.value = false
@@ -115,8 +115,8 @@ watch(
 watch(
   () => [
     lexicalStorage.selectedDatasets,
-    lexicalStorage.selectedParameters,
-    lexicalStorage.selectedCompileParams,
+    lexicalStorage.selectedFields,
+    lexicalStorage.selectedCompileFields,
     lexicalStorage.selectedColumns,
   ],
   async () => {
@@ -215,7 +215,7 @@ const exportCSV = () => {
 
   // find out which columns are collections (lists of values)
   const collectionColumn = []
-  for (const key of lexicalStorage.currentParameters) {
+  for (const key of lexicalStorage.currentFields) {
     if (key.collection) {
       collectionColumn.push(key.name)
     }
@@ -412,11 +412,11 @@ const updateOverview = () => {
     >
       <span>{{ $t('dataselector.statistics.parameter') }}</span>
       <div class="statistics-dropdown-toggle" @click="toggleDropdownCompileParams">
-        <span v-if="selectedCompileParams.length === 0">{{
+        <span v-if="selectedCompileFields.length === 0">{{
           $t('dataselector.statistics.noparameter')
         }}</span>
         <span v-else>{{
-          selectedCompileParams.map((x) => lexicalStorage.localizeParam(x)).join(', ')
+          selectedCompileFields.map((x) => lexicalStorage.localizeParam(x)).join(', ')
         }}</span>
       </div>
       <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
@@ -424,7 +424,7 @@ const updateOverview = () => {
           <input
             type="checkbox"
             :value="param.name"
-            v-model="selectedCompileParams"
+            v-model="selectedCompileFields"
             @change="updateCompileParams"
           />
           {{ lexicalStorage.localizeParam(param.name) }}

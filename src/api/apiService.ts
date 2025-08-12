@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
-import type { paramConfig } from '@/types/parameterPosition'
+import type { SelectedFieldConfig } from '@/types/datasetConfig'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
 
@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 export const getLexicalDatasets = async () => {
   try {
     const response = await axiosInstance.get('/config')
-    console.log('AXIOS Fetched datasets:', response)
+    // console.log('AXIOS Fetched datasets:', response)
     return response.data //.sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label),)
   } catch (error) {
     throw error
@@ -27,7 +27,7 @@ export const getTableData = async () => {
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
-    const queryParam = Object.entries(lexicalStoreData.selectedParameters)
+    const queryParam = Object.entries(lexicalStoreData.selectedFields)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
       .join(',')
 
@@ -38,11 +38,11 @@ export const getTableData = async () => {
         params['q'] = queryParam
       }
     }
-    console.log('AXIOS getTableData: param:', params)
+    // console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
-    console.log('AXIOS getTableData: hits:', response.data.hits)
+    // console.log('AXIOS getTableData: hits:', response.data.hits)
     const processedData = processDatasets(response.data.hits)
 
     return processedData
@@ -61,7 +61,7 @@ export const getSubTableData = async (
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
     const resources = datasets.join(',')
-    const queryParam = Object.entries(lexicalStoreData.selectedParameters)
+    const queryParam = Object.entries(lexicalStoreData.selectedFields)
       .map(([key, value]) => (value.value != '' ? `${value.position}|${key}|${value.value}` : ''))
       .join(',')
 
@@ -79,7 +79,7 @@ export const getSubTableData = async (
     //    if (pageSize > 10) {
     params['from'] = ((pageStart - 1) * pageSize).toString()
     //    }
-    console.log('getSubTableData - param:', params)
+    // console.log('getSubTableData - param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
@@ -92,7 +92,7 @@ export const getSubTableData = async (
 }
 
 export const getStatisticsData = async (
-  query: Record<string, paramConfig>,
+  query: Record<string, SelectedFieldConfig>,
   compileParams: string[],
   columns: string[],
 ) => {

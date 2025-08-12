@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import type { paramConfig } from '@/types/parameterPosition'
-//import type { FieldConfig } from '@/types/datasetConfig'
-
-const searchProps = defineProps<{
-  searchExtended: boolean
-}>()
+import type { SelectedFieldConfig } from '@/types/datasetConfig'
 
 /*
 watch(
@@ -24,44 +19,33 @@ const selectedDatasets = computed({
   get: () => lexicalStorage.selectedDatasets,
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
-const selectedParameters = computed({
-  get: () => lexicalStorage.selectedParameters,
-  set: (value) => lexicalStorage.setSelectedParameters(value),
+const selectedFields = computed({
+  get: () => lexicalStorage.selectedFields,
+  set: (value) => lexicalStorage.setSelectedFields(value),
 })
 
-const listLimit = computed({
-  get: () => lexicalStorage.listLimit,
-  set: (value) => lexicalStorage.setListLimit(value),
-})
+const currentFields = computed(() => lexicalStorage.currentFields)
 
-const currentParameters = computed(() => lexicalStorage.currentParameters)
-//const totalDatasets = computed(() => lexicalStorage.totalDatasets)
-/*
-const selectedParametersArray = computed({
-  get: () => Object.keys(lexicalStorage.selectedParameters),
-  set: (value) => value,
-})
-  */
-const selectedParametersArray = ref<string[]>([])
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
-const parameters = ref<Record<string, paramConfig>>({})
-const ParameterPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
-const ParameterPositionText = [
+const selectedFieldsArray = ref<string[]>([])
+
+const searchField = ref<Record<string, SelectedFieldConfig>>({})
+const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
+const searchFieldPositionText = [
   'dataselector.parameter.position.startswith',
   'dataselector.parameter.position.endswith',
   'dataselector.parameter.position.contains',
   'dataselector.parameter.position.equals',
   'dataselector.parameter.position.regex',
 ]
-const ParameterPositionEnabled = [true, true, false, true, false]
-//const searchExtended = ref(false)
+const searchFieldPositionEnabled = [true, true, false, true, false]
 
-const localizeParam = (p: string) => {
+const localizeField = (p: string) => {
   let label = p
-  for (const c of currentParameters.value) {
+  for (const c of currentFields.value) {
     if (c.name === p) {
       if (lexicalStorage.activeLocale == 'sv') {
         label = c.label.swe ? c.label.swe : (c.label as unknown as string)
@@ -86,6 +70,12 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 onMounted(() => {
+  // set "ingångsord" to default, also for statistics
+  const fields: Record<string, SelectedFieldConfig> = {}
+  fields['word'] = { value: '', position: 'equals' }
+  lexicalStorage.setSelectedFields(fields)
+  lexicalStorage.setSelectedCompileFields(['word'])
+
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -93,62 +83,62 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-// update state from URL
+// click search button
 const updateData = () => {
-  lexicalStorage.setSelectedParameters(parameters.value)
+  console.log('Button!', searchField.value)
+  lexicalStorage.setSelectedFields(searchField.value)
+  lexicalStorage.setIsSearch(true)
 }
 
-watch(selectedParametersArray, (newParams) => {
-  //console.log('WATCH: selectedParametersArray:', newParams)
-  newParams.forEach((param) => {
-    if (!parameters.value[param]) {
-      parameters.value[param] = { value: '', position: 'equals' }
+watch(selectedFieldsArray, (newFields) => {
+  console.log('WATCH: selectedFieldsArray:', newFields)
+  // keep list of searchable fields synced with fields available
+  newFields.forEach((fieldName) => {
+    if (!searchField.value[fieldName]) {
+      searchField.value[fieldName] = { value: '', position: 'equals' }
     }
   })
-
-  Object.keys(parameters.value).forEach((param) => {
-    if (!newParams.includes(param)) {
-      delete parameters.value[param]
+  Object.keys(searchField.value).forEach((fieldName) => {
+    if (!newFields.includes(fieldName)) {
+      delete searchField.value[fieldName]
     }
   })
 })
 
 watch(
-  () => currentParameters.value,
+  () => currentFields.value,
   (newParams) => {
-    //console.log('WATCH: currentParams.value', newParams)
+    console.log('WATCH: currentFields.value', newParams)
     if (newParams.length === 0) {
-      parameters.value = {}
-      selectedParameters.value = {}
-      //selectedColumns.value = []
-      //selectedCompileParams.value = []
+      searchField.value = {}
+      selectedFields.value = {}
       updateData()
     }
   },
 )
 
 watch(
-  () => lexicalStorage.selectedParameters,
-  (newSelectedParameters) => {
-    //console.log('WATCH: lexicalStorage.selectedParameters', newSelectedParameters)
-    selectedParametersArray.value = Object.keys(newSelectedParameters)
-    //console.log('-- parameters1', parameters, selectedParametersArray.value)
-    Object.keys(newSelectedParameters).forEach((param) => {
-      if (!parameters.value[param]) {
-        parameters.value[param] = {
-          value: newSelectedParameters[param].value,
-          position: newSelectedParameters[param].position,
+  () => lexicalStorage.selectedFields,
+  (newSelectedFields) => {
+    console.log('WATCH: lexicalStorage.selectedFields', newSelectedFields)
+    selectedFieldsArray.value = Object.keys(newSelectedFields)
+    //console.log('-- WATCH: lexicalStorage.selectedFields', newSelectedFields, selectedFieldsArray.value,searchField,)
+    Object.keys(newSelectedFields).forEach((param) => {
+      //console.log('-- param', param)
+      if (!searchField.value[param]) {
+        searchField.value[param] = {
+          value: newSelectedFields[param].value,
+          position: newSelectedFields[param].position,
         }
       }
     })
-    //console.log('-- parameters2', parameters)
   },
 )
 </script>
 
 <template>
   <!-- Select Simple/Advanced search
-  <div class="data-component">
+  <div class="search-component">
     <input type="checkbox" id="advancedSearchCheckbox" v-model="searchExtended" />
     <label for="advancedSearchCheckbox" class="search-advanced-label">{{
       $t('dataselector.search.advanced')
@@ -156,18 +146,12 @@ watch(
   </div>
   -->
 
-  <p v-if="selectedDatasets.length == 0" style="padding: 1rem">
-    {{ $t('message.nodatasetselected') }}
-  </p>
-
-  <!-- Simple search -->
+  <!-- Simple search
   <div
-    v-if="!searchProps.searchExtended && parameters.hasOwnProperty('word')"
-    class="data-component"
+    v-if="activeSearchTab === 'simple' && parameters.hasOwnProperty('word')"
+    class="search-component"
   >
-    <!-- Search-box -->
     <div class="search-container-simple">
-      <!-- <span>{{ $t('dataselector.parameters.prefix') }}:</span> -->
       <div class="input-group">
         <input
           class="search-input"
@@ -180,9 +164,10 @@ watch(
       </div>
     </div>
   </div>
+  -->
 
-  <!-- Advanced search -->
-  <div v-if="searchProps.searchExtended" ref="dropdownContainer" class="data-component">
+  <!-- prev advanced search -->
+  <div ref="dropdownContainer" class="search-component">
     <!-- Select field(s) for search -->
     <div
       class="dropdown"
@@ -192,111 +177,186 @@ watch(
       }"
       :disabled="selectedDatasets.length === 0"
     >
-      {{ $t('dataselector.parameters') }}
+      <!-- {{ $t('dataselector.parameters') }} -->
       <div class="dropdown-toggle" @click="toggleDropdownParams">
         <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
-        <span v-else-if="currentParameters.length === 0">{{
+        <span v-else-if="currentFields.length === 0">{{
           $t('dataselector.datasets.nocommon')
         }}</span>
-        <span v-else-if="selectedParametersArray.length === 0">{{
+        <span v-else-if="selectedFieldsArray.length === 0">{{
           $t('dataselector.noparameters')
         }}</span>
-        <span v-else>{{ selectedParametersArray.map((x) => localizeParam(x)).join(', ') }}</span>
+        <span v-else
+          >{{ selectedFieldsArray.map((x) => localizeField(x)).join(', ') }}
+          <i class="arrow-down"></i>
+        </span>
       </div>
       <div class="dropdown-menu" v-if="isDropdownParams">
-        <label v-for="param in currentParameters" :key="param.name" class="dropdown-item">
-          <input type="checkbox" :value="param.name" v-model="selectedParametersArray" />
+        <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
+          <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
           <span v-if="param.name == 'word'" style="font-weight: bold">
-            {{ localizeParam(param.name) }}
+            {{ localizeField(param.name) }}
           </span>
           <span v-else>
-            {{ localizeParam(param.name) }}
+            {{ localizeField(param.name) }}
           </span>
         </label>
       </div>
     </div>
     <!-- Search-box -->
-    <div v-for="param in selectedParametersArray" :key="param" class="search-container">
+    <div v-for="param in selectedFieldsArray" :key="param" class="search-container">
       <!-- Search-box
 
       <span :for="param"
-        >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeParam(param) }}</span
+        >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeField(param) }}</span
       >
        -->
       <div class="input-group">
-        <select v-model="parameters[param].position">
-          <option value="" disabled>{{ $t('dataselector.parameters.position') }}</option>
+        <select v-model="searchField[param].position">
+          <!--<option value="" disabled>{{ $t('dataselector.parameters.position') }}</option> -->
           <option
-            v-for="(position, index) in ParameterPosition"
+            v-for="(position, index) in searchFieldPosition"
             :key="position"
             :value="position"
-            :disabled="!ParameterPositionEnabled[index]"
+            :hidden="!searchFieldPositionEnabled[index]"
+            :disabled="!searchFieldPositionEnabled[index]"
           >
-            {{ $t(ParameterPositionText[index]) }}
+            {{ $t(searchFieldPositionText[index]) }}
           </option>
         </select>
+        <!--
         <input
           class="search-input"
           type="text"
           :id="param"
           v-model="parameters[param].value"
           :placeholder="$t('dataselector.parameters.placeholder')"
-          @change="updateData"
+        />
+        -->
+        <input
+          @keyup.enter="updateData"
+          class="search-input"
+          type="text"
+          :id="param"
+          v-model="searchField[param].value"
+          :placeholder="$t('dataselector.parameters.placeholder')"
         />
       </div>
     </div>
-    <div class="graph-parameter">
-      {{ $t('dataselector.list.limit') }}:
-
-      <input type="number" size="5" min="1" v-model="listLimit" @change="updateData" />
-    </div>
+    <button @click="updateData">
+      {{ $t('dataselector.datasearch') }}
+    </button>
   </div>
+
+  <!--
+  <p v-if="selectedDatasets.length == 0" style="padding: 1rem">
+    {{ $t('message.nodatasetselected') }}
+  </p>
+  -->
+
+  <!--
+  <div class="searchTabs">
+    <button :class="{ active: activeSearchTab === 'simple' }" @click="setActiveSearchTab('simple')">
+      {{ $t('tab.search.simple') }}
+    </button>
+    <button
+      :class="{ active: activeSearchTab === 'extended' }"
+      @click="setActiveSearchTab('extended')"
+    >
+      {{ $t('tab.search.extended') }}
+    </button>
+  </div>
+  -->
 </template>
 
 <style scoped>
-.data-component {
-  padding-left: 1rem;
-  padding-right: 1rem;
+/*
+input:focus {
+  outline: 2px solid var(--color-complement);
+}
+*/
+
+.search-component {
+  background-color: var(--sb-orange-light);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 1rem;
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
   align-items: center;
+}
+
+/* simple and advanced search */
+
+.searchTabs {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.searchTabs button {
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border: 1px solid var(--color-complement);
+  border-radius: 32px;
+  background-color: var(--color-complement);
+  cursor: pointer;
+  font-size: var(--font-size);
+  font-weight: bold;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.searchTabs button:hover {
+  background-color: var(--color-color-background-hover);
+}
+
+.searchTabs button.active {
+  background-color: none;
+  font-weight: bold;
+  background-color: white;
 }
 
 .search-advanced-label {
   padding-left: 0.5rem;
 }
 
-.search-container-simple,
-.search-container,
-.graph-parameter {
+.search-container-simple {
   margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  margin-right: 1rem;
 }
 
-.search-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+/*
+.search-container {
+  margin-top: 0rem;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
+*/
+
+/* select field */
 
 .dropdown {
+  flex: auto;
+  padding: 0.5rem;
   position: relative;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  margin-right: 1rem;
-  min-width: 200px;
+  margin-right: 0.5rem;
+  background-color: var(--sb-grey-light);
+  border-radius: 0.5rem;
+  color: black;
 }
 
 .dropdown-open {
-  border-color: var(--sb-orange);
+  /*border-color: var(--sb-orange);*/
 }
 
+/*
 .dropdown-group {
   background-color: var(--sb-grey-light);
   padding-left: 0.5rem;
 }
+*/
 
 .dropdown-disabled {
   pointer-events: none;
@@ -306,11 +366,9 @@ watch(
 
 .dropdown-toggle {
   display: inline;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
+  /* border: 1px solid var(--color-border); */
   border-radius: 4px;
   cursor: pointer;
-  background-color: white;
 }
 
 .dropdown-menu {
@@ -322,6 +380,7 @@ watch(
   border: 1px solid var(--color-border);
   max-height: 400px;
   overflow-y: auto;
+  width: fit-content;
   z-index: 1000;
 }
 
@@ -332,7 +391,7 @@ watch(
 .dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.5rem;
   color: var(--color-text);
 }
 
@@ -354,43 +413,56 @@ watch(
   padding: 0.5rem 1rem;
 }
 
+.dropdown:hover {
+  background-color: white;
+}
+/*
 .input-group {
   display: flex;
   align-items: center;
 }
+*/
+
+/* search position and search field */
 
 .input-group select {
+  background-color: var(--sb-grey-light);
   margin-right: 0.5rem;
   padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 15px;
 }
 
+.input-group select:hover {
+  background-color: white;
+}
 .input-group input {
   flex: 1;
+  margin-right: 0.5rem;
   padding: 0.5rem;
-  border: 1px solid var(--color-border);
+  /* border: 2px solid var(--sb-orange); */
+  border: none;
   border-radius: 4px;
+  width: 300px;
 }
 
-@media (max-width: 600px) {
-  .search-input,
-  .input-group select {
-    height: 30px;
-  }
+/* search-button */
+
+.search-component button {
+  background-color: var(--sb-orange);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  font-weight: bold;
+  color: white;
 }
 
-@media (min-width: 601px) and (max-width: 1200px) {
-  .search-input,
-  .input-group select {
-    height: 35px;
-  }
-}
-
-@media (min-width: 1201px) {
-  .search-input,
-  .input-group select {
-    height: 40px;
-  }
+.search-component button:hover {
+  background-color: white;
+  color: black;
 }
 </style>

@@ -1,5 +1,6 @@
 {
   "welcome": "Welcome!",
+  "titlebar.version": "Development version",
   "menu.home": "Home",
   "menu.about": "About",
   "menu.sv": "Swedish",
@@ -50,7 +51,7 @@
   "dataselector.parameter.position.startswith": "starts with",
   "dataselector.parameter.position.endswith": "ends with",
   "dataselector.parameter.position.contains": "contains",
-  "dataselector.parameter.position.equals": "equals",
+  "dataselector.parameter.position.equals": "is equal to",
   "dataselector.parameter.position.regex": "regex",
   "dataselector.list.limit": "List limit",
   "dataset.label": "Title",

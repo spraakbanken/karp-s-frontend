@@ -1,4 +1,4 @@
-import type { paramConfig } from '@/types/parameterPosition'
+import type { SelectedFieldConfig } from '@/types/datasetConfig'
 import { defineStore } from 'pinia'
 
 import { type FieldConfig, type Config, type DatasetDates } from '@/types/datasetConfig.ts'
@@ -6,51 +6,53 @@ import { type FieldConfig, type Config, type DatasetDates } from '@/types/datase
 
 interface SearchRedux {
   //allParams: string[]
-  currentConfig: Config
-  currentDatasets: string[] // was - datasetKeys[]
-  selectedDatasets: string[]
-  currentTags: string[]
+  currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
+  currentDatasets: string[] //  all datasets (id's)
+  selectedDatasets: string[] // selected datasets (id's)
+  currentTags: string[] // all tags
   //selectedTags: string[]
   //totalDatasets: number
-  paramsInDatasets: Record<string, FieldConfig[]> // object with key: resurceId, value: FieldConfig-array
-  currentParameters: FieldConfig[] // currentParams = available fields in selected datasets
-  selectedParameters: Record<string, paramConfig>
+  fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
+  currentFields: FieldConfig[] // available fields in selected datasets
+  selectedFields: Record<string, SelectedFieldConfig>
   //selectedParams: string[]
   selectedColumns: string[]
-  selectedCompileParams: string[]
+  selectedCompileFields: string[]
   searchQuery: string
   activeSearchTab: string
   activeResultTab: string
   activeLocale: string
-  listLimit: number
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
+  listLimit: number
+  isData: boolean
+  isSearch: boolean
+  isStart: boolean
 }
 
 // currentParams = list of available fields in selected datasets
 // selectedParams = list of selected fields
 export const lexicalStore = defineStore('dataset', {
   state: (): SearchRedux => ({
-    //allParams: [],
     currentConfig: { resources: [], tags: {}, fields: {} },
     currentDatasets: [],
     selectedDatasets: [],
     currentTags: [],
-    //selectedTags: [],
-    //totalDatasets: 0,
-    paramsInDatasets: {},
-    currentParameters: [],
-    selectedParameters: {},
-    //selectedParams: [],
+    fieldsInDatasets: {},
+    currentFields: [],
+    selectedFields: {},
     selectedColumns: [],
-    selectedCompileParams: [],
+    selectedCompileFields: [],
     searchQuery: '',
     activeSearchTab: 'simple',
     activeResultTab: 'table',
     activeLocale: 'sv',
-    listLimit: 5,
     datasetLabels: {},
     datasetDates: [],
+    listLimit: 5,
+    isData: false,
+    isSearch: false,
+    isStart: true,
   }),
   actions: {
     setDefault(config: Config) {
@@ -110,9 +112,9 @@ export const lexicalStore = defineStore('dataset', {
       //this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
 
       // we want all fields that are in selected datasets
-      // paramsInDatasets: Record<string, FieldConfig[]>
+      // fieldsInDatasets: Record<string, FieldConfig[]>
       // object with key: resurceId, value: FieldConfig-array
-      this.paramsInDatasets = config.resources.reduce(
+      this.fieldsInDatasets = config.resources.reduce(
         (acc, c) => {
           // we want the FieldConfig for f, not f name (string)
           acc[c.resourceId] = c.fields.map((f) => config.fields[f])
@@ -120,6 +122,9 @@ export const lexicalStore = defineStore('dataset', {
         },
         {} as Record<string, FieldConfig[]>,
       )
+
+      // setup default datasets for first run
+      this.setSelectedDataset(['saol14', 'so2009'])
     },
     setSearchQuery(query: string) {
       this.searchQuery = query
@@ -133,9 +138,9 @@ export const lexicalStore = defineStore('dataset', {
       // console.log('selectedColumns', columns)
       this.selectedColumns = columns
     },
-    setSelectedCompileParams(params: string[]) {
+    setSelectedCompileFields(fields: string[]) {
       // console.log('selectedCompileParams', params)
-      this.selectedCompileParams = params
+      this.selectedCompileFields = fields
     },
     setActiveSearchTab(tab: string) {
       this.activeSearchTab = tab
@@ -148,7 +153,7 @@ export const lexicalStore = defineStore('dataset', {
       //      if (keys.length === 1) {
       //        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
       //      } else {
-      const allParamsArray = keys.map((key) => this.paramsInDatasets[key])
+      const allParamsArray = keys.map((key) => this.fieldsInDatasets[key])
       if (allParamsArray.length > 0) {
         // keep only fields that exist in all datasets = find the intersection
         let intersection = allParamsArray[0]
@@ -160,19 +165,21 @@ export const lexicalStore = defineStore('dataset', {
           )
         }
         // make a copy
-        this.currentParameters = [...intersection]
+        this.currentFields = [...intersection]
         // and add the "ingångsord"
-        this.currentParameters.unshift({
+        this.currentFields.unshift({
           name: 'word',
           type: 'text',
           collection: false,
           label: { swe: 'ingångsord', eng: 'word' },
         })
-        // and set "ingångsord" to default for statistics
-        const parameters: Record<string, paramConfig> = {}
-        parameters['word'] = { value: '', position: 'startswith' }
-        this.setSelectedParameters(parameters)
-        this.setSelectedCompileParams(['word'])
+        // and set "ingångsord" to default, also for statistics
+        /*
+        const fields: Record<string, SelectedFieldConfig> = {}
+        fields['word'] = { value: '', position: 'equals' }
+        this.setSelectedFields(fields)
+        this.setSelectedCompileFields(['word'])
+        */
       } else {
         return []
       }
@@ -204,8 +211,18 @@ export const lexicalStore = defineStore('dataset', {
           }, {})
       }
     },
-    setSelectedParameters(params: Record<string, paramConfig>) {
-      this.selectedParameters = params
+    setSelectedFields(fields: Record<string, SelectedFieldConfig>) {
+      //console.log('setSelectedFields', fields)
+      this.selectedFields = fields
+    },
+    setIsData(x: boolean) {
+      this.isData = x
+    },
+    setIsSearch(x: boolean) {
+      this.isSearch = x
+    },
+    setIsStart(x: boolean) {
+      this.isStart = x
     },
     setEmpty() {
       this.selectedDatasets = []
@@ -217,7 +234,7 @@ export const lexicalStore = defineStore('dataset', {
     },
     localizeParam(p: string): string {
       let label = p
-      for (const c of this.currentParameters) {
+      for (const c of this.currentFields) {
         if (c.name === p) {
           if (this.activeLocale == 'sv') {
             label = c.label.swe ? c.label.swe : (c.label as unknown as string)
@@ -230,7 +247,7 @@ export const lexicalStore = defineStore('dataset', {
     },
     isList(p: string): boolean {
       let value = false
-      this.currentParameters.every((item) => {
+      this.currentFields.every((item) => {
         if (p == item.name) {
           value = item.collection
           return false
