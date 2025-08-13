@@ -330,7 +330,7 @@ watch(
 
 .dropdown {
   border: 1px solid var(--sb-orange-light);
-  background-color: var(--sb-orange-light);
+  background-color: var(--button-background-alt);
   border-radius: 4px;
   margin-bottom: 1rem;
   position: relative;

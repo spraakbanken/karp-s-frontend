@@ -302,7 +302,7 @@ input:focus {
 */
 
 .search-component {
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-search-area);
   border-radius: 0.5rem;
   margin-top: 0.5rem;
   padding: 1rem;
