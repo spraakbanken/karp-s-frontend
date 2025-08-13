@@ -14,11 +14,13 @@ watch(
 */
 
 const lexicalStorage = lexicalStore()
-
+/*
 const selectedDatasets = computed({
   get: () => lexicalStorage.selectedDatasets,
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
+*/
+
 const selectedFields = computed({
   get: () => lexicalStorage.selectedFields,
   set: (value) => lexicalStorage.setSelectedFields(value),
@@ -71,10 +73,7 @@ const handleClickOutside = (event: MouseEvent) => {
 
 onMounted(() => {
   // set "ingångsord" to default, also for statistics
-  const fields: Record<string, SelectedFieldConfig> = {}
-  fields['word'] = { value: '', position: 'equals' }
-  lexicalStorage.setSelectedFields(fields)
-  lexicalStorage.setSelectedCompileFields(['word'])
+  lexicalStorage.setStartField()
 
   document.addEventListener('click', handleClickOutside)
 })
@@ -85,7 +84,6 @@ onBeforeUnmount(() => {
 
 // click search button
 const updateData = () => {
-  console.log('Button!', searchField.value)
   lexicalStorage.setSelectedFields(searchField.value)
   lexicalStorage.setIsSearch(true)
 }
@@ -107,9 +105,9 @@ watch(selectedFieldsArray, (newFields) => {
 
 watch(
   () => currentFields.value,
-  (newParams) => {
-    console.log('WATCH: currentFields.value', newParams)
-    if (newParams.length === 0) {
+  (newFields) => {
+    console.log('WATCH: currentFields.value', newFields)
+    if (newFields.length === 0) {
       searchField.value = {}
       selectedFields.value = {}
       updateData()
@@ -134,6 +132,31 @@ watch(
     })
   },
 )
+
+/*
+watch(
+  () => lexicalStorage.selectedDatasets,
+  (newDatasets, oldDatasets) => {
+    // do not search if we select a dataset (with none previously)
+    // as we don't have anything to search for yet
+    let notEmpty = false
+    for (const [k, v] of Object.entries(searchField.value)) {
+      console.log('k, v', k, v)
+      if (v.value !== '') {
+        notEmpty = true
+      }
+    }
+    console.log(notEmpty, searchField.value)
+    if (notEmpty) {
+      setTimeout(function () {
+        updateData()
+      }, 1000)
+
+      //updateData()
+    }
+  },
+)
+  */
 </script>
 
 <template>
@@ -173,13 +196,15 @@ watch(
       class="dropdown"
       :class="{
         'dropdown-open': isDropdownParams,
-        'dropdown-disabled': selectedDatasets.length === 0,
+        'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
       }"
-      :disabled="selectedDatasets.length === 0"
+      :disabled="lexicalStorage.selectedDatasets.length === 0"
     >
       <!-- {{ $t('dataselector.parameters') }} -->
       <div class="dropdown-toggle" @click="toggleDropdownParams">
-        <span v-if="selectedDatasets.length === 0">{{ $t('dataselector.noparameters') }}</span>
+        <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
+          $t('dataselector.noparameters')
+        }}</span>
         <span v-else-if="currentFields.length === 0">{{
           $t('dataselector.datasets.nocommon')
         }}</span>

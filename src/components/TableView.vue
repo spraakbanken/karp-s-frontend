@@ -14,9 +14,7 @@ const currentTab = ref(lexicalStorage.activeResultTab)
 const isLoading = ref(false)
 
 const fetchData = async () => {
-  console.log('fetchData()')
-  //if (!lexicalStorage.firstRun) {
-  //console.log('fetchData()', lexicalStorage.selectedParameters)
+  console.log('fetchData()', lexicalStorage.selectedFields)
   isLoading.value = true
   lexicalStorage.setIsData(false)
   const newDatasets = lexicalStorage.selectedDatasets
@@ -44,14 +42,17 @@ const fetchData = async () => {
     currentResult.value = {}
     currentValues.value = []
   }
-  //lexicalStorage.setFirstRun(true)
-
-  // console.log('FETCHDATA', currentResult.value, Object.keys(currentResult).length)
-  // } else {
-  //   lexicalStorage.setFirstRun(false)
-  // }
 }
 
+watch(
+  () => lexicalStorage.isData,
+  (newIsData) => {
+    if (!newIsData) {
+      currentResult.value = {}
+      currentValues.value = []
+    }
+  },
+)
 watch(
   () => currentTab.value,
   () => {
@@ -74,7 +75,9 @@ watch(
 
     if (lexicalStorage.isSearch) {
       lexicalStorage.setIsSearch(false)
+      //setTimeout(function () {
       fetchData()
+      //}, 1000)
     }
   },
 )

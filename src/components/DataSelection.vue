@@ -12,6 +12,7 @@ const selectedDatasets = computed({
   get: () => lexicalStorage.selectedDatasets,
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
+
 /*
 const selectedTags = computed({
   get: () => lexicalStorage.selectedTags,
@@ -119,18 +120,9 @@ onBeforeUnmount(() => {
 const selectDataset = () => {
   console.log('selectDataset:', selectedDatasets.value.length)
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
-  // do not search if we select a dataset (with none previously)
-  // as we don't have anything to search for yet
-  if (selectedDatasets.value.length > 1) {
-    lexicalStorage.setIsSearch(true)
-  }
 }
 
-/*
-const selectTags = () => {
-  lexicalStorage.setSelectedTag(selectedTags.value)
-}
-*/
+// INFO: doesn't trigger the watch (because selectedDatasets is "computed")
 const selectTags = (tag: string) => {
   /*
   if (selectedTags.value.indexOf(tag) == -1) {
@@ -152,14 +144,14 @@ const selectTags = (tag: string) => {
   }
   //}
 
-  //lexicalStorage.setSelectedTag(selectedTags.value)
-  lexicalStorage.setSelectedDataset(selectedDatasets.value)
-
-  //console.log('selectTags', tag, selectedDatasets.value)
+  // TODO: unneccessary?
+  //lexicalStorage.setSelectedDataset(selectedDatasets.value)
+  selectDataset()
 }
 
 const unselectTags = () => {
-  selectedDatasets.value = []
+  //  selectedDatasets.value = []
+  lexicalStorage.setSelectedDataset([])
 }
 
 const filterDatasets = computed(() => {
@@ -199,17 +191,15 @@ const filterDatasets = computed(() => {
 })
 
 watch(
-  () => selectedDatasets.value,
+  () => selectedDatasets,
   (newDatasets, oldDatasets) => {
-    if (oldDatasets.length === 0) {
+    console.log('WATCH: DataSelection selectedDatasets', newDatasets)
+    if (oldDatasets.value.length === 0) {
       // set "ingångsord" to default, also for statistics
-      const fields: Record<string, SelectedFieldConfig> = {}
-      fields['word'] = { value: '', position: 'equals' }
-      lexicalStorage.setSelectedFields(fields)
-      lexicalStorage.setSelectedCompileFields(['word'])
+      lexicalStorage.setStartField()
     }
     // console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
-    if (newDatasets.length === 0) {
+    if (newDatasets.value.length === 0) {
       fields.value = {}
       selectedFields.value = {}
       selectedColumns.value = []
@@ -382,7 +372,7 @@ watch(
   right: 0;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
-  max-height: 400px;
+  max-height: 500px;
   scrollbar-width: 0;
   overflow-y: visible;
   z-index: 1000;
@@ -425,9 +415,10 @@ watch(
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  max-height: 400px;
+  max-height: 360px;
   align-content: flex-start;
   color: var(--color-text);
+  overflow-y: scroll;
 }
 
 .datasets-list {
@@ -454,6 +445,7 @@ watch(
   padding: 0.5rem;
   width: 260px;
   white-space: pre-line;
+  overflow-y: auto;
 }
 
 .datasets-info-label {

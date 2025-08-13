@@ -15,7 +15,7 @@ interface SearchRedux {
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets
   selectedFields: Record<string, SelectedFieldConfig>
-  //selectedParams: string[]
+  //searchField: Record<string, SelectedFieldConfig>
   selectedColumns: string[]
   selectedCompileFields: string[]
   searchQuery: string
@@ -41,6 +41,7 @@ export const lexicalStore = defineStore('dataset', {
     fieldsInDatasets: {},
     currentFields: [],
     selectedFields: {},
+    //searchField: {},
     selectedColumns: [],
     selectedCompileFields: [],
     searchQuery: '',
@@ -149,6 +150,7 @@ export const lexicalStore = defineStore('dataset', {
       this.activeResultTab = tab
     },
     setSelectedDataset(keys: string[]) {
+      console.log('setSelectedDataset')
       this.selectedDatasets = keys
       //      if (keys.length === 1) {
       //        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
@@ -173,13 +175,41 @@ export const lexicalStore = defineStore('dataset', {
           collection: false,
           label: { swe: 'ingångsord', eng: 'word' },
         })
+
+        // if we have fields in selectedFields (from beforehand)
+        // that are now not in currentFields
+        // remove them from selectedFields
+        console.log('setSelectedDataset: cleaning up copies')
+        const newSelectedFields: Record<string, SelectedFieldConfig> = {}
+        for (const [k, v] of Object.entries(this.selectedFields)) {
+          let bFound = false
+          console.log('k, v', k, v)
+          if (this.currentFields.find((f) => f.name === k)) {
+            bFound = true
+          }
+          if (bFound) {
+            newSelectedFields[k] = v
+          }
+        }
+        this.selectedFields = newSelectedFields
         // and set "ingångsord" to default, also for statistics
-        /*
-        const fields: Record<string, SelectedFieldConfig> = {}
-        fields['word'] = { value: '', position: 'equals' }
-        this.setSelectedFields(fields)
-        this.setSelectedCompileFields(['word'])
-        */
+        // TODO if selectedFields exists in all selected datasets
+        // don't do this:
+        console.log('in setSelectedDataset', this.selectedFields)
+        let isEmpty = true
+        for (const [k, v] of Object.entries(this.selectedFields)) {
+          console.log('k, v', k, v)
+          if (v.value !== '') {
+            isEmpty = false
+          }
+        }
+        if (isEmpty) {
+          const fields: Record<string, SelectedFieldConfig> = {}
+          fields['word'] = { value: '', position: 'equals' }
+          this.setSelectedFields(fields)
+          this.setSelectedCompileFields(['word'])
+        }
+        this.isData = false
       } else {
         return []
       }
@@ -212,8 +242,16 @@ export const lexicalStore = defineStore('dataset', {
       }
     },
     setSelectedFields(fields: Record<string, SelectedFieldConfig>) {
-      //console.log('setSelectedFields', fields)
+      console.log('setSelectedFields', fields)
       this.selectedFields = fields
+    },
+    setStartField() {
+      // set "ingångsord" to default, also for statistics
+      console.log('setStartField()')
+      const fields: Record<string, SelectedFieldConfig> = {}
+      fields['word'] = { value: '', position: 'equals' }
+      this.setSelectedFields(fields)
+      this.setSelectedCompileFields(['word'])
     },
     setIsData(x: boolean) {
       this.isData = x
