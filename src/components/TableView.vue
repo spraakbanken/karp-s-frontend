@@ -15,11 +15,11 @@ const isLoading = ref(false)
 
 const fetchData = async () => {
   console.log('fetchData()', lexicalStorage.selectedFields)
-  isLoading.value = true
   lexicalStorage.setIsData(false)
   const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
     try {
+      isLoading.value = true
       const data = await getTableData()
       isLoading.value = false
       currentResult.value = data
@@ -36,6 +36,7 @@ const fetchData = async () => {
         lexicalStorage.setIsStart(false)
       }
     } catch (error) {
+      isLoading.value = false
       console.error('Error fetching data:', error)
     }
   } else {
@@ -53,6 +54,16 @@ watch(
     }
   },
 )
+
+watch(
+  () => lexicalStorage.selectedDatasets,
+  (newDatasets) => {
+    if (newDatasets.length === 0) {
+      currentResult.value = {}
+      currentValues.value = []
+    }
+  },
+)
 watch(
   () => currentTab.value,
   () => {
@@ -63,10 +74,12 @@ watch(
   { immediate: true },
 )
 
+/*
 const listLimit = computed({
   get: () => lexicalStorage.listLimit,
   set: (value) => lexicalStorage.setListLimit(value),
 })
+*/
 
 watch(
   () => [lexicalStorage.isSearch],
@@ -98,23 +111,22 @@ watch(
 
 <template>
   <div class="table-wrapper">
+    <p v-if="isLoading" class="message">
+      {{ $t('message.loading') }}
+    </p>
     <!-- show no data -->
     <!--  <p v-if="lexicalStorage.selectedDatasets.length == 0">
       {{ $t('message.nodatasetselected') }}
     </p>
-    <p v-if="isLoading" class="message">
-      {{ $t('message.loading') }}
-    </p>
-    <p v-if="Object.keys(currentResult).length == 0">
-      {{ $t('error.nodata') }}
-    </p>
     -->
     <!-- show table -->
     <div v-if="lexicalStorage.isData">
+      <!--
       <div class="graph-parameter">
         {{ $t('dataselector.list.limit') }}:
         <input type="number" size="5" min="1" v-model="listLimit" @change="fetchData" />
       </div>
+      -->
       <div class="table-container" v-for="(dataset, index) in currentResult" :key="index">
         <SubTableView
           :data="currentResult[index].entries"
@@ -137,10 +149,6 @@ watch(
 
 .table-container {
   margin-bottom: 0rem;
-}
-
-.message {
-  margin: 0.5rem;
 }
 
 .graph-parameter {
@@ -180,5 +188,9 @@ watch(
   background-color: none;
   font-weight: bold;
   background-color: white;
+}
+
+.message {
+  margin: auto;
 }
 </style>

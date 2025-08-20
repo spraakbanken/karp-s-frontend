@@ -84,8 +84,10 @@ onBeforeUnmount(() => {
 
 // click search button
 const updateData = () => {
-  lexicalStorage.setSelectedFields(searchField.value)
-  lexicalStorage.setIsSearch(true)
+  if (currentFields.value.length > 0) {
+    lexicalStorage.setSelectedFields(searchField.value)
+    lexicalStorage.setIsSearch(true)
+  }
 }
 
 watch(selectedFieldsArray, (newFields) => {
@@ -190,9 +192,10 @@ watch(
   -->
 
   <!-- prev advanced search -->
-  <div ref="dropdownContainer" class="search-component">
+  <div class="search-component">
     <!-- Select field(s) for search -->
     <div
+      ref="dropdownContainer"
       class="dropdown"
       :class="{
         'dropdown-open': isDropdownParams,
@@ -259,6 +262,7 @@ watch(
         />
         -->
         <input
+          autofocus
           @keyup.enter="updateData"
           class="search-input"
           type="text"
@@ -462,6 +466,7 @@ input:focus {
 .input-group select:hover {
   background-color: white;
 }
+
 .input-group input {
   flex: 1;
   margin-right: 0.5rem;
@@ -470,6 +475,11 @@ input:focus {
   border: none;
   border-radius: 4px;
   width: 300px;
+}
+
+*:focus {
+  outline-color: var(--sb-orange);
+  outline-style: solid;
 }
 
 /* search-button */

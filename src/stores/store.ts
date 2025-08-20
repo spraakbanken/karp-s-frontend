@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 import { type FieldConfig, type Config, type DatasetDates } from '@/types/datasetConfig.ts'
 //import { isUndefined } from 'es-toolkit'
+import { useI18n } from 'vue-i18n'
 
 interface SearchRedux {
   //allParams: string[]
@@ -24,7 +25,7 @@ interface SearchRedux {
   activeLocale: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
-  listLimit: number
+  //listLimit: number
   isData: boolean
   isSearch: boolean
   isStart: boolean
@@ -50,7 +51,7 @@ export const lexicalStore = defineStore('dataset', {
     activeLocale: 'sv',
     datasetLabels: {},
     datasetDates: [],
-    listLimit: 5,
+    //listLimit: 5,
     isData: false,
     isSearch: false,
     isStart: true,
@@ -175,7 +176,6 @@ export const lexicalStore = defineStore('dataset', {
           collection: false,
           label: { swe: 'ingångsord', eng: 'word' },
         })
-
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields
         // remove them from selectedFields
@@ -193,8 +193,7 @@ export const lexicalStore = defineStore('dataset', {
         }
         this.selectedFields = newSelectedFields
         // and set "ingångsord" to default, also for statistics
-        // TODO if selectedFields exists in all selected datasets
-        // don't do this:
+        // but if selectedFields exists in all selected datasets don't do this
         console.log('in setSelectedDataset', this.selectedFields)
         let isEmpty = true
         for (const [k, v] of Object.entries(this.selectedFields)) {
@@ -267,9 +266,11 @@ export const lexicalStore = defineStore('dataset', {
       this.setActiveSearchTab('simple')
       this.setActiveResultTab('table')
     },
+    /*
     setListLimit(x: number) {
       this.listLimit = x
     },
+    */
     localizeParam(p: string): string {
       let label = p
       for (const c of this.currentFields) {
@@ -296,23 +297,29 @@ export const lexicalStore = defineStore('dataset', {
       return value
     },
     formatCell(x: string | string[]): string {
+      const { t } = useI18n()
+
       let value = ''
       //Array.isArray(x) ? x.join(', ') : x
       if (Array.isArray(x)) {
+        value = '<i>' + t('dataset.list') + ' (' + x.length + ')</i>'
         x.every((item, index) => {
-          if (index > 0) {
-            value = value + '<br>' + item
-          } else {
-            value = item
-          }
-          if (index == this.listLimit - 1) {
+          //if (index > 0) {
+          value = value + '<br>' + item
+          //} else {
+          //value = item
+          //}
+          //          if (index == this.listLimit - 1) {
+          /*
+          if (index == 2000 - 1) {
             if (index + 1 < x.length) {
-              value = value + '<br>' + '(' + x.length + ')'
+              //value = value + '<br>' + '<i>(' + x.length + ')</i>'
             }
             return false
           } else {
             return true
           }
+          */
         })
       } else {
         value = x

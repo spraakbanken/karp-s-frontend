@@ -60,28 +60,23 @@ const ex2 = encodeURI(
 </template>
 
 <style scoped>
-@media (min-width: 1024px) {
-  .about {
-    padding: 2rem;
-  }
+.about {
+  padding: 2rem;
+}
 
-  .row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    margin-bottom: 2rem;
-  }
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: 2rem;
+}
 
-  .col {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
-    flex: 1;
-    margin-right: 2rem;
-  }
-
-  .news {
-  }
+.col {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+  margin-right: 2rem;
 }
 </style>

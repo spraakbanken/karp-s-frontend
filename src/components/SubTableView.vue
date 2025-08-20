@@ -4,6 +4,8 @@ import type { Dataset } from '@/types/datasetConfig'
 import { lexicalStore } from '@/stores/store'
 import { getSubTableData } from '@/api/apiService'
 import { useI18n } from 'vue-i18n'
+import type { forEach } from 'es-toolkit/compat'
+import MaxHeight from '@/components/MaxHeight.vue'
 
 const { t } = useI18n()
 
@@ -23,13 +25,18 @@ const isLoading = ref(false)
 const processNewData = async () => {
   console.log('processNewData')
   isLoading.value = true
-  const data = await getSubTableData(
-    'baseform',
-    currentPage.value,
-    itemsPerPage.value,
-    props.dataset,
-  )
-  newData.value = data
+  try {
+    const data = await getSubTableData(
+      'baseform',
+      currentPage.value,
+      itemsPerPage.value,
+      props.dataset,
+    )
+    newData.value = data
+  } catch (error) {
+    newData.value = []
+    console.error('Error processing data:', error)
+  }
   isLoading.value = false
 }
 
@@ -76,12 +83,22 @@ const lastPage = () => {
       {{ lexicalStorage.datasetLabels[props.dataset] }}
       ({{ props.totalHits }})
     </div>
+
     <table v-if="props.data.length" class="fancy-table">
       <thead>
         <tr>
-          <th v-for="(value, key) in props.data[0]" :key="key">
+          <th
+            v-for="(value, key) in props.data[0]"
+            :key="key"
+            :class="{
+              'header-list': lexicalStorage.isList(key as string),
+            }"
+          >
             <div class="header-content">
               <span
+                :class="{
+                  'header-list-text': lexicalStorage.isList(key as string),
+                }"
                 >{{ lexicalStorage.localizeParam(key as string) }}
                 {{
                   lexicalStorage.isList(key as string) ? '(' + t('table.header.list') + ')' : ''
@@ -91,14 +108,22 @@ const lastPage = () => {
           </th>
         </tr>
       </thead>
+
       <tbody>
         <tr v-for="(item, index) in newData" :key="item.rank + '-' + index">
           <td v-for="(value, key) in item" :key="key">
-            <span v-html="lexicalStorage.formatCell(value)"></span>
+            <MaxHeight :max-height="200">
+              <span v-html="lexicalStorage.formatCell(value)"></span>
+            </MaxHeight>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div v-if="isLoading" class="message">
+      {{ $t('message.loading') }}
+    </div>
+
     <div v-if="props.data.length" class="pagination">
       <button @click="firstPage" :disabled="currentPage === 1">
         <i class="material-icons">first_page</i>
@@ -156,12 +181,32 @@ const lastPage = () => {
   width: 100%;
 }
 
+.button-expand {
+  display: inline-block;
+  border: 1px solid #333;
+  cursor: pointer;
+  padding: 1px 2px;
+  border-radius: 4px;
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+/*
 th,
 td {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
+  border: 1px solid var(--color-border);
+}
+*/
+th,
+td {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   border: 1px solid var(--color-border);
 }
 
@@ -262,5 +307,14 @@ tr:hover {
 
 .pagination-controls label {
   margin-right: 0.5rem;
+}
+
+.header-list {
+  font-style: italic;
+  background-color: var(--sb-grey-light);
+  color: black;
+}
+
+.message {
 }
 </style>

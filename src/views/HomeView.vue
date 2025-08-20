@@ -54,7 +54,8 @@ watch(
       <DataSearch />
       <DataSelection />
     </div>
-    <template v-if="lexicalStorage.isData">
+    <!-- <template v-if="lexicalStorage.isData"> -->
+    <template v-if="!lexicalStorage.isStart">
       <div class="tabs">
         <button
           :class="{ active: activeResultTab === 'table' }"
@@ -145,7 +146,8 @@ watch(
   border: none;
   border: 1px solid white;
   border-bottom: none;
-  background-color: var(--color-complement);
+  color: var(--button-inactive-text-color);
+  background-color: var(--button-inactive-bg-color);
   cursor: pointer;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -158,8 +160,8 @@ watch(
 
 .searchTabs button.active,
 .tabs button.active {
-  background-color: none;
+  color: var(--button-active-text-color);
   font-weight: bold;
-  background-color: white;
+  background-color: var(--button-active-bg-color);
 }
 </style>

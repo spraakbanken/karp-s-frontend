@@ -5,6 +5,7 @@ import type { Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
+import MaxHeight from '@/components/MaxHeight.vue'
 
 import { useI18n } from 'vue-i18n'
 
@@ -15,7 +16,7 @@ const lexicalStorage = lexicalStore()
 const currentResult = ref<Dataset[]>([])
 const tableHeaders = ref<string[]>([])
 const currentPage = ref(1)
-const itemsPerPage = ref(10)
+const itemsPerPage = ref(100)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeResultTab)
@@ -44,12 +45,12 @@ const handleClickOutsideS = (event: MouseEvent) => {
     isDropdownCompileParams.value = false
   }
 }
-
+/*
 const selectedDatasets = computed({
   get: () => lexicalStorage.selectedDatasets,
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
-
+*/
 const selectedCompileFields = computed({
   get: () => lexicalStorage.selectedCompileFields,
   set: (value) => lexicalStorage.setSelectedCompileFields(value),
@@ -81,6 +82,8 @@ const fetchData = async () => {
   const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
+  lexicalStorage.setIsData(false)
+
   //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (newFields && newCompileFields.length > 0) {
     try {
@@ -89,14 +92,17 @@ const fetchData = async () => {
         newCompileFields as string[],
         newColumns as string[],
       )
-      isLoading.value = false
       currentResult.value = tableData
+      if (currentResult.value.length > 0) {
+        lexicalStorage.setIsData(true)
+      }
       //console.log('fetchData result ', currentResult.value.length, currentResult.value)
       tableHeaders.value = headers
       // console.log('currentResult', currentResult.value);
     } catch (error) {
       console.error('Error fetching data:', error)
     }
+    isLoading.value = false
   } else {
     currentResult.value = []
   }
@@ -113,8 +119,20 @@ watch(
 )
 
 watch(
+  () => lexicalStorage.selectedDatasets,
+  (newDatasets, oldDatasets) => {
+    console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
+    if (newDatasets.length === 0) {
+      currentResult.value = []
+      lexicalStorage.setIsData(false)
+      //lexicalStorage.setActiveResultTab('table')
+    }
+  },
+)
+
+/*
+watch(
   () => [
-    lexicalStorage.selectedDatasets,
     lexicalStorage.selectedFields,
     lexicalStorage.selectedCompileFields,
     lexicalStorage.selectedColumns,
@@ -124,6 +142,21 @@ watch(
     updateOverview() // draw graph
   },
   { deep: true },
+)
+*/
+watch(
+  () => [lexicalStorage.isSearch],
+  () => {
+    console.log('Watch isSearch!')
+
+    if (lexicalStorage.isSearch) {
+      lexicalStorage.setIsSearch(false)
+      {
+        fetchData()
+        updateOverview() // draw graph
+      }
+    }
+  },
 )
 
 const sortedData = computed(() => {
@@ -349,8 +382,8 @@ const drawChart = () => {
 
       g.append('rect')
         .attr('x', x)
-        .attr('y', yscale(element))
-        .attr('height', height - yscale(element))
+        .attr('y', yscale(element as number))
+        .attr('height', height - yscale(element as number))
         .attr('width', barWidth)
         .attr('fill', '#F0581A')
         .attr('transform', `translate(${leftMargin}, ${topMargin})`)
@@ -359,14 +392,14 @@ const drawChart = () => {
       if (graph_dots.value) {
         g.append('circle')
           .attr('cx', x + leftMargin + barWidth / 2)
-          .attr('cy', yscale(element) + 30)
+          .attr('cy', yscale(element as number) + 30)
           .attr('r', graph_dot_r)
           .attr('fill', '#000000')
       }
 
       g.append('text')
         .attr('x', x + barWidth / 2)
-        .attr('y', yscale(element) - graph_dot_r - 1)
+        .attr('y', yscale(element as number) - graph_dot_r - 1)
         .attr('text-anchor', 'middle')
         .text(element)
         .attr('transform', `translate(${leftMargin}, ${topMargin})`)
@@ -400,171 +433,189 @@ const updateOverview = () => {
 </script>
 
 <template>
-  <!-- statistics settings -->
-  <div class="statistics" ref="dropdownContainerS">
-    <!-- chose field for compilation -->
-    <div
-      class="statistics-dropdown"
-      :class="{
-        'statistics-dropdown-open': isDropdownColumns,
-        'statistics-dropdown-disabled': selectedDatasets.length === 0,
-      }"
-    >
-      <span>{{ $t('dataselector.statistics.parameter') }}</span>
-      <div class="statistics-dropdown-toggle" @click="toggleDropdownCompileParams">
-        <span v-if="selectedCompileFields.length === 0">{{
-          $t('dataselector.statistics.noparameter')
-        }}</span>
-        <span v-else>{{
-          selectedCompileFields.map((x) => lexicalStorage.localizeParam(x)).join(', ')
-        }}</span>
-      </div>
-      <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
-        <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
-          <input
-            type="checkbox"
-            :value="param.name"
-            v-model="selectedCompileFields"
-            @change="updateCompileParams"
-          />
-          {{ lexicalStorage.localizeParam(param.name) }}
-        </label>
-      </div>
-    </div>
-    <!-- select additional fields for statistics -->
-    <div
-      class="statistics-dropdown"
-      :class="{
-        'statistics-dropdown-open': isDropdownColumns,
-        'statistics-dropdown-disabled': selectedDatasets.length === 0,
-      }"
-    >
-      <span>{{ $t('dataselector.statistics.columns') }}</span>
-      <div class="statistics-dropdown-toggle" @click="toggleDropdownColumns">
-        <span v-if="selectedColumns.length === 0">{{
-          $t('dataselector.statistics.nocolumns')
-        }}</span>
-        <span v-else>{{ selectedColumns.join(', ') }}</span>
-      </div>
-      <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
-        <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
-          <input
-            type="checkbox"
-            :value="param.name"
-            v-model="selectedColumns"
-            @change="updateColumns"
-          />
-          {{ lexicalStorage.localizeParam(param.name) }}
-        </label>
-      </div>
-    </div>
-    <div v-if="currentResult.length">
-      <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
-      <input
-        type="checkbox"
-        id="showOverviewCheckbox"
-        v-model="showOverview"
-        class="checkbox-showoverview"
-        @change="updateOverview()"
-      />
-      <label for="showOverviewCheckbox">
-        {{ $t('statistics.showOverview') }}
-      </label>
-    </div>
-  </div>
+  <!-- show no data -->
 
-  <div v-if="showOverview" class="overview-wrapper">
-    <div class="overview-settings">
-      <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
-      <!--
+  <div v-if="!lexicalStorage.isStart">
+    <!-- statistics settings -->
+    <div class="statistics" ref="dropdownContainerS">
+      <!-- chose field for compilation -->
+      <div
+        class="statistics-dropdown"
+        :class="{
+          'statistics-dropdown-open': isDropdownColumns,
+          'statistics-dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
+        }"
+      >
+        <span>{{ $t('dataselector.statistics.parameter') }}</span>
+        <div class="statistics-dropdown-toggle" @click="toggleDropdownCompileParams">
+          <span v-if="selectedCompileFields.length === 0">{{
+            $t('dataselector.statistics.noparameter')
+          }}</span>
+          <span v-else>{{
+            selectedCompileFields.map((x) => lexicalStorage.localizeParam(x)).join(', ')
+          }}</span>
+        </div>
+        <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
+          <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
+            <input
+              type="checkbox"
+              :value="param.name"
+              v-model="selectedCompileFields"
+              @change="updateCompileParams"
+            />
+            {{ lexicalStorage.localizeParam(param.name) }}
+          </label>
+        </div>
+      </div>
+      <!-- select additional fields for statistics -->
+      <div
+        class="statistics-dropdown"
+        :class="{
+          'statistics-dropdown-open': isDropdownColumns,
+          'statistics-dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
+        }"
+      >
+        <span>{{ $t('dataselector.statistics.columns') }}</span>
+        <div class="statistics-dropdown-toggle" @click="toggleDropdownColumns">
+          <span v-if="selectedColumns.length === 0">{{
+            $t('dataselector.statistics.nocolumns')
+          }}</span>
+          <span v-else
+            >{{ selectedColumns.map((x) => lexicalStorage.localizeParam(x)).join(', ') }}
+          </span>
+        </div>
+        <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
+          <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
+            <input
+              type="checkbox"
+              :value="param.name"
+              v-model="selectedColumns"
+              @change="updateColumns"
+            />
+            {{ lexicalStorage.localizeParam(param.name) }}
+          </label>
+        </div>
+      </div>
+      <div v-if="currentResult.length">
+        <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
+        <input
+          type="checkbox"
+          id="showOverviewCheckbox"
+          v-model="showOverview"
+          class="checkbox-showoverview"
+          @change="updateOverview()"
+        />
+        <label for="showOverviewCheckbox">
+          {{ $t('statistics.showOverview') }}
+        </label>
+      </div>
+    </div>
+
+    <div v-if="showOverview" class="overview-wrapper">
+      <div class="overview-settings">
+        <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
+        <!--
       <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
       -->
-      <span class="overview-setting">
-        {{ $t('graphs.threshold') }}
-        <input type="number" size="5" min="0" v-model="graph_threshold" @change="updateOverview" />
-      </span>
-      <span class="overview-setting">
-        <input type="checkbox" v-model="graph_textangled" @change="updateOverview" />
-        {{ $t('graphs.textangled') }}
-      </span>
-      <span class="overview-setting">
-        {{ $t('graphs.barwidth') }}
-        <input type="number" size="5" min="0" v-model="graph_barwidth" @change="updateOverview" />
-      </span>
-      <span class="overview-setting">
-        <input type="checkbox" v-model="graph_dots" @change="updateOverview" />
-        {{ $t('graphs.dots') }}
-      </span>
-    </div>
-    <div v-if="graph_value_count > graph_max_number_of_values" class="overview-max">
-      {{ $t('graphs.maxnumberofvalues', { number: graph_max_number_of_values }) }}
+        <span class="overview-setting">
+          {{ $t('graphs.threshold') }}
+          <input
+            type="number"
+            size="5"
+            min="0"
+            v-model="graph_threshold"
+            @change="updateOverview"
+          />
+        </span>
+        <span class="overview-setting">
+          <input type="checkbox" v-model="graph_textangled" @change="updateOverview" />
+          {{ $t('graphs.textangled') }}
+        </span>
+        <span class="overview-setting">
+          {{ $t('graphs.barwidth') }}
+          <input type="number" size="5" min="0" v-model="graph_barwidth" @change="updateOverview" />
+        </span>
+        <span class="overview-setting">
+          <input type="checkbox" v-model="graph_dots" @change="updateOverview" />
+          {{ $t('graphs.dots') }}
+        </span>
+      </div>
+      <div v-if="graph_value_count > graph_max_number_of_values" class="overview-max">
+        {{ $t('graphs.maxnumberofvalues', { number: graph_max_number_of_values }) }}
+      </div>
+
+      <div id="karps_graph"></div>
     </div>
 
-    <div id="karps_graph"></div>
+    <!-- show table -->
+    <div v-else class="table-wrapper">
+      <div class="tab" v-if="!isLoading">
+        {{ $t('statistics.numberOfHits') }}:
+        {{ currentResult.length }}
+      </div>
+
+      <table v-if="currentResult.length" class="fancy-table">
+        <thead>
+          <tr>
+            <th v-for="key in tableHeaders" :key="key" @click="sortTable(String(key))">
+              <div class="header-content">
+                <span
+                  >{{ lexicalStorage.localizeParam(key) }}
+                  {{ lexicalStorage.isList(key) ? '(' + t('table.header.list') + ')' : '' }}</span
+                >
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
+            <td v-for="(value, key) in item" :key="key">
+              <MaxHeight :max-height="200">
+                <span v-html="lexicalStorage.formatCell(value)"></span>
+              </MaxHeight>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- show no data -->
+      <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
+        {{ $t('message.nodatasetselected') }}
+      </p>
+      <p v-else-if="isLoading" class="message">
+        {{ $t('message.loading') }}
+      </p>
+      <p v-else>
+        {{ $t('error.nodata') }}
+      </p>
+
+      <!-- show pagers -->
+      <div v-if="currentResult.length" class="pagination">
+        <button @click="firstPage" :disabled="currentPage === 1">
+          <i class="material-icons">first_page</i>
+        </button>
+        <button @click="prevPage" :disabled="currentPage === 1">
+          <i class="material-icons">chevron_left</i>
+        </button>
+        <span>{{ currentPage }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">
+          <i class="material-icons">chevron_right</i>
+        </button>
+        <button @click="lastPage" :disabled="currentPage === totalPages">
+          <i class="material-icons">last_page</i>
+        </button>
+        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
+        <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
+          <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
 
-  <!-- show table -->
-  <div v-else class="table-wrapper">
-    <div class="tab" v-if="!isLoading">
-      {{ $t('statistics.numberOfHits') }}:
-      {{ currentResult.length }}
-    </div>
-
-    <table v-if="currentResult.length" class="fancy-table">
-      <thead>
-        <tr>
-          <th v-for="key in tableHeaders" :key="key" @click="sortTable(String(key))">
-            <div class="header-content">
-              <span
-                >{{ lexicalStorage.localizeParam(key) }}
-                {{ lexicalStorage.isList(key) ? '(' + t('table.header.list') + ')' : '' }}</span
-              >
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
-          <td v-for="(value, key) in item" :key="key">
-            <span v-html="lexicalStorage.formatCell(value)"></span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- show no data -->
-    <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
-      {{ $t('message.nodatasetselected') }}
-    </p>
-    <p v-else-if="isLoading" class="message">
-      {{ $t('message.loading') }}
-    </p>
-    <p v-else>
-      {{ $t('error.nodata') }}
-    </p>
-
-    <!-- show pagers -->
-    <div v-if="currentResult.length" class="pagination">
-      <button @click="firstPage" :disabled="currentPage === 1">
-        <i class="material-icons">first_page</i>
-      </button>
-      <button @click="prevPage" :disabled="currentPage === 1">
-        <i class="material-icons">chevron_left</i>
-      </button>
-      <span>{{ currentPage }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">
-        <i class="material-icons">chevron_right</i>
-      </button>
-      <button @click="lastPage" :disabled="currentPage === totalPages">
-        <i class="material-icons">last_page</i>
-      </button>
-      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
-      <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-        <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
-          {{ option }}
-        </option>
-      </select>
-    </div>
+  <div v-if="isLoading" class="message">
+    {{ $t('message.loading') }}
   </div>
 </template>
 
@@ -686,7 +737,10 @@ const updateOverview = () => {
 
 th,
 td {
-  padding: 0.75rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   border: 1px solid var(--color-border);
 }
 
@@ -722,7 +776,7 @@ th {
 }
 
 .message {
-  margin: 0.5rem;
+  margin: auto;
 }
 
 tr:nth-child(even) {
@@ -794,5 +848,10 @@ tr:hover {
 
 .pagination-controls label {
   margin-right: 0.5rem;
+}
+
+.message {
+  margin: auto;
+  text-align: center;
 }
 </style>

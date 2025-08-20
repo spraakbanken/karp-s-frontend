@@ -8,6 +8,7 @@ const datasetDates = computed(() => lexicalStorage.datasetDates)
 </script>
 
 <template>
+  {{ console.log(datasetDates) }}
   <div v-for="(value, index) in datasetDates" :key="index" class="latest-box">
     <div v-if="index < 5" class="latest-row">
       <span class="latest-label">{{ value.label }}</span>
