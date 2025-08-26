@@ -193,6 +193,47 @@ watch(
 
   <!-- prev advanced search -->
   <div class="search-component">
+    <!-- Search-box -->
+    <div v-for="param in selectedFieldsArray" :key="param" class="search-container">
+      <!-- Search-box
+
+      <span :for="param"
+        >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeField(param) }}</span
+      >
+       -->
+      <div class="input-group">
+        <!--
+        <input
+          class="search-input"
+          type="text"
+          :id="param"
+          v-model="parameters[param].value"
+          :placeholder="$t('dataselector.parameters.placeholder')"
+        />
+        -->
+        <input
+          autofocus
+          @keyup.enter="updateData"
+          class="search-input"
+          type="text"
+          :id="param"
+          v-model="searchField[param].value"
+          :placeholder="$t('dataselector.parameters.placeholder')"
+        />
+        <select v-model="searchField[param].position">
+          <!--<option value="" disabled>{{ $t('dataselector.parameters.position') }}</option> -->
+          <option
+            v-for="(position, index) in searchFieldPosition"
+            :key="position"
+            :value="position"
+            :hidden="!searchFieldPositionEnabled[index]"
+            :disabled="!searchFieldPositionEnabled[index]"
+          >
+            {{ $t(searchFieldPositionText[index]) }}
+          </option>
+        </select>
+      </div>
+    </div>
     <!-- Select field(s) for search -->
     <div
       ref="dropdownContainer"
@@ -229,47 +270,6 @@ watch(
             {{ localizeField(param.name) }}
           </span>
         </label>
-      </div>
-    </div>
-    <!-- Search-box -->
-    <div v-for="param in selectedFieldsArray" :key="param" class="search-container">
-      <!-- Search-box
-
-      <span :for="param"
-        >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeField(param) }}</span
-      >
-       -->
-      <div class="input-group">
-        <select v-model="searchField[param].position">
-          <!--<option value="" disabled>{{ $t('dataselector.parameters.position') }}</option> -->
-          <option
-            v-for="(position, index) in searchFieldPosition"
-            :key="position"
-            :value="position"
-            :hidden="!searchFieldPositionEnabled[index]"
-            :disabled="!searchFieldPositionEnabled[index]"
-          >
-            {{ $t(searchFieldPositionText[index]) }}
-          </option>
-        </select>
-        <!--
-        <input
-          class="search-input"
-          type="text"
-          :id="param"
-          v-model="parameters[param].value"
-          :placeholder="$t('dataselector.parameters.placeholder')"
-        />
-        -->
-        <input
-          autofocus
-          @keyup.enter="updateData"
-          class="search-input"
-          type="text"
-          :id="param"
-          v-model="searchField[param].value"
-          :placeholder="$t('dataselector.parameters.placeholder')"
-        />
       </div>
     </div>
     <button @click="updateData">

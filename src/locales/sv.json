@@ -40,7 +40,7 @@
   "dataselector.parameters": "Sök i",
   "dataselector.parameters.prefix": "Fält",
   "dataselector.parameters.position": "Välj position",
-  "dataselector.parameters.placeholder": "Ange ett värde",
+  "dataselector.parameters.placeholder": "",
   "dataselector.simplesearch.placeholder": "Sök i ingångsord",
   "dataselector.noparameters": "Inga fält valda",
   "dataselector.statistics": "Statistik",

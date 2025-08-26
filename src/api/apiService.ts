@@ -23,7 +23,7 @@ export const getLexicalDatasets = async () => {
   }
 }
 
-export const getTableData = async () => {
+export const getTableData = async (pageStart: number, pageSize: number) => {
   try {
     const lexicalStoreData = lexicalStore()
     const datasets = lexicalStoreData.selectedDatasets
@@ -39,14 +39,20 @@ export const getTableData = async () => {
         params['q'] = queryParam
       }
     }
+
+    params['size'] = pageSize.toString()
+    //    }
+    //    if (pageSize > 10) {
+    params['from'] = ((pageStart - 1) * pageSize).toString()
+
     // console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
     // console.log('AXIOS getTableData: hits:', response.data.hits)
-    const processedData = processDatasets(response.data.hits)
+    //const processedData = processDatasets(response.data.hits)
 
-    return processedData
+    return response.data
   } catch (error) {
     throw error
   }

@@ -68,12 +68,33 @@ export interface DatasetDates {
   updated: string
 }
 
+export type Entry = {
+  [key: string]: string
+}
+
+export type DatasetEntry = {
+  entry: Entry
+  resourceId: string
+}
+
+export type DatasetResult = {
+  hits: DatasetEntry[]
+  resourceHits: Record<string, number>
+  resourceOrder: Record<number, string>
+  total: number
+}
+
+export type DatasetResultGrp = {
+  resourceId: string
+  hits: DatasetEntry[]
+}
 // OLD - are they used?
 
 export type Dataset = {
   [key: string]: string
 }
 
+/*
 export type Entry = {
   entry: Dataset
 }
@@ -86,3 +107,4 @@ export type DatasetConfig = {
 export type Datasets = {
   [key: string]: DatasetConfig
 }
+*/

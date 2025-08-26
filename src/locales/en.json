@@ -40,7 +40,7 @@
   "dataselector.parameters": "Search in",
   "dataselector.parameters.prefix": "Field",
   "dataselector.parameters.position": "Select position",
-  "dataselector.parameters.placeholder": "Enter value",
+  "dataselector.parameters.placeholder": "",
   "dataselector.simplesearch.placeholder": "Search for word",
   "dataselector.noparameters": "No fields selected",
   "dataselector.statistics": "Statistics",
