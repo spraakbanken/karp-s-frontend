@@ -91,15 +91,19 @@ const fetchData = async () => {
 }
 
 watch(
-  () => [currentPage.value, itemsPerPage.value],
-  ([newPage, newItemsPerPage]) => {
-    //const end = newPage * newItemsPerPage
-    //itemsPerPage.value = newItemsPerPage
-    // if (end > 10) {
+  () => currentPage.value,
+  (newPage) => {
     fetchData()
-    // }
   },
   { immediate: true },
+)
+
+watch(
+  () => itemsPerPage.value,
+  (newItemsPerPage, oldItemsPerPage) => {
+    currentPage.value = Math.ceil(currentPage.value * (oldItemsPerPage / newItemsPerPage))
+    fetchData()
+  },
 )
 
 watch(
@@ -147,6 +151,7 @@ watch(
     if (lexicalStorage.isSearch) {
       lexicalStorage.setIsSearch(false)
       //setTimeout(function () {
+      currentPage.value = 1
       fetchData()
       //}, 1000)
     }

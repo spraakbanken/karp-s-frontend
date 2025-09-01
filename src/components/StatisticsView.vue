@@ -613,10 +613,11 @@ const updateOverview = () => {
       </div>
     </div>
   </div>
-
+  <!--
   <div v-if="isLoading" class="message">
     {{ $t('message.loading') }}
   </div>
+  -->
 </template>
 
 <style scoped>
@@ -723,7 +724,8 @@ const updateOverview = () => {
   display: grid;
   position: relative;
   /* margin-top: 2rem; */
-  padding: 1rem;
+  padding-left: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .fancy-table {

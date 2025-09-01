@@ -43,7 +43,7 @@ const searchFieldPositionText = [
   'dataselector.parameter.position.equals',
   'dataselector.parameter.position.regex',
 ]
-const searchFieldPositionEnabled = [true, true, false, true, false]
+const searchFieldPositionEnabled = [true, true, true, true, false]
 
 const localizeField = (p: string) => {
   let label = p
@@ -211,17 +211,19 @@ watch(
           :placeholder="$t('dataselector.parameters.placeholder')"
         />
         -->
-        <input
-          autofocus
-          @keyup.enter="updateData"
-          class="search-input"
-          type="text"
-          :id="param"
-          v-model="searchField[param].value"
-          :placeholder="$t('dataselector.parameters.placeholder')"
-        />
+        <div>
+          <input
+            autofocus
+            @keyup.enter="updateData"
+            class="search-input"
+            type="text"
+            :id="param"
+            v-model="searchField[param].value"
+            :placeholder="$t('dataselector.parameters.placeholder')"
+          />
+        </div>
+        <!--
         <select v-model="searchField[param].position">
-          <!--<option value="" disabled>{{ $t('dataselector.parameters.position') }}</option> -->
           <option
             v-for="(position, index) in searchFieldPosition"
             :key="position"
@@ -232,44 +234,84 @@ watch(
             {{ $t(searchFieldPositionText[index]) }}
           </option>
         </select>
+        -->
+        <div class="position">
+          <div class="group">
+            <label for="pos3">
+              <input type="radio" id="pos3" value="equals" v-model="searchField[param].position" />
+              {{ $t(searchFieldPositionText[3]) }}</label
+            >
+            <label for="pos0">
+              <input
+                type="radio"
+                id="pos0"
+                value="startswith"
+                v-model="searchField[param].position"
+              />
+              {{ $t(searchFieldPositionText[0]) }}</label
+            >
+          </div>
+          <div class="group">
+            <label for="pos1">
+              <input
+                type="radio"
+                id="pos1"
+                value="endswith"
+                v-model="searchField[param].position"
+              />
+              {{ $t(searchFieldPositionText[1]) }}</label
+            >
+            <label for="pos2">
+              <input
+                type="radio"
+                id="pos2"
+                value="contains"
+                v-model="searchField[param].position"
+              />
+              {{ $t(searchFieldPositionText[2]) }}</label
+            >
+          </div>
+        </div>
       </div>
     </div>
     <!-- Select field(s) for search -->
-    <div
-      ref="dropdownContainer"
-      class="dropdown"
-      :class="{
-        'dropdown-open': isDropdownParams,
-        'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
-      }"
-      :disabled="lexicalStorage.selectedDatasets.length === 0"
-    >
-      <!-- {{ $t('dataselector.parameters') }} -->
-      <div class="dropdown-toggle" @click="toggleDropdownParams">
-        <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
-          $t('dataselector.noparameters')
-        }}</span>
-        <span v-else-if="currentFields.length === 0">{{
-          $t('dataselector.datasets.nocommon')
-        }}</span>
-        <span v-else-if="selectedFieldsArray.length === 0">{{
-          $t('dataselector.noparameters')
-        }}</span>
-        <span v-else
-          >{{ selectedFieldsArray.map((x) => localizeField(x)).join(', ') }}
-          <i class="arrow-down"></i>
-        </span>
-      </div>
-      <div class="dropdown-menu" v-if="isDropdownParams">
-        <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
-          <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
-          <span v-if="param.name == 'word'" style="font-weight: bold">
-            {{ localizeField(param.name) }}
+    <div style="visibility: hidden; width: 0px; height: 0px">
+      <div
+        ref="dropdownContainer"
+        class="dropdown"
+        :class="{
+          'dropdown-open': isDropdownParams,
+          'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
+        }"
+        :disabled="lexicalStorage.selectedDatasets.length === 0"
+      >
+        <div class="dropdown-toggle" @click="toggleDropdownParams">
+          <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
+            $t('dataselector.noparameters')
+          }}</span>
+          <span v-else-if="currentFields.length === 0">{{
+            $t('dataselector.datasets.nocommon')
+          }}</span>
+          <span v-else-if="selectedFieldsArray.length === 0">{{
+            $t('dataselector.noparameters')
+          }}</span>
+          <span v-else
+            >{{ selectedFieldsArray.map((x) => localizeField(x)).join(', ') }}
+            <i class="arrow-down"></i>
           </span>
-          <span v-else>
-            {{ localizeField(param.name) }}
-          </span>
-        </label>
+        </div>
+
+        <div class="dropdown-menu" v-if="isDropdownParams">
+          <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
+            <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
+            <span v-if="param.name == 'word'" style="font-weight: bold">
+              {{ localizeField(param.name) }}
+            </span>
+            <span v-else>
+              {{ localizeField(param.name) }}
+            </span>
+          </label>
+        </div>
       </div>
     </div>
     <button @click="updateData">
@@ -308,12 +350,16 @@ input:focus {
 .search-component {
   background-color: var(--color-search-area);
   border-radius: 0.5rem;
-  margin-top: 0.5rem;
   padding: 1rem;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   align-items: center;
+  @media (width < 640px) {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 /* simple and advanced search */
@@ -454,6 +500,18 @@ input:focus {
 
 /* search position and search field */
 
+.input-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  @media (width < 640px) {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 .input-group select {
   background-color: var(--sb-grey-light);
   margin-right: 0.5rem;
@@ -467,17 +525,20 @@ input:focus {
   background-color: white;
 }
 
-.input-group input {
-  flex: 1;
+.input-group .search-input {
+  /* flex: 1;*/
   margin-right: 0.5rem;
   padding: 0.5rem;
   /* border: 2px solid var(--sb-orange); */
   border: none;
   border-radius: 4px;
   width: 300px;
+  @media (width < 640px) {
+    width: 400px;
+  }
 }
 
-*:focus {
+.input-group .search-input:focus {
   outline-color: var(--sb-orange);
   outline-style: solid;
 }
@@ -488,16 +549,42 @@ input:focus {
   background-color: var(--sb-orange);
   border: none;
   border-radius: 0.5rem;
-  padding: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0.5rem 1rem;
   text-align: center;
   font-weight: bold;
   color: white;
+  @media (width < 640px) {
+    width: 100%;
+  }
 }
 
 .search-component button:hover {
+  border: none;
   background-color: white;
   color: black;
+}
+
+.position {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.position .group {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.5rem;
+}
+
+.position label {
+  box-sizing: border-box;
+}
+
+.position input {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 2px;
 }
 </style>
