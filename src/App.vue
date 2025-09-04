@@ -1,42 +1,51 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import TitleBar from './components/TitleBar.vue'
+import FooterView from './components/FooterView.vue'
 </script>
 
 <template>
-  <header>
-    <TitleBar />
-  </header>
-
-  <RouterView />
+  <div class="wrapper">
+    <header>
+      <TitleBar />
+    </header>
+    <div class="main">
+      <RouterView />
+    </div>
+    <footer class="footer">
+      <FooterView />
+    </footer>
+  </div>
 </template>
 
 <style scoped>
+.wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
+  width: 100vw;
+  /* border-bottom: 2px solid var(--border-color); */
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+footer {
+  height: 150px;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
+.main {
+  flex: 1;
+}
+/*
+@media (max-width: 1024px) {
+  .wrapper {
     display: flex;
     place-items: flex-start;
     flex-wrap: nowrap;
+    place-items: left;
   }
 
   nav {
@@ -48,4 +57,5 @@ header {
     margin-top: 1rem;
   }
 }
+  */
 </style>

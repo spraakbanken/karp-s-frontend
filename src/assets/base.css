@@ -1,63 +1,63 @@
-/* color palette from <https://github.com/vuejs/theme> */
+@import url('sb.css');
+
+/* Define light mode variables */
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
-
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
-
-  --vt-c-indigo: #2c3e50;
-
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
-
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  --color-background: #ffffff;
+  --color-background-hover: var(--sb-orange);
+  --color-text: #000000;
+  --color-border: var(--sb-orange-light);
+  --color-border-open: var(--sb-orange);
+  --color-border-hover: #ccc;
+  --color-heading: #333;
+  --color-icon: #302d2d;
+  --color-icon-light: var(--sb-orange-light);
+  --color-icon-dark: #ffffff;
+  --border-color: #ddd;
+  --table-head-bg: var(--sb-orange-light);
+  --table-row-even-bg: #f9f9f9;
+  --table-row-odd-bg: #e9e9e9;
+  --button-active-bg-color: var(--sb-orange);
+  --button-active-text-color: #ffffff;
+  --button-inactive-bg-color: var(--sb-orange-light);
+  --button-inactive-text-color: black;
+  --button-background-alt: var(--sb-orange-light);
+  --color-search-area: var(--sb-orange-light);
+  --color-complement: var(--sb-orange-light);
+  --font-size: 15px;
+  --font-size-hover: 17px;
 }
 
-/* semantic color variables for this project */
-:root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
-
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
-
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
-
-  --section-gap: 160px;
+/* Define dark mode variables */
+[data-theme='dark'] {
+  --color-background: var(--sb-grey-darker); /* ##302d2d */
+  --color-text: #e0e0e0;
+  --color-border: var(--sb-grey-dark);
+  --color-border-open: var(--sb-grey-dark);
+  --color-border-hover: #555;
+  --color-heading: #f1f1f1;
+  --color-icon: #ffffff;
+  --color-icon-mode: var(--sb-blue-dark);
+  --border-color: #444;
+  --table-head-bg: var(--sb-grey-dark);
+  --table-row-even-bg: var(--sb-grey-darker);
+  --table-row-odd-bg: var(--sb-grey-medium);
+  --button-active-bg-color: var(--sb-orange);
+  --button-active-text-color: #ffffff;
+  --button-inactive-bg-color: var(--sb-grey-medium);
+  --button-inactive-text-color: #ffffff;
+  --button-background-alt: var(--sb-grey-light);
+  --color-search-area: var(--sb-grey-light);
+  --color-complement: var(--sb-grey-dark);
+  --font-size: 15px;
+  --font-size-hover: 17px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
+/* Define the light mode toggle */
+[data-theme='light'] {
+  --color-icon-mode: var(--color-icon-light);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
-}
-
+/* Apply the variables */
 body {
   min-height: 100vh;
   color: var(--color-text);
@@ -83,4 +83,61 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  /*font-weight: normal;*/
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 1rem;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+}
+
+th {
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: var(--table-row-even-bg);
+}
+
+tr:nth-child(odd) {
+  background-color: var(--table-row-odd-bg);
+}
+
+tr:hover {
+  background-color: var(--color-border-hover);
+}
+
+.material-icons {
+  color: var(--color-icon);
+  font-size: 20px;
+}
+
+.arrow-down {
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 2px;
+  margin-left: 5px;
+  vertical-align: 3px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
 }

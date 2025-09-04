@@ -31,4 +31,4 @@ coverage
 
 # Vue
 package-lock.json
-
+.env.dev

@@ -4,23 +4,43 @@ Karp-S - Språkbankens datapubliceringsplattform
 
 ## Developer documentation
 
+Initial:
+
 Sharepoint > Språkbanken > Documents > Plattformar > karp-s > development.docx
 
 ## Tools/framework
 
 Vue.js 3 with TypeScript
 
-### Recommended IDE Setup
+IDE Setup: [VSCode](https://code.visualstudio.com/) + Vue - official extension. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-[VSCode](https://code.visualstudio.com/) + Vue - official extension.
+Customize configuration: See [Vite Configuration Reference](https://vite.dev/config/).
 
-### Type Support for `.vue` Imports in TS
+## Workflow
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Build
 
-### Customize configuration
+```sh
+npm run build:production
+```
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Upload:
+
+```sh
+rsync --delete --exclude ".htaccess" -r dist/ <user>@k2.spraakdata.gu.se:/var/www/html_sb/karp-s
+```
+
+### Compile and Hot-Reload for Development
+
+```sh
+npm run dev:localdev
+```
+
+### Update
+
+```sh
+npm update
+```
 
 ### Project Setup
 
@@ -28,26 +48,28 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 npm install
 ```
 
-#### Compile and Hot-Reload for Development
+### Type-Check, Compile and Minify for Production
 
 ```sh
-npm run dev
+npm run build:production
 ```
 
-#### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-#### Run Unit Tests with [Vitest](https://vitest.dev/)
+### Run Unit Tests with [Vitest](https://vitest.dev/)
 
 ```sh
 npm run test:unit
 ```
 
-#### Lint with [ESLint](https://eslint.org/)
+### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
 ```
+
+## Backend
+
+- /dev redirectar alltid till den senaste och ska gå att använda lokalt (https://spraakbanken4.it.gu.se/karps/dev/)
+
+- när ni deployar frontenden, använd den med en git-commit-id i namnet, inte dev, då kommer den deployade frontenden att fortsätta fungera även om jag lägger upp en ny backend (https://spraakbanken4.it.gu.se/karps/443fe07/ just nu)
+
+- bara /karp-s försvinner (efter att ni uppdaterat frontenden att inte använda den)

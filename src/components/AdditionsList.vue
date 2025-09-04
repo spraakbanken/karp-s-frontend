@@ -1,0 +1,31 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { lexicalStore } from '@/stores/store'
+import { secondsToDate } from '@/utils/utils'
+
+const lexicalStorage = lexicalStore()
+const datasetDates = computed(() => lexicalStorage.datasetDates)
+</script>
+
+<template>
+  {{ console.log(datasetDates) }}
+  <div v-for="(value, index) in datasetDates" :key="index" class="latest-box">
+    <div v-if="index < 5" class="latest-row">
+      <span class="latest-label">{{ value.label }}</span>
+      <span class="latest-date">{{ secondsToDate(value.updated) }}</span>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.latest-box {
+}
+.latest-row {
+}
+.latest-label {
+  font-weight: normal;
+}
+.latest-date {
+  float: right;
+}
+</style>
