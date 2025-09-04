@@ -4,10 +4,10 @@ import { lexicalStore } from '@/stores/store'
 import { getTableData } from '@/api/apiService'
 import {
   type DatasetResult,
-  type Dataset,
   type DatasetEntry,
-  type DatasetResultGrp,
   type Entry,
+  type EntryS,
+  type FieldConfig,
 } from '@/types/datasetConfig'
 import { useI18n } from 'vue-i18n'
 import MaxHeight from '@/components/MaxHeight.vue'
@@ -28,30 +28,15 @@ const currentResult = ref<DatasetResult>({
 })
 // currentResult as returned from groupBy()
 const currentResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]>>({})
+// with rows sorted and put in (ordered) array
+const currentResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: string }[]>>({})
 
 //const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeResultTab)
 const isLoading = ref(false)
 const currentPage = ref(1)
-const itemsPerPage = ref(10)
+const itemsPerPage = ref(25)
 
-/*
-type currentResFunc = {
-  (res_id: string): string
-  current_res_id: string
-}
-const currentRes = <currentResFunc>((res_id: string) => {
-  if (typeof currentRes.current_res_id == 'undefined') {
-    currentRes.current_res_id = ''
-  }
-  if (res_id != currentRes.current_res_id) {
-    currentRes.current_res_id = res_id
-    return res_id
-  } else {
-    return ''
-  }
-})
-*/
 const fetchData = async () => {
   console.log('fetchData()', lexicalStorage.selectedFields)
   lexicalStorage.setIsData(false)
@@ -60,11 +45,41 @@ const fetchData = async () => {
     try {
       isLoading.value = true
       const data = await getTableData(currentPage.value, itemsPerPage.value)
-      console.log('fetchdata() - after getTableData()', data)
       isLoading.value = false
       currentResult.value = data
       currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
-      console.log('GroupBy:', currentResultGrp.value)
+      //console.log('fetchdata() - after getTableData()', currentResultGrp.value)
+
+      // sort columns based on config
+      // transform key,value-pairs to (ordered) array of key,value-pairs
+      for (const resId in currentResultGrp.value) {
+        // original
+        const dataset_unsorted: DatasetEntry[] = currentResultGrp.value[resId]
+        // with sorted rows
+        currentResultGrpSorted.value[resId] = []
+        // for each unsorted row
+        for (let i = 0; i < dataset_unsorted.length; i++) {
+          // unsorted row
+          const e0: Entry = dataset_unsorted[i].entry
+          //for (const key in e0) {
+          //  console.log('ORDERO: ', key, e0[key])
+          //}
+          // fields in correct order
+          const fieldsFromConfig: FieldConfig[] =
+            lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
+          // sorted row
+          const e1: EntryS[] = []
+          // loop over config, when field is found, add value to new row/array
+          for (const key in fieldsFromConfig) {
+            //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
+            e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
+          }
+          // add new row/array to sorted result
+          currentResultGrpSorted.value[resId].push({ entry: e1, resourceId: resId })
+        }
+      }
+
+      //console.log('GroupBySorted:', currentResultGrpSorted.value)
       /*
       currentValues.value = newDatasets.flatMap(
         (key) => currentResult.value[key] || [],
@@ -92,7 +107,7 @@ const fetchData = async () => {
 
 watch(
   () => currentPage.value,
-  (newPage) => {
+  () => {
     fetchData()
   },
   { immediate: true },
@@ -194,7 +209,7 @@ const picsbar = (ds: string) => {
     }
   }
   currentPage.value = Math.floor(hitCount / itemsPerPage.value) + 1
-  console.log('Page: ', currentPage.value)
+  //console.log('Page: ', currentPage.value)
 }
 
 const totalPages = computed(() => {
@@ -234,26 +249,10 @@ const lastPage = () => {
     -->
     <!-- show table -->
     <div v-if="lexicalStorage.isData">
-      <!--
-      <div class="graph-parameter">
-        {{ $t('dataselector.list.limit') }}:
-        <input type="number" size="5" min="1" v-model="listLimit" @change="fetchData" />
-      </div>
-      -->
-      <!--
-      <div class="table-container" v-for="(dataset, index) in currentResult" :key="index">
-        <TableView
-          :data="currentResult[index].entries"
-          :dataset="index"
-          :totalHits="currentResult[index].total"
-        />
-      </div>
-      -->
-
       <!-- picsbar -->
       <table class="picsbar">
         <tbody>
-          <tr>
+          <tr class="picsbar-row">
             <td
               class="picsbar-tooltip"
               v-for="(value, key) in currentResult.resourceOrder"
@@ -272,62 +271,51 @@ const lastPage = () => {
       </table>
 
       <!-- table -->
-      <table v-if="currentResult.total > 0" class="fancy-table">
-        <thead>
-          <tr>
-            <th
-              v-for="(value, key) in currentResult.hits[0].entry"
-              :key="key"
-              :class="{
-                'header-list': lexicalStorage.isList(key as string),
-              }"
-            >
-              <div class="header-content">
-                <span
-                  :class="{
-                    'header-list-text': lexicalStorage.isList(key as string),
-                  }"
-                  >{{ lexicalStorage.localizeParam(key as string) }}
-                  {{
-                    lexicalStorage.isList(key as string) ? '(' + t('table.header.list') + ')' : ''
-                  }}</span
-                >
-              </div>
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <!--
-          <tr v-for="(entry, index) in currentResult.hits" :key="index">
-            <td v-if="currentRes(entry.resourceId)">{{ entry.resourceId }}</td>
-            <td v-for="(value, key) in entry.entry" :key="key">
-              <MaxHeight :max-height="200">
-                <span v-html="lexicalStorage.formatCell(value)"></span>
-              </MaxHeight>
-            </td>
-          </tr>
-          -->
-          <template v-for="(item, key, index) in currentResultGrp" :key="index">
+      <template v-for="(item, key, index) in currentResultGrpSorted" :key="index">
+        <table v-if="currentResult.total > 0" class="fancy-table">
+          <tbody>
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
                 {{ lexicalStorage.datasetLabels[key] }}
               </td>
             </tr>
+            <!-- column names -->
+            <tr>
+              <th
+                v-for="(value, key) in item[0].entry"
+                :key="key"
+                :class="{
+                  'header-list': lexicalStorage.isList(value.name),
+                }"
+              >
+                <div class="header-content">
+                  <span
+                    :class="{
+                      'header-list-text': lexicalStorage.isList(value.name),
+                    }"
+                    >{{ lexicalStorage.localizeParam(value.name) }}
+                    {{
+                      lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
+                    }}</span
+                  >
+                </div>
+              </th>
+            </tr>
+
             <!-- show dataset entries -->
             <template v-for="(value1, key) in item" :key="key">
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
-                  <MaxHeight :max-height="200">
-                    <span v-html="lexicalStorage.formatCell(value2)"></span>
+                  <MaxHeight :max-height="100">
+                    <span v-html="lexicalStorage.formatCell(value2.value)"></span>
                   </MaxHeight>
                 </td>
               </tr>
             </template>
-          </template>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </template>
       <div class="pagination">
         <!--<div v-if="props.data.length" class="pagination">-->
         <button @click="firstPage" :disabled="currentPage === 1">
@@ -347,7 +335,7 @@ const lastPage = () => {
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
         <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-          <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
+          <option v-for="option in [10, 25, 50, 100]" :key="option" :value="option">
             {{ option }}
           </option>
         </select>
@@ -413,11 +401,16 @@ const lastPage = () => {
 }
 
 /* picsbar */
+.picsbar {
+  table-layout: fixed;
+}
 .picsbar tr {
-  height: 16px;
+  max-height: 16px;
 }
 .picsbar td {
+  max-height: 16px;
   text-align: center;
+  white-space: nowrap;
 }
 .picsbar td:nth-child(even) {
   background-color: var(--table-row-even-bg);
@@ -462,6 +455,7 @@ const lastPage = () => {
 
 .picsbar-tooltip:hover .picsbar-tooltiptext {
   visibility: visible;
+  white-space: normal;
 }
 
 /* table */
@@ -521,8 +515,8 @@ tr:hover {
 
 .dataset-label {
   text-align: center;
-  background-color: var(--sb-grey-dark);
-  color: white;
+  background-color: white;
+  color: black;
   font-weight: bold;
 }
 

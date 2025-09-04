@@ -51,8 +51,8 @@ watch(
   >
     <!-- <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>-->
     <div class="search">
-      <DataSearch />
       <DataSelection />
+      <DataSearch />
     </div>
     <!-- <template v-if="lexicalStorage.isData"> -->
     <template v-if="!lexicalStorage.isStart">

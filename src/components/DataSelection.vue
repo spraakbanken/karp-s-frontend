@@ -237,14 +237,14 @@ watch(
     <!-- <span style="font-weight: bold">{{ $t('dataselector.datasets') }}</span> -->
     <div class="dropdown" :class="{ 'dropdown-open': isDropdownOpen }">
       <div class="dropdown-toggle" @click="toggleDropdown">
+        {{ selectedDatasets.length }}
+        {{ $t('dataselector.datasets.selected.of') }}
+        {{ currentDatasets.length }}
         {{
           selectedDatasets.length === 1
             ? $t('dataselector.dataset.selected')
             : $t('dataselector.datasets.selected')
         }}
-        ({{ selectedDatasets.length }}
-        {{ $t('dataselector.datasets.selected.of') }}
-        {{ currentDatasets.length }})
         <i class="arrow-down"></i>
       </div>
 
@@ -409,6 +409,7 @@ watch(
 
 .dropdown-filter {
   padding: 0.5rem 1rem;
+  color: var(--color-text);
 }
 
 .datasets-group {

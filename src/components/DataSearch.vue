@@ -349,6 +349,8 @@ input:focus {
 
 .search-component {
   background-color: var(--color-search-area);
+  color: black;
+  margin-bottom: 1rem;
   border-radius: 0.5rem;
   padding: 1rem;
   display: flex;

@@ -72,6 +72,11 @@ export type Entry = {
   [key: string]: string
 }
 
+export type EntryS = {
+  name: string
+  value: string
+}
+
 export type DatasetEntry = {
   entry: Entry
   resourceId: string

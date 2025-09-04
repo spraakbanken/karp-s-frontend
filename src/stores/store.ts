@@ -151,13 +151,13 @@ export const lexicalStore = defineStore('dataset', {
       this.activeResultTab = tab
     },
     setSelectedDataset(keys: string[]) {
-      console.log('setSelectedDataset')
       this.selectedDatasets = keys
       //      if (keys.length === 1) {
       //        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
       //      } else {
       const allParamsArray = keys.map((key) => this.fieldsInDatasets[key])
       if (allParamsArray.length > 0) {
+        /*
         // keep only fields that exist in all datasets = find the intersection
         let intersection = allParamsArray[0]
         for (let i = 1; i < allParamsArray.length; i++) {
@@ -167,8 +167,32 @@ export const lexicalStore = defineStore('dataset', {
             ),
           )
         }
+        console.log('setSelectedDataset - allParamsArray', allParamsArray)
         // make a copy
         this.currentFields = [...intersection]
+        */
+
+        // keep only fields that exist in all datasets = find the intersection
+
+        let intersection: FieldConfig[] = []
+        for (let i = 0; i < allParamsArray.length; i++) {
+          for (let j = 0; j < allParamsArray[i].length; j++) {
+            const item: FieldConfig = allParamsArray[i][j]
+            let found: boolean = false
+            for (let k = 0; k < intersection.length; k++) {
+              if (intersection[k].name == item.name && intersection[k].type == item.type) {
+                found = true
+                break
+              }
+            }
+            if (!found) {
+              intersection.unshift(item)
+            }
+          }
+        }
+
+        this.currentFields = intersection
+
         // and add the "ingångsord"
         this.currentFields.unshift({
           name: 'word',
@@ -179,7 +203,7 @@ export const lexicalStore = defineStore('dataset', {
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields
         // remove them from selectedFields
-        console.log('setSelectedDataset: cleaning up copies')
+        console.log('setSelectedDataset: cleaning up copies', this.currentFields)
         const newSelectedFields: Record<string, SelectedFieldConfig> = {}
         for (const [k, v] of Object.entries(this.selectedFields)) {
           let bFound = false
@@ -287,13 +311,14 @@ export const lexicalStore = defineStore('dataset', {
     isList(p: string): boolean {
       let value = false
       this.currentFields.every((item) => {
-        if (p == item.name) {
+        if (p === item.name) {
           value = item.collection
           return false
         } else {
           return true
         }
       })
+
       return value
     },
     formatCell(x: string | string[]): string {
@@ -302,10 +327,10 @@ export const lexicalStore = defineStore('dataset', {
       let value = ''
       //Array.isArray(x) ? x.join(', ') : x
       if (Array.isArray(x)) {
-        value = '<i>' + t('dataset.list') + ' (' + x.length + ')</i>'
+        //value = '<i>' + t('dataset.list') + ' (' + x.length + ')</i>'
         x.every((item, index) => {
           //if (index > 0) {
-          value = value + '<br>' + item
+          value = value + (value ? '<br>' : '') + item
           //} else {
           //value = item
           //}
@@ -320,6 +345,7 @@ export const lexicalStore = defineStore('dataset', {
             return true
           }
           */
+          return true
         })
       } else {
         value = x
