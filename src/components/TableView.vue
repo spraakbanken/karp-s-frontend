@@ -41,6 +41,7 @@ const itemsPerPage = ref(25)
 const fetchData = async () => {
   console.log('fetchData()', lexicalStorage.selectedFields)
 
+  // convert checkboxes to search "position"
   for (const sf in lexicalStorage.selectedFields) {
     if (lexicalStorage.selectedFields[sf].positionMedial) {
       lexicalStorage.selectedFields[sf].position = 'contains'

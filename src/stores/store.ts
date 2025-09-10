@@ -15,7 +15,9 @@ interface SearchRedux {
   //allParams: string[]
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
   currentDatasets: string[] //  all datasets (id's)
+  currentDatasetsSize: number // total number of entries
   selectedDatasets: string[] // selected datasets (id's)
+  selectedDatasetsSize: number // number of entries in selected datasets
   currentTags: string[] // all tags
   //selectedTags: string[]
   //totalDatasets: number
@@ -43,7 +45,9 @@ export const lexicalStore = defineStore('dataset', {
   state: (): SearchRedux => ({
     currentConfig: { resources: [], tags: {}, fields: {} },
     currentDatasets: [],
+    currentDatasetsSize: 0,
     selectedDatasets: [],
+    selectedDatasetsSize: 0,
     currentTags: [],
     fieldsInDatasets: {},
     currentFields: [],
@@ -65,6 +69,8 @@ export const lexicalStore = defineStore('dataset', {
   actions: {
     setDefault(config: Config) {
       this.currentConfig = config
+
+      // array of machine id of all datasets
       this.currentDatasets = config.resources.map((c) => c.resourceId)
       if (this.activeLocale == 'sv') {
         this.datasetLabels = config.resources
@@ -84,40 +90,19 @@ export const lexicalStore = defineStore('dataset', {
           }, {})
       }
 
-      // sort datasetLabels
-      /*
-      this.datasetLabels = Object.keys(this.datasetLabels)
-        .sort(function (a, b) {
-          return a.localeCompare(b, 'sv', { numeric: true })
-        })
-        .reduce((acc, key) => {
-          acc[key] = this.datasetLabels[key]
-          return acc
-        }, {})
-      console.log('SORTED', this.datasetLabels)
-      */
-
+      // all tags
       this.currentTags = [
         ...new Set(config.resources.flatMap((c) => (c.tags == undefined ? [] : c.tags))),
       ]
-      // .filter((elt) => elt !== undefined))
-      console.log('CurrentTags:', this.currentTags)
+      //console.log('CurrentTags:', this.currentTags)
       this.datasetDates = config.resources.map((c) => ({
         resourceId: c.resourceId,
         label: this.datasetLabels[c.resourceId],
         updated: c.updated,
       }))
-      /*
-        .reduce((acc, obj) => {
-          return { ...acc, ...obj }
-        }, {})
-        */
       this.datasetDates.sort(function (a, b) {
         return parseInt(b.updated) - parseInt(a.updated)
       })
-
-      console.log('datasetDates', this.datasetDates)
-      //this.allParams = config.flatMap((c) => c.fields.map((f) => f.name))
 
       // we want all fields that are in selected datasets
       // fieldsInDatasets: Record<string, FieldConfig[]>
@@ -131,8 +116,14 @@ export const lexicalStore = defineStore('dataset', {
         {} as Record<string, FieldConfig[]>,
       )
 
-      // setup default datasets for first run
-      this.setSelectedDataset(['saol14', 'so2009'])
+      // calculate total number of entries
+      for (const ds in this.currentDatasets) {
+        this.currentDatasetsSize += Number(this.currentConfig.resources[ds].size)
+      }
+
+      // setup default datasets for first run = select all
+      // this.setSelectedDataset(['saol14', 'so2009'])
+      this.setSelectedDataset(this.currentDatasets)
     },
     setSearchQuery(query: string) {
       this.searchQuery = query
@@ -233,13 +224,22 @@ export const lexicalStore = defineStore('dataset', {
           }
         }
         if (isEmpty) {
-          const fields: Record<string, SelectedFieldConfig> = {}
-          fields[entryWordField] = { value: '', position: 'equals' }
-          this.setSelectedFields(fields)
-          this.setSelectedCompileFields([entryWordField])
+          this.setStartField()
         }
+
+        // calculate size (# of entries) in selected datasets
+        this.selectedDatasetsSize = 0
+        for (const ds of this.selectedDatasets) {
+          const elt = this.currentConfig.resources.find((x) => x.resourceId === ds)
+          if (elt) {
+            this.selectedDatasetsSize += Number(elt.size)
+          }
+        }
+        //  console.log('Tot size=', selectedDatasetsSize.value, formatNumber(foo, 2))
+
         this.isData = false
       } else {
+        this.selectedDatasetsSize = 0
         return []
       }
       //}
@@ -278,7 +278,13 @@ export const lexicalStore = defineStore('dataset', {
       // set "ingångsord" to default, also for statistics
       //console.log('setStartField()')
       const fields: Record<string, SelectedFieldConfig> = {}
-      fields[entryWordField] = { value: '', position: 'equals' }
+      fields[entryWordField] = {
+        value: '',
+        position: 'equals',
+        positionInitial: false,
+        positionMedial: false,
+        positionFinal: false,
+      }
       this.setSelectedFields(fields)
       this.setSelectedCompileFields([entryWordField])
     },

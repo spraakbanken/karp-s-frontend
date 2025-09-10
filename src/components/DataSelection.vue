@@ -6,7 +6,7 @@ import {
   entryWordProperty,
   entryWordDescriptionProperty,
 } from '@/types/datasetConfig'
-import { secondsToDate } from '@/utils/utils'
+import { secondsToDate, formatNumber } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
 
 const previousDataset = ref('')
@@ -52,7 +52,7 @@ const datasetInfo = ref(<ResourceLocalized>{
 })
 
 const datasetInfoFill = (dataset: string) => {
-  console.log('DSI: ', dataset, previousDataset.value)
+  //console.log('DSI: ', dataset, previousDataset.value)
   if (dataset !== previousDataset.value) {
     const elt = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
     if (elt != undefined) {
@@ -138,15 +138,10 @@ const selectDataset = () => {
 
 // INFO: doesn't trigger the watch (because selectedDatasets is "computed")
 const selectTags = (tag: string) => {
-  /*
-  if (selectedTags.value.indexOf(tag) == -1) {
-    selectedTags.value.push(tag)
-  }
-*/
   const currentConfig = lexicalStorage.currentConfig
+
   // select datasets that have one of the tags in newTags
-  //selectedDatasets.value = []
-  //for (const tag of newTags) {
+
   for (const elt of currentConfig.resources) {
     if (elt.tags !== undefined) {
       if (elt.tags.includes(tag)) {
@@ -156,7 +151,6 @@ const selectTags = (tag: string) => {
       }
     }
   }
-  //}
 
   // TODO: unneccessary?
   //lexicalStorage.setSelectedDataset(selectedDatasets.value)
@@ -208,6 +202,7 @@ watch(
   () => selectedDatasets,
   (newDatasets, oldDatasets) => {
     console.log('WATCH: DataSelection selectedDatasets', newDatasets)
+
     if (oldDatasets.value.length === 0) {
       // set "ingångsord" to default, also for statistics
       lexicalStorage.setStartField()
@@ -259,6 +254,9 @@ watch(
             ? $t('dataselector.dataset.selected')
             : $t('dataselector.datasets.selected')
         }}
+        — {{ formatNumber(lexicalStorage.selectedDatasetsSize, 2) }}
+        {{ $t('dataselector.entries.of') }}
+        {{ formatNumber(lexicalStorage.currentDatasetsSize, 2) }} {{ $t('dataselector.entries') }}
         <i class="arrow-down"></i>
       </div>
 
@@ -342,7 +340,7 @@ watch(
 <style scoped>
 .data-component {
   padding: 0rem;
-  width: 300px;
+  width: 500px;
 }
 
 .dropdown {
