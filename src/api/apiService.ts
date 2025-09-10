@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { processDatasets, processSubDataset } from '@/utils/processDatasets'
+//import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
-import type { SelectedFieldConfig } from '@/types/datasetConfig'
-import { delay } from 'es-toolkit'
+import { type SelectedFieldConfig } from '@/types/datasetConfig'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
 
@@ -16,8 +15,7 @@ const axiosInstance = axios.create({
 export const getLexicalDatasets = async () => {
   try {
     const response = await axiosInstance.get('/config')
-    // console.log('AXIOS Fetched datasets:', response)
-    return response.data //.sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label),)
+    return response.data
   } catch (error) {
     throw error
   }
@@ -58,6 +56,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
   }
 }
 
+/*
 export const getSubTableData = async (
   compile: string,
   pageStart: number,
@@ -97,6 +96,7 @@ export const getSubTableData = async (
     throw error
   }
 }
+*/
 
 export const getStatisticsData = async (
   query: Record<string, SelectedFieldConfig>,

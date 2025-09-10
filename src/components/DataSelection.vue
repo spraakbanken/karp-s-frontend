@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import type { SelectedFieldConfig } from '@/types/datasetConfig'
+import {
+  type SelectedFieldConfig,
+  entryWordProperty,
+  entryWordDescriptionProperty,
+} from '@/types/datasetConfig'
 import { secondsToDate } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
 
@@ -43,7 +47,8 @@ const datasetInfo = ref(<ResourceLocalized>{
   size: '',
   tags: [],
   updated: '',
-  word: '',
+  [entryWordProperty]: '',
+  [entryWordDescriptionProperty]: '',
 })
 
 const datasetInfoFill = (dataset: string) => {
@@ -57,16 +62,25 @@ const datasetInfoFill = (dataset: string) => {
           ? elt.label.swe
           : (elt.label as unknown as string)
         datasetInfo.value['description'] = elt.description ? elt.description.swe : ''
+        datasetInfo.value[entryWordDescriptionProperty] = (
+          typeof elt[entryWordProperty].description == 'string'
+            ? elt[entryWordProperty].description
+            : elt[entryWordProperty].description.swe
+        ) as string
       } else {
         datasetInfo.value['label'] = elt.label.eng
           ? elt.label.eng
           : (elt.label as unknown as string)
         datasetInfo.value['description'] = elt.description ? elt.description.eng : ''
+        datasetInfo.value[entryWordDescriptionProperty] =
+          typeof elt[entryWordProperty].description == 'string'
+            ? elt[entryWordProperty].description
+            : elt[entryWordProperty].description.eng
       }
       datasetInfo.value['size'] = elt.size
       datasetInfo.value['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
       datasetInfo.value['link'] = elt.link
-      datasetInfo.value['word'] = elt.word
+      datasetInfo.value[entryWordProperty] = elt[entryWordProperty].field
       datasetInfo.value['fields'] = elt.fields
       //}
 
@@ -78,7 +92,7 @@ const datasetInfoFill = (dataset: string) => {
     datasetInfo.value['size'] = ''
     datasetInfo.value['updated'] = ''
     datasetInfo.value['link'] = ''
-    datasetInfo.value['word'] = ''
+    datasetInfo.value[entryWordProperty] = ''
     datasetInfo.value['fields'] = []
     previousDataset.value = ''
   }
@@ -308,7 +322,10 @@ watch(
               <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
             </div>
             <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
-            <div class="">{{ datasetInfo.word }}</div>
+            <div class="">{{ datasetInfo[entryWordProperty] }}</div>
+            <div class="datasets-info-description">
+              {{ datasetInfo[entryWordDescriptionProperty] }}
+            </div>
             <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
             <div class="">
               <div v-for="item in datasetInfo.fields" :key="item">
@@ -451,5 +468,9 @@ watch(
 
 .datasets-info-label {
   font-weight: bold;
+}
+
+.datasets-info-description {
+  font-style: italic;
 }
 </style>

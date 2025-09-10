@@ -1,9 +1,15 @@
 import type { SelectedFieldConfig } from '@/types/datasetConfig'
 import { defineStore } from 'pinia'
 
-import { type FieldConfig, type Config, type DatasetDates } from '@/types/datasetConfig.ts'
+import {
+  type FieldConfig,
+  type Config,
+  type DatasetDates,
+  entryWordField,
+  entryWordProperty,
+} from '@/types/datasetConfig.ts'
 //import { isUndefined } from 'es-toolkit'
-import { useI18n } from 'vue-i18n'
+//import { useI18n } from 'vue-i18n'
 
 interface SearchRedux {
   //allParams: string[]
@@ -174,7 +180,7 @@ export const lexicalStore = defineStore('dataset', {
 
         // keep only fields that exist in all datasets = find the intersection
 
-        let intersection: FieldConfig[] = []
+        const intersection: FieldConfig[] = []
         for (let i = 0; i < allParamsArray.length; i++) {
           for (let j = 0; j < allParamsArray[i].length; j++) {
             const item: FieldConfig = allParamsArray[i][j]
@@ -195,7 +201,7 @@ export const lexicalStore = defineStore('dataset', {
 
         // and add the "ingångsord"
         this.currentFields.unshift({
-          name: 'word',
+          name: entryWordField,
           type: 'text',
           collection: false,
           label: { swe: 'ingångsord', eng: 'word' },
@@ -228,9 +234,9 @@ export const lexicalStore = defineStore('dataset', {
         }
         if (isEmpty) {
           const fields: Record<string, SelectedFieldConfig> = {}
-          fields['word'] = { value: '', position: 'equals' }
+          fields[entryWordField] = { value: '', position: 'equals' }
           this.setSelectedFields(fields)
-          this.setSelectedCompileFields(['word'])
+          this.setSelectedCompileFields([entryWordField])
         }
         this.isData = false
       } else {
@@ -270,11 +276,11 @@ export const lexicalStore = defineStore('dataset', {
     },
     setStartField() {
       // set "ingångsord" to default, also for statistics
-      console.log('setStartField()')
+      //console.log('setStartField()')
       const fields: Record<string, SelectedFieldConfig> = {}
-      fields['word'] = { value: '', position: 'equals' }
+      fields[entryWordField] = { value: '', position: 'equals' }
       this.setSelectedFields(fields)
-      this.setSelectedCompileFields(['word'])
+      this.setSelectedCompileFields([entryWordField])
     },
     setIsData(x: boolean) {
       this.isData = x
@@ -295,19 +301,25 @@ export const lexicalStore = defineStore('dataset', {
       this.listLimit = x
     },
     */
-    localizeParam(p: string): string {
+    camelify(p: string): string {
+      return p.toLowerCase().replace(/(_\w)/g, (m) => m.toUpperCase().substring(1))
+    },
+    localizeField(p: string): string {
+      const pCamel = p //this.camelify(p)
       let label = p
       for (const c of this.currentFields) {
-        if (c.name === p) {
+        if (c.name === pCamel) {
           if (this.activeLocale == 'sv') {
             label = c.label.swe ? c.label.swe : (c.label as unknown as string)
           } else {
             label = c.label.eng ? c.label.eng : (c.label as unknown as string)
           }
+          break
         }
       }
       return label
     },
+
     isList(p: string): boolean {
       let value = false
       this.currentFields.every((item) => {
@@ -322,7 +334,7 @@ export const lexicalStore = defineStore('dataset', {
       return value
     },
     formatCell(x: string | string[]): string {
-      const { t } = useI18n()
+      //const { t } = useI18n()
 
       let value = ''
       //Array.isArray(x) ? x.join(', ') : x

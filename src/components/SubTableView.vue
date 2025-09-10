@@ -99,7 +99,7 @@ const lastPage = () => {
                 :class="{
                   'header-list-text': lexicalStorage.isList(key as string),
                 }"
-                >{{ lexicalStorage.localizeParam(key as string) }}
+                >{{ lexicalStorage.localizeField(key as string) }}
                 {{
                   lexicalStorage.isList(key as string) ? '(' + t('table.header.list') + ')' : ''
                 }}</span

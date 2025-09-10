@@ -35,7 +35,7 @@ const dropdownContainer = ref<HTMLElement | null>(null)
 const selectedFieldsArray = ref<string[]>([])
 
 const searchField = ref<Record<string, SelectedFieldConfig>>({})
-const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
+//const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
 const searchFieldPositionText = [
   'dataselector.parameter.position.startswith',
   'dataselector.parameter.position.endswith',
@@ -43,8 +43,10 @@ const searchFieldPositionText = [
   'dataselector.parameter.position.equals',
   'dataselector.parameter.position.regex',
 ]
-const searchFieldPositionEnabled = [true, true, true, true, false]
 
+//const searchFieldPositionEnabled = [true, true, true, true, false]
+
+/*
 const localizeField = (p: string) => {
   let label = p
   for (const c of currentFields.value) {
@@ -58,6 +60,7 @@ const localizeField = (p: string) => {
   }
   return label
 }
+*/
 
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
@@ -82,6 +85,60 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
+const handlePos = (param: string, pos: number) => {
+  console.log('handlePos: ', param)
+  // pos: start, end, middle
+  if (pos == 0) {
+    // clicked start
+    // on
+    if (!searchField.value[param].positionInitial) {
+      if (searchField.value[param].positionFinal) {
+        searchField.value[param].positionMedial = true
+      }
+    } else {
+      // off
+      searchField.value[param].positionMedial = false
+    }
+  } else if (pos == 2) {
+    // clicked middle
+    // on
+    if (!searchField.value[param].positionMedial) {
+      searchField.value[param].positionInitial = true
+      searchField.value[param].positionFinal = true
+    } else {
+      // off
+      searchField.value[param].positionInitial = false
+      searchField.value[param].positionFinal = false
+    }
+  }
+  if (pos == 1) {
+    // clicked end
+    // on
+    if (!searchField.value[param].positionFinal) {
+      if (searchField.value[param].positionInitial) {
+        searchField.value[param].positionMedial = true
+      }
+    } else {
+      // off
+      searchField.value[param].positionMedial = false
+    }
+  }
+
+  /*
+  || !searchField.value[param].positionFinal) {
+    searchField.value[param].positionMedial = false
+  } else if (searchField.value[param].positionMedial) {
+    searchField.value[param].positionInitial = true
+    searchField.value[param].positionFinal = true
+  } else if (!searchField.value[param].positionMedial) {
+    searchField.value[param].positionInitial = false
+    searchField.value[param].positionFinal = false
+  } else if (searchField.value[param].positionInitial && searchField.value[param].positionFinal) {
+    searchField.value[param].positionMedial = true
+  }
+*/
+}
+
 // click search button
 const updateData = () => {
   if (currentFields.value.length > 0) {
@@ -95,7 +152,13 @@ watch(selectedFieldsArray, (newFields) => {
   // keep list of searchable fields synced with fields available
   newFields.forEach((fieldName) => {
     if (!searchField.value[fieldName]) {
-      searchField.value[fieldName] = { value: '', position: 'equals' }
+      searchField.value[fieldName] = {
+        value: '',
+        position: 'equals',
+        positionInitial: false,
+        positionMedial: false,
+        positionFinal: false,
+      }
     }
   })
   Object.keys(searchField.value).forEach((fieldName) => {
@@ -129,6 +192,9 @@ watch(
         searchField.value[param] = {
           value: newSelectedFields[param].value,
           position: newSelectedFields[param].position,
+          positionInitial: newSelectedFields[param].positionInitial,
+          positionMedial: newSelectedFields[param].positionMedial,
+          positionFinal: newSelectedFields[param].positionFinal,
         }
       }
     })
@@ -158,7 +224,7 @@ watch(
     }
   },
 )
-  */
+*/
 </script>
 
 <template>
@@ -237,38 +303,35 @@ watch(
         -->
         <div class="position">
           <div class="group">
-            <label for="pos3">
-              <input type="radio" id="pos3" value="equals" v-model="searchField[param].position" />
-              {{ $t(searchFieldPositionText[3]) }}</label
-            >
             <label for="pos0">
               <input
-                type="radio"
+                @click="handlePos(param, 0)"
+                type="checkbox"
                 id="pos0"
                 value="startswith"
-                v-model="searchField[param].position"
+                v-model="searchField[param].positionInitial"
               />
               {{ $t(searchFieldPositionText[0]) }}</label
             >
-          </div>
-          <div class="group">
-            <label for="pos1">
-              <input
-                type="radio"
-                id="pos1"
-                value="endswith"
-                v-model="searchField[param].position"
-              />
-              {{ $t(searchFieldPositionText[1]) }}</label
-            >
             <label for="pos2">
               <input
-                type="radio"
+                @click="handlePos(param, 2)"
+                type="checkbox"
                 id="pos2"
                 value="contains"
-                v-model="searchField[param].position"
+                v-model="searchField[param].positionMedial"
               />
               {{ $t(searchFieldPositionText[2]) }}</label
+            >
+            <label for="pos1">
+              <input
+                @click="handlePos(param, 1)"
+                type="checkbox"
+                id="pos1"
+                value="endswith"
+                v-model="searchField[param].positionFinal"
+              />
+              {{ $t(searchFieldPositionText[1]) }}</label
             >
           </div>
         </div>
@@ -296,7 +359,7 @@ watch(
             $t('dataselector.noparameters')
           }}</span>
           <span v-else
-            >{{ selectedFieldsArray.map((x) => localizeField(x)).join(', ') }}
+            >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
             <i class="arrow-down"></i>
           </span>
         </div>
@@ -305,10 +368,10 @@ watch(
           <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
             <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
             <span v-if="param.name == 'word'" style="font-weight: bold">
-              {{ localizeField(param.name) }}
+              {{ lexicalStorage.localizeField(param.name) }}
             </span>
             <span v-else>
-              {{ localizeField(param.name) }}
+              {{ lexicalStorage.localizeField(param.name) }}
             </span>
           </label>
         </div>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import type { Dataset } from '@/types/datasetConfig'
+import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
-import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
+import type { SelectedFieldConfig, CountHeadersColumn } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
 import MaxHeight from '@/components/MaxHeight.vue'
 
@@ -14,7 +14,7 @@ const { t } = useI18n()
 const lexicalStorage = lexicalStore()
 
 const currentResult = ref<Dataset[]>([])
-const tableHeaders = ref<string[]>([])
+const tableHeaders = ref<CountHeadersColumn[]>([])
 const currentPage = ref(1)
 const itemsPerPage = ref(100)
 const sortKey = ref('')
@@ -98,6 +98,18 @@ const fetchData = async () => {
       }
       //console.log('fetchData result ', currentResult.value.length, currentResult.value)
       tableHeaders.value = headers
+      // make sure any appearences of "entryWord" i headers
+      // are replaced by "entry_word"
+      // ie replace entryWordFieldCamel with entryWordField
+      tableHeaders.value.forEach((f, i) => {
+        if (f.columnField == entryWordFieldCamel) {
+          tableHeaders.value[i].columnField = entryWordField
+        }
+        if (f.headerField == entryWordFieldCamel) {
+          tableHeaders.value[i].headerField = entryWordField
+        }
+      })
+
       // console.log('currentResult', currentResult.value);
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -127,23 +139,20 @@ watch(
       lexicalStorage.setIsData(false)
       //lexicalStorage.setActiveResultTab('table')
     }
+    selectedCompileFields.value = [entryWordField]
+    selectedColumns.value = []
   },
 )
 
-/*
 watch(
-  () => [
-    lexicalStorage.selectedFields,
-    lexicalStorage.selectedCompileFields,
-    lexicalStorage.selectedColumns,
-  ],
+  () => [lexicalStorage.selectedCompileFields, lexicalStorage.selectedColumns],
   async () => {
     await fetchData()
     updateOverview() // draw graph
   },
   { deep: true },
 )
-*/
+
 watch(
   () => [lexicalStorage.isSearch],
   () => {
@@ -452,7 +461,7 @@ const updateOverview = () => {
             $t('dataselector.statistics.noparameter')
           }}</span>
           <span v-else>{{
-            selectedCompileFields.map((x) => lexicalStorage.localizeParam(x)).join(', ')
+            selectedCompileFields.map((x) => lexicalStorage.localizeField(x)).join(', ')
           }}</span>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
@@ -463,7 +472,7 @@ const updateOverview = () => {
               v-model="selectedCompileFields"
               @change="updateCompileParams"
             />
-            {{ lexicalStorage.localizeParam(param.name) }}
+            {{ lexicalStorage.localizeField(param.name) }}
           </label>
         </div>
       </div>
@@ -481,7 +490,7 @@ const updateOverview = () => {
             $t('dataselector.statistics.nocolumns')
           }}</span>
           <span v-else
-            >{{ selectedColumns.map((x) => lexicalStorage.localizeParam(x)).join(', ') }}
+            >{{ selectedColumns.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
           </span>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
@@ -492,7 +501,7 @@ const updateOverview = () => {
               v-model="selectedColumns"
               @change="updateColumns"
             />
-            {{ lexicalStorage.localizeParam(param.name) }}
+            {{ lexicalStorage.localizeField(param.name) }}
           </label>
         </div>
       </div>
@@ -557,12 +566,46 @@ const updateOverview = () => {
       <table v-if="currentResult.length" class="fancy-table">
         <thead>
           <tr>
-            <th v-for="key in tableHeaders" :key="key" @click="sortTable(String(key))">
+            <th
+              v-for="(key, index) in tableHeaders"
+              :key="index"
+              @click="sortTable(String(index))"
+              :class="{
+                'header-list': lexicalStorage.isList(key.columnField),
+                'header-total': key.type == 'total',
+                'header-compile': key.type == 'compile',
+              }"
+            >
               <div class="header-content">
-                <span
-                  >{{ lexicalStorage.localizeParam(key) }}
-                  {{ lexicalStorage.isList(key) ? '(' + t('table.header.list') + ')' : '' }}</span
-                >
+                <template v-if="key.type == 'compile'">
+                  <span>
+                    {{ lexicalStorage.localizeField(key.columnField) }}
+                    {{
+                      lexicalStorage.isList(key.columnField)
+                        ? '(' + t('table.header.list') + ')'
+                        : ''
+                    }}
+                  </span>
+                </template>
+                <template v-if="key.type == 'value'">
+                  <span>
+                    {{ lexicalStorage.localizeField(key.columnField) }}
+                    {{
+                      lexicalStorage.isList(key.columnField)
+                        ? '(' + t('table.header.list') + ')'
+                        : ''
+                    }}
+                  </span>
+                  <span class="resource">
+                    <br />
+                    {{ lexicalStorage.localizeField(key.headerValue) }}
+                  </span>
+                </template>
+                <template v-if="key.type == 'total'">
+                  <span>
+                    {{ t('statistics.total') }}
+                  </span>
+                </template>
               </div>
             </th>
           </tr>
@@ -597,7 +640,7 @@ const updateOverview = () => {
         <button @click="prevPage" :disabled="currentPage === 1">
           <i class="material-icons">chevron_left</i>
         </button>
-        <span>{{ currentPage }} of {{ totalPages }}</span>
+        <span style="color: var(--color-text)"> {{ currentPage }} of {{ totalPages }} </span>
         <button @click="nextPage" :disabled="currentPage === totalPages">
           <i class="material-icons">chevron_right</i>
         </button>
@@ -720,6 +763,8 @@ const updateOverview = () => {
   width: fit-content;
 }
 
+/* table */
+
 .table-wrapper {
   display: grid;
   position: relative;
@@ -747,13 +792,18 @@ td {
 }
 
 th {
-  background-color: var(--sb-orange-light);
-  /* background-color: var(--table-head-bg); */
+  background-color: var(--table-head-bg);
   color: var(--color-heading);
   font-weight: bold;
-  cursor: pointer;
+  /* cursor: pointer; */
+  vertical-align: top;
 }
 
+th .resource {
+  font-style: italic;
+}
+
+/*
 .header-content {
   display: flex;
   align-items: center;
@@ -764,6 +814,24 @@ th {
   display: flex;
   align-items: center;
 }
+*/
+
+.header-compile {
+  background-color: var(--sb-orange);
+  color: white;
+}
+
+.header-list {
+  background-color: var(--sb-grey-light);
+  color: black;
+}
+
+.header-total {
+  background-color: black;
+  color: white;
+}
+
+/* elements */
 
 .export-button {
   margin-top: 1rem;

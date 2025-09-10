@@ -26,6 +26,7 @@ const currentResult = ref<DatasetResult>({
   resourceOrder: {},
   total: 0,
 })
+
 // currentResult as returned from groupBy()
 const currentResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]>>({})
 // with rows sorted and put in (ordered) array
@@ -39,6 +40,19 @@ const itemsPerPage = ref(25)
 
 const fetchData = async () => {
   console.log('fetchData()', lexicalStorage.selectedFields)
+
+  for (const sf in lexicalStorage.selectedFields) {
+    if (lexicalStorage.selectedFields[sf].positionMedial) {
+      lexicalStorage.selectedFields[sf].position = 'contains'
+    } else if (lexicalStorage.selectedFields[sf].positionInitial) {
+      lexicalStorage.selectedFields[sf].position = 'startswith'
+    } else if (lexicalStorage.selectedFields[sf].positionFinal) {
+      lexicalStorage.selectedFields[sf].position = 'endswith'
+    } else {
+      lexicalStorage.selectedFields[sf].position = 'equals'
+    }
+  }
+
   lexicalStorage.setIsData(false)
   const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
@@ -48,6 +62,7 @@ const fetchData = async () => {
       isLoading.value = false
       currentResult.value = data
       currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
+      currentResultGrpSorted.value = {}
       //console.log('fetchdata() - after getTableData()', currentResultGrp.value)
 
       // sort columns based on config
@@ -209,7 +224,7 @@ const picsbar = (ds: string) => {
     }
   }
   currentPage.value = Math.floor(hitCount / itemsPerPage.value) + 1
-  //console.log('Page: ', currentPage.value)
+  console.log('Page: ', currentPage.value, hitCount)
 }
 
 const totalPages = computed(() => {
@@ -294,7 +309,7 @@ const lastPage = () => {
                     :class="{
                       'header-list-text': lexicalStorage.isList(value.name),
                     }"
-                    >{{ lexicalStorage.localizeParam(value.name) }}
+                    >{{ lexicalStorage.localizeField(value.name) }}
                     {{
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
                     }}</span
@@ -404,14 +419,18 @@ const lastPage = () => {
 .picsbar {
   table-layout: fixed;
 }
+
 .picsbar tr {
   max-height: 16px;
 }
+
 .picsbar td {
   max-height: 16px;
   text-align: center;
   white-space: nowrap;
+  cursor: pointer;
 }
+
 .picsbar td:nth-child(even) {
   background-color: var(--table-row-even-bg);
 }

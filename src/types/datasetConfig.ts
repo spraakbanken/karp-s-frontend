@@ -1,3 +1,8 @@
+export const entryWordField = 'entry_word'
+export const entryWordFieldCamel = 'entryWord'
+export const entryWordProperty = 'entryWord'
+export const entryWordDescriptionProperty = 'entryWordDescription'
+
 export interface FieldConfig {
   name: string
   type: string
@@ -15,6 +20,11 @@ export interface Description {
   eng: string
 }
 
+export interface EntryWord {
+  field: string
+  description: string | Description
+}
+
 export interface Resource {
   resourceId: string
   label: Label
@@ -24,18 +34,20 @@ export interface Resource {
   size: string
   tags: string[]
   updated: string
-  word: string
+  [entryWordProperty]: EntryWord
 }
 
+// localized version of Resource
 export interface ResourceLocalized {
   label: string
   description: string
-  fields: string[] // WAS: FieldConfig[], but it isn't when we get it from the BE
+  fields: string[]
   link: string
   size: string
   tags: string[]
   updated: string
-  word: string
+  [entryWordProperty]: string
+  entryWordDescription: string
 }
 
 export interface TagLabel {
@@ -54,6 +66,9 @@ export interface FieldConfigArray {
 export type SelectedFieldConfig = {
   value: string
   position: string
+  positionInitial: boolean
+  positionMedial: boolean
+  positionFinal: boolean
 }
 
 export interface Config {
@@ -99,6 +114,12 @@ export type Dataset = {
   [key: string]: string
 }
 
+export type CountHeadersColumn = {
+  type: string
+  columnField: string
+  headerField: string
+  headerValue: string
+}
 /*
 export type Entry = {
   entry: Dataset
