@@ -1,3 +1,18 @@
+import type { ByLang } from '@/util.types'
+import { useI18n } from 'vue-i18n'
+
+// Return propeer text according to locale
+export const th = (x?: ByLang | string): string | undefined => {
+  const { locale } = useI18n()
+  if (typeof x == 'string') return x
+  //if (useI18n. == 'en') {
+  if (locale.value == 'en') {
+    return x['eng']
+  } else {
+    return x['swe']
+  }
+}
+
 export const secondsToDate = (seconds: string): string => {
   const date = new Date(parseInt(seconds) * 1000)
   return date.toISOString().substring(0, 10)

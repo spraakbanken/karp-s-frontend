@@ -8,6 +8,7 @@ import {
 } from '@/types/datasetConfig'
 import { secondsToDate, formatNumber } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
+import { th } from '@/utils/utils'
 
 const previousDataset = ref('')
 const lexicalStorage = lexicalStore()
@@ -145,9 +146,10 @@ const selectDataset = () => {
 const selectTags = (tag: string) => {
   if (selectedTags.value.indexOf(tag) == -1) {
     selectedTags.value.push(tag)
-    console.log('selectedTags=', selectedTags.value)
+    //console.log('selectedTags=', selectedTags.value)
     doFilterDatasets()
-  } /*
+  }
+  /*
   const currentConfig = lexicalStorage.currentConfig
 
   // select datasets that have one of the tags in newTags
@@ -345,8 +347,11 @@ watch(
           <!-- show tags -->
           <div class="dropdown-tags">
             <div v-for="tag in currentTags" :key="tag">
-              <button @click="selectTags(tag)" class="tags-button">
+              <button @click="selectTags(tag)" class="tags-button datasets-tooltip">
                 {{ lexicalStorage.currentConfig.tags[tag].label }}
+                <span class="datasets-tooltiptext">{{
+                  th(lexicalStorage.currentConfig.tags[tag].description)
+                }}</span>
               </button>
               <!-- show tags
           <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
@@ -576,5 +581,43 @@ watch(
 
 .datasets-info-description {
   font-style: italic;
+}
+
+.datasets-tooltip {
+  position: relative;
+}
+
+.datasets-tooltip .datasets-tooltiptext {
+  width: 120px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+
+  visibility: hidden;
+  background-color: var(--sb-orange);
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 5px 0;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.datasets-tooltip .datasets-tooltiptext::after {
+  content: ' ';
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--sb-orange) transparent transparent transparent;
+}
+
+.datasets-tooltip:hover .datasets-tooltiptext {
+  visibility: visible;
+  white-space: normal;
 }
 </style>

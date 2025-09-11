@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
-import type { ByLang } from '@/util.types'
+//import type { ByLang } from '@/util.types'
 import { useI18n } from 'vue-i18n'
+
+import { th } from '@/utils/utils'
 
 const { locale } = useI18n()
 const items = reactive<NewsItem[]>([])
@@ -20,16 +22,6 @@ onMounted(async () => {
 // Format date according to locale
 function getDate(date: Date) {
   return date.toLocaleDateString(locale.value, { dateStyle: 'long' })
-}
-
-// Return propeer text according to locale
-function th(x?: ByLang | string): string | undefined {
-  if (typeof x == 'string') return x
-  if (locale.value == 'en') {
-    return x['eng']
-  } else {
-    return x['swe']
-  }
 }
 </script>
 

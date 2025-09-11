@@ -225,7 +225,7 @@ const picsbar = (ds: string) => {
     }
   }
   currentPage.value = Math.floor(hitCount / itemsPerPage.value) + 1
-  console.log('Page: ', currentPage.value, hitCount)
+  //console.log('Page: ', currentPage.value, hitCount)
 }
 
 const totalPages = computed(() => {
