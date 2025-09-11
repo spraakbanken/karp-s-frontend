@@ -330,9 +330,9 @@ watch(
             ? $t('dataselector.dataset.selected')
             : $t('dataselector.datasets.selected')
         }}
-        — {{ formatNumber(lexicalStorage.selectedDatasetsSize, 2) }}
+        <br />({{ formatNumber(lexicalStorage.selectedDatasetsSize, 2) }}
         {{ $t('dataselector.entries.of') }}
-        {{ formatNumber(lexicalStorage.currentDatasetsSize, 2) }} {{ $t('dataselector.entries') }}
+        {{ formatNumber(lexicalStorage.currentDatasetsSize, 2) }} {{ $t('dataselector.entries') }})
         <i class="arrow-down"></i>
       </div>
 
@@ -438,7 +438,7 @@ watch(
 <style scoped>
 .data-component {
   padding: 0rem;
-  width: 500px;
+  width: 300px;
 }
 
 .dropdown {
