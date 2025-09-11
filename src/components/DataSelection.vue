@@ -38,6 +38,8 @@ const selectedColumns = computed({
 
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
+const filteredDatasets = ref<string[]>([])
+const selectedTags = ref<string[]>([])
 
 const datasetInfo = ref(<ResourceLocalized>{
   label: '',
@@ -108,6 +110,9 @@ const dropdownContainer = ref<HTMLElement | null>(null)
 const fields = ref<Record<string, SelectedFieldConfig>>({})
 
 const toggleDropdown = () => {
+  if (!isDropdownOpen.value) {
+    doFilterDatasets()
+  }
   isDropdownOpen.value = !isDropdownOpen.value
   isDropdownParams.value = false
   isDropdownColumns.value = false
@@ -138,6 +143,11 @@ const selectDataset = () => {
 
 // INFO: doesn't trigger the watch (because selectedDatasets is "computed")
 const selectTags = (tag: string) => {
+  if (selectedTags.value.indexOf(tag) == -1) {
+    selectedTags.value.push(tag)
+    console.log('selectedTags=', selectedTags.value)
+    doFilterDatasets()
+  } /*
   const currentConfig = lexicalStorage.currentConfig
 
   // select datasets that have one of the tags in newTags
@@ -155,19 +165,76 @@ const selectTags = (tag: string) => {
   // TODO: unneccessary?
   //lexicalStorage.setSelectedDataset(selectedDatasets.value)
   selectDataset()
+  */
 }
 
 const unselectTags = () => {
-  //  selectedDatasets.value = []
-  lexicalStorage.setSelectedDataset([])
+  if (selectedDatasets.value.length > 0) {
+    selectedTags.value = []
+  }
+  doFilterDatasets()
 }
 
-const filterDatasets = computed(() => {
-  /*
-  if (!searchDatasets.value) {
-    return currentDatasets.value
+const hasTags = (rid: string): boolean => {
+  let includeRes = false
+  for (const c of lexicalStorage.currentConfig.resources) {
+    if (c.resourceId == rid) {
+      for (const t of selectedTags.value) {
+        console.log('hasTags: ', t, rid)
+        if ('tags' in c) {
+          if (c.tags.includes(t)) {
+            includeRes = true
+          }
+        }
+      }
+    }
   }
-*/
+  return includeRes
+}
+
+const doFilterDatasets = () => {
+  let label: string = ''
+  let arr: string[] = []
+
+  const currentConfig = lexicalStorage.currentConfig
+  for (const c of currentConfig.resources) {
+    if (lexicalStorage.activeLocale == 'sv') {
+      label = c.label.swe ? c.label.swe : (c.label as unknown as string)
+    } else {
+      label = c.label.eng ? c.label.eng : (c.label as unknown as string)
+    }
+    if (
+      (!searchDatasets.value ||
+        label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1) &&
+      (selectedTags.value.length == 0 || hasTags(c.resourceId))
+    ) {
+      arr.push(c.resourceId)
+    }
+  }
+
+  arr = arr.sort(function (a, b) {
+    return lexicalStorage.datasetLabels[a].localeCompare(
+      lexicalStorage.datasetLabels[b],
+      lexicalStorage.activeLocale,
+      { numeric: true },
+    )
+  })
+
+  console.log('doFilterDatasets:', searchDatasets.value, selectedTags.value.length, arr)
+  filteredDatasets.value = arr
+}
+
+watch(searchDatasets, (newFilter) => {
+  doFilterDatasets()
+})
+
+// select all datasets that we have filtered
+const selectAllFiltered = () => {
+  lexicalStorage.setSelectedDataset(filteredDatasets.value)
+}
+
+/*
+const filterDatasets = computed(() => {
   let label: string = ''
   let arr: string[] = []
   const currentConfig = lexicalStorage.currentConfig
@@ -178,8 +245,9 @@ const filterDatasets = computed(() => {
       label = c.label.eng ? c.label.eng : (c.label as unknown as string)
     }
     if (
-      !searchDatasets.value ||
-      label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1
+      (!searchDatasets.value ||
+        label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1) &&
+      true
     ) {
       arr.push(c.resourceId)
     }
@@ -197,7 +265,9 @@ const filterDatasets = computed(() => {
 
   return arr
 })
+*/
 
+// TODO doesn trigger, change start of watch
 watch(
   () => selectedDatasets,
   (newDatasets, oldDatasets) => {
@@ -237,8 +307,7 @@ watch(
       }
     }
   },
-)
-  */
+*/
 </script>
 
 <template>
@@ -266,31 +335,43 @@ watch(
         v-if="isDropdownOpen"
         :class="{ 'datasets-list-wider': datasetInfo['label'] !== '' }"
       >
-        <div class="dropdown-group">{{ $t('dataselector.tags.title') }}</div>
-        <!-- show tags -->
-        <div class="dropdown-tags">
-          <div v-for="tag in currentTags" :key="tag">
-            <button @click="selectTags(tag)" class="tags-button">
-              {{ lexicalStorage.currentConfig.tags[tag].label }}
-            </button>
-            <!-- show tags
+        <div class="dropdown-group">
+          {{ $t('dataselector.tags.title') }}
+          <!-- show tags -->
+          <div class="dropdown-tags">
+            <div v-for="tag in currentTags" :key="tag">
+              <button @click="selectTags(tag)" class="tags-button">
+                {{ lexicalStorage.currentConfig.tags[tag].label }}
+              </button>
+              <!-- show tags
           <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
             {{ lexicalStorage.currentConfig.tags[tag].label }} -->
+            </div>
+            <button
+              @click="unselectTags()"
+              class="tags-button-action"
+              :disabled="selectedTags.length == 0"
+            >
+              {{ $t('dataselector.tags.unselect') }}
+            </button>
+            <button @click="selectAllFiltered()" class="tags-button-action">
+              {{ $t('dataselector.tags.select') }}
+            </button>
           </div>
-          <button @click="unselectTags()" class="tags-button">
-            {{ $t('dataselector.tags.unselect') }}
-          </button>
-        </div>
-        <!-- dataset list -->
+          <!-- dataset list -->
+          <!--
         <div class="dropdown-group">{{ $t('dataselector.datasets.title') }}</div>
-        <!-- filter -->
-        <div class="dropdown-filter">
-          {{ $t('dataselector.datasets.filter') }}: <input type="text" v-model="searchDatasets" />
+        -->
+          <!-- filter -->
+          <div class="dropdown-filter">
+            {{ $t('dataselector.datasets.filter') }}:
+            <input type="text" v-model="searchDatasets" />
+          </div>
         </div>
         <!-- list datasets -->
         <div class="datasets-group">
           <div class="datasets-list">
-            <div v-for="dataset in filterDatasets" :key="dataset" class="dropdown-item">
+            <div v-for="dataset in filteredDatasets" :key="dataset" class="dropdown-item">
               <div>
                 <input
                   type="checkbox"
@@ -418,13 +499,26 @@ watch(
 .dropdown-tags input {
   margin-right: 0.5rem;
 }
+
 .dropdown-tags .tags-button {
   margin-right: 0.5rem;
 }
 
+.dropdown-tags .tags-button-action {
+  margin-right: 0.5rem;
+  background-color: black;
+  color: white;
+  font-weight: bold;
+}
+
+.dropdown-tags .tags-button-action:disabled {
+  background-color: black;
+  color: var(--sb-grey-medium);
+}
+
 .dropdown-filter {
   padding: 0.5rem 1rem;
-  color: var(--color-text);
+  color: black;
 }
 
 .datasets-group {

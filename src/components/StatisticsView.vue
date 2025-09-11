@@ -598,7 +598,7 @@ const updateOverview = () => {
                   </span>
                   <span class="resource">
                     <br />
-                    {{ lexicalStorage.localizeField(key.headerValue) }}
+                    {{ lexicalStorage.datasetLabels[key.headerValue] }}
                   </span>
                 </template>
                 <template v-if="key.type == 'total'">
