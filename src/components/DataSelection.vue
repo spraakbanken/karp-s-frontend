@@ -168,10 +168,15 @@ const selectTags = (tag: string) => {
   */
 }
 
+const unselectAll = () => {
+  selectedDatasets.value = []
+}
+
 const unselectTags = () => {
-  if (selectedDatasets.value.length > 0) {
-    selectedTags.value = []
-  }
+  //if (selectedDatasets.value.length > 0) {
+  selectedTags.value = []
+  //}
+  searchDatasets.value = ''
   doFilterDatasets()
 }
 
@@ -350,12 +355,19 @@ watch(
             <button
               @click="unselectTags()"
               class="tags-button-action"
-              :disabled="selectedTags.length == 0"
+              :disabled="selectedTags.length == 0 && searchDatasets == ''"
             >
-              {{ $t('dataselector.tags.unselect') }}
+              {{ $t('dataselector.tags.reset') }}
             </button>
             <button @click="selectAllFiltered()" class="tags-button-action">
               {{ $t('dataselector.tags.select') }}
+            </button>
+            <button
+              @click="unselectAll()"
+              class="tags-button-action"
+              :disabled="lexicalStorage.selectedDatasets.length == 0"
+            >
+              {{ $t('dataselector.tags.unselect') }}
             </button>
           </div>
           <!-- dataset list -->
