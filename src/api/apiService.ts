@@ -122,7 +122,8 @@ export const getStatisticsData = async (
       }
     }
     if (compileParams.length > 0) {
-      params['compile'] = encodeURIComponent(compileParams.join(','))
+      //params['compile'] = encodeURIComponent(compileParams.join(','))
+      params['compile'] = compileParams.join(',')
     }
     if (columns.length > 0) {
       params['columns'] = 'resource_id=' + columns.join(',')

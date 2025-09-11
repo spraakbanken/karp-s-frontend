@@ -348,7 +348,7 @@ watch(
           <div class="dropdown-tags">
             <div v-for="tag in currentTags" :key="tag">
               <button @click="selectTags(tag)" class="tags-button datasets-tooltip">
-                {{ lexicalStorage.currentConfig.tags[tag].label }}
+                {{ th(lexicalStorage.currentConfig.tags[tag].label) }}
                 <span class="datasets-tooltiptext">{{
                   th(lexicalStorage.currentConfig.tags[tag].description)
                 }}</span>
@@ -508,8 +508,9 @@ watch(
 
 .dropdown-tags {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0rem 1rem;
   color: var(--color-text);
 }
 
@@ -519,6 +520,7 @@ watch(
 
 .dropdown-tags .tags-button {
   margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .dropdown-tags .tags-button-action {
