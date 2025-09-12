@@ -347,10 +347,16 @@ watch(
           <!-- show tags -->
           <div class="dropdown-tags">
             <div v-for="tag in currentTags" :key="tag">
-              <button @click="selectTags(tag)" class="tags-button datasets-tooltip">
+              <button
+                @click="selectTags(tag)"
+                :class="{ 'tags-button-selected': selectedTags.indexOf(tag) !== -1 }"
+                class="tags-button datasets-tooltip"
+              >
                 {{ th(lexicalStorage.currentConfig.tags[tag].label) }}
                 <span class="datasets-tooltiptext">{{
                   th(lexicalStorage.currentConfig.tags[tag].description)
+                    ? th(lexicalStorage.currentConfig.tags[tag].description)
+                    : $t('dataselector.tags.missingdescription')
                 }}</span>
               </button>
               <!-- show tags
@@ -364,16 +370,6 @@ watch(
             >
               {{ $t('dataselector.tags.reset') }}
             </button>
-            <button @click="selectAllFiltered()" class="tags-button-action">
-              {{ $t('dataselector.tags.select') }}
-            </button>
-            <button
-              @click="unselectAll()"
-              class="tags-button-action"
-              :disabled="lexicalStorage.selectedDatasets.length == 0"
-            >
-              {{ $t('dataselector.tags.unselect') }}
-            </button>
           </div>
           <!-- dataset list -->
           <!--
@@ -384,6 +380,18 @@ watch(
             {{ $t('dataselector.datasets.filter') }}:
             <input type="text" v-model="searchDatasets" />
           </div>
+        </div>
+        <div class="dropdown-selectors">
+          <button @click="selectAllFiltered()" class="tags-button-action">
+            {{ $t('dataselector.tags.select') }}
+          </button>
+          <button
+            @click="unselectAll()"
+            class="tags-button-action"
+            :disabled="lexicalStorage.selectedDatasets.length == 0"
+          >
+            {{ $t('dataselector.tags.unselect') }}
+          </button>
         </div>
         <!-- list datasets -->
         <div class="datasets-group">
@@ -514,6 +522,28 @@ watch(
   color: var(--color-text);
 }
 
+.dropdown-selectors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0rem 1rem;
+  color: var(--color-text);
+}
+
+.dropdown-selectors .tags-button-action {
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+
+  background-color: black;
+  color: white;
+  font-weight: bold;
+}
+
+.dropdown-selectors .tags-button-action:disabled {
+  background-color: black;
+  color: var(--sb-grey-medium);
+}
+
 .dropdown-tags input {
   margin-right: 0.5rem;
 }
@@ -526,6 +556,12 @@ watch(
 .dropdown-tags .tags-button-action {
   margin-right: 0.5rem;
   background-color: black;
+  color: white;
+  font-weight: bold;
+}
+
+.dropdown-tags .tags-button-selected {
+  background-color: var(--sb-orange);
   color: white;
   font-weight: bold;
 }
@@ -590,10 +626,10 @@ watch(
 }
 
 .datasets-tooltip .datasets-tooltiptext {
-  width: 120px;
+  width: 160px;
   bottom: 100%;
   left: 50%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  margin-left: -80px; /* Use half of the width to center the tooltip */
 
   visibility: hidden;
   background-color: var(--sb-orange);

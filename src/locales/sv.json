@@ -31,6 +31,7 @@
   "dataselector.tags.reset": "Återställ",
   "dataselector.tags.select": "Välj",
   "dataselector.tags.unselect": "Avmarkera alla",
+  "dataselector.tags.missingdescription": "Saknar beskrivning",
   "dataselector.datasets.title": "Datamängder",
   "dataselector.datasets": "Välj datamängder",
   "dataselector.nodatasets": "Välj en eller flera datamängder",

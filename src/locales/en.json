@@ -31,6 +31,7 @@
   "dataselector.tags.reset": "Reset",
   "dataselector.tags.select": "Select",
   "dataselector.tags.unselect": "Deselect all",
+  "dataselector.tags.missingdescription": "No description",
   "dataselector.datasets.title": "Datasets",
   "dataselector.datasets": "Select datasets",
   "dataselector.nodatasets": "Select one or more datasets",
