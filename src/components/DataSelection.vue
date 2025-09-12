@@ -363,13 +363,6 @@ watch(
           <input type="checkbox" :value="tag" v-model="selectedTags" @change="selectTags" />
             {{ lexicalStorage.currentConfig.tags[tag].label }} -->
             </div>
-            <button
-              @click="unselectTags()"
-              class="tags-button-action"
-              :disabled="selectedTags.length == 0 && searchDatasets == ''"
-            >
-              {{ $t('dataselector.tags.reset') }}
-            </button>
           </div>
           <!-- dataset list -->
           <!--
@@ -379,6 +372,15 @@ watch(
           <div class="dropdown-filter">
             {{ $t('dataselector.datasets.filter') }}:
             <input type="text" v-model="searchDatasets" />
+          </div>
+          <div>
+            <button
+              @click="unselectTags()"
+              class="tags-button-action"
+              :disabled="selectedTags.length == 0 && searchDatasets == ''"
+            >
+              {{ $t('dataselector.tags.reset') }}
+            </button>
           </div>
         </div>
         <div class="dropdown-selectors">
@@ -506,7 +508,7 @@ watch(
 .dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0rem 1rem;
   color: var(--color-text);
 }
 
@@ -518,7 +520,7 @@ watch(
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0rem 1rem;
+  padding: 0rem 0.5rem;
   color: var(--color-text);
 }
 
@@ -548,13 +550,14 @@ watch(
   margin-right: 0.5rem;
 }
 
-.dropdown-tags .tags-button {
+.dropdown-group .tags-button {
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-.dropdown-tags .tags-button-action {
-  margin-right: 0.5rem;
+.dropdown-group .tags-button-action {
+  margin: 0 0.5rem 0.5rem 0.5rem;
+  padding: 0.5;
   background-color: black;
   color: white;
   font-weight: bold;
@@ -566,13 +569,13 @@ watch(
   font-weight: bold;
 }
 
-.dropdown-tags .tags-button-action:disabled {
+.dropdown-group .tags-button-action:disabled {
   background-color: black;
   color: var(--sb-grey-medium);
 }
 
 .dropdown-filter {
-  padding: 0.5rem 1rem;
+  padding: 0rem 0.5rem 0.5rem 0.5rem;
   color: black;
 }
 
