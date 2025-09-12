@@ -22,18 +22,18 @@ const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeResultTab)
 
 const isDropdownColumns = ref(false)
-const isDropdownCompileParams = ref(false)
+const isDropdownCompileFields = ref(false)
 const dropdownContainerS = ref<HTMLElement | null>(null)
 
 const toggleDropdownColumns = () => {
   isDropdownColumns.value = !isDropdownColumns.value
   //  isDropdownOpen.value = false
   //  isDropdownParams.value = false
-  isDropdownCompileParams.value = false
+  isDropdownCompileFields.value = false
 }
 
-const toggleDropdownCompileParams = () => {
-  isDropdownCompileParams.value = !isDropdownCompileParams.value
+const toggleDropdownCompileFields = () => {
+  isDropdownCompileFields.value = !isDropdownCompileFields.value
   //  isDropdownOpen.value = false
   //  isDropdownParams.value = false
   isDropdownColumns.value = false
@@ -42,7 +42,7 @@ const toggleDropdownCompileParams = () => {
 const handleClickOutsideS = (event: MouseEvent) => {
   if (dropdownContainerS.value && !dropdownContainerS.value.contains(event.target as Node)) {
     isDropdownColumns.value = false
-    isDropdownCompileParams.value = false
+    isDropdownCompileFields.value = false
   }
 }
 /*
@@ -60,7 +60,7 @@ const selectedColumns = computed({
   set: (value) => lexicalStorage.setSelectedColumns(value),
 })
 
-const currentParams = computed(() => lexicalStorage.currentFields)
+const currentFields = computed(() => lexicalStorage.currentFields)
 
 // update state from URL
 const updateColumns = () => {
@@ -456,7 +456,7 @@ const updateOverview = () => {
         }"
       >
         <span>{{ $t('dataselector.statistics.parameter') }}</span>
-        <div class="statistics-dropdown-toggle" @click="toggleDropdownCompileParams">
+        <div class="statistics-dropdown-toggle" @click="toggleDropdownCompileFields">
           <span v-if="selectedCompileFields.length === 0">{{
             $t('dataselector.statistics.noparameter')
           }}</span>
@@ -464,8 +464,8 @@ const updateOverview = () => {
             selectedCompileFields.map((x) => lexicalStorage.localizeField(x)).join(', ')
           }}</span>
         </div>
-        <div class="statistics-dropdown-menu" v-if="isDropdownCompileParams">
-          <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
+        <div class="statistics-dropdown-menu" v-if="isDropdownCompileFields">
+          <label v-for="param in currentFields" :key="param.name" class="statistics-dropdown-item">
             <input
               type="checkbox"
               :value="param.name"
@@ -494,7 +494,7 @@ const updateOverview = () => {
           </span>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
-          <label v-for="param in currentParams" :key="param.name" class="statistics-dropdown-item">
+          <label v-for="param in currentFields" :key="param.name" class="statistics-dropdown-item">
             <input
               type="checkbox"
               :value="param.name"

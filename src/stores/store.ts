@@ -6,25 +6,18 @@ import {
   type Config,
   type DatasetDates,
   entryWordField,
-  entryWordProperty,
 } from '@/types/datasetConfig.ts'
-//import { isUndefined } from 'es-toolkit'
-//import { useI18n } from 'vue-i18n'
 
 interface SearchRedux {
-  //allParams: string[]
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
   currentDatasets: string[] //  all datasets (id's)
   currentDatasetsSize: number // total number of entries
   selectedDatasets: string[] // selected datasets (id's)
   selectedDatasetsSize: number // number of entries in selected datasets
   currentTags: string[] // all tags
-  //selectedTags: string[]
-  //totalDatasets: number
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets
   selectedFields: Record<string, SelectedFieldConfig>
-  //searchField: Record<string, SelectedFieldConfig>
   selectedColumns: string[]
   selectedCompileFields: string[]
   searchQuery: string
@@ -33,7 +26,6 @@ interface SearchRedux {
   activeLocale: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
-  //listLimit: number
   isData: boolean
   isSearch: boolean
   isStart: boolean
@@ -52,7 +44,6 @@ export const lexicalStore = defineStore('dataset', {
     fieldsInDatasets: {},
     currentFields: [],
     selectedFields: {},
-    //searchField: {},
     selectedColumns: [],
     selectedCompileFields: [],
     searchQuery: '',
@@ -149,54 +140,16 @@ export const lexicalStore = defineStore('dataset', {
     },
     setSelectedDataset(keys: string[]) {
       this.selectedDatasets = keys
-      //      if (keys.length === 1) {
-      //        this.currentParameters = keys.flatMap((k) => this.paramsInDatasets[k])
-      //      } else {
-      const allParamsArray = keys.map((key) => this.fieldsInDatasets[key])
-      if (allParamsArray.length > 0) {
-        /*
-        // keep only fields that exist in all datasets = find the intersection
-        let intersection = allParamsArray[0]
-        for (let i = 1; i < allParamsArray.length; i++) {
-          intersection = intersection.filter((param) =>
-            allParamsArray[i].some(
-              (otherParam) => otherParam.name === param.name && otherParam.type === param.type,
-            ),
-          )
-        }
-        console.log('setSelectedDataset - allParamsArray', allParamsArray)
-        // make a copy
-        this.currentFields = [...intersection]
-        */
-
-        // keep only fields that exist in all datasets = find the intersection
-
-        const intersection: FieldConfig[] = []
-        for (let i = 0; i < allParamsArray.length; i++) {
-          for (let j = 0; j < allParamsArray[i].length; j++) {
-            const item: FieldConfig = allParamsArray[i][j]
-            let found: boolean = false
-            for (let k = 0; k < intersection.length; k++) {
-              if (intersection[k].name == item.name && intersection[k].type == item.type) {
-                found = true
-                break
-              }
-            }
-            if (!found) {
-              intersection.unshift(item)
-            }
-          }
-        }
-
-        this.currentFields = intersection
-
-        // and add the "ingångsord"
-        this.currentFields.unshift({
-          name: entryWordField,
-          type: 'text',
-          collection: false,
-          label: { swe: 'ingångsord', eng: 'word' },
-        })
+      this.setUnionFields(this.selectedDatasets)
+      // so now we have all fields that are in all selected datasets
+      // and add the "ingångsord"
+      this.currentFields.unshift({
+        name: entryWordField,
+        type: 'text',
+        collection: false,
+        label: { swe: 'ingångsord', eng: 'word' },
+      })
+      if (this.currentFields.length > 0) {
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields
         // remove them from selectedFields
@@ -204,7 +157,7 @@ export const lexicalStore = defineStore('dataset', {
         const newSelectedFields: Record<string, SelectedFieldConfig> = {}
         for (const [k, v] of Object.entries(this.selectedFields)) {
           let bFound = false
-          console.log('k, v', k, v)
+          //console.log('k, v', k, v)
           if (this.currentFields.find((f) => f.name === k)) {
             bFound = true
           }
@@ -218,7 +171,7 @@ export const lexicalStore = defineStore('dataset', {
         console.log('in setSelectedDataset', this.selectedFields)
         let isEmpty = true
         for (const [k, v] of Object.entries(this.selectedFields)) {
-          console.log('k, v', k, v)
+          //console.log('k, v', k, v)
           if (v.value !== '') {
             isEmpty = false
           }
@@ -250,6 +203,47 @@ export const lexicalStore = defineStore('dataset', {
       this.setSelectedDataset(this.selectedDatasets)
     },
     */
+    setUnionFields(keys: string[]) {
+      // get union of fields in all selected datasets
+      const fieldUnion: FieldConfig[] = []
+      for (const k of keys) {
+        if (k in this.fieldsInDatasets) {
+          for (const fc of this.fieldsInDatasets[k]) {
+            // check if it is already in
+            let found: boolean = false
+            for (let i = 0; i < fieldUnion.length; i++) {
+              if (fieldUnion[i].name == fc.name && fieldUnion[i].type == fc.type) {
+                found = true
+                break
+              }
+            }
+            if (!found) {
+              fieldUnion.push(fc)
+            }
+          }
+        }
+      }
+      // now check that they are in all selected datasets
+      const fieldIntersection: FieldConfig[] = []
+      for (const fu of fieldUnion) {
+        let foundInAll: boolean = true
+        for (const k of keys) {
+          let foundInDS: boolean = false
+          for (const fc of this.fieldsInDatasets[k]) {
+            if (fu.name == fc.name && fu.type == fc.type) {
+              foundInDS = true
+              break
+            }
+          }
+          foundInAll = foundInAll && foundInDS
+        }
+        if (foundInAll) {
+          fieldIntersection.push(fu)
+        }
+      }
+      this.currentFields = fieldIntersection
+      console.log('setUnionFields:', this.currentFields)
+    },
     setLocale(locale: string) {
       this.activeLocale = locale
       if (this.activeLocale == 'sv') {
@@ -302,11 +296,6 @@ export const lexicalStore = defineStore('dataset', {
       this.setActiveSearchTab('simple')
       this.setActiveResultTab('table')
     },
-    /*
-    setListLimit(x: number) {
-      this.listLimit = x
-    },
-    */
     camelify(p: string): string {
       return p.toLowerCase().replace(/(_\w)/g, (m) => m.toUpperCase().substring(1))
     },
@@ -325,7 +314,6 @@ export const lexicalStore = defineStore('dataset', {
       }
       return label
     },
-
     isList(p: string): boolean {
       let value = false
       this.currentFields.every((item) => {
@@ -340,29 +328,10 @@ export const lexicalStore = defineStore('dataset', {
       return value
     },
     formatCell(x: string | string[]): string {
-      //const { t } = useI18n()
-
       let value = ''
-      //Array.isArray(x) ? x.join(', ') : x
       if (Array.isArray(x)) {
-        //value = '<i>' + t('dataset.list') + ' (' + x.length + ')</i>'
         x.every((item, index) => {
-          //if (index > 0) {
           value = value + (value ? '<br>' : '') + item
-          //} else {
-          //value = item
-          //}
-          //          if (index == this.listLimit - 1) {
-          /*
-          if (index == 2000 - 1) {
-            if (index + 1 < x.length) {
-              //value = value + '<br>' + '<i>(' + x.length + ')</i>'
-            }
-            return false
-          } else {
-            return true
-          }
-          */
           return true
         })
       } else {

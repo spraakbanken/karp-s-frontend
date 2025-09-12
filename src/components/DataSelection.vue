@@ -144,30 +144,14 @@ const selectDataset = () => {
 
 // INFO: doesn't trigger the watch (because selectedDatasets is "computed")
 const selectTags = (tag: string) => {
-  if (selectedTags.value.indexOf(tag) == -1) {
+  const tagIndex = selectedTags.value.indexOf(tag)
+  if (tagIndex == -1) {
     selectedTags.value.push(tag)
-    //console.log('selectedTags=', selectedTags.value)
-    doFilterDatasets()
+  } else {
+    // remove it
+    selectedTags.value.splice(tagIndex, 1)
   }
-  /*
-  const currentConfig = lexicalStorage.currentConfig
-
-  // select datasets that have one of the tags in newTags
-
-  for (const elt of currentConfig.resources) {
-    if (elt.tags !== undefined) {
-      if (elt.tags.includes(tag)) {
-        if (!selectedDatasets.value.includes(elt.resourceId)) {
-          selectedDatasets.value.push(elt.resourceId)
-        }
-      }
-    }
-  }
-
-  // TODO: unneccessary?
-  //lexicalStorage.setSelectedDataset(selectedDatasets.value)
-  selectDataset()
-  */
+  doFilterDatasets()
 }
 
 const unselectAll = () => {
@@ -529,6 +513,7 @@ watch(
   flex-wrap: wrap;
   align-items: center;
   padding: 0rem 1rem;
+  margin-bottom: 0.5rem;
   color: var(--color-text);
 }
 
@@ -566,7 +551,6 @@ watch(
 .dropdown-tags .tags-button-selected {
   background-color: var(--sb-orange);
   color: white;
-  font-weight: bold;
 }
 
 .dropdown-group .tags-button-action:disabled {
@@ -583,7 +567,7 @@ watch(
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  max-height: 360px;
+  max-height: 300px;
   align-content: flex-start;
   color: var(--color-text);
   overflow-y: scroll;

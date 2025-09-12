@@ -35,7 +35,7 @@ const dropdownContainer = ref<HTMLElement | null>(null)
 const selectedFieldsArray = ref<string[]>([])
 
 const searchField = ref<Record<string, SelectedFieldConfig>>({})
-//const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
+const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
 const searchFieldPositionText = [
   'dataselector.parameter.position.startswith',
   'dataselector.parameter.position.endswith',
@@ -45,22 +45,6 @@ const searchFieldPositionText = [
 ]
 
 //const searchFieldPositionEnabled = [true, true, true, true, false]
-
-/*
-const localizeField = (p: string) => {
-  let label = p
-  for (const c of currentFields.value) {
-    if (c.name === p) {
-      if (lexicalStorage.activeLocale == 'sv') {
-        label = c.label.swe ? c.label.swe : (c.label as unknown as string)
-      } else {
-        label = c.label.eng ? c.label.eng : (c.label as unknown as string)
-      }
-    }
-  }
-  return label
-}
-*/
 
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
@@ -85,66 +69,112 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-const handlePos = (param: string, pos: number) => {
-  console.log('handlePos: ', param)
-  // pos: start, end, middle
+const fixPos = (f: string) => {
+  if (
+    searchField.value[f].positionInitial &&
+    !searchField.value[f].positionMedial &&
+    !searchField.value[f].positionFinal
+  ) {
+    // startswith
+    searchField.value[f].position = searchFieldPosition[0]
+  } else if (
+    !searchField.value[f].positionInitial &&
+    !searchField.value[f].positionMedial &&
+    searchField.value[f].positionFinal
+  ) {
+    // endswidth
+    searchField.value[f].position = searchFieldPosition[1]
+  } else if (
+    searchField.value[f].positionInitial &&
+    searchField.value[f].positionMedial &&
+    searchField.value[f].positionFinal
+  ) {
+    // contains
+    searchField.value[f].position = searchFieldPosition[2]
+  } else {
+    // equals
+    searchField.value[f].position = searchFieldPosition[3]
+  }
+}
+
+const handlePos = (f: string, pos: number) => {
   if (pos == 0) {
     // clicked start
     // on
-    if (!searchField.value[param].positionInitial) {
-      if (searchField.value[param].positionFinal) {
-        searchField.value[param].positionMedial = true
+    if (!searchField.value[f].positionInitial) {
+      if (searchField.value[f].positionFinal) {
+        searchField.value[f].positionMedial = true
       }
     } else {
       // off
-      searchField.value[param].positionMedial = false
+      searchField.value[f].positionMedial = false
     }
   } else if (pos == 2) {
     // clicked middle
     // on
-    if (!searchField.value[param].positionMedial) {
-      searchField.value[param].positionInitial = true
-      searchField.value[param].positionFinal = true
+    if (!searchField.value[f].positionMedial) {
+      searchField.value[f].positionInitial = true
+      searchField.value[f].positionFinal = true
     } else {
       // off
-      searchField.value[param].positionInitial = false
-      searchField.value[param].positionFinal = false
+      searchField.value[f].positionInitial = false
+      searchField.value[f].positionFinal = false
     }
   }
   if (pos == 1) {
     // clicked end
     // on
-    if (!searchField.value[param].positionFinal) {
-      if (searchField.value[param].positionInitial) {
-        searchField.value[param].positionMedial = true
+    if (!searchField.value[f].positionFinal) {
+      if (searchField.value[f].positionInitial) {
+        searchField.value[f].positionMedial = true
       }
     } else {
       // off
-      searchField.value[param].positionMedial = false
+      searchField.value[f].positionMedial = false
     }
   }
-
+  // now translate this to .position
+  console.log('P: ', searchField.value[f])
+  console.log('P2', JSON.parse(JSON.stringify(searchField.value[f])))
   /*
-  || !searchField.value[param].positionFinal) {
-    searchField.value[param].positionMedial = false
-  } else if (searchField.value[param].positionMedial) {
-    searchField.value[param].positionInitial = true
-    searchField.value[param].positionFinal = true
-  } else if (!searchField.value[param].positionMedial) {
-    searchField.value[param].positionInitial = false
-    searchField.value[param].positionFinal = false
-  } else if (searchField.value[param].positionInitial && searchField.value[param].positionFinal) {
-    searchField.value[param].positionMedial = true
+  if (
+    searchField.value[f].positionInitial &&
+    !searchField.value[f].positionMedial &&
+    !searchField.value[f].positionFinal
+  ) {
+    // startswith
+    searchField.value[f].position = searchFieldPosition[0]
+  } else if (
+    !searchField.value[f].positionInitial &&
+    !searchField.value[f].positionMedial &&
+    searchField.value[f].positionFinal
+  ) {
+    // endswidth
+    searchField.value[f].position = searchFieldPosition[1]
+  } else if (
+    searchField.value[f].positionInitial &&
+    searchField.value[f].positionMedial &&
+    searchField.value[f].positionFinal
+  ) {
+    // contains
+    searchField.value[f].position = searchFieldPosition[2]
+  } else {
+    // equals
+    searchField.value[f].position = searchFieldPosition[3]
   }
-*/
+  */
+  setTimeout(() => {
+    fixPos(f)
+  }, 500)
+  console.log('handlePos: ', searchField.value[f], searchFieldPosition)
 }
 
 // click search button
 const updateData = () => {
-  if (currentFields.value.length > 0) {
-    lexicalStorage.setSelectedFields(searchField.value)
-    lexicalStorage.setIsSearch(true)
-  }
+  //if (currentFields.value.length > 0) {
+  lexicalStorage.setSelectedFields(searchField.value)
+  lexicalStorage.setIsSearch(true)
+  //}
 }
 
 watch(selectedFieldsArray, (newFields) => {
