@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import type { SelectedFieldConfig } from '@/types/datasetConfig'
+import type { entryWordField, SelectedFieldConfig } from '@/types/datasetConfig'
 
 /*
 watch(
@@ -134,39 +134,14 @@ const handlePos = (f: string, pos: number) => {
     }
   }
   // now translate this to .position
-  console.log('P: ', searchField.value[f])
-  console.log('P2', JSON.parse(JSON.stringify(searchField.value[f])))
-  /*
-  if (
-    searchField.value[f].positionInitial &&
-    !searchField.value[f].positionMedial &&
-    !searchField.value[f].positionFinal
-  ) {
-    // startswith
-    searchField.value[f].position = searchFieldPosition[0]
-  } else if (
-    !searchField.value[f].positionInitial &&
-    !searchField.value[f].positionMedial &&
-    searchField.value[f].positionFinal
-  ) {
-    // endswidth
-    searchField.value[f].position = searchFieldPosition[1]
-  } else if (
-    searchField.value[f].positionInitial &&
-    searchField.value[f].positionMedial &&
-    searchField.value[f].positionFinal
-  ) {
-    // contains
-    searchField.value[f].position = searchFieldPosition[2]
-  } else {
-    // equals
-    searchField.value[f].position = searchFieldPosition[3]
-  }
-  */
+  //console.log('P: ', searchField.value[f])
+  //console.log('P2', JSON.parse(JSON.stringify(searchField.value[f])))
+
+  // we need a tick so all searchField.value[f].position* values get truly set
   setTimeout(() => {
     fixPos(f)
-  }, 500)
-  console.log('handlePos: ', searchField.value[f], searchFieldPosition)
+  }, 0)
+  //console.log('handlePos: ', searchField.value[f], searchFieldPosition)
 }
 
 // click search button
@@ -397,7 +372,7 @@ watch(
         <div class="dropdown-menu" v-if="isDropdownParams">
           <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
             <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
-            <span v-if="param.name == 'word'" style="font-weight: bold">
+            <span v-if="param.name == entryWordField" style="font-weight: bold">
               {{ lexicalStorage.localizeField(param.name) }}
             </span>
             <span v-else>

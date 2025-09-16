@@ -10,7 +10,6 @@ import { secondsToDate, formatNumber } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
 import { th } from '@/utils/utils'
 
-const previousDataset = ref('')
 const lexicalStorage = lexicalStore()
 
 const selectedDatasets = computed({
@@ -53,6 +52,11 @@ const datasetInfo = ref(<ResourceLocalized>{
   [entryWordProperty]: '',
   [entryWordDescriptionProperty]: '',
 })
+
+const previousDataset = ref('')
+const listExcludedDatasets = ref<boolean>(false)
+const listSortSelectedFirst = ref<boolean>(true)
+const listShowSelectedOnly = ref<boolean>(false)
 
 const datasetInfoFill = (dataset: string) => {
   //console.log('DSI: ', dataset, previousDataset.value)
@@ -140,6 +144,9 @@ onBeforeUnmount(() => {
 const selectDataset = () => {
   console.log('selectDataset:', selectedDatasets.value.length)
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
+  if (listSortSelectedFirst.value) {
+    doFilterDatasets()
+  }
 }
 
 // INFO: doesn't trigger the watch (because selectedDatasets is "computed")
@@ -187,6 +194,8 @@ const doFilterDatasets = () => {
   let label: string = ''
   let arr: string[] = []
 
+  listExcludedDatasets.value = false
+
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
     if (lexicalStorage.activeLocale == 'sv') {
@@ -194,22 +203,52 @@ const doFilterDatasets = () => {
     } else {
       label = c.label.eng ? c.label.eng : (c.label as unknown as string)
     }
-    if (
+    if (listShowSelectedOnly.value) {
+      if (selectedDatasets.value.includes(c.resourceId)) {
+        arr.push(c.resourceId)
+      }
+    } else if (
       (!searchDatasets.value ||
         label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1) &&
       (selectedTags.value.length == 0 || hasTags(c.resourceId))
     ) {
       arr.push(c.resourceId)
+    } else {
+      if (selectedDatasets.value.includes(c.resourceId)) {
+        listExcludedDatasets.value = true
+      }
     }
   }
 
-  arr = arr.sort(function (a, b) {
-    return lexicalStorage.datasetLabels[a].localeCompare(
-      lexicalStorage.datasetLabels[b],
-      lexicalStorage.activeLocale,
-      { numeric: true },
-    )
-  })
+  if (listSortSelectedFirst.value) {
+    // sort selected first, then alphabetically
+    arr = arr.sort(function (a, b) {
+      return selectedDatasets.value.includes(a) && selectedDatasets.value.includes(b)
+        ? lexicalStorage.datasetLabels[a].localeCompare(
+            lexicalStorage.datasetLabels[b],
+            lexicalStorage.activeLocale,
+            { numeric: true },
+          )
+        : selectedDatasets.value.includes(a)
+          ? -1
+          : selectedDatasets.value.includes(b)
+            ? 1
+            : lexicalStorage.datasetLabels[a].localeCompare(
+                lexicalStorage.datasetLabels[b],
+                lexicalStorage.activeLocale,
+                { numeric: true },
+              )
+    })
+  } else {
+    // sort alphabetically
+    arr = arr.sort(function (a, b) {
+      return lexicalStorage.datasetLabels[a].localeCompare(
+        lexicalStorage.datasetLabels[b],
+        lexicalStorage.activeLocale,
+        { numeric: true },
+      )
+    })
+  }
 
   console.log('doFilterDatasets:', searchDatasets.value, selectedTags.value.length, arr)
   filteredDatasets.value = arr
@@ -358,6 +397,15 @@ watch(
             <input type="text" v-model="searchDatasets" />
           </div>
           <div>
+            <input
+              type="checkbox"
+              :value="true"
+              v-model="listShowSelectedOnly"
+              @change="doFilterDatasets"
+            />
+            {{ $t('dataselector.datasets.showselected') }}
+          </div>
+          <div>
             <button
               @click="unselectTags()"
               class="tags-button-action"
@@ -365,6 +413,20 @@ watch(
             >
               {{ $t('dataselector.tags.reset') }}
             </button>
+          </div>
+        </div>
+        <div class="dropdown-selectedfirst">
+          <div>
+            <input
+              type="checkbox"
+              :value="true"
+              v-model="listSortSelectedFirst"
+              @change="doFilterDatasets"
+            />
+            {{ $t('dataselector.datasets.selectedfirst') }}
+          </div>
+          <div v-if="listExcludedDatasets" class="datasets-excluded">
+            {{ $t('dataselector.datasets.excluded') }}
           </div>
         </div>
         <div class="dropdown-selectors">
@@ -504,7 +566,7 @@ watch(
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0rem 0.5rem;
+  padding: 0rem 0rem;
   color: var(--color-text);
 }
 
@@ -541,7 +603,7 @@ watch(
 }
 
 .dropdown-group .tags-button-action {
-  margin: 0 0.5rem 0.5rem 0.5rem;
+  margin: 0 0.5rem 0.5rem 0rem;
   padding: 0.5;
   background-color: black;
   color: white;
@@ -559,15 +621,24 @@ watch(
 }
 
 .dropdown-filter {
-  padding: 0rem 0.5rem 0.5rem 0.5rem;
   color: black;
+}
+
+.dropdown-selectedfirst {
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+}
+
+.datasets-excluded {
+  margin-top: 0.5rem;
+  font-style: italic;
 }
 
 .datasets-group {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  max-height: 300px;
+  max-height: 240px;
   align-content: flex-start;
   color: var(--color-text);
   overflow-y: scroll;
@@ -575,7 +646,7 @@ watch(
 
 .datasets-list {
   max-height: 100%;
-  width: 280px;
+  width: 290px;
   background-color: var(--color-background);
   overflow-y: auto;
 }
