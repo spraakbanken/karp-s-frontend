@@ -16,11 +16,11 @@ const lexicalStorage = lexicalStore()
 
 onMounted(async () => {
   try {
-    console.log('--HomeView/onMounted()')
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
-    console.log('--HomeView/onMounted() prep to sync')
-    syncStoreWithRouter(router)
+    if (syncStoreWithRouter(router)) {
+      lexicalStorage.setIsSearch(true)
+    }
   } catch (error) {
     console.error(error)
   }

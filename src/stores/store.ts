@@ -26,6 +26,8 @@ interface SearchRedux {
   activeLocale: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
+  pageStart: number
+  pageSize: number
   isData: boolean
   isSearch: boolean
   isStart: boolean
@@ -52,6 +54,8 @@ export const lexicalStore = defineStore('dataset', {
     activeLocale: 'sv',
     datasetLabels: {},
     datasetDates: [],
+    pageStart: 1,
+    pageSize: 25,
     //listLimit: 5,
     isData: false,
     isSearch: false,
@@ -153,7 +157,6 @@ export const lexicalStore = defineStore('dataset', {
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields
         // remove them from selectedFields
-        console.log('setSelectedDataset: cleaning up copies', this.currentFields)
         const newSelectedFields: Record<string, SelectedFieldConfig> = {}
         for (const [k, v] of Object.entries(this.selectedFields)) {
           let bFound = false
@@ -168,7 +171,6 @@ export const lexicalStore = defineStore('dataset', {
         this.selectedFields = newSelectedFields
         // and set "ingångsord" to default, also for statistics
         // but if selectedFields exists in all selected datasets don't do this
-        console.log('in setSelectedDataset', this.selectedFields)
         let isEmpty = true
         for (const [k, v] of Object.entries(this.selectedFields)) {
           //console.log('k, v', k, v)
@@ -242,7 +244,6 @@ export const lexicalStore = defineStore('dataset', {
         }
       }
       this.currentFields = fieldIntersection
-      console.log('setUnionFields:', this.currentFields)
     },
     setLocale(locale: string) {
       this.activeLocale = locale
@@ -265,7 +266,7 @@ export const lexicalStore = defineStore('dataset', {
       }
     },
     setSelectedFields(fields: Record<string, SelectedFieldConfig>) {
-      console.log('setSelectedFields', fields)
+      // console.log('setSelectedFields: ', JSON.parse(JSON.stringify(fields)))
       this.selectedFields = fields
     },
     setStartField() {

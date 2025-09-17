@@ -153,7 +153,13 @@ const updateData = () => {
 }
 
 watch(selectedFieldsArray, (newFields) => {
-  console.log('WATCH: selectedFieldsArray:', newFields)
+  /*
+  console.log(
+    'WATCH: selectedFieldsArray:',
+    newFields,
+    JSON.parse(JSON.stringify(searchField.value)),
+  )
+  */
   // keep list of searchable fields synced with fields available
   newFields.forEach((fieldName) => {
     if (!searchField.value[fieldName]) {
@@ -176,7 +182,7 @@ watch(selectedFieldsArray, (newFields) => {
 watch(
   () => currentFields.value,
   (newFields) => {
-    console.log('WATCH: currentFields.value', newFields)
+    //console.log('WATCH: currentFields.value', newFields)
     if (newFields.length === 0) {
       searchField.value = {}
       selectedFields.value = {}
@@ -188,12 +194,22 @@ watch(
 watch(
   () => lexicalStorage.selectedFields,
   (newSelectedFields) => {
-    console.log('WATCH: lexicalStorage.selectedFields', newSelectedFields)
+    //console.log('WATCH: lexicalStorage.selectedFields', newSelectedFields)
     selectedFieldsArray.value = Object.keys(newSelectedFields)
     //console.log('-- WATCH: lexicalStorage.selectedFields', newSelectedFields, selectedFieldsArray.value,searchField,)
     Object.keys(newSelectedFields).forEach((param) => {
       //console.log('-- param', param)
       if (!searchField.value[param]) {
+        // add
+        searchField.value[param] = {
+          value: newSelectedFields[param].value,
+          position: newSelectedFields[param].position,
+          positionInitial: newSelectedFields[param].positionInitial,
+          positionMedial: newSelectedFields[param].positionMedial,
+          positionFinal: newSelectedFields[param].positionFinal,
+        }
+      } else {
+        // update
         searchField.value[param] = {
           value: newSelectedFields[param].value,
           position: newSelectedFields[param].position,

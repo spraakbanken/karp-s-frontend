@@ -39,7 +39,7 @@ const currentPage = ref(1)
 const itemsPerPage = ref(25)
 
 const fetchData = async () => {
-  console.log('fetchData()', lexicalStorage.selectedFields)
+  //console.log('fetchData: ', JSON.parse(JSON.stringify(lexicalStorage.selectedFields)))
 
   // convert checkboxes to search "position"
   for (const sf in lexicalStorage.selectedFields) {
@@ -96,17 +96,7 @@ const fetchData = async () => {
       }
 
       //console.log('GroupBySorted:', currentResultGrpSorted.value)
-      /*
-      currentValues.value = newDatasets.flatMap(
-        (key) => currentResult.value[key] || [],
-      ) as unknown as Dataset[]
-      // did we get any results?
-      Object.entries(currentResult.value).forEach(([key, value]) => {
-        if (value.total > 0) {
-          lexicalStorage.setIsData(true)
-        }
-      })
-        */
+
       lexicalStorage.setIsData(currentResult.value.total > 0)
       if (lexicalStorage.isStart) {
         lexicalStorage.setIsStart(false)
@@ -124,14 +114,17 @@ const fetchData = async () => {
 watch(
   () => currentPage.value,
   () => {
+    //lexicalStorage.pageStart = currentPage.value
+    console.log('WATCH currentPage.value', currentPage.value)
     fetchData()
   },
-  { immediate: true },
 )
 
 watch(
   () => itemsPerPage.value,
   (newItemsPerPage, oldItemsPerPage) => {
+    //lexicalStorage.pageSize = itemsPerPage.value
+    console.log('WATCH itemsPerPage.value', itemsPerPage.value)
     currentPage.value = Math.ceil(currentPage.value * (oldItemsPerPage / newItemsPerPage))
     fetchData()
   },
@@ -167,15 +160,8 @@ watch(
   { immediate: true },
 )
 
-/*
-const listLimit = computed({
-  get: () => lexicalStorage.listLimit,
-  set: (value) => lexicalStorage.setListLimit(value),
-})
-*/
-
 watch(
-  () => [lexicalStorage.isSearch],
+  () => lexicalStorage.isSearch,
   () => {
     console.log('Watch isSearch!')
 
@@ -208,15 +194,6 @@ const picsbar = (ds: string) => {
   // add count until found
   // so we should go to page: count / itemsPerPage.value
   let hitCount: number = 0
-  /*
-  for (const key in currentResult.value.resourceHits) {
-    if (key === ds) {
-      break
-    } else {
-      hitCount += currentResult.value.resourceHits[key]
-    }
-  }
-    */
   for (const index in currentResult.value.resourceOrder) {
     if (currentResult.value.resourceOrder[index] === ds) {
       break
@@ -269,19 +246,20 @@ const lastPage = () => {
       <table class="picsbar">
         <tbody>
           <tr class="picsbar-row">
-            <td
-              class="picsbar-tooltip"
-              v-for="(value, key) in currentResult.resourceOrder"
-              :style="{ width: currentResult.resourceHits[value] / currentResult.total + '%' }"
-              :key="key"
-              @click="picsbar(value)"
-            >
-              {{ lexicalStorage.datasetLabels[value] }}
-              <span class="picsbar-tooltiptext"
-                >{{ lexicalStorage.datasetLabels[value] }}:
-                {{ currentResult.resourceHits[value] }}</span
+            <template v-for="(value, key) in currentResult.resourceOrder" :key="key">
+              <td
+                v-if="currentResult.resourceHits[value] > 0"
+                class="picsbar-tooltip"
+                :style="{ width: currentResult.resourceHits[value] / currentResult.total + '%' }"
+                @click="picsbar(value)"
               >
-            </td>
+                {{ lexicalStorage.datasetLabels[value] }}
+                <span class="picsbar-tooltiptext"
+                  >{{ lexicalStorage.datasetLabels[value] }}:
+                  {{ currentResult.resourceHits[value] }}</span
+                >
+              </td>
+            </template>
           </tr>
         </tbody>
       </table>
@@ -323,7 +301,7 @@ const lastPage = () => {
             <template v-for="(value1, key) in item" :key="key">
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
-                  <MaxHeight :max-height="100">
+                  <MaxHeight :max-height="120">
                     <span v-html="lexicalStorage.formatCell(value2.value)"></span>
                   </MaxHeight>
                 </td>
@@ -419,6 +397,7 @@ const lastPage = () => {
 /* picsbar */
 .picsbar {
   table-layout: fixed;
+  overflow-x: clip;
 }
 
 .picsbar tr {
@@ -464,7 +443,7 @@ const lastPage = () => {
 
 .picsbar-tooltip .picsbar-tooltiptext::after {
   content: ' ';
-  position: absolute;
+  position: absolute; /* absolute */
   top: 100%; /* At the bottom of the tooltip */
   left: 50%;
   margin-left: -5px;
