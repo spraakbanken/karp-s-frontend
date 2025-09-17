@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
@@ -19,6 +19,7 @@ onMounted(async () => {
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
     if (syncStoreWithRouter(router)) {
+      lexicalStorage.setIsStart(false)
       lexicalStorage.setIsSearch(true)
     }
   } catch (error) {
@@ -32,14 +33,13 @@ const setActiveResultTab = (tab: string) => {
   activeResultTab.value = tab
 }
 
-/*
 watch(
   () => lexicalStorage.activeResultTab,
   (newTab) => {
     activeResultTab.value = newTab
+    console.log('WATCH lexicalStorage.activeResultTab', activeResultTab.value)
   },
 )
-*/
 </script>
 
 <template>

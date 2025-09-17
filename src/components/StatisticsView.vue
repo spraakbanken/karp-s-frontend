@@ -154,9 +154,9 @@ watch(
 )
 
 watch(
-  () => [lexicalStorage.isSearch],
+  () => lexicalStorage.isSearch,
   () => {
-    console.log('Watch isSearch!')
+    console.log('Watch stats isSearch!')
 
     if (lexicalStorage.isSearch) {
       lexicalStorage.setIsSearch(false)
@@ -443,7 +443,6 @@ const updateOverview = () => {
 
 <template>
   <!-- show no data -->
-
   <div v-if="!lexicalStorage.isStart">
     <!-- statistics settings -->
     <div class="statistics" ref="dropdownContainerS">
