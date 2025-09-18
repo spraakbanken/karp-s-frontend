@@ -137,7 +137,6 @@ watch(
     if (newDatasets.length === 0) {
       currentResult.value = []
       lexicalStorage.setIsData(false)
-      //lexicalStorage.setActiveResultTab('table')
     }
     selectedCompileFields.value = [entryWordField]
     selectedColumns.value = []
@@ -251,10 +250,19 @@ const exportCSV = () => {
   //  for (const title in currentResult.value[0]) {
   //console.log()
   for (const key in tableHeaders.value) {
-    csv += tableHeaders.value[key] + ','
+    if (tableHeaders.value[key].type == 'compile') {
+      csv += lexicalStorage.localizeField(tableHeaders.value[key].columnField) + ','
+    } else if (tableHeaders.value[key].type == 'value') {
+      csv +=
+        lexicalStorage.localizeField(tableHeaders.value[key].columnField) +
+        ' (' +
+        lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] +
+        '),'
+    } else if (tableHeaders.value[key].type == 'total') {
+      csv += t('statistics.total') + ','
+    }
   }
   csv += '\n'
-
   // find out which columns are collections (lists of values)
   const collectionColumn = []
   for (const key of lexicalStorage.currentFields) {
@@ -262,19 +270,22 @@ const exportCSV = () => {
       collectionColumn.push(key.name)
     }
   }
-  //console.log('CSV cc', collectionColumn, tableHeaders.value)
 
   // write data
   for (const row in currentResult.value) {
-    const value = currentResult.value[row]
+    const rowItems: Dataset = currentResult.value[row]
     // value could be array
     //console.log('CurrP', lexicalStorage.currentParameters)
-    for (const key in value) {
+    for (const key in rowItems) {
       //console.log('CSV type', key, value[key], Object.keys(tableHeaders.value)[key])
-      if (collectionColumn.includes(tableHeaders.value[key])) {
-        csv += value[key].replace('"', '').replace('[', '').replace(']', '').replace(',', ';') + ','
+      //                      <span v-html="lexicalStorage.formatCell(value)"></span>
+
+      if (collectionColumn.includes(tableHeaders.value[key].columnField)) {
+        console.log('Columnfield:', rowItems[key])
+        csv += '"' + lexicalStorage.formatCell(rowItems[key], '; ') + '\",'
+        //rowItems[key].replace('"', '').replace('[', '').replace(']', '').replace(',', ';') + ','
       } else {
-        csv += value[key] + ','
+        csv += '"' + rowItems[key] + '\",'
       }
     }
     csv += '\n'
@@ -557,7 +568,7 @@ const updateOverview = () => {
 
     <!-- show table -->
     <div v-else class="table-wrapper">
-      <div class="tab" v-if="!isLoading">
+      <div class="tab" v-if="!isLoading && currentResult.length">
         {{ $t('statistics.numberOfHits') }}:
         {{ currentResult.length }}
       </div>
@@ -621,13 +632,13 @@ const updateOverview = () => {
       </table>
 
       <!-- show no data -->
-      <p v-else-if="lexicalStorage.selectedDatasets.length == 0">
+      <p v-else-if="lexicalStorage.selectedDatasets.length == 0" class="message">
         {{ $t('message.nodatasetselected') }}
       </p>
       <p v-else-if="isLoading" class="message">
         {{ $t('message.loading') }}
       </p>
-      <p v-else>
+      <p v-else class="message">
         {{ $t('error.nodata') }}
       </p>
 
@@ -844,8 +855,10 @@ th .resource {
   margin-left: 1rem;
 }
 
-.message {
-  margin: auto;
+/* table */
+
+tr {
+  vertical-align: top;
 }
 
 tr:nth-child(even) {
@@ -859,6 +872,8 @@ tr:nth-child(odd) {
 tr:hover {
   background-color: var(--color-border-hover);
 }
+
+/* pagination */
 
 .pagination {
   display: flex;
@@ -919,8 +934,11 @@ tr:hover {
   margin-right: 0.5rem;
 }
 
+/* Info and error messages */
+
 .message {
   margin: auto;
   text-align: center;
+  font-style: italic;
 }
 </style>

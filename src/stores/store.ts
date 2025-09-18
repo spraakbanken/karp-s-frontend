@@ -328,11 +328,13 @@ export const lexicalStore = defineStore('dataset', {
 
       return value
     },
-    formatCell(x: string | string[]): string {
+    formatCell(x: string | string[], divider: string = '<br>'): string {
       let value = ''
       if (Array.isArray(x)) {
         x.every((item, index) => {
-          value = value + (value ? '<br>' : '') + item
+          console.log('array: ', item)
+          value = value + (value ? divider : '') + item
+
           return true
         })
       } else {

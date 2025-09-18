@@ -150,7 +150,6 @@ watch(
   },
 )
 
-/*
 watch(
   () => currentTab.value,
   () => {
@@ -160,7 +159,7 @@ watch(
   },
   { immediate: true },
 )
-*/
+
 watch(
   () => lexicalStorage.isSearch,
   () => {
