@@ -16,7 +16,8 @@ interface SearchRedux {
   selectedDatasetsSize: number // number of entries in selected datasets
   currentTags: string[] // all tags
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
-  currentFields: FieldConfig[] // available fields in selected datasets
+  currentFields: FieldConfig[] // available fields in selected datasets (union)
+  currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
   selectedFields: Record<string, SelectedFieldConfig>
   selectedColumns: string[]
   selectedCompileFields: string[]
@@ -24,6 +25,8 @@ interface SearchRedux {
   activeSearchTab: string
   activeResultTab: string
   activeLocale: string
+  sortField: string
+  sortOrder: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
   pageStart: number
@@ -45,6 +48,7 @@ export const lexicalStore = defineStore('dataset', {
     currentTags: [],
     fieldsInDatasets: {},
     currentFields: [],
+    currentCommonFields: [],
     selectedFields: {},
     selectedColumns: [],
     selectedCompileFields: [],
@@ -52,6 +56,8 @@ export const lexicalStore = defineStore('dataset', {
     activeSearchTab: 'simple',
     activeResultTab: 'table',
     activeLocale: 'sv',
+    sortField: '',
+    sortOrder: 'asc',
     datasetLabels: {},
     datasetDates: [],
     pageStart: 1,
@@ -144,10 +150,16 @@ export const lexicalStore = defineStore('dataset', {
     },
     setSelectedDataset(keys: string[]) {
       this.selectedDatasets = keys
-      this.setUnionFields(this.selectedDatasets)
-      // so now we have all fields that are in all selected datasets
+      this.setUnionAndIntersectionFields(this.selectedDatasets)
+      // so now we have all fields that are in all selected datasets, union and intersection
       // and add the "ingångsord"
       this.currentFields.unshift({
+        name: entryWordField,
+        type: 'text',
+        collection: false,
+        label: { swe: 'ingångsord', eng: 'word' },
+      })
+      this.currentCommonFields.unshift({
         name: entryWordField,
         type: 'text',
         collection: false,
@@ -197,6 +209,11 @@ export const lexicalStore = defineStore('dataset', {
         this.selectedDatasetsSize = 0
         return []
       }
+      this.sortField = entryWordField
+      this.sortOrder = 'asc'
+      this.setSelectedCompileFields([entryWordField])
+      this.setSelectedColumns([])
+
       //}
     },
     /*
@@ -205,7 +222,7 @@ export const lexicalStore = defineStore('dataset', {
       this.setSelectedDataset(this.selectedDatasets)
     },
     */
-    setUnionFields(keys: string[]) {
+    setUnionAndIntersectionFields(keys: string[]) {
       // get union of fields in all selected datasets
       const fieldUnion: FieldConfig[] = []
       for (const k of keys) {
@@ -225,6 +242,7 @@ export const lexicalStore = defineStore('dataset', {
           }
         }
       }
+      this.currentFields = fieldUnion
       // now check that they are in all selected datasets
       const fieldIntersection: FieldConfig[] = []
       for (const fu of fieldUnion) {
@@ -243,7 +261,7 @@ export const lexicalStore = defineStore('dataset', {
           fieldIntersection.push(fu)
         }
       }
-      this.currentFields = fieldIntersection
+      this.currentCommonFields = fieldIntersection
     },
     setLocale(locale: string) {
       this.activeLocale = locale
@@ -282,6 +300,17 @@ export const lexicalStore = defineStore('dataset', {
       }
       this.setSelectedFields(fields)
       this.setSelectedCompileFields([entryWordField])
+    },
+    setSort(sf: string) {
+      if (sf) {
+        const sortParams: string[] = sf.split('|')
+        if (sortParams.length > 1) {
+          this.sortField = sortParams[0]
+          if (sortParams.length > 2) {
+            this.sortOrder = sortParams[1]
+          }
+        }
+      }
     },
     setIsData(x: boolean) {
       this.isData = x
@@ -332,9 +361,7 @@ export const lexicalStore = defineStore('dataset', {
       let value = ''
       if (Array.isArray(x)) {
         x.every((item, index) => {
-          console.log('array: ', item)
           value = value + (value ? divider : '') + item
-
           return true
         })
       } else {

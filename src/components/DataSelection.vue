@@ -178,7 +178,7 @@ const hasTags = (rid: string): boolean => {
   for (const c of lexicalStorage.currentConfig.resources) {
     if (c.resourceId == rid) {
       for (const t of selectedTags.value) {
-        console.log('hasTags: ', t, rid)
+        //console.log('hasTags: ', t, rid)
         if ('tags' in c) {
           if (c.tags.includes(t)) {
             includeRes = true
@@ -250,7 +250,7 @@ const doFilterDatasets = () => {
     })
   }
 
-  console.log('doFilterDatasets:', searchDatasets.value, selectedTags.value.length, arr)
+  //console.log('doFilterDatasets:', searchDatasets.value, selectedTags.value.length, arr)
   filteredDatasets.value = arr
 }
 

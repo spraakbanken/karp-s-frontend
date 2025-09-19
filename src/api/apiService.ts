@@ -1,7 +1,7 @@
 import axios from 'axios'
 //import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
-import { type SelectedFieldConfig } from '@/types/datasetConfig'
+import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
 
@@ -23,10 +23,10 @@ export const getLexicalDatasets = async () => {
 
 export const getTableData = async (pageStart: number, pageSize: number) => {
   try {
-    const lexicalStoreData = lexicalStore()
-    const datasets = lexicalStoreData.selectedDatasets
+    const lexicalStorage = lexicalStore()
+    const datasets = lexicalStorage.selectedDatasets
     const resources = datasets.join(',')
-    const queryParam = Object.entries(lexicalStoreData.selectedFields)
+    const queryParam = Object.entries(lexicalStorage.selectedFields)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
       .join(',')
 
@@ -38,12 +38,17 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
       }
     }
 
+    // TODO: remove this if when it is working in the BE
+    if (lexicalStorage.sortField != entryWordField) {
+      params['sort'] = lexicalStorage.sortField + '|' + lexicalStorage.sortOrder
+    }
+
     params['size'] = pageSize.toString()
     //    }
     //    if (pageSize > 10) {
     params['from'] = ((pageStart - 1) * pageSize).toString()
 
-    // console.log('AXIOS getTableData: param:', params)
+    console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
@@ -105,15 +110,22 @@ export const getStatisticsData = async (
 ) => {
   try {
     // console.log('Fetching data for:', query, columns)
-    const lexicalStoreData = lexicalStore()
-    const datasets = lexicalStoreData.selectedDatasets
+    const lexicalStorage = lexicalStore()
+    const datasets = lexicalStorage.selectedDatasets
     const resources = datasets.join(',')
+    /*
     const queryParam = Object.entries(query)
       .map(
         ([key, value]) =>
           `${value.position}|${encodeURIComponent(key)}|${encodeURIComponent(value.value)}`,
       )
       .join(',')
+    */
+
+    const queryParam = Object.entries(query)
+      .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+      .join(',')
+
     const params: Record<string, string> = {}
     params['resources'] = resources
     if (queryParam) {
@@ -126,7 +138,7 @@ export const getStatisticsData = async (
       params['compile'] = compileParams.join(',')
     }
     if (columns.length > 0) {
-      params['columns'] = 'resource_id=' + columns.join(',')
+      params['columns'] = 'resource_id=' + encodeURIComponent(columns.join(','))
     }
     const response = await axiosInstance.get(`/count`, {
       params: params,

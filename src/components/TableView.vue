@@ -32,6 +32,28 @@ const currentResultGrp = ref<Record<string, { entry: Entry; resourceId: string }
 // with rows sorted and put in (ordered) array
 const currentResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: string }[]>>({})
 
+const currentFields = computed(() => lexicalStorage.currentFields)
+const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
+// sort column
+const sortField = ref(lexicalStorage.sortField)
+
+const doSort = (s: string) => {
+  sortField.value = s
+  if (sortField.value == lexicalStorage.sortField) {
+    if (lexicalStorage.sortOrder == 'asc') {
+      lexicalStorage.sortOrder = 'desc'
+    } else {
+      lexicalStorage.sortOrder = 'asc'
+    }
+  } else {
+    lexicalStorage.sortOrder = 'asc'
+  }
+  lexicalStorage.sortField = sortField.value
+  fetchData()
+
+  console.log('doSort()', sortField.value)
+}
+
 //const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeResultTab)
 const isLoading = ref(false)
@@ -293,6 +315,17 @@ const lastPage = () => {
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
                     }}</span
                   >
+                  <span
+                    class="header-sortable"
+                    :class="{ 'header-sortable-selected': lexicalStorage.sortField == value.name }"
+                    v-if="currentCommonFields.find((obj) => obj.name === value.name)"
+                    @click="doSort(value.name)"
+                    >{{
+                      lexicalStorage.sortOrder == 'asc' || lexicalStorage.sortField != value.name
+                        ? '▼'
+                        : '▲'
+                    }}</span
+                  >
                 </div>
               </th>
             </tr>
@@ -482,18 +515,30 @@ th {
   background-color: var(--table-head-bg);
   color: var(--color-heading);
   font-weight: bold;
-  cursor: pointer;
 }
 
 .header-content {
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: space-between;
 }
 
 .header-content span {
   display: flex;
-  align-items: center;
+}
+
+.header-sortable {
+  cursor: pointer;
+}
+
+.header-sortable-selected {
+  color: var(--sb-orange);
+}
+
+.header-list {
+  font-style: italic;
+  background-color: var(--sb-grey-light);
+  color: black;
 }
 
 tr {
@@ -517,12 +562,6 @@ tr:hover {
   background-color: white;
   color: black;
   font-weight: bold;
-}
-
-.header-list {
-  font-style: italic;
-  background-color: var(--sb-grey-light);
-  color: black;
 }
 
 /* pagination */

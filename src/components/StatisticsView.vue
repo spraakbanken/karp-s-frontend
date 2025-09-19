@@ -61,6 +61,27 @@ const selectedColumns = computed({
 })
 
 const currentFields = computed(() => lexicalStorage.currentFields)
+const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
+
+// sort column
+const sortField = ref(lexicalStorage.sortField)
+
+const doSort = (s: string) => {
+  sortField.value = s
+  if (sortField.value == lexicalStorage.sortField) {
+    if (lexicalStorage.sortOrder == 'asc') {
+      lexicalStorage.sortOrder = 'desc'
+    } else {
+      lexicalStorage.sortOrder = 'asc'
+    }
+  } else {
+    lexicalStorage.sortOrder = 'asc'
+  }
+  lexicalStorage.sortField = sortField.value
+  fetchData()
+
+  console.log('doSort()', sortField.value)
+}
 
 // update state from URL
 const updateColumns = () => {
@@ -154,13 +175,12 @@ watch(
 
 watch(
   () => lexicalStorage.isSearch,
-  () => {
-    console.log('Watch stats isSearch!')
-
+  async () => {
     if (lexicalStorage.isSearch) {
       lexicalStorage.setIsSearch(false)
       {
-        fetchData()
+        await fetchData()
+        console.log('upd overview')
         updateOverview() // draw graph
       }
     }
@@ -475,7 +495,11 @@ const updateOverview = () => {
           }}</span>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownCompileFields">
-          <label v-for="param in currentFields" :key="param.name" class="statistics-dropdown-item">
+          <label
+            v-for="param in currentCommonFields"
+            :key="param.name"
+            class="statistics-dropdown-item"
+          >
             <input
               type="checkbox"
               :value="param.name"
@@ -504,7 +528,11 @@ const updateOverview = () => {
           </span>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
-          <label v-for="param in currentFields" :key="param.name" class="statistics-dropdown-item">
+          <label
+            v-for="param in currentCommonFields"
+            :key="param.name"
+            class="statistics-dropdown-item"
+          >
             <input
               type="checkbox"
               :value="param.name"
@@ -606,6 +634,22 @@ const updateOverview = () => {
                         : ''
                     }}
                   </span>
+
+                  <span
+                    class="header-sortable"
+                    :class="{
+                      'header-sortable-selected': lexicalStorage.sortField == key.columnField,
+                    }"
+                    v-if="currentCommonFields.find((obj) => obj.name === key.columnField)"
+                    @click="doSort(key.columnField)"
+                    >{{
+                      lexicalStorage.sortOrder == 'asc' ||
+                      lexicalStorage.sortField != key.columnField
+                        ? '▼'
+                        : '▲'
+                    }}</span
+                  >
+
                   <span class="resource">
                     <br />
                     {{ lexicalStorage.datasetLabels[key.headerValue] }}
@@ -811,6 +855,14 @@ th {
 
 th .resource {
   font-style: italic;
+}
+
+.header-sortable {
+  cursor: pointer;
+}
+
+.header-sortable-selected {
+  color: var(--sb-orange);
 }
 
 /*

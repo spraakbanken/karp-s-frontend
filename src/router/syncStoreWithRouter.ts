@@ -19,6 +19,7 @@ export function syncStoreWithRouter(router: Router): boolean {
       compile: lexicalStorage.selectedCompileFields.join(','),
       columns: lexicalStorage.selectedColumns.join(','),
       tab: lexicalStorage.activeResultTab,
+      sort: lexicalStorage.sortField + '|' + lexicalStorage.sortOrder,
       //pagestart: lexicalStorage.pageStart,
       //pagesize: lexicalStorage.pageSize,
     }
@@ -41,6 +42,8 @@ export function syncStoreWithRouter(router: Router): boolean {
       compile: lexicalStorage.selectedCompileFields,
       columns: lexicalStorage.selectedColumns,
       tab: lexicalStorage.activeResultTab,
+      sortField: lexicalStorage.sortField,
+      sortOrder: lexicalStorage.sortOrder,
       //pagestart: lexicalStorage.pageStart,
       //pagesize: lexicalStorage.pageSize,
     }),
@@ -88,6 +91,10 @@ export function syncStoreWithRouter(router: Router): boolean {
     if (query.has('tab')) {
       //console.log('initializeStoreFromQuery: tab=', query.get('tab'))
       lexicalStorage.setActiveResultTab(query.get('tab')!)
+    }
+    if (query.has('sort')) {
+      //console.log('initializeStoreFromQuery: tab=', query.get('tab'))
+      lexicalStorage.setSort(query.get('sort')!)
     }
     /*
     if (query.has('pagestart')) {
