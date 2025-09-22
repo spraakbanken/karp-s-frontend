@@ -61,48 +61,6 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
   }
 }
 
-/*
-export const getSubTableData = async (
-  compile: string,
-  pageStart: number,
-  pageSize: number,
-  dataset: string,
-) => {
-  try {
-    const lexicalStoreData = lexicalStore()
-    const datasets = lexicalStoreData.selectedDatasets
-    const resources = datasets.join(',')
-    const queryParam = Object.entries(lexicalStoreData.selectedFields)
-      .map(([key, value]) => (value.value != '' ? `${value.position}|${key}|${value.value}` : ''))
-      .join(',')
-
-    const params: Record<string, string> = {}
-    params['resources'] = resources
-    if (queryParam) {
-      params['q'] = queryParam
-    }
-    if (compile) {
-      params['compile'] = compile
-    }
-    //    if (pageSize > 10) {
-    params['size'] = pageSize.toString()
-    //    }
-    //    if (pageSize > 10) {
-    params['from'] = ((pageStart - 1) * pageSize).toString()
-    //    }
-    // console.log('getSubTableData - param:', params)
-    const response = await axiosInstance.get(`/search`, {
-      params: params,
-    })
-    // console.log('Fetched data:', response.data.hits)
-    const processedData = processSubDataset(response.data.hits, dataset)
-    return processedData
-  } catch (error) {
-    throw error
-  }
-}
-*/
-
 export const getStatisticsData = async (
   query: Record<string, SelectedFieldConfig>,
   compileParams: string[],
@@ -134,16 +92,15 @@ export const getStatisticsData = async (
       }
     }
     if (compileParams.length > 0) {
-      //params['compile'] = encodeURIComponent(compileParams.join(','))
       params['compile'] = compileParams.join(',')
     }
     if (columns.length > 0) {
-      params['columns'] = 'resource_id=' + encodeURIComponent(columns.join(','))
+      params['columns'] = 'resource_id=' + columns.join(',')
     }
+    //console.log('AXIOS call:', queryParam, params)
     const response = await axiosInstance.get(`/count`, {
       params: params,
     })
-    // console.log('Fetched data:', response.data.table)
     const tableData = response.data.table
     const headers = response.data.headers
     return { tableData, headers }
