@@ -334,7 +334,7 @@ const lastPage = () => {
             <template v-for="(value1, key) in item" :key="key">
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
-                  <MaxHeight :max-height="120">
+                  <MaxHeight :max-height="150">
                     <span v-html="lexicalStorage.formatCell(value2.value)"></span>
                   </MaxHeight>
                 </td>

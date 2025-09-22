@@ -29,7 +29,7 @@ const [expanded, toggleExpanded] = useToggle()
       :class="{ mask: !expanded && height > maxHeight }"
       :style="{
         // Set max height to slightly less than requested, to avoid ridiculously small differences between closed and expanded heights.
-        maxHeight: !expanded ? maxHeight - 50 + 'px' : undefined,
+        maxHeight: !expanded ? maxHeight - 30 + 'px' : undefined,
       }"
     >
       <!-- Inner wrapper, of which height is measured (content's intrinsic height) -->

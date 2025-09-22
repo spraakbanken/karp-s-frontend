@@ -659,6 +659,10 @@ const updateOverview = () => {
                   <span>
                     {{ t('statistics.total') }}
                   </span>
+                  <span v-if="key.headerField">
+                    <br />
+                    {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                  </span>
                 </template>
               </div>
             </th>

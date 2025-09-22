@@ -48,7 +48,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     //    if (pageSize > 10) {
     params['from'] = ((pageStart - 1) * pageSize).toString()
 
-    console.log('AXIOS getTableData: param:', params)
+    //console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
