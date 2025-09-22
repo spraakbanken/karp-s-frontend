@@ -279,7 +279,15 @@ const exportCSV = () => {
         lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] +
         '),'
     } else if (tableHeaders.value[key].type == 'total') {
-      csv += t('statistics.total') + ','
+      if (tableHeaders.value[key].headerField) {
+        csv +=
+          t('statistics.total') +
+          ' (' +
+          lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] +
+          '),'
+      } else {
+        csv += t('statistics.total') + ','
+      }
     }
   }
   csv += '\n'
