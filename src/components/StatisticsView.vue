@@ -84,13 +84,25 @@ const doSort = (s: string) => {
 }
 
 // update state from URL
-const updateColumns = () => {
-  lexicalStorage.setSelectedColumns(selectedColumns.value)
+const updateCompileParams = () => {
+  lexicalStorage.setSelectedCompileFields(selectedCompileFields.value)
 }
 
 // update state from URL
-const updateCompileParams = () => {
-  lexicalStorage.setSelectedCompileFields(selectedCompileFields.value)
+const updateColumns = () => {
+  updateShowHitsCheckbox.value = false
+  lexicalStorage.setSelectedColumns(selectedColumns.value)
+}
+
+const updateShowHitsCheckbox = ref(true)
+// UI show hits choice in "Additonal columns" dropdown
+const updateShowHits = () => {
+  console.log('CHKBOX:', updateShowHitsCheckbox.value)
+  if (updateShowHitsCheckbox.value) {
+    selectedColumns.value = []
+  } else {
+    selectedColumns.value = [entryWordField]
+  }
 }
 
 // show overview switch
@@ -329,7 +341,7 @@ const exportCSV = () => {
 /*
   Graph/Overview
 */
-const graph_max_number_of_values = 100
+//const graph_max_number_of_values = 100
 
 const graph_threshold = ref<number>(1)
 const graph_textangled = ref<boolean>(false)
@@ -356,11 +368,11 @@ const drawChart = () => {
     // last # is always total
     //console.log('row=', row, 'category=', category, 'value=', value)
     if (value >= graph_threshold.value) {
-      if (graph_value_count.value < graph_max_number_of_values) {
-        dataObj[category] = value
-        if (value > graph_value_max.value) {
-          graph_value_max.value = value
-        }
+      //if (graph_value_count.value < graph_max_number_of_values) {
+      dataObj[category] = value
+      if (value > graph_value_max.value) {
+        graph_value_max.value = value
+        //}
       }
       graph_value_count.value++
     }
@@ -382,11 +394,14 @@ const drawChart = () => {
 
     d3.selectAll('#karps_graph svg').remove()
 
+    /*
     const width =
       (barWidth + barSpace) *
       (graph_value_count.value < graph_max_number_of_values
         ? graph_value_count.value
         : graph_max_number_of_values)
+    */
+    const width = (barWidth + barSpace) * graph_value_count.value
 
     const svg = d3
       .select('#karps_graph')
@@ -536,6 +551,10 @@ const updateOverview = () => {
           </span>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
+          <label class="statistics-dropdown-item">
+            <input type="checkbox" v-model="updateShowHitsCheckbox" @change="updateShowHits" />
+            {{ $t('dataselector.statistics.nocolumns') }}
+          </label>
           <label
             v-for="param in currentCommonFields"
             :key="param.name"
@@ -595,10 +614,11 @@ const updateOverview = () => {
           {{ $t('graphs.dots') }}
         </span>
       </div>
+      <!--
       <div v-if="graph_value_count > graph_max_number_of_values" class="overview-max">
         {{ $t('graphs.maxnumberofvalues', { number: graph_max_number_of_values }) }}
       </div>
-
+      -->
       <div id="karps_graph"></div>
     </div>
 
@@ -626,6 +646,8 @@ const updateOverview = () => {
                 <template v-if="key.type == 'compile'">
                   <span>
                     {{ lexicalStorage.localizeField(key.columnField) }}
+                  </span>
+                  <span>
                     {{
                       lexicalStorage.isList(key.columnField)
                         ? '(' + t('table.header.list') + ')'
@@ -634,42 +656,51 @@ const updateOverview = () => {
                   </span>
                 </template>
                 <template v-if="key.type == 'value'">
-                  <span>
-                    {{ lexicalStorage.localizeField(key.columnField) }}
-                    {{
-                      lexicalStorage.isList(key.columnField)
-                        ? '(' + t('table.header.list') + ')'
-                        : ''
-                    }}
-                  </span>
+                  <div class="header-value-col">
+                    <div class="header-value-row">
+                      <span>
+                        {{ lexicalStorage.localizeField(key.columnField) }}
+                        {{
+                          lexicalStorage.isList(key.columnField)
+                            ? '(' + t('table.header.list') + ')'
+                            : ''
+                        }}
+                      </span>
 
-                  <span
-                    class="header-sortable"
-                    :class="{
-                      'header-sortable-selected': lexicalStorage.sortField == key.columnField,
-                    }"
-                    v-if="currentCommonFields.find((obj) => obj.name === key.columnField)"
-                    @click="doSort(key.columnField)"
-                    >{{
-                      lexicalStorage.sortOrder == 'asc' ||
-                      lexicalStorage.sortField != key.columnField
-                        ? '▼'
-                        : '▲'
-                    }}</span
-                  >
-
-                  <span class="resource">
-                    <br />
-                    {{ lexicalStorage.datasetLabels[key.headerValue] }}
-                  </span>
+                      <span
+                        class="header-sortable"
+                        :class="{
+                          'header-sortable-selected': lexicalStorage.sortField == key.columnField,
+                        }"
+                        v-if="currentCommonFields.find((obj) => obj.name === key.columnField)"
+                        @click="doSort(key.columnField)"
+                      >
+                        {{
+                          lexicalStorage.sortOrder == 'asc' ||
+                          lexicalStorage.sortField != key.columnField
+                            ? '▼'
+                            : '▲'
+                        }}
+                      </span>
+                    </div>
+                    <div>
+                      <span class="resource">
+                        {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                      </span>
+                    </div>
+                  </div>
                 </template>
                 <template v-if="key.type == 'total'">
+                  <!--
                   <span>
                     {{ t('statistics.total') }}
                   </span>
+                  -->
                   <span v-if="key.headerField">
-                    <br />
                     {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                  </span>
+                  <span v-else>
+                    {{ t('statistics.total') }}
                   </span>
                 </template>
               </div>
@@ -867,6 +898,25 @@ th {
 
 th .resource {
   font-style: italic;
+}
+
+.header-content {
+  display: flex;
+  align-items: top;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.header-value-col {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header-value-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .header-sortable {

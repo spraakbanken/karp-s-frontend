@@ -481,7 +481,7 @@ watch(
             <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
             <div class="">
               <div v-for="item in datasetInfo.fields" :key="item">
-                {{ item }}
+                {{ lexicalStorage.localizeField(item) }}
               </div>
             </div>
           </div>
@@ -494,7 +494,7 @@ watch(
 <style scoped>
 .data-component {
   padding: 0rem;
-  width: 300px;
+  width: 480px;
 }
 
 .dropdown {
