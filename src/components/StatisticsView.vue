@@ -20,6 +20,8 @@ const itemsPerPage = ref(100)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeResultTab)
+const showExpanded = ref(false)
+const columnCount = ref(false)
 
 const isDropdownColumns = ref(false)
 const isDropdownCompileFields = ref(false)
@@ -97,7 +99,7 @@ const updateColumns = () => {
 const updateShowHitsCheckbox = ref(true)
 // UI show hits choice in "Additonal columns" dropdown
 const updateShowHits = () => {
-  console.log('CHKBOX:', updateShowHitsCheckbox.value)
+  //console.log('CHKBOX:', updateShowHitsCheckbox.value)
   if (updateShowHitsCheckbox.value) {
     selectedColumns.value = []
   } else {
@@ -124,6 +126,7 @@ const fetchData = async () => {
         newFields as Record<string, SelectedFieldConfig>,
         newCompileFields as string[],
         newColumns as string[],
+        columnCount.value as boolean,
       )
       currentResult.value = tableData
       if (currentResult.value.length > 0) {
@@ -177,7 +180,7 @@ watch(
 )
 
 watch(
-  () => [lexicalStorage.selectedCompileFields, lexicalStorage.selectedColumns],
+  () => [lexicalStorage.selectedCompileFields, lexicalStorage.selectedColumns, columnCount],
   async () => {
     await fetchData()
     updateOverview() // draw graph
@@ -569,19 +572,38 @@ const updateOverview = () => {
             {{ lexicalStorage.localizeField(param.name) }}
           </label>
         </div>
+        <div>
+          <!-- show count instead of value -->
+          <label for="columnCount">
+            <input type="checkbox" id="columnCount" value="true" v-model="columnCount" />
+            {{ $t('statistics.showColumnCount') }}</label
+          >
+        </div>
       </div>
       <div v-if="currentResult.length">
-        <button @click="exportCSV()" class="export-button">{{ $t('statistics.exportCSV') }}</button>
-        <input
-          type="checkbox"
-          id="showOverviewCheckbox"
-          v-model="showOverview"
-          class="checkbox-showoverview"
-          @change="updateOverview()"
-        />
-        <label for="showOverviewCheckbox">
-          {{ $t('statistics.showOverview') }}
-        </label>
+        <div>
+          <button @click="exportCSV()" class="export-button">
+            {{ $t('statistics.exportCSV') }}
+          </button>
+        </div>
+        <div>
+          <label for="showOverviewCheckbox">
+            <input
+              type="checkbox"
+              id="showOverviewCheckbox"
+              v-model="showOverview"
+              @change="updateOverview()"
+            />
+            {{ $t('statistics.showOverview') }}
+          </label>
+        </div>
+        <div>
+          <!-- show all cells expanded -->
+          <label for="showExpanded">
+            <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
+            {{ $t('table.show.expanded') }}</label
+          >
+        </div>
       </div>
     </div>
 
@@ -691,13 +713,23 @@ const updateOverview = () => {
                   </div>
                 </template>
                 <template v-if="key.type == 'total'">
-                  <!--
-                  <span>
-                    {{ t('statistics.total') }}
+                  <span v-if="columnCount && selectedColumns.length > 0">
+                    <template v-if="key.headerField">
+                      {{ lexicalStorage.localizeField(key.headerField) }}<br />
+                      {{ key.headerValue }}
+                    </template>
+                    <template v-else>
+                      {{ t('statistics.total') }}
+                    </template>
                   </span>
-                  -->
-                  <span v-if="key.headerField">
-                    {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                  <span v-else-if="key.headerField">
+                    <span v-if="selectedColumns.length > 0">
+                      {{ lexicalStorage.localizeField(key.headerField) }}<br />
+                      {{ key.headerValue }}
+                    </span>
+                    <span v-else>
+                      {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                    </span>
                   </span>
                   <span v-else>
                     {{ t('statistics.total') }}
@@ -710,9 +742,14 @@ const updateOverview = () => {
         <tbody>
           <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
             <td v-for="(value, key) in item" :key="key">
-              <MaxHeight :max-height="200">
+              <template v-if="showExpanded">
                 <span v-html="lexicalStorage.formatCell(value)"></span>
-              </MaxHeight>
+              </template>
+              <template v-else>
+                <MaxHeight :max-height="32">
+                  <span v-html="lexicalStorage.formatCell(value)"></span>
+                </MaxHeight>
+              </template>
             </td>
           </tr>
         </tbody>
@@ -958,15 +995,11 @@ th .resource {
 /* elements */
 
 .export-button {
-  margin-top: 1rem;
+  margin-top: 0rem;
 }
 
 .overview-settings .export-button {
   margin: 0;
-}
-
-.checkbox-showoverview {
-  margin-left: 1rem;
 }
 
 /* table */

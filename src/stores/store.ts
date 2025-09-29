@@ -18,9 +18,9 @@ interface SearchRedux {
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets (union)
   currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
-  selectedFields: Record<string, SelectedFieldConfig>
-  selectedColumns: string[]
-  selectedCompileFields: string[]
+  selectedFields: Record<string, SelectedFieldConfig> // fields we are searching in
+  selectedCompileFields: string[] // statistics, fields we compile on
+  selectedColumns: string[] // statistics, field we show totals on
   searchQuery: string
   activeSearchTab: string
   activeResultTab: string
@@ -50,8 +50,8 @@ export const lexicalStore = defineStore('dataset', {
     currentFields: [],
     currentCommonFields: [],
     selectedFields: {},
-    selectedColumns: [],
     selectedCompileFields: [],
+    selectedColumns: [],
     searchQuery: '',
     activeSearchTab: 'simple',
     activeResultTab: 'table',

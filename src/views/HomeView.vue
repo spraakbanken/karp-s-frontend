@@ -144,8 +144,6 @@ watch(
   padding: 0.5rem 1rem;
   margin: 0;
   border: none;
-  border: 1px solid white;
-  border-bottom: none;
   color: var(--button-inactive-text-color);
   background-color: var(--button-inactive-bg-color);
   cursor: pointer;
@@ -160,8 +158,12 @@ watch(
 
 .searchTabs button.active,
 .tabs button.active {
-  color: var(--button-active-text-color);
+  color: black;
   font-weight: bold;
+  /*
+    color: var(--button-active-text-color);
   background-color: var(--button-active-bg-color);
+  */
+  background-color: white;
 }
 </style>

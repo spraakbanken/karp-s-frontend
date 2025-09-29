@@ -65,6 +65,7 @@ export const getStatisticsData = async (
   query: Record<string, SelectedFieldConfig>,
   compileParams: string[],
   columns: string[],
+  columnCount: boolean,
 ) => {
   try {
     // console.log('Fetching data for:', query, columns)
@@ -95,7 +96,12 @@ export const getStatisticsData = async (
       params['compile'] = compileParams.join(',')
     }
     if (columns.length > 0) {
-      params['columns'] = 'resource_id=' + columns.join(',')
+      //params['columns'] = 'resource_id=' + columns.join(',')
+      if (columnCount) {
+        params['columns'] = columns.map((item) => `${item}=_count`).join(',')
+      } else {
+        params['columns'] = columns.map((item) => `resource_id=${item}`).join(',')
+      }
     }
     //console.log('AXIOS call:', queryParam, params)
     const response = await axiosInstance.get(`/count`, {

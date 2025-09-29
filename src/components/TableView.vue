@@ -36,6 +36,8 @@ const currentFields = computed(() => lexicalStorage.currentFields)
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 // sort column
 const sortField = ref(lexicalStorage.sortField)
+// always show expanded rows (no "View more" button)
+const showExpanded = ref(false)
 
 const doSort = (s: string) => {
   sortField.value = s
@@ -286,6 +288,12 @@ const lastPage = () => {
         </tbody>
       </table>
 
+      <!-- show all cells expanded -->
+      <label>
+        <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
+        {{ $t('table.show.expanded') }}</label
+      >
+
       <!-- table -->
       <template v-for="(item, key, index) in currentResultGrpSorted" :key="index">
         <table v-if="currentResult.total > 0" class="fancy-table">
@@ -334,9 +342,14 @@ const lastPage = () => {
             <template v-for="(value1, key) in item" :key="key">
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
-                  <MaxHeight :max-height="150">
+                  <template v-if="showExpanded">
                     <span v-html="lexicalStorage.formatCell(value2.value)"></span>
-                  </MaxHeight>
+                  </template>
+                  <template v-else>
+                    <MaxHeight :max-height="32">
+                      <span v-html="lexicalStorage.formatCell(value2.value)"></span>
+                    </MaxHeight>
+                  </template>
                 </td>
               </tr>
             </template>
@@ -378,6 +391,11 @@ const lastPage = () => {
   /* margin-top: 2rem; */
   padding-left: 0.5rem;
   padding-top: 0.5rem;
+  /*
+  border-style: solid;
+  border-color: var(--color-complement);
+  border-width: 0.5rem 0 0 0;
+  */
 }
 
 .table-container {

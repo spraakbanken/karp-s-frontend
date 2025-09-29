@@ -498,9 +498,8 @@ watch(
 }
 
 .dropdown {
-  border: 1px solid var(--sb-orange-light);
+  border-radius: 0.5rem;
   background-color: var(--button-background-alt);
-  border-radius: 4px;
   margin-bottom: 1rem;
   position: relative;
   color: black;
@@ -530,9 +529,11 @@ watch(
   text-align: center;
 }
 
+/*
 .dropdown:hover {
   background-color: white;
 }
+*/
 
 .dropdown-menu {
   position: absolute;

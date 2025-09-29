@@ -13,6 +13,15 @@ watch(
 )
 */
 
+const setActiveSearchTab = (tab: string) => {
+  if (tab == 'simple') {
+    // remove any additional fields we search on
+    // TODO this removes any search data, so improve this
+    lexicalStorage.setStartField()
+  }
+  lexicalStorage.setActiveSearchTab(tab)
+}
+
 const lexicalStorage = lexicalStore()
 /*
 const selectedDatasets = computed({
@@ -277,19 +286,79 @@ watch(
     </div>
   </div>
   -->
-
-  <!-- prev advanced search -->
   <div class="search-component">
-    <!-- Search-box -->
-    <div v-for="param in selectedFieldsArray" :key="param" class="search-container">
-      <!-- Search-box
+    <!-- prev advanced search -->
+    <div>
+      <div class="searchTabs">
+        <button
+          :class="{ active: lexicalStorage.activeSearchTab === 'simple' }"
+          @click="setActiveSearchTab('simple')"
+        >
+          {{ $t('tab.search.simple') }}
+        </button>
+        <button
+          disabled
+          :class="{ active: lexicalStorage.activeSearchTab === 'extended' }"
+          @click="setActiveSearchTab('extended')"
+        >
+          {{ $t('tab.search.extended') }}
+        </button>
+        <button
+          disabled
+          :class="{ active: lexicalStorage.activeSearchTab === 'advanced' }"
+          @click="setActiveSearchTab('advanced')"
+        >
+          {{ $t('tab.search.advanced') }}
+        </button>
+      </div>
+    </div>
+    <div class="search-container">
+      <!-- Select field(s) for search-->
+      <div v-if="lexicalStorage.activeSearchTab == 'extended'">
+        <div
+          ref="dropdownContainer"
+          class="dropdown"
+          :class="{
+            'dropdown-open': isDropdownParams,
+            'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
+          }"
+          :disabled="lexicalStorage.selectedDatasets.length === 0"
+        >
+          <div class="dropdown-toggle" @click="toggleDropdownParams">
+            <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
+              $t('dataselector.noparameters')
+            }}</span>
+            <span v-else-if="currentFields.length === 0">{{
+              $t('dataselector.datasets.nocommon')
+            }}</span>
+            <span v-else-if="selectedFieldsArray.length === 0">{{
+              $t('dataselector.noparameters')
+            }}</span>
+            <span v-else
+              >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
+              <i class="arrow-down"></i>
+            </span>
+          </div>
 
-      <span :for="param"
-        >{{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeField(param) }}</span
-      >
+          <div class="dropdown-menu" v-if="isDropdownParams">
+            <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
+              <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
+              {{ lexicalStorage.localizeField(param.name) }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search a field -->
+      <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
+        <!-- Search-box
        -->
-      <div class="input-group">
-        <!--
+        <span :for="param">
+          <span v-if="lexicalStorage.activeSearchTab == 'extended'">
+            {{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeField(param) }}
+          </span>
+          <div class="input-group">
+            <!--
         <input
           class="search-input"
           type="text"
@@ -298,18 +367,18 @@ watch(
           :placeholder="$t('dataselector.parameters.placeholder')"
         />
         -->
-        <div>
-          <input
-            autofocus
-            @keyup.enter="updateData"
-            class="search-input"
-            type="text"
-            :id="param"
-            v-model="searchField[param].value"
-            :placeholder="$t('dataselector.parameters.placeholder')"
-          />
-        </div>
-        <!--
+            <div>
+              <input
+                autofocus
+                @keyup.enter="updateData"
+                class="search-input"
+                type="text"
+                :id="param"
+                v-model="searchField[param].value"
+                :placeholder="$t('dataselector.parameters.placeholder')"
+              />
+            </div>
+            <!--
         <select v-model="searchField[param].position">
           <option
             v-for="(position, index) in searchFieldPosition"
@@ -322,105 +391,53 @@ watch(
           </option>
         </select>
         -->
-        <div class="position">
-          <div class="group">
-            <label for="pos0">
-              <input
-                @click="handlePos(param, 0)"
-                type="checkbox"
-                id="pos0"
-                value="startswith"
-                v-model="searchField[param].positionInitial"
-              />
-              {{ $t(searchFieldPositionText[0]) }}</label
-            >
-            <label for="pos2">
-              <input
-                @click="handlePos(param, 2)"
-                type="checkbox"
-                id="pos2"
-                value="contains"
-                v-model="searchField[param].positionMedial"
-              />
-              {{ $t(searchFieldPositionText[2]) }}</label
-            >
-            <label for="pos1">
-              <input
-                @click="handlePos(param, 1)"
-                type="checkbox"
-                id="pos1"
-                value="endswith"
-                v-model="searchField[param].positionFinal"
-              />
-              {{ $t(searchFieldPositionText[1]) }}</label
-            >
+            <div class="position">
+              <div class="group">
+                <label for="pos0">
+                  <input
+                    @click="handlePos(param, 0)"
+                    type="checkbox"
+                    id="pos0"
+                    value="startswith"
+                    v-model="searchField[param].positionInitial"
+                  />
+                  {{ $t(searchFieldPositionText[0]) }}</label
+                >
+                <label for="pos2">
+                  <input
+                    @click="handlePos(param, 2)"
+                    type="checkbox"
+                    id="pos2"
+                    value="contains"
+                    v-model="searchField[param].positionMedial"
+                  />
+                  {{ $t(searchFieldPositionText[2]) }}</label
+                >
+                <label for="pos1">
+                  <input
+                    @click="handlePos(param, 1)"
+                    type="checkbox"
+                    id="pos1"
+                    value="endswith"
+                    v-model="searchField[param].positionFinal"
+                  />
+                  {{ $t(searchFieldPositionText[1]) }}</label
+                >
+              </div>
+            </div>
           </div>
-        </div>
+        </span>
       </div>
+      <button @click="updateData" class="search-button">
+        {{ $t('dataselector.datasearch') }}
+      </button>
     </div>
-    <!-- Select field(s) for search -->
-    <div style="visibility: hidden; width: 0px; height: 0px">
-      <div
-        ref="dropdownContainer"
-        class="dropdown"
-        :class="{
-          'dropdown-open': isDropdownParams,
-          'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
-        }"
-        :disabled="lexicalStorage.selectedDatasets.length === 0"
-      >
-        <div class="dropdown-toggle" @click="toggleDropdownParams">
-          <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
-            $t('dataselector.noparameters')
-          }}</span>
-          <span v-else-if="currentFields.length === 0">{{
-            $t('dataselector.datasets.nocommon')
-          }}</span>
-          <span v-else-if="selectedFieldsArray.length === 0">{{
-            $t('dataselector.noparameters')
-          }}</span>
-          <span v-else
-            >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
-            <i class="arrow-down"></i>
-          </span>
-        </div>
-
-        <div class="dropdown-menu" v-if="isDropdownParams">
-          <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
-            <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
-            <span v-if="param.name == entryWordField" style="font-weight: bold">
-              {{ lexicalStorage.localizeField(param.name) }}
-            </span>
-            <span v-else>
-              {{ lexicalStorage.localizeField(param.name) }}
-            </span>
-          </label>
-        </div>
-      </div>
-    </div>
-    <button @click="updateData">
-      {{ $t('dataselector.datasearch') }}
-    </button>
   </div>
 
   <!--
   <p v-if="selectedDatasets.length == 0" style="padding: 1rem">
     {{ $t('message.nodatasetselected') }}
   </p>
-  -->
-
-  <!--
-  <div class="searchTabs">
-    <button :class="{ active: activeSearchTab === 'simple' }" @click="setActiveSearchTab('simple')">
-      {{ $t('tab.search.simple') }}
-    </button>
-    <button
-      :class="{ active: activeSearchTab === 'extended' }"
-      @click="setActiveSearchTab('extended')"
-    >
-      {{ $t('tab.search.extended') }}
-    </button>
-  </div>
   -->
 </template>
 
@@ -431,16 +448,14 @@ input:focus {
 }
 */
 
+/* structure */
 .search-component {
-  background-color: var(--color-search-area);
   color: black;
   margin-bottom: 1rem;
-  border-radius: 0.5rem;
-  padding: 1rem;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   @media (width < 640px) {
     flex-direction: column;
     align-items: center;
@@ -448,53 +463,57 @@ input:focus {
   }
 }
 
+.search-container-simple {
+  margin-top: 0.5rem;
+}
+
+.search-container {
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-top: 0rem;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  background-color: var(--color-search-area);
+}
+
+.search-repeat {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-top: 0rem;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  background-color: var(--color-search-area);
+}
+
 /* simple and advanced search */
 
 .searchTabs {
   display: flex;
   justify-content: flex-start;
+  border-radius: 0;
+  padding-left: 1rem;
 }
 
 .searchTabs button {
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
-  border: 1px solid var(--color-complement);
-  border-radius: 32px;
-  background-color: var(--color-complement);
-  cursor: pointer;
-  font-size: var(--font-size);
-  font-weight: bold;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
-}
-
-.searchTabs button:hover {
-  background-color: var(--color-color-background-hover);
+  border: none;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: var(--sb-grey-light);
 }
 
 .searchTabs button.active {
-  background-color: none;
+  background-color: var(--color-search-area);
   font-weight: bold;
-  background-color: white;
 }
 
 .search-advanced-label {
   padding-left: 0.5rem;
 }
-
-.search-container-simple {
-  margin-top: 0.5rem;
-}
-
-/*
-.search-container {
-  margin-top: 0rem;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-}
-*/
 
 /* select field */
 
@@ -614,6 +633,7 @@ input:focus {
 .input-group .search-input {
   /* flex: 1;*/
   margin-right: 0.5rem;
+  margin-left: 0.5rem;
   padding: 0.5rem;
   /* border: 2px solid var(--sb-orange); */
   border: none;
@@ -631,7 +651,7 @@ input:focus {
 
 /* search-button */
 
-.search-component button {
+.search-button {
   background-color: var(--sb-orange);
   border: none;
   border-radius: 0.5rem;
@@ -639,12 +659,13 @@ input:focus {
   text-align: center;
   font-weight: bold;
   color: white;
+  width: 30%;
   @media (width < 640px) {
     width: 100%;
   }
 }
 
-.search-component button:hover {
+.search-button:hover {
   border: none;
   background-color: white;
   color: black;

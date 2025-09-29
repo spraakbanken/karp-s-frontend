@@ -16,20 +16,13 @@ const [expanded, toggleExpanded] = useToggle()
 
 <template>
   <div>
-    <div v-if="height > maxHeight" class="text-center p-2 text-sm">
-      <ActionButton class="button-slim" @click="toggleExpanded()">
-        <PhCaretDoubleUp v-if="expanded" class="inline mb-1 mr-0.5" />
-        <PhCaretDoubleDown v-else class="inline mb-1 mr-0.5" />
-        {{ expanded ? $t('expand.close') : $t('expand.open') }}
-      </ActionButton>
-    </div>
     <!-- Outer wrapper, whose height gets limited -->
     <div
       class="overflow-auto"
       :class="{ mask: !expanded && height > maxHeight }"
       :style="{
         // Set max height to slightly less than requested, to avoid ridiculously small differences between closed and expanded heights.
-        maxHeight: !expanded ? maxHeight - 30 + 'px' : undefined,
+        maxHeight: !expanded ? maxHeight + 'px' : undefined,
       }"
     >
       <!-- Inner wrapper, of which height is measured (content's intrinsic height) -->
@@ -37,11 +30,22 @@ const [expanded, toggleExpanded] = useToggle()
         <slot />
       </div>
     </div>
+    <div v-if="height > maxHeight" class="text-center p-2 text-sm">
+      <ActionButton class="button-slim" @click="toggleExpanded()">
+        <PhCaretDoubleUp v-if="expanded" class="button-detail" />
+        <PhCaretDoubleDown v-else class="button-detail" />
+        {{ expanded ? $t('expand.close') : $t('expand.open') }}
+      </ActionButton>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .mask {
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 4em);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 0em);
+  /*mask-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 4em);*/
+}
+.button-detail {
+  display: inline;
 }
 </style>
