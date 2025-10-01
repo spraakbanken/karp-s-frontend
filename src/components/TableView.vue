@@ -8,6 +8,7 @@ import {
   type Entry,
   type EntryS,
   type FieldConfig,
+  entryWordField,
 } from '@/types/datasetConfig'
 import { useI18n } from 'vue-i18n'
 import MaxHeight from '@/components/MaxHeight.vue'
@@ -88,7 +89,7 @@ const fetchData = async () => {
       currentResult.value = data
       currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
       currentResultGrpSorted.value = {}
-      //console.log('fetchdata() - after getTableData()', currentResultGrp.value)
+      //console.log('fetchdata() - after getTableData()', data, currentResultGrp.value)
 
       // sort columns based on config
       // transform key,value-pairs to (ordered) array of key,value-pairs
@@ -97,6 +98,13 @@ const fetchData = async () => {
         const dataset_unsorted: DatasetEntry[] = currentResultGrp.value[resId]
         // with sorted rows
         currentResultGrpSorted.value[resId] = []
+
+        // we will fill the first column with the value of the entryword
+        const resIndex = lexicalStorage.currentConfig.resources.findIndex(
+          (item) => item.resourceId === resId,
+        )
+        const entryWord = lexicalStorage.currentConfig.resources[resIndex].entryWord.field
+
         // for each unsorted row
         for (let i = 0; i < dataset_unsorted.length; i++) {
           // unsorted row
@@ -109,6 +117,10 @@ const fetchData = async () => {
             lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
           // sorted row
           const e1: EntryS[] = []
+
+          // add entryword as first column
+          e1.push({ name: entryWordField, value: e0[entryWord] })
+
           // loop over config, when field is found, add value to new row/array
           for (const key in fieldsFromConfig) {
             //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
@@ -289,7 +301,7 @@ const lastPage = () => {
       </table>
 
       <!-- show all cells expanded -->
-      <label>
+      <label for="showExpanded">
         <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
         {{ $t('table.show.expanded') }}</label
       >
@@ -301,7 +313,8 @@ const lastPage = () => {
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
-                {{ lexicalStorage.datasetLabels[key] }}
+                {{ lexicalStorage.datasetLabels[key] }}:
+                {{ currentResult.resourceHits[key] }}
               </td>
             </tr>
             <!-- column names -->
@@ -311,6 +324,7 @@ const lastPage = () => {
                 :key="key"
                 :class="{
                   'header-list': lexicalStorage.isList(value.name),
+                  'header-compile': value.name == entryWordField,
                 }"
               >
                 <div class="header-content">
@@ -557,6 +571,11 @@ th {
   font-style: italic;
   background-color: var(--sb-grey-light);
   color: black;
+}
+
+.header-compile {
+  background-color: var(--sb-orange);
+  color: white;
 }
 
 tr {

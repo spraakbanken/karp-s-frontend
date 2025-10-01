@@ -52,7 +52,10 @@ const searchFieldPositionText = [
   'dataselector.parameter.position.equals',
   'dataselector.parameter.position.regex',
 ]
-
+const searchExtendedOp = computed({
+  get: () => lexicalStorage.searchExtendedOp,
+  set: (x) => lexicalStorage.setSearchExtendedOp(x),
+})
 //const searchFieldPositionEnabled = [true, true, true, true, false]
 
 const toggleDropdownParams = () => {
@@ -297,7 +300,6 @@ watch(
           {{ $t('tab.search.simple') }}
         </button>
         <button
-          disabled
           :class="{ active: lexicalStorage.activeSearchTab === 'extended' }"
           @click="setActiveSearchTab('extended')"
         >
@@ -347,15 +349,44 @@ watch(
             </label>
           </div>
         </div>
+        <div>
+          <span>{{ $t('search.operator.title') }}</span>
+          <input
+            class="operator-button"
+            type="radio"
+            id="searchExtendedOpAnd"
+            value="true"
+            v-model="searchExtendedOp"
+          />
+          <label class="operator-button" for="searchExtendedOpAnd">{{
+            $t('search.operator.and')
+          }}</label>
+          <input
+            class="operator-button"
+            type="radio"
+            id="searchExtendedOpOr"
+            value="false"
+            v-model="searchExtendedOp"
+          />
+          <label class="operator-button" for="searchExtendedOpOr">{{
+            $t('search.operator.or')
+          }}</label>
+        </div>
       </div>
-
       <!-- Search a field -->
       <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
         <!-- Search-box
        -->
         <span :for="param">
           <span v-if="lexicalStorage.activeSearchTab == 'extended'">
-            {{ $t('dataselector.parameters.prefix') }}: {{ lexicalStorage.localizeField(param) }}
+            {{ lexicalStorage.localizeField(param) }}
+            <i
+              >({{
+                lexicalStorage.currentCommonFields.find((item) => item.name === param)
+                  ? $t('search.field.common')
+                  : $t('search.field.notcommon')
+              }})</i
+            >
           </span>
           <div class="input-group">
             <!--
@@ -521,7 +552,6 @@ input:focus {
   flex: auto;
   padding: 0.5rem;
   position: relative;
-  margin-right: 0.5rem;
   background-color: var(--sb-grey-light);
   border-radius: 0.5rem;
   color: black;
@@ -649,6 +679,9 @@ input:focus {
   outline-style: solid;
 }
 
+.operator-button {
+  margin-left: 0.25rem;
+}
 /* search-button */
 
 .search-button {

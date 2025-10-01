@@ -25,16 +25,28 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
   try {
     const lexicalStorage = lexicalStore()
     const datasets = lexicalStorage.selectedDatasets
+    const params: Record<string, string> = {}
+
+    // datasets
     const resources = datasets.join(',')
+    params['resources'] = resources
+
+    // query/field parameters
     const queryParam = Object.entries(lexicalStorage.selectedFields)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-      .join(',')
-
-    const params: Record<string, string> = {}
-    params['resources'] = resources
+      .join('||')
     if (queryParam) {
       if (!queryParam.endsWith('|')) {
-        params['q'] = queryParam
+        if (Object.keys(lexicalStorage.selectedFields).length == 1) {
+          params['q'] = queryParam
+        } else {
+          // more than one field, ie Extended search
+          if (lexicalStorage.searchExtendedOp) {
+            params['q'] = 'and(' + queryParam + ')'
+          } else {
+            params['q'] = 'or(' + queryParam + ')'
+          }
+        }
       }
     }
 
@@ -44,16 +56,11 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     }
 
     params['size'] = pageSize.toString()
-    //    }
-    //    if (pageSize > 10) {
     params['from'] = ((pageStart - 1) * pageSize).toString()
 
-    //console.log('AXIOS getTableData: param:', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
     })
-    // console.log('AXIOS getTableData: hits:', response.data.hits)
-    //const processedData = processDatasets(response.data.hits)
 
     return response.data
   } catch (error) {
@@ -68,33 +75,39 @@ export const getStatisticsData = async (
   columnCount: boolean,
 ) => {
   try {
-    // console.log('Fetching data for:', query, columns)
     const lexicalStorage = lexicalStore()
     const datasets = lexicalStorage.selectedDatasets
-    const resources = datasets.join(',')
-    /*
-    const queryParam = Object.entries(query)
-      .map(
-        ([key, value]) =>
-          `${value.position}|${encodeURIComponent(key)}|${encodeURIComponent(value.value)}`,
-      )
-      .join(',')
-    */
+    const params: Record<string, string> = {}
 
+    // datasets
+    const resources = datasets.join(',')
+    params['resources'] = resources
+
+    // query/field parameters
     const queryParam = Object.entries(query)
       .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-      .join(',')
-
-    const params: Record<string, string> = {}
-    params['resources'] = resources
+      .join('||')
     if (queryParam) {
       if (!queryParam.endsWith('|')) {
-        params['q'] = queryParam
+        if (Object.keys(lexicalStorage.selectedFields).length == 1) {
+          params['q'] = queryParam
+        } else {
+          // more than one field, ie Extended search
+          if (lexicalStorage.searchExtendedOp) {
+            params['q'] = 'and(' + queryParam + ')'
+          } else {
+            params['q'] = 'or(' + queryParam + ')'
+          }
+        }
       }
     }
+
+    // compile on
     if (compileParams.length > 0) {
       params['compile'] = compileParams.join(',')
     }
+
+    // columns
     if (columns.length > 0) {
       //params['columns'] = 'resource_id=' + columns.join(',')
       if (columnCount) {
@@ -103,7 +116,7 @@ export const getStatisticsData = async (
         params['columns'] = columns.map((item) => `resource_id=${item}`).join(',')
       }
     }
-    //console.log('AXIOS call:', queryParam, params)
+
     const response = await axiosInstance.get(`/count`, {
       params: params,
     })

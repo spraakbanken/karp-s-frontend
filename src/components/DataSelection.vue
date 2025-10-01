@@ -301,7 +301,7 @@ const filterDatasets = computed(() => {
 watch(
   () => selectedDatasets,
   (newDatasets, oldDatasets) => {
-    console.log('WATCH: DataSelection selectedDatasets', newDatasets)
+    //console.log('WATCH: DataSelection selectedDatasets', newDatasets)
 
     if (oldDatasets.value.length === 0) {
       // set "ingångsord" to default, also for statistics
@@ -375,7 +375,9 @@ watch(
                 :class="{ 'tags-button-selected': selectedTags.indexOf(tag) !== -1 }"
                 class="tags-button datasets-tooltip"
               >
-                {{ th(lexicalStorage.currentConfig.tags[tag].label) }}
+                {{ th(lexicalStorage.currentConfig.tags[tag].label) }}&nbsp; ({{
+                  formatNumber(lexicalStorage.tagEntriesCount[tag], 2)
+                }})
                 <span class="datasets-tooltiptext">{{
                   th(lexicalStorage.currentConfig.tags[tag].description)
                     ? th(lexicalStorage.currentConfig.tags[tag].description)
@@ -395,7 +397,16 @@ watch(
           <div class="dropdown-filter">
             {{ $t('dataselector.datasets.filter') }}:
             <input type="text" v-model="searchDatasets" />
+            <button
+              @click="unselectTags()"
+              class="tags-button-action"
+              style="margin-left: 0.5rem"
+              :disabled="selectedTags.length == 0 && searchDatasets == ''"
+            >
+              {{ $t('dataselector.tags.reset') }}
+            </button>
           </div>
+          <!--
           <div>
             <input
               type="checkbox"
@@ -405,17 +416,10 @@ watch(
             />
             {{ $t('dataselector.datasets.showselected') }}
           </div>
-          <div>
-            <button
-              @click="unselectTags()"
-              class="tags-button-action"
-              :disabled="selectedTags.length == 0 && searchDatasets == ''"
-            >
-              {{ $t('dataselector.tags.reset') }}
-            </button>
-          </div>
+          -->
         </div>
         <div class="dropdown-selectedfirst">
+          <!--
           <div>
             <input
               type="checkbox"
@@ -425,6 +429,7 @@ watch(
             />
             {{ $t('dataselector.datasets.selectedfirst') }}
           </div>
+          -->
           <div v-if="listExcludedDatasets" class="datasets-excluded">
             {{ $t('dataselector.datasets.excluded') }}
           </div>

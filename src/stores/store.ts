@@ -15,6 +15,7 @@ interface SearchRedux {
   selectedDatasets: string[] // selected datasets (id's)
   selectedDatasetsSize: number // number of entries in selected datasets
   currentTags: string[] // all tags
+  tagEntriesCount: Record<string, number> // total number of entries for tags
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets (union)
   currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
@@ -22,6 +23,7 @@ interface SearchRedux {
   selectedCompileFields: string[] // statistics, fields we compile on
   selectedColumns: string[] // statistics, field we show totals on
   searchQuery: string
+  searchExtendedOp: boolean
   activeSearchTab: string
   activeResultTab: string
   activeLocale: string
@@ -46,6 +48,7 @@ export const lexicalStore = defineStore('dataset', {
     selectedDatasets: [],
     selectedDatasetsSize: 0,
     currentTags: [],
+    tagEntriesCount: {},
     fieldsInDatasets: {},
     currentFields: [],
     currentCommonFields: [],
@@ -53,6 +56,7 @@ export const lexicalStore = defineStore('dataset', {
     selectedCompileFields: [],
     selectedColumns: [],
     searchQuery: '',
+    searchExtendedOp: true,
     activeSearchTab: 'simple',
     activeResultTab: 'table',
     activeLocale: 'sv',
@@ -122,12 +126,28 @@ export const lexicalStore = defineStore('dataset', {
         this.currentDatasetsSize += Number(this.currentConfig.resources[ds].size)
       }
 
+      // count number of entries in each tagset
+      this.currentTags.forEach((tag) => {
+        if (!(tag in this.tagEntriesCount)) {
+          this.tagEntriesCount[tag] = 0
+        }
+        for (const c of this.currentConfig.resources) {
+          if (c.hasOwnProperty('tags')) {
+            if (c.tags.includes(tag)) {
+              this.tagEntriesCount[tag] += Number(c.size)
+            }
+          }
+        }
+      })
       // setup default datasets for first run = select all
       // this.setSelectedDataset(['saol14', 'so2009'])
       this.setSelectedDataset(this.currentDatasets)
     },
     setSearchQuery(query: string) {
       this.searchQuery = query
+    },
+    setSearchExtendedOp(x: boolean) {
+      this.searchExtendedOp = x
     },
     /*
     setSelectedParams(params: string[]) {

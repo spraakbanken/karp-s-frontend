@@ -646,13 +646,22 @@ const updateOverview = () => {
 
     <!-- show table -->
     <div v-else class="table-wrapper">
+      <!--
       <div class="tab" v-if="!isLoading && currentResult.length">
         {{ $t('statistics.numberOfHits') }}:
         {{ currentResult.length }}
       </div>
-
+      -->
       <table v-if="currentResult.length" class="fancy-table">
         <thead>
+          <!-- show number of hits -->
+          <tr>
+            <td colspan="100%" class="dataset-label">
+              {{ $t('statistics.numberOfHits') }}:
+              {{ currentResult.length }}
+            </td>
+          </tr>
+
           <tr>
             <th
               v-for="(key, index) in tableHeaders"
@@ -935,6 +944,13 @@ th {
 
 th .resource {
   font-style: italic;
+}
+
+.dataset-label {
+  text-align: center;
+  background-color: white;
+  color: black;
+  font-weight: bold;
 }
 
 .header-content {
