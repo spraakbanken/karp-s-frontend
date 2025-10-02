@@ -144,9 +144,11 @@ onBeforeUnmount(() => {
 const selectDataset = () => {
   //console.log('selectDataset:', selectedDatasets.value.length)
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
+  /* save filtering/sorting until next time we open dropdown
   if (listSortSelectedFirst.value) {
     doFilterDatasets()
   }
+  */
 }
 
 // INFO: doesn't trigger the watch (because selectedDatasets is "computed")
@@ -158,10 +160,23 @@ const selectTags = (tag: string) => {
     // remove it
     selectedTags.value.splice(tagIndex, 1)
   }
-  doFilterDatasets()
+
+  const selDS: string[] = []
+  const currentConfig = lexicalStorage.currentConfig
+  for (const c of currentConfig.resources) {
+    //if (!selectedDatasets.value.includes(c.resourceId)) {
+    if (hasTags(c.resourceId)) {
+      selDS.push(c.resourceId)
+    }
+    //}
+  }
+  selectedDatasets.value = selDS
+
+  //doFilterDatasets()
 }
 
 const unselectAll = () => {
+  selectedTags.value = []
   selectedDatasets.value = []
 }
 
@@ -210,7 +225,8 @@ const doFilterDatasets = () => {
     } else if (
       (!searchDatasets.value ||
         label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1) &&
-      (selectedTags.value.length == 0 || hasTags(c.resourceId))
+      true
+      //      (selectedTags.value.length == 0 || hasTags(c.resourceId))
     ) {
       arr.push(c.resourceId)
     } else {

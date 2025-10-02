@@ -374,15 +374,11 @@ watch(
           </div>
         </div>
         <!-- Search a field -->
+        <i>Obs! Sök f n enbart i gemensamma fält.</i>
         <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
           <!-- Search-box
        -->
-          <p v-if="lexicalStorage.activeSearchTab == 'extended'">
-            <i
-              >Obs! I nuläget går det endast att söka i fält som är gemensamma för alla valda
-              datamängder.</i
-            >
-          </p>
+          <div v-if="lexicalStorage.activeSearchTab == 'extended'"></div>
           <hr v-if="lexicalStorage.activeSearchTab == 'extended'" class="search-repeat-hr" />
           <span :for="param">
             <span v-if="lexicalStorage.activeSearchTab == 'extended'">
@@ -704,7 +700,7 @@ input:focus {
   border-radius: 4px;
   width: 300px;
   @media (width < 640px) {
-    width: 400px;
+    width: 300px;
   }
 }
 

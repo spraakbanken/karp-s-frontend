@@ -973,6 +973,7 @@ th .resource {
 }
 
 .header-sortable {
+  color: var(--sb-grey-medium);
   cursor: pointer;
 }
 
