@@ -57,6 +57,10 @@ const searchExtendedOp = computed({
   set: (x) => lexicalStorage.setSearchExtendedOp(x),
 })
 //const searchFieldPositionEnabled = [true, true, true, true, false]
+const searchQuery = computed({
+  get: () => lexicalStorage.searchQuery,
+  set: (x) => lexicalStorage.setSearchQuery(x),
+})
 
 const toggleDropdownParams = () => {
   isDropdownParams.value = !isDropdownParams.value
@@ -270,25 +274,6 @@ watch(
   </div>
   -->
 
-  <!-- Simple search
-  <div
-    v-if="activeSearchTab === 'simple' && parameters.hasOwnProperty('word')"
-    class="search-component"
-  >
-    <div class="search-container-simple">
-      <div class="input-group">
-        <input
-          class="search-input"
-          type="text"
-          id="word"
-          v-model="parameters['word'].value"
-          :placeholder="$t('dataselector.simplesearch.placeholder')"
-          @change="updateData"
-        />
-      </div>
-    </div>
-  </div>
-  -->
   <div class="search-component">
     <!-- prev advanced search -->
     <div>
@@ -306,7 +291,6 @@ watch(
           {{ $t('tab.search.extended') }}
         </button>
         <button
-          disabled
           :class="{ active: lexicalStorage.activeSearchTab === 'advanced' }"
           @click="setActiveSearchTab('advanced')"
         >
@@ -316,80 +300,101 @@ watch(
     </div>
     <div class="search-container">
       <!-- Select field(s) for search-->
-      <div v-if="lexicalStorage.activeSearchTab == 'extended'">
-        <div
-          ref="dropdownContainer"
-          class="dropdown"
-          :class="{
-            'dropdown-open': isDropdownParams,
-            'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
-          }"
-          :disabled="lexicalStorage.selectedDatasets.length === 0"
-        >
-          <div class="dropdown-toggle" @click="toggleDropdownParams">
-            <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
-              $t('dataselector.noparameters')
-            }}</span>
-            <span v-else-if="currentFields.length === 0">{{
-              $t('dataselector.datasets.nocommon')
-            }}</span>
-            <span v-else-if="selectedFieldsArray.length === 0">{{
-              $t('dataselector.noparameters')
-            }}</span>
-            <span v-else
-              >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
-              <i class="arrow-down"></i>
-            </span>
-          </div>
+      <div
+        v-if="
+          lexicalStorage.activeSearchTab == 'simple' || lexicalStorage.activeSearchTab == 'extended'
+        "
+      >
+        <div v-if="lexicalStorage.activeSearchTab == 'extended'">
+          <div
+            ref="dropdownContainer"
+            class="dropdown"
+            :class="{
+              'dropdown-open': isDropdownParams,
+              'dropdown-disabled': lexicalStorage.selectedDatasets.length === 0,
+            }"
+            :disabled="lexicalStorage.selectedDatasets.length === 0"
+          >
+            <div class="dropdown-toggle" @click="toggleDropdownParams">
+              <span v-if="lexicalStorage.selectedDatasets.length === 0">{{
+                $t('dataselector.noparameters')
+              }}</span>
+              <span v-else-if="currentFields.length === 0">{{
+                $t('dataselector.datasets.nocommon')
+              }}</span>
+              <span v-else-if="selectedFieldsArray.length === 0">{{
+                $t('dataselector.noparameters')
+              }}</span>
+              <span v-else
+                >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
+                <i class="arrow-down"></i>
+              </span>
+            </div>
 
-          <div class="dropdown-menu" v-if="isDropdownParams">
-            <label v-for="param in currentFields" :key="param.name" class="dropdown-item">
-              <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
-              {{ lexicalStorage.localizeField(param.name) }}
-            </label>
+            <div class="dropdown-menu" v-if="isDropdownParams">
+              <div v-for="param in currentFields" :key="param.name" class="dropdown-item">
+                <label> </label>
+
+                <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
+                {{ lexicalStorage.localizeField(param.name) }}&nbsp;
+                <span style="float: right">
+                  <i>
+                    {{
+                      lexicalStorage.currentCommonFields.find((item) => item.name === param.name)
+                        ? ''
+                        : '(' + $t('search.field.notcommon.short') + ')'
+                    }}</i
+                  >
+                </span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 0.5rem">
+            <span>{{ $t('search.operator.title') }}</span>
+            <input
+              class="operator-button"
+              type="radio"
+              id="searchExtendedOpAnd"
+              value="true"
+              v-model="searchExtendedOp"
+            />
+            <label class="operator-button" for="searchExtendedOpAnd">{{
+              $t('search.operator.and')
+            }}</label>
+            <input
+              class="operator-button"
+              type="radio"
+              id="searchExtendedOpOr"
+              value="false"
+              v-model="searchExtendedOp"
+            />
+            <label class="operator-button" for="searchExtendedOpOr">{{
+              $t('search.operator.or')
+            }}</label>
           </div>
         </div>
-        <div>
-          <span>{{ $t('search.operator.title') }}</span>
-          <input
-            class="operator-button"
-            type="radio"
-            id="searchExtendedOpAnd"
-            value="true"
-            v-model="searchExtendedOp"
-          />
-          <label class="operator-button" for="searchExtendedOpAnd">{{
-            $t('search.operator.and')
-          }}</label>
-          <input
-            class="operator-button"
-            type="radio"
-            id="searchExtendedOpOr"
-            value="false"
-            v-model="searchExtendedOp"
-          />
-          <label class="operator-button" for="searchExtendedOpOr">{{
-            $t('search.operator.or')
-          }}</label>
-        </div>
-      </div>
-      <!-- Search a field -->
-      <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
-        <!-- Search-box
+        <!-- Search a field -->
+        <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
+          <!-- Search-box
        -->
-        <span :for="param">
-          <span v-if="lexicalStorage.activeSearchTab == 'extended'">
-            {{ lexicalStorage.localizeField(param) }}
+          <p v-if="lexicalStorage.activeSearchTab == 'extended'">
             <i
-              >({{
-                lexicalStorage.currentCommonFields.find((item) => item.name === param)
-                  ? $t('search.field.common')
-                  : $t('search.field.notcommon')
-              }})</i
+              >Obs! I nuläget går det endast att söka i fält som är gemensamma för alla valda
+              datamängder.</i
             >
-          </span>
-          <div class="input-group">
-            <!--
+          </p>
+          <hr v-if="lexicalStorage.activeSearchTab == 'extended'" class="search-repeat-hr" />
+          <span :for="param">
+            <span v-if="lexicalStorage.activeSearchTab == 'extended'">
+              {{ lexicalStorage.localizeField(param) }}
+              <i>{{
+                lexicalStorage.currentCommonFields.find((item) => item.name === param)
+                  ? ''
+                  : '(' + $t('search.field.notcommon') + ')'
+              }}</i>
+            </span>
+            <div class="input-group">
+              <!--
         <input
           class="search-input"
           type="text"
@@ -398,18 +403,18 @@ watch(
           :placeholder="$t('dataselector.parameters.placeholder')"
         />
         -->
-            <div>
-              <input
-                autofocus
-                @keyup.enter="updateData"
-                class="search-input"
-                type="text"
-                :id="param"
-                v-model="searchField[param].value"
-                :placeholder="$t('dataselector.parameters.placeholder')"
-              />
-            </div>
-            <!--
+              <div>
+                <input
+                  autofocus
+                  @keyup.enter="updateData"
+                  class="search-input"
+                  type="text"
+                  :id="param"
+                  v-model="searchField[param].value"
+                  :placeholder="$t('dataselector.parameters.placeholder')"
+                />
+              </div>
+              <!--
         <select v-model="searchField[param].position">
           <option
             v-for="(position, index) in searchFieldPosition"
@@ -422,42 +427,62 @@ watch(
           </option>
         </select>
         -->
-            <div class="position">
-              <div class="group">
-                <label for="pos0">
-                  <input
-                    @click="handlePos(param, 0)"
-                    type="checkbox"
-                    id="pos0"
-                    value="startswith"
-                    v-model="searchField[param].positionInitial"
-                  />
-                  {{ $t(searchFieldPositionText[0]) }}</label
-                >
-                <label for="pos2">
-                  <input
-                    @click="handlePos(param, 2)"
-                    type="checkbox"
-                    id="pos2"
-                    value="contains"
-                    v-model="searchField[param].positionMedial"
-                  />
-                  {{ $t(searchFieldPositionText[2]) }}</label
-                >
-                <label for="pos1">
-                  <input
-                    @click="handlePos(param, 1)"
-                    type="checkbox"
-                    id="pos1"
-                    value="endswith"
-                    v-model="searchField[param].positionFinal"
-                  />
-                  {{ $t(searchFieldPositionText[1]) }}</label
-                >
+              <div class="position">
+                <div class="group">
+                  <label for="pos0">
+                    <input
+                      @click="handlePos(param, 0)"
+                      type="checkbox"
+                      id="pos0"
+                      value="startswith"
+                      v-model="searchField[param].positionInitial"
+                    />
+                    {{ $t(searchFieldPositionText[0]) }}</label
+                  >
+                  <label for="pos2">
+                    <input
+                      @click="handlePos(param, 2)"
+                      type="checkbox"
+                      id="pos2"
+                      value="contains"
+                      v-model="searchField[param].positionMedial"
+                    />
+                    {{ $t(searchFieldPositionText[2]) }}</label
+                  >
+                  <label for="pos1">
+                    <input
+                      @click="handlePos(param, 1)"
+                      type="checkbox"
+                      id="pos1"
+                      value="endswith"
+                      v-model="searchField[param].positionFinal"
+                    />
+                    {{ $t(searchFieldPositionText[1]) }}</label
+                  >
+                </div>
               </div>
             </div>
-          </div>
-        </span>
+          </span>
+        </div>
+      </div>
+      <div v-else-if="lexicalStorage.activeSearchTab == 'advanced'" class="search-advanced">
+        <div class="label">
+          {{ $t('search.advanced.label') }}
+        </div>
+        <div class="label">
+          <a href="https://ws.spraakbanken.gu.se/docs/karp#tag/Searching">Karp Query Language</a>
+        </div>
+        <div>
+          <input
+            autofocus
+            @keyup.enter="updateData"
+            class="search-input"
+            type="text"
+            :id="searchQuery"
+            v-model="searchQuery"
+            :placeholder="$t('search.advanced.placeholder')"
+          />
+        </div>
       </div>
       <button @click="updateData" class="search-button">
         {{ $t('dataselector.datasearch') }}
@@ -510,13 +535,23 @@ input:focus {
 }
 
 .search-repeat {
-  padding: 0.5rem;
+  padding: 0rem;
   border-radius: 0.5rem;
   margin-top: 0rem;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   background-color: var(--color-search-area);
+}
+
+.search-repeat-hr {
+  background: black;
+  height: 2px;
+  border: 0px;
+  width: 100%;
+  margin: auto;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 /* simple and advanced search */
@@ -575,7 +610,7 @@ input:focus {
 }
 
 .dropdown-toggle {
-  display: inline;
+  /* display: inline; */
   /* border: 1px solid var(--color-border); */
   border-radius: 4px;
   cursor: pointer;
@@ -599,8 +634,6 @@ input:focus {
 }
 
 .dropdown-item {
-  display: flex;
-  align-items: center;
   padding: 0.25rem 0.5rem;
   color: var(--color-text);
 }
@@ -660,7 +693,8 @@ input:focus {
   background-color: white;
 }
 
-.input-group .search-input {
+/*.input-group .search-input { */
+.search-input {
   /* flex: 1;*/
   margin-right: 0.5rem;
   margin-left: 0.5rem;
@@ -674,7 +708,7 @@ input:focus {
   }
 }
 
-.input-group .search-input:focus {
+.search-input:focus {
   outline-color: var(--sb-orange);
   outline-style: solid;
 }
@@ -683,6 +717,27 @@ input:focus {
   margin-left: 0.25rem;
 }
 /* search-button */
+
+.search-advanced {
+  width: 450px;
+}
+
+.search-advanced .search-input {
+  width: 100%;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.search-advanced .label {
+  margin-bottom: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.search-advanced a {
+  padding: 0px;
+}
 
 .search-button {
   background-color: var(--sb-orange);

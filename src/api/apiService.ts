@@ -32,22 +32,29 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     params['resources'] = resources
 
     // query/field parameters
-    const queryParam = Object.entries(lexicalStorage.selectedFields)
-      .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-      .join('||')
-    if (queryParam) {
-      if (!queryParam.endsWith('|')) {
-        if (Object.keys(lexicalStorage.selectedFields).length == 1) {
-          params['q'] = queryParam
-        } else {
-          // more than one field, ie Extended search
-          if (lexicalStorage.searchExtendedOp) {
-            params['q'] = 'and(' + queryParam + ')'
+    if (
+      lexicalStorage.activeSearchTab == 'simple' ||
+      lexicalStorage.activeSearchTab == 'extended'
+    ) {
+      const queryParam = Object.entries(lexicalStorage.selectedFields)
+        .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+        .join('||')
+      if (queryParam) {
+        if (!queryParam.endsWith('|')) {
+          if (Object.keys(lexicalStorage.selectedFields).length == 1) {
+            params['q'] = queryParam
           } else {
-            params['q'] = 'or(' + queryParam + ')'
+            // more than one field, ie Extended search
+            if (lexicalStorage.searchExtendedOp) {
+              params['q'] = 'and(' + queryParam + ')'
+            } else {
+              params['q'] = 'or(' + queryParam + ')'
+            }
           }
         }
       }
+    } else if (lexicalStorage.activeSearchTab == 'advanced') {
+      params['q'] = lexicalStorage.searchQuery
     }
 
     // TODO: remove this if when it is working in the BE

@@ -142,7 +142,7 @@ onBeforeUnmount(() => {
 })
 
 const selectDataset = () => {
-  console.log('selectDataset:', selectedDatasets.value.length)
+  //console.log('selectDataset:', selectedDatasets.value.length)
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
   if (listSortSelectedFirst.value) {
     doFilterDatasets()
