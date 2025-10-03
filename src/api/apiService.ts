@@ -45,11 +45,12 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
             params['q'] = queryParam
           } else {
             // more than one field, ie Extended search
-            if (lexicalStorage.searchExtendedOp) {
+            if (lexicalStorage.searchExtendedOp == true) {
               params['q'] = 'and(' + queryParam + ')'
             } else {
               params['q'] = 'or(' + queryParam + ')'
             }
+            console.log('gtd: ', lexicalStorage.searchExtendedOp, params['q'])
           }
         }
       }
@@ -100,7 +101,7 @@ export const getStatisticsData = async (
           params['q'] = queryParam
         } else {
           // more than one field, ie Extended search
-          if (lexicalStorage.searchExtendedOp) {
+          if (lexicalStorage.searchExtendedOp == true) {
             params['q'] = 'and(' + queryParam + ')'
           } else {
             params['q'] = 'or(' + queryParam + ')'

@@ -17,7 +17,7 @@ export function syncStoreWithRouter(router: Router): boolean {
       lexicalStorage.activeSearchTab == 'extended' &&
       Object.keys(lexicalStorage.selectedFields).length > 1
     ) {
-      if (lexicalStorage.searchExtendedOp) {
+      if (lexicalStorage.searchExtendedOp == true) {
         queryString = 'and'
       } else {
         queryString = 'or'

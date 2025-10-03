@@ -374,7 +374,11 @@ watch(
           </div>
         </div>
         <!-- Search a field -->
-        <i>Obs! Sök f n enbart i gemensamma fält.</i>
+        <!--
+        <div v-if="lexicalStorage.activeSearchTab == 'extended'">
+          <i>Obs! Sök f n enbart i gemensamma fält.</i>
+        </div>
+        -->
         <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
           <!-- Search-box
        -->
