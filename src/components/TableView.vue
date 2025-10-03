@@ -289,7 +289,9 @@ const lastPage = () => {
                 :style="{ width: currentResult.resourceHits[value] / currentResult.total + '%' }"
                 @click="picsbar(value)"
               >
-                {{ lexicalStorage.datasetLabels[value] }}
+                <template v-if="Object.keys(currentResult.resourceOrder).length < 6">
+                  {{ lexicalStorage.datasetLabels[value] }}
+                </template>
                 <span class="picsbar-tooltiptext"
                   >{{ lexicalStorage.datasetLabels[value] }}:
                   {{ currentResult.resourceHits[value] }}</span
@@ -333,9 +335,10 @@ const lastPage = () => {
                       'header-list-text': lexicalStorage.isList(value.name),
                     }"
                     >{{ lexicalStorage.localizeField(value.name) }}
+                    <!--
                     {{
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
-                    }}</span
+                    }}--></span
                   >
                   <span
                     class="header-sortable"
@@ -466,7 +469,7 @@ const lastPage = () => {
 }
 
 .picsbar tr {
-  max-height: 16px;
+  height: 24px;
 }
 
 .picsbar td {

@@ -39,7 +39,10 @@ const selectedColumns = computed({
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
 const filteredDatasets = ref<string[]>([])
-const selectedTags = ref<string[]>([])
+const selectedTags = computed({
+  get: () => lexicalStorage.selectedTags,
+  set: (value) => lexicalStorage.setSelectedTags(value),
+})
 
 const datasetInfo = ref(<ResourceLocalized>{
   label: '',

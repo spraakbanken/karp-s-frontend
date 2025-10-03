@@ -16,6 +16,7 @@ interface SearchRedux {
   selectedDatasetsSize: number // number of entries in selected datasets
   currentTags: string[] // all tags
   tagEntriesCount: Record<string, number> // total number of entries for tags
+  selectedTags: string[] // currently selected tags
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets (union)
   currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
@@ -49,6 +50,7 @@ export const lexicalStore = defineStore('dataset', {
     selectedDatasetsSize: 0,
     currentTags: [],
     tagEntriesCount: {},
+    selectedTags: [],
     fieldsInDatasets: {},
     currentFields: [],
     currentCommonFields: [],
@@ -140,8 +142,9 @@ export const lexicalStore = defineStore('dataset', {
         }
       })
       // setup default datasets for first run = select all
-      // this.setSelectedDataset(['saol14', 'so2009'])
       this.setSelectedDataset(this.currentDatasets)
+      // and select all tags
+      this.setSelectedTags(this.currentTags)
     },
     setSearchQuery(query: string) {
       this.searchQuery = query
@@ -161,6 +164,10 @@ export const lexicalStore = defineStore('dataset', {
     setSelectedCompileFields(fields: string[]) {
       // console.log('selectedCompileParams', params)
       this.selectedCompileFields = fields
+    },
+    setSelectedTags(t: string[]) {
+      // make copy
+      this.selectedTags = [...t]
     },
     setActiveSearchTab(tab: string) {
       this.activeSearchTab = tab

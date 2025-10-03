@@ -380,8 +380,7 @@ watch(
         </div>
         -->
         <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
-          <!-- Search-box
-       -->
+          <!-- Search-box -->
           <div v-if="lexicalStorage.activeSearchTab == 'extended'"></div>
           <hr v-if="lexicalStorage.activeSearchTab == 'extended'" class="search-repeat-hr" />
           <span :for="param">
@@ -411,7 +410,11 @@ watch(
                   type="text"
                   :id="param"
                   v-model="searchField[param].value"
-                  :placeholder="$t('dataselector.parameters.placeholder')"
+                  :placeholder="
+                    lexicalStorage.activeSearchTab == 'extended'
+                      ? $t('dataselector.parameters.placeholder')
+                      : $t('dataselector.simplesearch.placeholder')
+                  "
                 />
               </div>
               <!--

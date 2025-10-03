@@ -678,13 +678,14 @@ const updateOverview = () => {
                   <span>
                     {{ lexicalStorage.localizeField(key.columnField) }}
                   </span>
+                  <!--
                   <span>
                     {{
                       lexicalStorage.isList(key.columnField)
                         ? '(' + t('table.header.list') + ')'
                         : ''
                     }}
-                  </span>
+                  </span>-->
                 </template>
                 <template v-if="key.type == 'value'">
                   <div class="header-value-col">
