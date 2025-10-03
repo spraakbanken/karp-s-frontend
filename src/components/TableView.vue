@@ -335,6 +335,16 @@ const lastPage = () => {
                       'header-list-text': lexicalStorage.isList(value.name),
                     }"
                     >{{ lexicalStorage.localizeField(value.name) }}
+                    <span v-if="value.name == entryWordField">
+                      {{
+                        '/' +
+                        lexicalStorage.localizeField(
+                          lexicalStorage.currentConfig.resources.find(
+                            (i) => i.resourceId === item[0]['resourceId'],
+                          )?.entryWord.field!,
+                        )
+                      }}</span
+                    >
                     <!--
                     {{
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''

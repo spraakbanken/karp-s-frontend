@@ -322,9 +322,9 @@ watch(
               <span v-else-if="currentFields.length === 0">{{
                 $t('dataselector.datasets.nocommon')
               }}</span>
-              <span v-else-if="selectedFieldsArray.length === 0">{{
-                $t('dataselector.noparameters')
-              }}</span>
+              <span v-else-if="selectedFieldsArray.length === 0"
+                >{{ $t('dataselector.noparameters') }} <i class="arrow-down"></i>
+              </span>
               <span v-else
                 >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
                 <i class="arrow-down"></i>
@@ -528,13 +528,14 @@ input:focus {
 
 .search-container {
   align-items: center;
-  padding: 0.5rem;
+  padding: 1rem;
   border-radius: 0.5rem;
   margin-top: 0rem;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
   background-color: var(--color-search-area);
+  width: 500px;
 }
 
 .search-repeat {
