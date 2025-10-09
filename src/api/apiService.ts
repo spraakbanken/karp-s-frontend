@@ -2,6 +2,7 @@ import axios from 'axios'
 //import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
 import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
+import type { forEach } from 'es-toolkit/compat'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
 
@@ -22,8 +23,10 @@ export const getLexicalDatasets = async () => {
 }
 
 export const getTableData = async (pageStart: number, pageSize: number) => {
+  const lexicalStorage = lexicalStore()
   try {
-    const lexicalStorage = lexicalStore()
+    lexicalStorage.incIsLoading()
+
     const datasets = lexicalStorage.selectedDatasets
     const params: Record<string, string> = {}
 
@@ -66,13 +69,43 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     params['size'] = pageSize.toString()
     params['from'] = ((pageStart - 1) * pageSize).toString()
 
+    lexicalStorage.abortController = new AbortController()
+    const signal = lexicalStorage.abortController.signal
+
     const response = await axiosInstance.get(`/search`, {
       params: params,
+      signal: signal,
     })
-
+    lexicalStorage.decIsLoading()
     return response.data
   } catch (error) {
-    throw error
+    let errMsg = ''
+    lexicalStorage.decIsLoading()
+
+    if (axios.isCancel(error)) {
+      // request was cancelled "by user", no error, return empty data
+      return {}
+    } else {
+      if (error.response?.data?.detail !== undefined) {
+        const d = error.response.data.detail
+        if (Array.isArray(d)) {
+          d.forEach((obj) => {
+            Object.keys(obj).forEach((key) => {
+              errMsg += `${key}: ${obj[key]}` + '. '
+            })
+          })
+        } else if (typeof d === 'object' && d !== null) {
+          Object.keys(d).forEach((key) => {
+            errMsg += `${key}: ${d[key]}` + '. '
+          })
+        }
+      } else {
+        errMsg = (error as Error).message
+      }
+      //console.log('Error catch:', errMsg)
+      //throw error
+      throw new Error(errMsg ? errMsg : 'unknown')
+    }
   }
 }
 
@@ -82,8 +115,10 @@ export const getStatisticsData = async (
   columns: string[],
   columnCount: boolean,
 ) => {
+  const lexicalStorage = lexicalStore()
   try {
-    const lexicalStorage = lexicalStore()
+    // request was cancelled "by user", no error, return empty data
+    lexicalStorage.incIsLoading()
     const datasets = lexicalStorage.selectedDatasets
     const params: Record<string, string> = {}
 
@@ -125,13 +160,46 @@ export const getStatisticsData = async (
       }
     }
 
+    lexicalStorage.abortController = new AbortController()
+    const signal = lexicalStorage.abortController.signal
+
     const response = await axiosInstance.get(`/count`, {
       params: params,
+      signal: signal,
     })
     const tableData = response.data.table
     const headers = response.data.headers
+    lexicalStorage.decIsLoading()
+
     return { tableData, headers }
   } catch (error) {
-    throw error
+    let errMsg = ''
+    lexicalStorage.decIsLoading()
+
+    //console.log(axios.isCancel(error), error)
+    if (axios.isCancel(error)) {
+      // request was cancelled "by user", no error, return empty data
+      const tableData = []
+      const headers = []
+      return { tableData, headers }
+    } else {
+      if (error.response?.data?.detail !== undefined) {
+        const d = error.response.data.detail
+        if (Array.isArray(d)) {
+          d.forEach((obj) => {
+            Object.keys(obj).forEach((key) => {
+              errMsg += `${key}: ${obj[key]}` + '. '
+            })
+          })
+        } else if (typeof d === 'object' && d !== null) {
+          Object.keys(d).forEach((key) => {
+            errMsg += `${key}: ${d[key]}` + '. '
+          })
+        }
+      } else {
+        errMsg = (error as Error).message
+      }
+      throw new Error(errMsg ? errMsg : 'unknown')
+    }
   }
 }

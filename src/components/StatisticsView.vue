@@ -6,6 +6,7 @@ import { getStatisticsData } from '@/api/apiService'
 import type { SelectedFieldConfig, CountHeadersColumn } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
 import MaxHeight from '@/components/MaxHeight.vue'
+import { formatCell } from '@/utils/utils'
 
 import { useI18n } from 'vue-i18n'
 
@@ -32,6 +33,11 @@ const toggleDropdownColumns = () => {
   //  isDropdownOpen.value = false
   //  isDropdownParams.value = false
   isDropdownCompileFields.value = false
+  // possibly trigger search if closing dropdown
+  if (isSearchChanged.value && !isDropdownColumns.value) {
+    lexicalStorage.setIsSearch(true)
+    isSearchChanged.value = false
+  }
 }
 
 const toggleDropdownCompileFields = () => {
@@ -39,12 +45,23 @@ const toggleDropdownCompileFields = () => {
   //  isDropdownOpen.value = false
   //  isDropdownParams.value = false
   isDropdownColumns.value = false
+  // possibly trigger search if closing dropdown
+  if (isSearchChanged.value && !isDropdownCompileFields.value) {
+    lexicalStorage.setIsSearch(true)
+    isSearchChanged.value = false
+  }
 }
 
 const handleClickOutsideS = (event: MouseEvent) => {
   if (dropdownContainerS.value && !dropdownContainerS.value.contains(event.target as Node)) {
+    //console.log('handleClickOutsideS')
     isDropdownColumns.value = false
     isDropdownCompileFields.value = false
+    // trigger search
+    if (isSearchChanged.value) {
+      lexicalStorage.setIsSearch(true)
+      isSearchChanged.value = false
+    }
   }
 }
 /*
@@ -62,7 +79,7 @@ const selectedColumns = computed({
   set: (value) => lexicalStorage.setSelectedColumns(value),
 })
 
-const currentFields = computed(() => lexicalStorage.currentFields)
+//const currentFields = computed(() => lexicalStorage.currentFields)
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 
 // sort column
@@ -96,7 +113,7 @@ const updateColumns = () => {
   lexicalStorage.setSelectedColumns(selectedColumns.value)
 }
 
-const updateShowHitsCheckbox = ref(true)
+const updateShowHitsCheckbox = ref(selectedColumns.value.length == 0)
 // UI show hits choice in "Additonal columns" dropdown
 const updateShowHits = () => {
   //console.log('CHKBOX:', updateShowHitsCheckbox.value)
@@ -110,10 +127,14 @@ const updateShowHits = () => {
 // show overview switch
 const showOverview = ref(false)
 
-const isLoading = ref(false)
+const isSearchChanged = ref(false)
+const errorMessage = ref('')
 
 const fetchData = async () => {
-  isLoading.value = true
+  // abort any current running queries
+  lexicalStorage.abortController.abort()
+
+  currentResult.value = []
   const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
@@ -122,6 +143,8 @@ const fetchData = async () => {
   //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (newFields && newCompileFields.length > 0) {
     try {
+      errorMessage.value = ''
+
       const { tableData, headers } = await getStatisticsData(
         newFields as Record<string, SelectedFieldConfig>,
         newCompileFields as string[],
@@ -137,6 +160,7 @@ const fetchData = async () => {
       // make sure any appearences of "entryWord" i headers
       // are replaced by "entry_word"
       // ie replace entryWordFieldCamel with entryWordField
+
       tableHeaders.value.forEach((f, i) => {
         if (f.columnField == entryWordFieldCamel) {
           tableHeaders.value[i].columnField = entryWordField
@@ -145,12 +169,10 @@ const fetchData = async () => {
           tableHeaders.value[i].headerField = entryWordField
         }
       })
-
       // console.log('currentResult', currentResult.value);
     } catch (error) {
-      console.error('Error fetching data:', error)
+      errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
-    isLoading.value = false
   } else {
     currentResult.value = []
   }
@@ -159,6 +181,8 @@ const fetchData = async () => {
 watch(
   () => currentTab.value,
   () => {
+    lexicalStorage.abortController.abort()
+    lexicalStorage.resetIsLoading()
     if (currentTab.value === 'statistics') {
       fetchData()
     }
@@ -182,8 +206,12 @@ watch(
 watch(
   () => [lexicalStorage.selectedCompileFields, lexicalStorage.selectedColumns, columnCount],
   async () => {
-    await fetchData()
-    updateOverview() // draw graph
+    console.log('WATCH compile, column, count')
+    isSearchChanged.value = true
+    /*
+      await fetchData()
+      updateOverview() // draw graph
+    */
   },
   { deep: true },
 )
@@ -195,7 +223,7 @@ watch(
       lexicalStorage.setIsSearch(false)
       {
         await fetchData()
-        console.log('upd overview')
+        //console.log('upd overview')
         updateOverview() // draw graph
       }
     }
@@ -294,12 +322,27 @@ const exportCSV = () => {
         lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] +
         '),'
     } else if (tableHeaders.value[key].type == 'total') {
-      if (tableHeaders.value[key].headerField) {
-        csv +=
-          t('statistics.total') +
-          ' (' +
-          lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] +
-          '),'
+      // mirror template headers
+      if (columnCount.value && selectedColumns.value.length > 0) {
+        if (tableHeaders.value[key].headerField) {
+          csv +=
+            lexicalStorage.localizeField(tableHeaders.value[key].headerField) +
+            ' (' +
+            tableHeaders.value[key].headerValue +
+            '),'
+        } else {
+          csv += t('statistics.total') + ','
+        }
+      } else if (tableHeaders.value[key].headerField) {
+        if (selectedColumns.value.length > 0) {
+          csv +=
+            lexicalStorage.localizeField(tableHeaders.value[key].headerField) +
+            ' (' +
+            tableHeaders.value[key].headerValue +
+            '),'
+        } else {
+          csv += lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] + ','
+        }
       } else {
         csv += t('statistics.total') + ','
       }
@@ -325,7 +368,7 @@ const exportCSV = () => {
 
       if (collectionColumn.includes(tableHeaders.value[key].columnField)) {
         console.log('Columnfield:', rowItems[key])
-        csv += '"' + lexicalStorage.formatCell(rowItems[key], '; ') + '\",'
+        csv += '"' + formatCell(rowItems[key], '; ') + '\",'
         //rowItems[key].replace('"', '').replace('[', '').replace(']', '').replace(',', ';') + ','
       } else {
         csv += '"' + rowItems[key] + '\",'
@@ -646,12 +689,19 @@ const updateOverview = () => {
 
     <!-- show table -->
     <div v-else class="table-wrapper">
-      <!--
-      <div class="tab" v-if="!isLoading && currentResult.length">
-        {{ $t('statistics.numberOfHits') }}:
-        {{ currentResult.length }}
-      </div>
-      -->
+      <!-- show error message -->
+      <p v-if="errorMessage != ''" class="message">
+        {{ errorMessage }}
+      </p>
+      <!-- show no data message -->
+      <p v-else-if="lexicalStorage.selectedDatasets.length == 0" class="message">
+        {{ $t('message.nodatasetselected') }}
+      </p>
+      <!-- show loading message -->
+      <p v-else-if="lexicalStorage.isLoading > 0" class="message-big">
+        {{ $t('message.loading') }}
+      </p>
+
       <table v-if="currentResult.length" class="fancy-table">
         <thead>
           <!-- show number of hits -->
@@ -753,28 +803,17 @@ const updateOverview = () => {
           <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
             <td v-for="(value, key) in item" :key="key">
               <template v-if="showExpanded">
-                <span v-html="lexicalStorage.formatCell(value)"></span>
+                <span v-html="formatCell(value)"></span>
               </template>
               <template v-else>
                 <MaxHeight :max-height="32">
-                  <span v-html="lexicalStorage.formatCell(value)"></span>
+                  <span v-html="formatCell(value)"></span>
                 </MaxHeight>
               </template>
             </td>
           </tr>
         </tbody>
       </table>
-
-      <!-- show no data -->
-      <p v-else-if="lexicalStorage.selectedDatasets.length == 0" class="message">
-        {{ $t('message.nodatasetselected') }}
-      </p>
-      <p v-else-if="isLoading" class="message">
-        {{ $t('message.loading') }}
-      </p>
-      <p v-else class="message">
-        {{ $t('error.nodata') }}
-      </p>
 
       <!-- show pagers -->
       <div v-if="currentResult.length" class="pagination">
@@ -800,11 +839,6 @@ const updateOverview = () => {
       </div>
     </div>
   </div>
-  <!--
-  <div v-if="isLoading" class="message">
-    {{ $t('message.loading') }}
-  </div>
-  -->
 </template>
 
 <style scoped>
@@ -1105,5 +1139,13 @@ tr:hover {
   margin: auto;
   text-align: center;
   font-style: italic;
+}
+
+.message-big {
+  margin: auto;
+  text-align: center;
+  font-style: italic;
+  font-size: x-large;
+  margin-bottom: 1rem;
 }
 </style>

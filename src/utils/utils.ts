@@ -13,6 +13,13 @@ export const th = (x?: ByLang | string): string | undefined => {
   }
 }
 
+// Format date according to locale
+export const getDate = (date: Date) => {
+  const { locale } = useI18n()
+
+  return date.toLocaleDateString(locale.value, { dateStyle: 'long' })
+}
+
 export const secondsToDate = (seconds: string): string => {
   const date = new Date(parseInt(seconds) * 1000)
   return date.toISOString().substring(0, 10)
@@ -34,4 +41,21 @@ export const formatNumber = (num: number, precision: number = 2): string => {
   }
 
   return num.toString()
+}
+
+export const camelify = (p: string): string => {
+  return p.toLowerCase().replace(/(_\w)/g, (m) => m.toUpperCase().substring(1))
+}
+
+export const formatCell = (x: string | string[], divider: string = '<br>'): string => {
+  let value = ''
+  if (Array.isArray(x)) {
+    x.every((item, index) => {
+      value = value + (value ? divider : '') + item
+      return true
+    })
+  } else {
+    value = x
+  }
+  return value
 }

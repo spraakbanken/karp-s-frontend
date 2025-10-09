@@ -82,7 +82,7 @@
   "search.field.notcommon.short": "not common",
   "search.advanced.label": "Search using query language:",
   "search.advanced.placeholder": "<query language>",
-  "table.show.expanded": "Show all rows",
+  "table.show.expanded": "Show all rows in fields",
   "table.header.list": "list",
   "table.footer.itemsperpage": "Items per page",
   "statistics.exportCSV": "Export CSV",
@@ -99,6 +99,7 @@
   "graphs.dots": "Dots",
   "graphs.maxnumberofvalues": "Only the first {number} values are shown",
   "error.nodata": "No data available. Please select a parameter.",
+  "error.fetching.data": "Error fetching data.",
   "message.loading": "Loading...",
   "message.nodatasetselected": "No dataset selected"
 }

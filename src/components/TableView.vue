@@ -10,6 +10,7 @@ import {
   type FieldConfig,
   entryWordField,
 } from '@/types/datasetConfig'
+import { formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
 import MaxHeight from '@/components/MaxHeight.vue'
 //import { template } from 'es-toolkit/compat'
@@ -59,12 +60,14 @@ const doSort = (s: string) => {
 
 //const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeResultTab)
-const isLoading = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(25)
 
+const errorMessage = ref('')
+
 const fetchData = async () => {
-  //console.log('fetchData: ', JSON.parse(JSON.stringify(lexicalStorage.selectedFields)))
+  // abort any current running queries
+  lexicalStorage.abortController.abort()
 
   // convert checkboxes to search "position"
   for (const sf in lexicalStorage.selectedFields) {
@@ -83,63 +86,57 @@ const fetchData = async () => {
   const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
     try {
-      isLoading.value = true
+      errorMessage.value = ''
       const data = await getTableData(currentPage.value, itemsPerPage.value)
-      isLoading.value = false
-      currentResult.value = data
-      currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
-      currentResultGrpSorted.value = {}
-      //console.log('fetchdata() - after getTableData()', data, currentResultGrp.value)
+      if (Object.keys(data).length !== 0) {
+        currentResult.value = data
+        currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
+        currentResultGrpSorted.value = {}
+        //console.log('fetchdata() - after getTableData()', data, currentResultGrp.value)
 
-      // sort columns based on config
-      // transform key,value-pairs to (ordered) array of key,value-pairs
-      for (const resId in currentResultGrp.value) {
-        // original
-        const dataset_unsorted: DatasetEntry[] = currentResultGrp.value[resId]
-        // with sorted rows
-        currentResultGrpSorted.value[resId] = []
+        // sort columns based on config
+        // transform key,value-pairs to (ordered) array of key,value-pairs
+        for (const resId in currentResultGrp.value) {
+          // original
+          const dataset_unsorted: DatasetEntry[] = currentResultGrp.value[resId]
+          // with sorted rows
+          currentResultGrpSorted.value[resId] = []
 
-        // we will fill the first column with the value of the entryword
-        const resIndex = lexicalStorage.currentConfig.resources.findIndex(
-          (item) => item.resourceId === resId,
-        )
-        const entryWord = lexicalStorage.currentConfig.resources[resIndex].entryWord.field
+          // we will fill the first column with the value of the entryword
+          const resIndex = lexicalStorage.currentConfig.resources.findIndex(
+            (item) => item.resourceId === resId,
+          )
+          const entryWord = lexicalStorage.currentConfig.resources[resIndex].entryWord.field
 
-        // for each unsorted row
-        for (let i = 0; i < dataset_unsorted.length; i++) {
-          // unsorted row
-          const e0: Entry = dataset_unsorted[i].entry
-          //for (const key in e0) {
-          //  console.log('ORDERO: ', key, e0[key])
-          //}
-          // fields in correct order
-          const fieldsFromConfig: FieldConfig[] =
-            lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
-          // sorted row
-          const e1: EntryS[] = []
+          // for each unsorted row
+          for (let i = 0; i < dataset_unsorted.length; i++) {
+            // unsorted row
+            const e0: Entry = dataset_unsorted[i].entry
+            //for (const key in e0) {
+            //  console.log('ORDERO: ', key, e0[key])
+            //}
+            // fields in correct order
+            const fieldsFromConfig: FieldConfig[] =
+              lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
+            // sorted row
+            const e1: EntryS[] = []
 
-          // add entryword as first column
-          e1.push({ name: entryWordField, value: e0[entryWord] })
+            // add entryword as first column
+            e1.push({ name: entryWordField, value: e0[entryWord] })
 
-          // loop over config, when field is found, add value to new row/array
-          for (const key in fieldsFromConfig) {
-            //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
-            e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
+            // loop over config, when field is found, add value to new row/array
+            for (const key in fieldsFromConfig) {
+              //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
+              e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
+            }
+            // add new row/array to sorted result
+            currentResultGrpSorted.value[resId].push({ entry: e1, resourceId: resId })
           }
-          // add new row/array to sorted result
-          currentResultGrpSorted.value[resId].push({ entry: e1, resourceId: resId })
         }
       }
-
-      //console.log('GroupBySorted:', currentResultGrpSorted.value)
-
       lexicalStorage.setIsData(currentResult.value.total > 0)
-      if (lexicalStorage.isStart) {
-        lexicalStorage.setIsStart(false)
-      }
     } catch (error) {
-      isLoading.value = false
-      console.error('Error fetching data:', error)
+      errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
   } else {
     currentResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
@@ -189,6 +186,8 @@ watch(
 watch(
   () => currentTab.value,
   () => {
+    lexicalStorage.abortController.abort()
+    lexicalStorage.resetIsLoading()
     if (currentTab.value === 'table') {
       fetchData()
     }
@@ -268,8 +267,11 @@ const lastPage = () => {
 
 <template>
   <div class="table-wrapper">
-    <p v-if="isLoading" class="message">
+    <p v-if="lexicalStorage.isLoading" class="message-big">
       {{ $t('message.loading') }}
+    </p>
+    <p v-if="errorMessage != ''" class="message">
+      {{ errorMessage }}
     </p>
     <!-- show no data -->
     <!--  <p v-if="lexicalStorage.selectedDatasets.length == 0">
@@ -335,15 +337,16 @@ const lastPage = () => {
                       'header-list-text': lexicalStorage.isList(value.name),
                     }"
                     >{{ lexicalStorage.localizeField(value.name) }}
-                    <span v-if="value.name == entryWordField">
+                    <template v-if="value.name == entryWordField">
                       {{
-                        '/' +
+                        '(' +
                         lexicalStorage.localizeField(
                           lexicalStorage.currentConfig.resources.find(
                             (i) => i.resourceId === item[0]['resourceId'],
                           )?.entryWord.field!,
-                        )
-                      }}</span
+                        ) +
+                        ')'
+                      }}</template
                     >
                     <!--
                     {{
@@ -370,11 +373,11 @@ const lastPage = () => {
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
                   <template v-if="showExpanded">
-                    <span v-html="lexicalStorage.formatCell(value2.value)"></span>
+                    <span v-html="formatCell(value2.value)"></span>
                   </template>
                   <template v-else>
                     <MaxHeight :max-height="32">
-                      <span v-html="lexicalStorage.formatCell(value2.value)"></span>
+                      <span v-html="formatCell(value2.value)"></span>
                     </MaxHeight>
                   </template>
                 </td>
@@ -470,6 +473,16 @@ const lastPage = () => {
 
 .message {
   margin: auto;
+  text-align: center;
+  font-style: italic;
+}
+
+.message-big {
+  margin: auto;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-style: italic;
+  font-size: x-large;
 }
 
 /* picsbar */

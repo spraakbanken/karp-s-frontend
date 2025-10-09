@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
+import { fetchNews, type NewsItem } from '@/api/news.service'
 
 import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
@@ -8,12 +9,14 @@ import StatisticsView from '@/components/StatisticsView.vue'
 import DataSelection from '@/components/DataSelection.vue'
 
 import { getLexicalDatasets } from '@/api/apiService'
+import { th, getDate } from '@/utils/utils'
 
 import router from '@/router'
 import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
 
 const lexicalStorage = lexicalStore()
 
+/*
 onMounted(async () => {
   try {
     const datasets = await getLexicalDatasets()
@@ -24,6 +27,22 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error(error)
+  }
+})
+*/
+
+const items = reactive<NewsItem[]>([])
+
+onMounted(async () => {
+  if (syncStoreWithRouter(router)) {
+    lexicalStorage.setIsStart(false)
+    lexicalStorage.setIsSearch(true)
+  }
+  try {
+    const items_ = await fetchNews(true)
+    items.push(...items_)
+  } catch (error) {
+    console.error('Could not fetch and parse news', error)
   }
 })
 
@@ -37,7 +56,7 @@ watch(
   () => lexicalStorage.activeResultTab,
   (newTab) => {
     activeResultTab.value = newTab
-    console.log('WATCH lexicalStorage.activeResultTab', activeResultTab.value)
+    //console.log('WATCH lexicalStorage.activeResultTab', activeResultTab.value)
   },
 )
 </script>
@@ -54,6 +73,20 @@ watch(
       <DataSelection />
       <DataSearch />
     </div>
+
+    <!-- featured news -->
+    <div v-if="items.length && lexicalStorage.isStart">
+      <article v-for="(item, i) in items" :key="i" class="newsarticle">
+        <header class="">
+          <h3 class="newstitle">{{ th(item.title) }}</h3>
+          <time :datetime="item.created.toString()" class="newsdate">
+            {{ getDate(item.created) }}
+          </time>
+        </header>
+        <div class="newsbody" v-html="th(item.body)"></div>
+      </article>
+    </div>
+
     <!-- <template v-if="lexicalStorage.isData"> -->
     <template v-if="!lexicalStorage.isStart">
       <div class="tabs">
@@ -165,5 +198,23 @@ watch(
   background-color: var(--button-active-bg-color);
   */
   background-color: white;
+}
+
+/* News, featured */
+.newsarticle {
+  margin-bottom: 0.5rem;
+  width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+.newstitle {
+}
+
+.newsdate {
+  font-style: italic;
+}
+
+.newsbody {
 }
 </style>

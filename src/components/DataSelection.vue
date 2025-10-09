@@ -316,7 +316,7 @@ const filterDatasets = computed(() => {
 })
 */
 
-// TODO doesn trigger, change start of watch
+// TODO doesnt trigger, change start of watch
 watch(
   () => selectedDatasets,
   (newDatasets, oldDatasets) => {
@@ -671,13 +671,13 @@ watch(
 
 .datasets-list {
   max-height: 100%;
-  width: 290px;
+  width: 470px;
   background-color: var(--color-background);
   overflow-y: auto;
 }
 
 .datasets-list-wider {
-  width: 550px;
+  width: 736px;
 }
 
 .datasets-icon {

@@ -3,26 +3,19 @@ import { onMounted, reactive } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
 //import type { ByLang } from '@/util.types'
 import { useI18n } from 'vue-i18n'
+import { th, getDate } from '@/utils/utils'
 
-import { th } from '@/utils/utils'
-
-const { locale } = useI18n()
 const items = reactive<NewsItem[]>([])
 
 // Get news from newsdesk repository
 onMounted(async () => {
   try {
-    const items_ = await fetchNews(false)
+    const items_ = await fetchNews()
     items.push(...items_)
   } catch (error) {
     console.error('Could not fetch and parse news', error)
   }
 })
-
-// Format date according to locale
-function getDate(date: Date) {
-  return date.toLocaleDateString(locale.value, { dateStyle: 'long' })
-}
 </script>
 
 <template>

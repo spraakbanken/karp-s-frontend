@@ -32,11 +32,13 @@ interface SearchRedux {
   sortOrder: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
+  abortController: AbortController
   pageStart: number
   pageSize: number
   isData: boolean
-  isSearch: boolean
-  isStart: boolean
+  isSearch: boolean // trigger a search (call server)
+  isStart: boolean // is app in start mode? (do not show anything except dataselection/datasearch boxes)
+  isLoading: number
 }
 
 // currentParams = list of available fields in selected datasets
@@ -66,12 +68,14 @@ export const lexicalStore = defineStore('dataset', {
     sortOrder: 'asc',
     datasetLabels: {},
     datasetDates: [],
+    abortController: new AbortController(),
     pageStart: 1,
     pageSize: 25,
     //listLimit: 5,
     isData: false,
     isSearch: false,
     isStart: true,
+    isLoading: 0,
   }),
   actions: {
     setDefault(config: Config) {
@@ -348,13 +352,19 @@ export const lexicalStore = defineStore('dataset', {
     setIsStart(x: boolean) {
       this.isStart = x
     },
+    incIsLoading() {
+      this.isLoading++
+    },
+    decIsLoading() {
+      this.isLoading--
+    },
+    resetIsLoading() {
+      this.isLoading = 0
+    },
     setEmpty() {
       this.selectedDatasets = []
       this.setActiveSearchTab('simple')
       this.setActiveResultTab('table')
-    },
-    camelify(p: string): string {
-      return p.toLowerCase().replace(/(_\w)/g, (m) => m.toUpperCase().substring(1))
     },
     localizeField(p: string): string {
       const pCamel = p //this.camelify(p)
@@ -382,18 +392,6 @@ export const lexicalStore = defineStore('dataset', {
         }
       })
 
-      return value
-    },
-    formatCell(x: string | string[], divider: string = '<br>'): string {
-      let value = ''
-      if (Array.isArray(x)) {
-        x.every((item, index) => {
-          value = value + (value ? divider : '') + item
-          return true
-        })
-      } else {
-        value = x
-      }
       return value
     },
   },

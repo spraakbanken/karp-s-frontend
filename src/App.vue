@@ -1,7 +1,22 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { lexicalStore } from '@/stores/store'
+
 import { RouterView } from 'vue-router'
 import TitleBar from './components/TitleBar.vue'
 import FooterView from './components/FooterView.vue'
+import { getLexicalDatasets } from '@/api/apiService'
+
+const lexicalStorage = lexicalStore()
+
+onMounted(async () => {
+  try {
+    const datasets = await getLexicalDatasets()
+    lexicalStorage.setDefault(datasets)
+  } catch (error) {
+    console.error(error)
+  }
+})
 </script>
 
 <template>
