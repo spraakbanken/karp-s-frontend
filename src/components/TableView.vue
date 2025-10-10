@@ -273,7 +273,11 @@ const lastPage = () => {
     <p v-if="errorMessage != ''" class="message">
       {{ errorMessage }}
     </p>
-    <!-- show no data -->
+    <p v-if="!lexicalStorage.isData" class="message-big">
+      {{ $t('error.nodata') }}
+    </p>
+
+    <!-- show no datasets -->
     <!--  <p v-if="lexicalStorage.selectedDatasets.length == 0">
       {{ $t('message.nodatasetselected') }}
     </p>

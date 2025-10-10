@@ -28,18 +28,6 @@ const isDropdownColumns = ref(false)
 const isDropdownCompileFields = ref(false)
 const dropdownContainerS = ref<HTMLElement | null>(null)
 
-const toggleDropdownColumns = () => {
-  isDropdownColumns.value = !isDropdownColumns.value
-  //  isDropdownOpen.value = false
-  //  isDropdownParams.value = false
-  isDropdownCompileFields.value = false
-  // possibly trigger search if closing dropdown
-  if (isSearchChanged.value && !isDropdownColumns.value) {
-    lexicalStorage.setIsSearch(true)
-    isSearchChanged.value = false
-  }
-}
-
 const toggleDropdownCompileFields = () => {
   isDropdownCompileFields.value = !isDropdownCompileFields.value
   //  isDropdownOpen.value = false
@@ -52,11 +40,33 @@ const toggleDropdownCompileFields = () => {
   }
 }
 
+const toggleDropdownColumns = () => {
+  isDropdownColumns.value = !isDropdownColumns.value
+  //  isDropdownOpen.value = false
+  //  isDropdownParams.value = false
+  isDropdownCompileFields.value = false
+  // if closing
+  if (!isDropdownColumns.value) {
+    if (selectedColumns.value.length === 0) {
+      selectedColumns.value = [entryWordField]
+    }
+  }
+  // possibly trigger search if closing dropdown
+  if (isSearchChanged.value && !isDropdownColumns.value) {
+    lexicalStorage.setIsSearch(true)
+    isSearchChanged.value = false
+  }
+}
+
 const handleClickOutsideS = (event: MouseEvent) => {
   if (dropdownContainerS.value && !dropdownContainerS.value.contains(event.target as Node)) {
     //console.log('handleClickOutsideS')
     isDropdownColumns.value = false
     isDropdownCompileFields.value = false
+    // make sure at least "Antal" is selected as column
+    if (selectedColumns.value.length === 0) {
+      selectedColumns.value = [entryWordField]
+    }
     // trigger search
     if (isSearchChanged.value) {
       lexicalStorage.setIsSearch(true)
@@ -120,7 +130,7 @@ const updateShowHits = () => {
   if (updateShowHitsCheckbox.value) {
     selectedColumns.value = []
   } else {
-    selectedColumns.value = [entryWordField]
+    //selectedColumns.value = [entryWordField]
   }
 }
 
@@ -193,7 +203,7 @@ watch(
 watch(
   () => lexicalStorage.selectedDatasets,
   (newDatasets, oldDatasets) => {
-    console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
+    //console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
     if (newDatasets.length === 0) {
       currentResult.value = []
       lexicalStorage.setIsData(false)
@@ -206,7 +216,7 @@ watch(
 watch(
   () => [lexicalStorage.selectedCompileFields, lexicalStorage.selectedColumns, columnCount],
   async () => {
-    console.log('WATCH compile, column, count')
+    //console.log('WATCH compile, column, count')
     isSearchChanged.value = true
     /*
       await fetchData()
@@ -310,8 +320,6 @@ const exportCSV = () => {
   let csv = ''
 
   // write headers
-  //  for (const title in currentResult.value[0]) {
-  //console.log()
   for (const key in tableHeaders.value) {
     if (tableHeaders.value[key].type == 'compile') {
       csv += lexicalStorage.localizeField(tableHeaders.value[key].columnField) + ','
@@ -361,15 +369,15 @@ const exportCSV = () => {
   for (const row in currentResult.value) {
     const rowItems: Dataset = currentResult.value[row]
     // value could be array
-    //console.log('CurrP', lexicalStorage.currentParameters)
     for (const key in rowItems) {
-      //console.log('CSV type', key, value[key], Object.keys(tableHeaders.value)[key])
-      //                      <span v-html="lexicalStorage.formatCell(value)"></span>
-
-      if (collectionColumn.includes(tableHeaders.value[key].columnField)) {
-        console.log('Columnfield:', rowItems[key])
-        csv += '"' + formatCell(rowItems[key], '; ') + '\",'
-        //rowItems[key].replace('"', '').replace('[', '').replace(']', '').replace(',', ';') + ','
+      const key_number = Number(key)
+      if ('columnField' in tableHeaders.value[key_number]) {
+        if (collectionColumn.includes(tableHeaders.value[key_number].columnField)) {
+          console.log('Columnfield:', rowItems[key])
+          csv += '"' + formatCell(rowItems[key], '; ') + '\",'
+        } else {
+          csv += '"' + rowItems[key] + '\",'
+        }
       } else {
         csv += '"' + rowItems[key] + '\",'
       }
@@ -542,7 +550,6 @@ const updateOverview = () => {
 </script>
 
 <template>
-  <!-- show no data -->
   <div v-if="!lexicalStorage.isStart">
     <!-- statistics settings -->
     <div class="statistics" ref="dropdownContainerS">
@@ -650,6 +657,7 @@ const updateOverview = () => {
       </div>
     </div>
 
+    <!-- show overview/graph -->
     <div v-if="showOverview" class="overview-wrapper">
       <div class="overview-settings">
         <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
@@ -701,6 +709,9 @@ const updateOverview = () => {
       <p v-else-if="lexicalStorage.isLoading > 0" class="message-big">
         {{ $t('message.loading') }}
       </p>
+      <p v-if="!lexicalStorage.isData" class="message-big">
+        {{ $t('error.nodata') }}
+      </p>
 
       <table v-if="currentResult.length" class="fancy-table">
         <thead>
@@ -742,11 +753,11 @@ const updateOverview = () => {
                     <div class="header-value-row">
                       <span>
                         {{ lexicalStorage.localizeField(key.columnField) }}
-                        {{
+                        <!--{{
                           lexicalStorage.isList(key.columnField)
                             ? '(' + t('table.header.list') + ')'
                             : ''
-                        }}
+                      }}-->
                       </span>
 
                       <span
