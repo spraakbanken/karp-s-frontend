@@ -34,10 +34,12 @@ onMounted(async () => {
 const items = reactive<NewsItem[]>([])
 
 onMounted(async () => {
+  /*
   if (syncStoreWithRouter(router)) {
     lexicalStorage.setIsStart(false)
     lexicalStorage.setIsSearch(true)
   }
+*/
   try {
     const items_ = await fetchNews(true)
     items.push(...items_)

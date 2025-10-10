@@ -166,7 +166,7 @@ const updateData = () => {
   lexicalStorage.setSelectedFields(searchField.value)
   lexicalStorage.setIsSearch(true)
   lexicalStorage.setIsStart(false)
-
+  console.log('updateData, isSearch:', lexicalStorage.isSearch)
   //}
 }
 

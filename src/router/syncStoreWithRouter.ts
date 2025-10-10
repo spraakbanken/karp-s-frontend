@@ -8,7 +8,7 @@ export function syncStoreWithRouter(router: Router): boolean {
   const lexicalStorage = lexicalStore()
 
   const updateRouterQuery = () => {
-    //console.log('updateRouterQuery.')
+    console.log('updateRouterQuery.')
     const currentQuery = router.currentRoute.value.query
     let queryString = ''
     if (lexicalStorage.activeSearchTab == 'advanced') {
@@ -78,7 +78,7 @@ export function syncStoreWithRouter(router: Router): boolean {
 
   const initializeStoreFromQuery = (): boolean => {
     const query = new URLSearchParams(window.location.search)
-    console.log('initializeStoreFromQuery: query=', query, query.get('tab'))
+    console.log('initializeStoreFromQuery: query=', query)
     let gotQuery: boolean = false
     if (query.has('resources')) {
       lexicalStorage.setSelectedDataset(query.get('resources')!.split(','))

@@ -3,9 +3,12 @@ import { onMounted } from 'vue'
 import { lexicalStore } from '@/stores/store'
 
 import { RouterView } from 'vue-router'
+import router from '@/router'
+
 import TitleBar from './components/TitleBar.vue'
 import FooterView from './components/FooterView.vue'
 import { getLexicalDatasets } from '@/api/apiService'
+import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
 
 const lexicalStorage = lexicalStore()
 
@@ -13,6 +16,10 @@ onMounted(async () => {
   try {
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
+    if (syncStoreWithRouter(router)) {
+      lexicalStorage.setIsStart(false)
+      lexicalStorage.setIsSearch(true)
+    }
   } catch (error) {
     console.error(error)
   }

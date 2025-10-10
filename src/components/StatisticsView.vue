@@ -33,6 +33,12 @@ const toggleDropdownCompileFields = () => {
   //  isDropdownOpen.value = false
   //  isDropdownParams.value = false
   isDropdownColumns.value = false
+  // if closing
+  if (!isDropdownColumns.value) {
+    if (selectedColumns.value.length === 0 && !updateShowHitsCheckbox.value) {
+      selectedColumns.value = [entryWordField]
+    }
+  }
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownCompileFields.value) {
     lexicalStorage.setIsSearch(true)
@@ -47,7 +53,7 @@ const toggleDropdownColumns = () => {
   isDropdownCompileFields.value = false
   // if closing
   if (!isDropdownColumns.value) {
-    if (selectedColumns.value.length === 0) {
+    if (selectedColumns.value.length === 0 && !updateShowHitsCheckbox.value) {
       selectedColumns.value = [entryWordField]
     }
   }
@@ -64,7 +70,7 @@ const handleClickOutsideS = (event: MouseEvent) => {
     isDropdownColumns.value = false
     isDropdownCompileFields.value = false
     // make sure at least "Antal" is selected as column
-    if (selectedColumns.value.length === 0) {
+    if (selectedColumns.value.length === 0 && !updateShowHitsCheckbox.value) {
       selectedColumns.value = [entryWordField]
     }
     // trigger search
@@ -229,6 +235,8 @@ watch(
 watch(
   () => lexicalStorage.isSearch,
   async () => {
+    console.log('Watch isSearch!')
+
     if (lexicalStorage.isSearch) {
       lexicalStorage.setIsSearch(false)
       {
@@ -238,6 +246,7 @@ watch(
       }
     }
   },
+  { immediate: true },
 )
 
 const sortedData = computed(() => {
@@ -622,13 +631,15 @@ const updateOverview = () => {
             {{ lexicalStorage.localizeField(param.name) }}
           </label>
         </div>
+        <!-- show count instead of value -->
+        <!--
         <div>
-          <!-- show count instead of value -->
           <label for="columnCount">
             <input type="checkbox" id="columnCount" value="true" v-model="columnCount" />
             {{ $t('statistics.showColumnCount') }}</label
           >
         </div>
+        -->
       </div>
       <div v-if="currentResult.length">
         <div>
@@ -709,7 +720,10 @@ const updateOverview = () => {
       <p v-else-if="lexicalStorage.isLoading > 0" class="message-big">
         {{ $t('message.loading') }}
       </p>
-      <p v-if="!lexicalStorage.isData" class="message-big">
+      <p
+        v-if="!lexicalStorage.isData && !lexicalStorage.isStart && !lexicalStorage.isLoading"
+        class="message-big"
+      >
         {{ $t('error.nodata') }}
       </p>
 
@@ -784,6 +798,7 @@ const updateOverview = () => {
                   </div>
                 </template>
                 <template v-if="key.type == 'total'">
+                  <!--
                   <span v-if="columnCount && selectedColumns.length > 0">
                     <template v-if="key.headerField">
                       {{ lexicalStorage.localizeField(key.headerField) }}<br />
@@ -793,14 +808,16 @@ const updateOverview = () => {
                       {{ t('statistics.total') }}
                     </template>
                   </span>
-                  <span v-else-if="key.headerField">
+                  -->
+                  <span v-if="key.headerField">
+                    <!--
                     <span v-if="selectedColumns.length > 0">
                       {{ lexicalStorage.localizeField(key.headerField) }}<br />
                       {{ key.headerValue }}
                     </span>
-                    <span v-else>
-                      {{ lexicalStorage.datasetLabels[key.headerValue] }}
-                    </span>
+                    <span v-else>-->
+                    {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                    <!--</span>-->
                   </span>
                   <span v-else>
                     {{ t('statistics.total') }}

@@ -180,6 +180,7 @@ export const lexicalStore = defineStore('dataset', {
       this.activeResultTab = tab
     },
     setSelectedDataset(keys: string[]) {
+      //console.log('setSelectedDataset, keys:', keys)
       this.selectedDatasets = keys
       this.setUnionAndIntersectionFields(this.selectedDatasets)
       // so now we have all fields that are in all selected datasets, union and intersection

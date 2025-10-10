@@ -208,6 +208,7 @@ watch(
       //}, 1000)
     }
   },
+  { immediate: true },
 )
 
 /*
@@ -273,7 +274,10 @@ const lastPage = () => {
     <p v-if="errorMessage != ''" class="message">
       {{ errorMessage }}
     </p>
-    <p v-if="!lexicalStorage.isData" class="message-big">
+    <p
+      v-if="!lexicalStorage.isData && !lexicalStorage.isStart && !lexicalStorage.isLoading"
+      class="message-big"
+    >
       {{ $t('error.nodata') }}
     </p>
 
