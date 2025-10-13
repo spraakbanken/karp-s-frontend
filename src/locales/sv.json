@@ -98,6 +98,7 @@
   "graphs.textangled": "Snedställd text",
   "graphs.barwidth": "Stapelbredd",
   "graphs.dots": "Punkter",
+  "graphs.horizontal": "Horisontell",
   "graphs.maxnumberofvalues": "Endast de första {number} värdena visas",
   "error.nodata": "Det finns ingen data att visa.",
   "error.fetching.data": "Fel uppstod vid hämtning av data.",

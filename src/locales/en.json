@@ -97,6 +97,7 @@
   "graphs.threshold": "Threshold",
   "graphs.barwidth": "Bar width",
   "graphs.dots": "Dots",
+  "graphs.horizontal": "Horisontal",
   "graphs.maxnumberofvalues": "Only the first {number} values are shown",
   "error.nodata": "No data available. Please select a parameter.",
   "error.fetching.data": "Error fetching data.",

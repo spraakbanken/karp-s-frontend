@@ -410,6 +410,7 @@ const graph_threshold = ref<number>(1)
 const graph_textangled = ref<boolean>(false)
 const graph_barwidth = ref<number>(60)
 const graph_dots = ref<boolean>(false)
+const graph_horizontal = ref<boolean>(true)
 
 const graph_value_max = ref<number>(0)
 const graph_value_count = ref<number>(0)
@@ -423,24 +424,56 @@ const drawChart = () => {
   graph_value_max.value = 0
   graph_value_count.value = 0
   // write data
-  for (const row in currentResult.value) {
-    const row2 = currentResult.value[row]
-    const category: string = <string>row2[0] // first # is always category
-    const row2_length = row2.length
-    const value: number = <number>(<unknown>row2[<number>(<unknown>row2_length) - 1]) // last # is always total
-    // last # is always total
-    //console.log('row=', row, 'category=', category, 'value=', value)
-    if (value >= graph_threshold.value) {
-      //if (graph_value_count.value < graph_max_number_of_values) {
-      dataObj[category] = value
-      if (value > graph_value_max.value) {
-        graph_value_max.value = value
-        //}
+  //for (const row in currentResult.value) {
+  if (Object.keys(currentResult.value).length === 1) {
+    // one hit distributed on datasets
+    const rowItems: Dataset = currentResult.value[0]
+    for (const key in rowItems) {
+      const key_number = Number(key)
+      //console.log('OVERVIEW :', tableHeaders.value[key_number])
+      // filter total column
+      if (
+        tableHeaders.value[key_number].type === 'total' &&
+        'headerField' in tableHeaders.value[key_number]
+      ) {
+        const category: string =
+          lexicalStorage.datasetLabels[tableHeaders.value[key_number].headerValue]
+        //const category: string = tableHeaders.value[key_number].headerValue
+        const value: number = Number(rowItems[key])
+        //console.log('row=', row, 'category=', category, 'value=', value)
+        if (value >= graph_threshold.value) {
+          //if (graph_value_count.value < graph_max_number_of_values) {
+          dataObj[category] = value
+          if (value > graph_value_max.value) {
+            graph_value_max.value = value
+            //}
+          }
+          graph_value_count.value++
+        }
       }
-      graph_value_count.value++
+    }
+  } else {
+    for (const row in currentResult.value) {
+      // multiple hits
+      const row2 = currentResult.value[row]
+      const category: string = <string>row2[0] // first # is always category
+      const row2_length = row2.length
+      const value: number = <number>(<unknown>row2[<number>(<unknown>row2_length) - 1]) // last # is always total
+      // last # is always total
+      //console.log('row=', row, 'category=', category, 'value=', value)
+      if (value >= graph_threshold.value) {
+        //if (graph_value_count.value < graph_max_number_of_values) {
+        dataObj[category] = value
+        if (value > graph_value_max.value) {
+          graph_value_max.value = value
+          //}
+        }
+        graph_value_count.value++
+      }
     }
   }
-  console.log('drawChart() Dataobj len=', Object.keys(dataObj).length, graph_value_count.value)
+
+  //console.log('drawChart() Dataobj len=', Object.keys(dataObj).length, graph_value_count.value)
 
   if (graph_value_count.value > 0) {
     // create graph
@@ -448,95 +481,159 @@ const drawChart = () => {
     const barWidth = graph_barwidth.value
     const barSpace = 20
     const graph_dot_r = 3
-    const leftMargin = 30
-    const rightMargin = 20
+    const rightMargin = 30
     const bottomMargin = 120
     const topMargin = 30
 
-    const height = 400
-
     d3.selectAll('#karps_graph svg').remove()
 
-    /*
-    const width =
-      (barWidth + barSpace) *
-      (graph_value_count.value < graph_max_number_of_values
-        ? graph_value_count.value
-        : graph_max_number_of_values)
-    */
-    const width = (barWidth + barSpace) * graph_value_count.value
+    if (graph_horizontal.value) {
+      // horizontal
+      const leftMargin = 30
 
-    const svg = d3
-      .select('#karps_graph')
-      .append('svg')
-      .attr('width', width + leftMargin + rightMargin)
-      .attr('height', height + topMargin + bottomMargin)
+      const height = 400
+      const width = (barWidth + barSpace) * graph_value_count.value
 
-    // X scale and axis
-    const xscale = d3.scaleBand().domain(Object.keys(dataObj)).range([0, width])
-    const x_axis = d3.axisBottom(xscale)
+      const svg = d3
+        .select('#karps_graph')
+        .append('svg')
+        .attr('width', width + leftMargin + rightMargin)
+        .attr('height', height + topMargin + bottomMargin)
 
-    if (graph_textangled.value) {
-      svg
-        .append('g')
-        .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
-        .call(x_axis)
-        .selectAll('text')
-        .style('text-anchor', 'end')
-        .attr('dx', '-.8em')
-        .attr('dy', '.15em')
-        .attr('transform', 'rotate(-65)')
-    } else {
-      svg
-        .append('g')
-        .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
-        .call(x_axis)
-    }
+      // X scale and axis
+      const xscale = d3.scaleBand().domain(Object.keys(dataObj)).range([0, width])
+      const x_axis = d3.axisBottom(xscale)
 
-    // Y scale and axis
-
-    const yscale = d3.scaleLinear().domain([0, graph_value_max.value]).range([height, 0])
-    const yAxisTicks = yscale.ticks().filter(Number.isInteger)
-    const y_axis = d3.axisLeft(yscale).tickValues(yAxisTicks).tickFormat(d3.format('d'))
-
-    svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(y_axis)
-
-    Object.values(dataObj).forEach((element, index) => {
-      const g = svg.append('g')
-
-      const x = index * (barWidth + barSpace) + leftMargin / 2
-
-      g.append('rect')
-        .attr('x', x)
-        .attr('y', yscale(element as number))
-        .attr('height', height - yscale(element as number))
-        .attr('width', barWidth)
-        .attr('fill', '#F0581A')
-        .attr('transform', `translate(${leftMargin}, ${topMargin})`)
-
-      // dot
-      if (graph_dots.value) {
-        g.append('circle')
-          .attr('cx', x + leftMargin + barWidth / 2)
-          .attr('cy', yscale(element as number) + 30)
-          .attr('r', graph_dot_r)
-          .attr('fill', '#000000')
+      // legends/titles
+      if (graph_textangled.value) {
+        svg
+          .append('g')
+          .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
+          .call(x_axis)
+          .selectAll('text')
+          .style('text-anchor', 'end')
+          .attr('dx', '-.8em')
+          .attr('dy', '.15em')
+          .attr('transform', 'rotate(-65)')
+      } else {
+        svg
+          .append('g')
+          .attr('transform', `translate(${leftMargin}, ${topMargin + height})`)
+          .call(x_axis)
       }
 
-      g.append('text')
-        .attr('x', x + barWidth / 2)
-        .attr('y', yscale(element as number) - graph_dot_r - 1)
-        .attr('text-anchor', 'middle')
-        .text(element)
-        .attr('transform', `translate(${leftMargin}, ${topMargin})`)
-    })
+      // Y scale and axis
+
+      const yscale = d3.scaleLinear().domain([0, graph_value_max.value]).range([height, 0])
+      const yAxisTicks = yscale.ticks().filter(Number.isInteger)
+      const y_axis = d3.axisLeft(yscale).tickValues(yAxisTicks).tickFormat(d3.format('d'))
+
+      svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(y_axis)
+
+      Object.values(dataObj).forEach((element, index) => {
+        const g = svg.append('g')
+
+        const x = index * (barWidth + barSpace) + leftMargin / 2
+
+        g.append('rect')
+          .attr('x', x)
+          .attr('y', yscale(element as number))
+          .attr('height', height - yscale(element as number))
+          .attr('width', barWidth)
+          .attr('fill', '#F0581A')
+          .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+
+        // dot
+        if (graph_dots.value) {
+          g.append('circle')
+            .attr('cx', x + leftMargin + barWidth / 2)
+            .attr('cy', yscale(element as number) + 30)
+            .attr('r', graph_dot_r)
+            .attr('fill', '#000000')
+        }
+
+        g.append('text')
+          .attr('x', x + barWidth / 2)
+          .attr('y', yscale(element as number) - graph_dot_r - 1)
+          .attr('text-anchor', 'middle')
+          .text(element)
+          .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+      })
+    } else {
+      // vertical
+      const leftMargin = 100
+
+      const width = 1000
+      const height = (barWidth + barSpace) * graph_value_count.value
+
+      const svg = d3
+        .select('#karps_graph')
+        .append('svg')
+        .attr('width', width + leftMargin + rightMargin)
+        .attr('height', height + topMargin + bottomMargin)
+
+      // Y scale and axis
+      const yscale = d3.scaleBand().domain(Object.keys(dataObj)).range([0, height])
+      const y_axis = d3.axisLeft(yscale)
+
+      // legends/titles
+      if (graph_textangled.value) {
+        svg
+          .append('g')
+          .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+          .call(y_axis)
+          .selectAll('text')
+          .style('text-anchor', 'end')
+          .attr('dx', '-.8em')
+          .attr('dy', '.15em')
+          .attr('transform', 'rotate(-45)')
+      } else {
+        svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(y_axis)
+      }
+
+      // X scale and axis
+      const xscale = d3.scaleLinear().domain([0, graph_value_max.value]).range([0, width])
+      const xAxisTicks = xscale.ticks().filter(Number.isInteger)
+      const x_axis = d3.axisTop(xscale).tickValues(xAxisTicks).tickFormat(d3.format('d'))
+
+      svg.append('g').attr('transform', `translate(${leftMargin}, ${topMargin})`).call(x_axis)
+
+      Object.values(dataObj).forEach((element, index) => {
+        const g = svg.append('g')
+
+        const y = index * (barWidth + barSpace) + topMargin / 2
+
+        g.append('rect')
+          .attr('y', y)
+          .attr('x', 0)
+          .attr('width', xscale(element as number))
+          .attr('height', barWidth)
+          .attr('fill', '#F0581A')
+          .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+
+        // dot
+        if (graph_dots.value) {
+          g.append('circle')
+            .attr('cy', y + topMargin + barWidth / 2)
+            .attr('cx', leftMargin + xscale(element as number))
+            .attr('r', graph_dot_r)
+            .attr('fill', '#000000')
+        }
+
+        g.append('text')
+          .attr('y', y + barWidth / 2)
+          .attr('x', xscale(element as number) + graph_dot_r + 3)
+          .attr('text-anchor', 'left')
+          .text(element)
+          .attr('transform', `translate(${leftMargin}, ${topMargin})`)
+      })
+    }
   } else {
     d3.selectAll('#karps_graph svg').remove()
   }
 }
 
-// Export graph as SVG
-// https://stackoverflow.com/questions/23218174/how-do-i-save-export-an-svg-file-after-creating-an-svg-with-d3-js-ie-safari-an
+// export graph as SVG
 const exportSVG = () => {
   const svgEl = document.getElementById('karps_graph')
   if (svgEl !== null) {
@@ -648,22 +745,21 @@ const updateOverview = () => {
           </button>
         </div>
         <div>
-          <label for="showOverviewCheckbox">
-            <input
-              type="checkbox"
-              id="showOverviewCheckbox"
-              v-model="showOverview"
-              @change="updateOverview()"
-            />
+          <input
+            type="checkbox"
+            id="showOverviewCheckbox"
+            v-model="showOverview"
+            v-bind:disabled="selectedColumns.length !== 0"
+            @change="updateOverview()"
+          />
+          <label for="showOverviewCheckbox" v-bind:disabled="selectedColumns.length !== 0">
             {{ $t('statistics.showOverview') }}
           </label>
         </div>
         <div>
           <!-- show all cells expanded -->
-          <label for="showExpanded">
-            <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
-            {{ $t('table.show.expanded') }}</label
-          >
+          <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
+          <label for="showExpanded">{{ $t('table.show.expanded') }} </label>
         </div>
       </div>
     </div>
@@ -673,8 +769,8 @@ const updateOverview = () => {
       <div class="overview-settings">
         <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
         <!--
-      <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
-      -->
+        <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
+        -->
         <span class="overview-setting">
           {{ $t('graphs.threshold') }}
           <input
@@ -696,6 +792,10 @@ const updateOverview = () => {
         <span class="overview-setting">
           <input type="checkbox" v-model="graph_dots" @change="updateOverview" />
           {{ $t('graphs.dots') }}
+        </span>
+        <span class="overview-setting">
+          <input type="checkbox" v-model="graph_horizontal" @change="updateOverview" />
+          {{ $t('graphs.horizontal') }}
         </span>
       </div>
       <!--
@@ -1080,6 +1180,10 @@ th .resource {
 
 .overview-settings .export-button {
   margin: 0;
+}
+
+input[type='checkbox'][disabled] + label {
+  color: #505050;
 }
 
 /* table */
