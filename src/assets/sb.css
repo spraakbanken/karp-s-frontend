@@ -9,4 +9,8 @@
   --sb-grey-dark: #606060;
   --sb-grey-medium: #909090;
   --sb-grey-light: #d0d0d0;
+
+  --sb-error-background: #f8d7da;
+  --sb-error-text: #721c24;
+  --sb-message-background: #f8f5d7;
 }

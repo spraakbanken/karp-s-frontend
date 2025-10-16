@@ -77,7 +77,7 @@ watch(
     </div>
 
     <!-- featured news -->
-    <div v-if="items.length && lexicalStorage.isStart">
+    <div v-if="items.length && lexicalStorage.isStart" class="message-featured">
       <article v-for="(item, i) in items" :key="i" class="newsarticle">
         <header class="">
           <h3 class="newstitle">{{ th(item.title) }}</h3>

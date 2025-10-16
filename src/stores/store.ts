@@ -145,8 +145,8 @@ export const lexicalStore = defineStore('dataset', {
           }
         }
       })
-      // setup default datasets for first run = select all
-      this.setSelectedDataset(this.currentDatasets)
+      // setup default datasets for first run = select all except "Fula ordboken" ("fulaord")
+      this.setSelectedDataset(this.currentDatasets.filter((element) => element !== 'fulaord'))
       // and select all tags
       this.setSelectedTags(this.currentTags)
     },

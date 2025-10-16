@@ -7,8 +7,8 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg780"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
-   sodipodi:docname="karps_slogan.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="karps_slogan_master.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,9 +24,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.9211583"
-     inkscape:cx="198.83838"
-     inkscape:cy="111.65139"
+     inkscape:zoom="1.3584641"
+     inkscape:cx="271.26224"
+     inkscape:cy="137.2874"
      inkscape:window-width="1920"
      inkscape:window-height="1025"
      inkscape:window-x="0"
@@ -80,12 +80,14 @@
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-43.744099,-16.703826)"
        id="text825-0"
-       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:49.3333px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect827-2);display:inline;fill:#000000"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:49.3333px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect827-2);display:inline;fill:#f0581a;fill-opacity:1"><tspan
          x="165.33203"
          y="211.82125"
-         id="tspan1302"><tspan
+         id="tspan5"><tspan
+           style="fill:#000000"
+           id="tspan3">Karp</tspan><tspan
            style="font-size:53.3333px;font-family:'Jost*';-inkscape-font-specification:'Jost*, Light'"
-           id="tspan1300">KarpS</tspan></tspan></text>
+           id="tspan4">-s</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-126.56188,-44.891886)"
@@ -93,9 +95,9 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:49.3333px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect10965);display:inline;fill:#f0581a;fill-opacity:1"><tspan
          x="482.19141"
          y="340.18958"
-         id="tspan1306"><tspan
+         id="tspan7"><tspan
            style="font-weight:500;font-size:16.6667px;font-family:'Jost*';-inkscape-font-specification:'Jost*, Medium';fill:#1a1a1a"
-           id="tspan1304">Språkbankens datapubliceringsplattform</tspan></tspan></text>
+           id="tspan6">Språkbankens datapubliceringsplattform</tspan></tspan></text>
     <g
        id="g1063"
        transform="translate(-96.254366,0.17579069)">
@@ -129,12 +131,14 @@
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-43.744099,4.7395567)"
        id="text825-0-3"
-       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:49.3333px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect827-2-12);display:inline;fill:#000000"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:49.3333px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect827-2-12);display:inline;fill:#f0581a;fill-opacity:1"><tspan
          x="165.33203"
          y="211.82125"
-         id="tspan1310"><tspan
+         id="tspan10"><tspan
+           style="fill:#000000"
+           id="tspan8">Karp</tspan><tspan
            style="font-size:53.3333px;font-family:'Jost*';-inkscape-font-specification:'Jost*, Light'"
-           id="tspan1308">KarpS</tspan></tspan></text>
+           id="tspan9">-s</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-126.56188,-23.448504)"
@@ -142,9 +146,9 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:49.3333px;font-family:'Open Sans';-inkscape-font-specification:'Open Sans, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect10965-9);display:inline;fill:#f0581a;fill-opacity:1"><tspan
          x="482.19141"
          y="340.18958"
-         id="tspan1314"><tspan
+         id="tspan12"><tspan
            style="font-weight:500;font-size:16.6667px;font-family:'Jost*';-inkscape-font-specification:'Jost*, Medium';fill:#1a1a1a"
-           id="tspan1312">Språkbanken’s data publishing platform</tspan></tspan></text>
+           id="tspan11">Språkbanken’s data publishing platform</tspan></tspan></text>
     <g
        id="g1063-9"
        transform="translate(-96.254366,21.619173)">

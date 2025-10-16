@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import {
+  ROW_MAX_HEIGHT,
+  ROW_SHOW_EXPANDED_DEFAULT,
+  ROWS_PER_PAGE,
+  GRAPH_BARWIDTH,
+} from '@/constants.ts'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
@@ -17,11 +23,11 @@ const lexicalStorage = lexicalStore()
 const currentResult = ref<Dataset[]>([])
 const tableHeaders = ref<CountHeadersColumn[]>([])
 const currentPage = ref(1)
-const itemsPerPage = ref(100)
+const itemsPerPage = ref(ROWS_PER_PAGE)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeResultTab)
-const showExpanded = ref(false)
+const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 const columnCount = ref(false)
 
 const isDropdownColumns = ref(false)
@@ -157,7 +163,7 @@ const fetchData = async () => {
   lexicalStorage.setIsData(false)
 
   //console.log('fetchData', newParams, newCompileParams, newColumns)
-  if (newFields && newCompileFields.length > 0) {
+  if (newFields && newCompileFields.length > 0 && lexicalStorage.selectedDatasets.length > 0) {
     try {
       errorMessage.value = ''
 
@@ -406,14 +412,16 @@ const exportCSV = () => {
 */
 //const graph_max_number_of_values = 100
 
-const graph_threshold = ref<number>(1)
+const graph_threshold_min = ref<number>(1)
+const graph_threshold_max = ref<number>(999)
 const graph_textangled = ref<boolean>(false)
-const graph_barwidth = ref<number>(60)
+const graph_barwidth = ref<number>(GRAPH_BARWIDTH)
 const graph_dots = ref<boolean>(false)
 const graph_horizontal = ref<boolean>(true)
 
 const graph_value_max = ref<number>(0)
 const graph_value_count = ref<number>(0)
+const graph_value_excluded = ref<number>(0)
 
 const drawChart = () => {
   console.log('drawChart() ', currentResult.value.length)
@@ -423,6 +431,7 @@ const drawChart = () => {
   const dataObj: dict = {}
   graph_value_max.value = 0
   graph_value_count.value = 0
+  graph_value_excluded.value = 0
   // write data
   //for (const row in currentResult.value) {
   if (Object.keys(currentResult.value).length === 1) {
@@ -441,7 +450,7 @@ const drawChart = () => {
         //const category: string = tableHeaders.value[key_number].headerValue
         const value: number = Number(rowItems[key])
         //console.log('row=', row, 'category=', category, 'value=', value)
-        if (value >= graph_threshold.value) {
+        if (value >= graph_threshold_min.value && value <= graph_threshold_max.value) {
           //if (graph_value_count.value < graph_max_number_of_values) {
           dataObj[category] = value
           if (value > graph_value_max.value) {
@@ -449,6 +458,8 @@ const drawChart = () => {
             //}
           }
           graph_value_count.value++
+        } else {
+          graph_value_excluded.value++
         }
       }
     }
@@ -461,7 +472,7 @@ const drawChart = () => {
       const value: number = <number>(<unknown>row2[<number>(<unknown>row2_length) - 1]) // last # is always total
       // last # is always total
       //console.log('row=', row, 'category=', category, 'value=', value)
-      if (value >= graph_threshold.value) {
+      if (value >= graph_threshold_min.value && value <= graph_threshold_max.value) {
         //if (graph_value_count.value < graph_max_number_of_values) {
         dataObj[category] = value
         if (value > graph_value_max.value) {
@@ -469,6 +480,8 @@ const drawChart = () => {
           //}
         }
         graph_value_count.value++
+      } else {
+        graph_value_excluded.value++
       }
     }
   }
@@ -650,6 +663,13 @@ const exportSVG = () => {
 
 const updateOverview = () => {
   if (showOverview.value) {
+    if (graph_dots.value) {
+      graph_barwidth.value = 0
+    } else {
+      if (graph_barwidth.value === 0) {
+        graph_barwidth.value = GRAPH_BARWIDTH
+      }
+    }
     drawChart()
   }
 }
@@ -751,14 +771,14 @@ const updateOverview = () => {
             v-model="showOverview"
             v-bind:disabled="selectedColumns.length !== 0"
             @change="updateOverview()"
-          />
+          />&nbsp;
           <label for="showOverviewCheckbox" v-bind:disabled="selectedColumns.length !== 0">
             {{ $t('statistics.showOverview') }}
           </label>
         </div>
         <div>
           <!-- show all cells expanded -->
-          <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
+          <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />&nbsp;
           <label for="showExpanded">{{ $t('table.show.expanded') }} </label>
         </div>
       </div>
@@ -767,19 +787,26 @@ const updateOverview = () => {
     <!-- show overview/graph -->
     <div v-if="showOverview" class="overview-wrapper">
       <div class="overview-settings">
-        <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
-        <!--
-        <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
-        -->
         <span class="overview-setting">
           {{ $t('graphs.threshold') }}
           <input
             type="number"
             size="5"
             min="0"
-            v-model="graph_threshold"
+            v-model="graph_threshold_min"
             @change="updateOverview"
           />
+          -
+          <input
+            type="number"
+            size="5"
+            min="0"
+            v-model="graph_threshold_max"
+            @change="updateOverview"
+          />
+          <i style="margin-left: 0.5rem" v-if="graph_value_excluded > 0"
+            >{{ graph_value_excluded }} {{ $t('graphs.excluded') }}</i
+          >
         </span>
         <span class="overview-setting">
           <input type="checkbox" v-model="graph_textangled" @change="updateOverview" />
@@ -797,6 +824,14 @@ const updateOverview = () => {
           <input type="checkbox" v-model="graph_horizontal" @change="updateOverview" />
           {{ $t('graphs.horizontal') }}
         </span>
+        <span class="overview-setting">
+          <button @click="exportSVG()" class="export-button">{{ $t('graphs.export.svg') }}</button>
+        </span>
+        <!--
+        <span class="overview-setting">
+          <button @click="exportPNG()" class="export-button">{{ $t('graphs.export.png') }}</button>
+        </span>
+        -->
       </div>
       <!--
       <div v-if="graph_value_count > graph_max_number_of_values" class="overview-max">
@@ -809,15 +844,11 @@ const updateOverview = () => {
     <!-- show table -->
     <div v-else class="table-wrapper">
       <!-- show error message -->
-      <p v-if="errorMessage != ''" class="message">
+      <p v-if="errorMessage != ''" class="message-error">
         {{ errorMessage }}
       </p>
-      <!-- show no data message -->
-      <p v-else-if="lexicalStorage.selectedDatasets.length == 0" class="message">
-        {{ $t('message.nodatasetselected') }}
-      </p>
       <!-- show loading message -->
-      <p v-else-if="lexicalStorage.isLoading > 0" class="message-big">
+      <p v-if="lexicalStorage.isLoading > 0" class="message-big">
         {{ $t('message.loading') }}
       </p>
       <p
@@ -825,6 +856,10 @@ const updateOverview = () => {
         class="message-big"
       >
         {{ $t('error.nodata') }}
+      </p>
+      <!-- show no data message -->
+      <p v-if="lexicalStorage.selectedDatasets.length == 0" class="message">
+        {{ $t('message.nodatasetselected') }}
       </p>
 
       <table v-if="currentResult.length" class="fancy-table">
@@ -934,7 +969,7 @@ const updateOverview = () => {
                 <span v-html="formatCell(value)"></span>
               </template>
               <template v-else>
-                <MaxHeight :max-height="32">
+                <MaxHeight :max-height="ROW_MAX_HEIGHT">
                   <span v-html="formatCell(value)"></span>
                 </MaxHeight>
               </template>
@@ -960,7 +995,7 @@ const updateOverview = () => {
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
         <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-          <option v-for="option in [10, 20, 50, 100]" :key="option" :value="option">
+          <option v-for="option in [10, 20, 50, 100, 1000]" :key="option" :value="option">
             {{ option }}
           </option>
         </select>
@@ -1041,15 +1076,16 @@ const updateOverview = () => {
   display: grid;
   position: relative;
   /* margin-top: 2rem; */
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .overview-settings {
-  padding: 0;
+  padding: 0.5rem;
+  background-color: var(--sb-orange-light);
 }
 
 .overview-setting {
-  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .overview-max {
@@ -1263,21 +1299,5 @@ tr:hover {
 
 .pagination-controls label {
   margin-right: 0.5rem;
-}
-
-/* Info and error messages */
-
-.message {
-  margin: auto;
-  text-align: center;
-  font-style: italic;
-}
-
-.message-big {
-  margin: auto;
-  text-align: center;
-  font-style: italic;
-  font-size: x-large;
-  margin-bottom: 1rem;
 }
 </style>

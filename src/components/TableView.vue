@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT, ROWS_PER_PAGE } from '@/constants.ts'
 import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { getTableData } from '@/api/apiService'
@@ -39,7 +40,7 @@ const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 // sort column
 const sortField = ref(lexicalStorage.sortField)
 // always show expanded rows (no "View more" button)
-const showExpanded = ref(false)
+const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 
 const doSort = (s: string) => {
   sortField.value = s
@@ -61,7 +62,7 @@ const doSort = (s: string) => {
 //const currentValues = ref<Dataset[]>([])
 const currentTab = ref(lexicalStorage.activeResultTab)
 const currentPage = ref(1)
-const itemsPerPage = ref(25)
+const itemsPerPage = ref(ROWS_PER_PAGE)
 
 const errorMessage = ref('')
 
@@ -271,7 +272,7 @@ const lastPage = () => {
     <p v-if="lexicalStorage.isLoading" class="message-big">
       {{ $t('message.loading') }}
     </p>
-    <p v-if="errorMessage != ''" class="message">
+    <p v-if="errorMessage != ''" class="message-error">
       {{ errorMessage }}
     </p>
     <p
@@ -384,7 +385,7 @@ const lastPage = () => {
                     <span v-html="formatCell(value2.value)"></span>
                   </template>
                   <template v-else>
-                    <MaxHeight :max-height="32">
+                    <MaxHeight :max-height="ROW_MAX_HEIGHT">
                       <span v-html="formatCell(value2.value)"></span>
                     </MaxHeight>
                   </template>
@@ -413,7 +414,7 @@ const lastPage = () => {
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
         <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
-          <option v-for="option in [10, 25, 50, 100]" :key="option" :value="option">
+          <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
             {{ option }}
           </option>
         </select>
@@ -477,20 +478,6 @@ const lastPage = () => {
   background-color: none;
   font-weight: bold;
   background-color: white;
-}
-
-.message {
-  margin: auto;
-  text-align: center;
-  font-style: italic;
-}
-
-.message-big {
-  margin: auto;
-  margin-bottom: 1rem;
-  text-align: center;
-  font-style: italic;
-  font-size: x-large;
 }
 
 /* picsbar */

@@ -37,3 +37,39 @@ a,
     border-top: 1px solid #ddd;
   }
 }
+
+/* Info and error messages */
+
+.message {
+  margin: auto;
+  text-align: center;
+  font-style: italic;
+}
+
+.message-featured {
+  background-color: var(--sb-message-background);
+  box-sizing: content-box;
+  margin: auto;
+  text-align: center;
+  color: black;
+  width: 600px;
+  padding: 1rem;
+  margin-top: 2rem;
+}
+
+.message-error {
+  background-color: var(--sb-error-background);
+  margin: auto;
+  text-align: center;
+  color: var(--sb-error-text);
+  width: 600px;
+  padding: 1rem;
+}
+
+.message-big {
+  margin: auto;
+  text-align: center;
+  font-style: italic;
+  font-size: x-large;
+  margin-bottom: 1rem;
+}

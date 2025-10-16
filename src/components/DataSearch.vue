@@ -340,13 +340,15 @@ watch(
                 <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
                 {{ lexicalStorage.localizeField(param.name) }}&nbsp;
                 <span style="float: right">
-                  <i>
-                    {{
-                      lexicalStorage.currentCommonFields.find((item) => item.name === param.name)
-                        ? ''
-                        : '(' + $t('search.field.notcommon.short') + ')'
-                    }}</i
-                  >
+                  <img
+                    height="16px"
+                    src="@/assets/sb_symbol_exclamation.svg"
+                    class="datasets-icon"
+                    v-if="
+                      !lexicalStorage.currentCommonFields.find((item) => item.name === param.name)
+                    "
+                    :title="$t('search.field.notcommon')"
+                  />
                 </span>
               </div>
             </div>
