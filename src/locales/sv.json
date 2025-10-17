@@ -100,7 +100,7 @@
   "graphs.dots": "Punkter",
   "graphs.horizontal": "Horisontell",
   "graphs.maxnumberofvalues": "Endast de första {number} värdena visas",
-  "graphs.excluded": "värden visas ej",
+  "graphs.excluded": "Värden som ej visas:",
   "error.nodata": "Det finns inget att visa.",
   "error.fetching.data": "Fel uppstod vid hämtning av data.",
   "message.loading": "Hämtar data...",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT, ROWS_PER_PAGE } from '@/constants.ts'
+import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT, ROWS_PER_PAGE } from '@/utils/constants'
 import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { getTableData } from '@/api/apiService'
@@ -35,7 +35,7 @@ const currentResultGrp = ref<Record<string, { entry: Entry; resourceId: string }
 // with rows sorted and put in (ordered) array
 const currentResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: string }[]>>({})
 
-const currentFields = computed(() => lexicalStorage.currentFields)
+//const currentFields = computed(() => lexicalStorage.currentFields)
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 // sort column
 const sortField = ref(lexicalStorage.sortField)

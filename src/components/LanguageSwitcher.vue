@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { useUser } from '@/stores/store'
+import { lexicalStore } from '@/stores/store'
 
-// update activeLocale in store
-const userStore = useUser()
-const { activeLocale } = storeToRefs(userStore)
+const lexicalStorage = lexicalStore()
+const { activeLocale } = storeToRefs(lexicalStorage)
 </script>
 
 <template>

@@ -100,7 +100,7 @@
   "graphs.dots": "Dots",
   "graphs.horizontal": "Horisontal",
   "graphs.maxnumberofvalues": "Only the first {number} values are shown",
-  "graphs.excluded": "values are not shown",
+  "graphs.excluded": "Values not shown:",
   "error.nodata": "There is nothing to show.",
   "error.fetching.data": "Error fetching data.",
   "message.loading": "Loading...",

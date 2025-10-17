@@ -2,7 +2,6 @@
 import { onMounted, reactive } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
 //import type { ByLang } from '@/util.types'
-import { useI18n } from 'vue-i18n'
 import { th, getDate } from '@/utils/utils'
 
 const items = reactive<NewsItem[]>([])

@@ -4,7 +4,7 @@ import {
   ROW_SHOW_EXPANDED_DEFAULT,
   ROWS_PER_PAGE,
   GRAPH_BARWIDTH,
-} from '@/constants.ts'
+} from '@/utils/constants'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
@@ -182,7 +182,6 @@ const fetchData = async () => {
       // make sure any appearences of "entryWord" i headers
       // are replaced by "entry_word"
       // ie replace entryWordFieldCamel with entryWordField
-
       tableHeaders.value.forEach((f, i) => {
         if (f.columnField == entryWordFieldCamel) {
           tableHeaders.value[i].columnField = entryWordField
@@ -413,7 +412,7 @@ const exportCSV = () => {
 //const graph_max_number_of_values = 100
 
 const graph_threshold_min = ref<number>(1)
-const graph_threshold_max = ref<number>(999)
+const graph_threshold_max = ref<unknown>('')
 const graph_textangled = ref<boolean>(false)
 const graph_barwidth = ref<number>(GRAPH_BARWIDTH)
 const graph_dots = ref<boolean>(false)
@@ -450,7 +449,10 @@ const drawChart = () => {
         //const category: string = tableHeaders.value[key_number].headerValue
         const value: number = Number(rowItems[key])
         //console.log('row=', row, 'category=', category, 'value=', value)
-        if (value >= graph_threshold_min.value && value <= graph_threshold_max.value) {
+        if (
+          value >= graph_threshold_min.value &&
+          (graph_threshold_max.value == '' || value <= Number(graph_threshold_max.value))
+        ) {
           //if (graph_value_count.value < graph_max_number_of_values) {
           dataObj[category] = value
           if (value > graph_value_max.value) {
@@ -472,7 +474,10 @@ const drawChart = () => {
       const value: number = <number>(<unknown>row2[<number>(<unknown>row2_length) - 1]) // last # is always total
       // last # is always total
       //console.log('row=', row, 'category=', category, 'value=', value)
-      if (value >= graph_threshold_min.value && value <= graph_threshold_max.value) {
+      if (
+        value >= graph_threshold_min.value &&
+        (graph_threshold_max.value == '' || value <= Number(graph_threshold_max.value))
+      ) {
         //if (graph_value_count.value < graph_max_number_of_values) {
         dataObj[category] = value
         if (value > graph_value_max.value) {
@@ -805,8 +810,8 @@ const updateOverview = () => {
             @change="updateOverview"
           />
           <i style="margin-left: 0.5rem" v-if="graph_value_excluded > 0"
-            >{{ graph_value_excluded }} {{ $t('graphs.excluded') }}</i
-          >
+            >{{ $t('graphs.excluded') }} {{ graph_value_excluded }}
+          </i>
         </span>
         <span class="overview-setting">
           <input type="checkbox" v-model="graph_textangled" @change="updateOverview" />
@@ -963,6 +968,7 @@ const updateOverview = () => {
           </tr>
         </thead>
         <tbody>
+          <!-- show data -->
           <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
             <td v-for="(value, key) in item" :key="key">
               <template v-if="showExpanded">

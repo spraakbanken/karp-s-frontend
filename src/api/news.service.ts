@@ -1,7 +1,7 @@
 const Yaml = import('js-yaml').then((m) => m.default)
 import { once } from 'es-toolkit'
-import { addDays, retry } from '@/util'
-import type { ByLang } from '@/util.types'
+import { addDays, retry } from '@/utils/utils'
+import type { ByLang } from '@/types/util.types'
 
 const NEWS_URL: string = import.meta.env.VITE_NEWS_URL
 
