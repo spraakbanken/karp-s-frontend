@@ -13,15 +13,16 @@ import type { SelectedFieldConfig, CountHeadersColumn } from '@/types/datasetCon
 import * as d3 from 'd3'
 import MaxHeight from '@/components/MaxHeight.vue'
 import { formatCell } from '@/utils/utils'
-
+import { isNumber } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const lexicalStorage = lexicalStore()
 
-const currentResult = ref<Dataset[]>([])
-const tableHeaders = ref<CountHeadersColumn[]>([])
+const currentHeaders = ref<CountHeadersColumn[]>([])
+const currentTable = ref<Dataset[]>([])
+const currentTotals = ref<number[]>([])
 const currentPage = ref(1)
 const itemsPerPage = ref(ROWS_PER_PAGE)
 const sortKey = ref('')
@@ -156,7 +157,8 @@ const fetchData = async () => {
   // abort any current running queries
   lexicalStorage.abortController.abort()
 
-  currentResult.value = []
+  currentTable.value = []
+  currentTotals.value = []
   const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
@@ -167,35 +169,35 @@ const fetchData = async () => {
     try {
       errorMessage.value = ''
 
-      const { tableData, headers } = await getStatisticsData(
+      const { headers, table, totals } = await getStatisticsData(
         newFields as Record<string, SelectedFieldConfig>,
         newCompileFields as string[],
         newColumns as string[],
         columnCount.value as boolean,
       )
-      currentResult.value = tableData
-      if (currentResult.value.length > 0) {
-        lexicalStorage.setIsData(true)
-      }
-      //console.log('fetchData result ', currentResult.value.length, currentResult.value)
-      tableHeaders.value = headers
+      currentHeaders.value = headers
       // make sure any appearences of "entryWord" i headers
       // are replaced by "entry_word"
       // ie replace entryWordFieldCamel with entryWordField
-      tableHeaders.value.forEach((f, i) => {
+      currentHeaders.value.forEach((f, i) => {
         if (f.columnField == entryWordFieldCamel) {
-          tableHeaders.value[i].columnField = entryWordField
+          currentHeaders.value[i].columnField = entryWordField
         }
         if (f.headerField == entryWordFieldCamel) {
-          tableHeaders.value[i].headerField = entryWordField
+          currentHeaders.value[i].headerField = entryWordField
         }
       })
-      // console.log('currentResult', currentResult.value);
+      //console.log('tableHeaders', currentHeaders.value)
+      currentTable.value = table
+      if (currentTable.value.length > 0) {
+        lexicalStorage.setIsData(true)
+      }
+      currentTotals.value = totals
     } catch (error) {
       errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
   } else {
-    currentResult.value = []
+    currentTable.value = []
   }
 }
 
@@ -216,7 +218,7 @@ watch(
   (newDatasets, oldDatasets) => {
     //console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
     if (newDatasets.length === 0) {
-      currentResult.value = []
+      currentTable.value = []
       lexicalStorage.setIsData(false)
     }
     selectedCompileFields.value = [entryWordField]
@@ -256,9 +258,9 @@ watch(
 
 const sortedData = computed(() => {
   //console.log('Recalc!', sortKey.value)
-  if (!sortKey.value) return currentResult.value
+  if (!sortKey.value) return currentTable.value
 
-  return [...currentResult.value].sort((a, b) => {
+  return [...currentTable.value].sort((a, b) => {
     //const aValue = a[sortKey.value]
     //const bValue = b[sortKey.value]
     // data is of format a[0] = "name", a[1] = number
@@ -286,7 +288,7 @@ const paginatedData = computed(() => {
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(currentResult.value.length / itemsPerPage.value)
+  return Math.ceil(currentTable.value.length / itemsPerPage.value)
 })
 
 const prevPage = () => {
@@ -334,36 +336,39 @@ const exportCSV = () => {
   let csv = ''
 
   // write headers
-  for (const key in tableHeaders.value) {
-    if (tableHeaders.value[key].type == 'compile') {
-      csv += lexicalStorage.localizeField(tableHeaders.value[key].columnField) + ','
-    } else if (tableHeaders.value[key].type == 'value') {
+  for (const key in currentHeaders.value) {
+    if (currentHeaders.value[key].type == 'compile') {
+      csv += lexicalStorage.localizeField(currentHeaders.value[key].columnField) + ','
+    } else if (currentHeaders.value[key].type == 'value') {
       csv +=
-        lexicalStorage.localizeField(tableHeaders.value[key].columnField) +
+        lexicalStorage.localizeField(currentHeaders.value[key].columnField) +
         ' (' +
-        lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] +
+        lexicalStorage.datasetLabels[currentHeaders.value[key].headerValue] +
         '),'
-    } else if (tableHeaders.value[key].type == 'total') {
+    } else if (
+      currentHeaders.value[key].type == 'total' ||
+      currentHeaders.value[key].type == 'count'
+    ) {
       // mirror template headers
       if (columnCount.value && selectedColumns.value.length > 0) {
-        if (tableHeaders.value[key].headerField) {
+        if (currentHeaders.value[key].headerField) {
           csv +=
-            lexicalStorage.localizeField(tableHeaders.value[key].headerField) +
+            lexicalStorage.localizeField(currentHeaders.value[key].headerField) +
             ' (' +
-            tableHeaders.value[key].headerValue +
+            currentHeaders.value[key].headerValue +
             '),'
         } else {
           csv += t('statistics.total') + ','
         }
-      } else if (tableHeaders.value[key].headerField) {
+      } else if (currentHeaders.value[key].headerField) {
         if (selectedColumns.value.length > 0) {
           csv +=
-            lexicalStorage.localizeField(tableHeaders.value[key].headerField) +
+            lexicalStorage.localizeField(currentHeaders.value[key].headerField) +
             ' (' +
-            tableHeaders.value[key].headerValue +
+            currentHeaders.value[key].headerValue +
             '),'
         } else {
-          csv += lexicalStorage.datasetLabels[tableHeaders.value[key].headerValue] + ','
+          csv += lexicalStorage.datasetLabels[currentHeaders.value[key].headerValue] + ','
         }
       } else {
         csv += t('statistics.total') + ','
@@ -380,13 +385,13 @@ const exportCSV = () => {
   }
 
   // write data
-  for (const row in currentResult.value) {
-    const rowItems: Dataset = currentResult.value[row]
+  for (const row in currentTable.value) {
+    const rowItems: Dataset = currentTable.value[row]
     // value could be array
     for (const key in rowItems) {
       const key_number = Number(key)
-      if ('columnField' in tableHeaders.value[key_number]) {
-        if (collectionColumn.includes(tableHeaders.value[key_number].columnField)) {
+      if ('columnField' in currentHeaders.value[key_number]) {
+        if (collectionColumn.includes(currentHeaders.value[key_number].columnField)) {
           console.log('Columnfield:', rowItems[key])
           csv += '"' + formatCell(rowItems[key], '; ') + '\",'
         } else {
@@ -398,6 +403,16 @@ const exportCSV = () => {
     }
     csv += '\n'
   }
+
+  // write totals
+  if (currentTotals.value.length > 0) {
+    csv += '\"' + t('statistics.total') + '\",'
+    for (let i: number = 1; i < currentTotals.value.length; i++) {
+      csv += '\"' + currentTotals.value[i] + '\",'
+    }
+    csv += '\n'
+  }
+
   //console.log('CSV =', csv)
   // save as file
   const anchor = document.createElement('a')
@@ -423,7 +438,7 @@ const graph_value_count = ref<number>(0)
 const graph_value_excluded = ref<number>(0)
 
 const drawChart = () => {
-  console.log('drawChart() ', currentResult.value.length)
+  console.log('drawChart() ', currentTable.value.length)
   interface dict {
     [key: string]: string | number
   }
@@ -433,19 +448,19 @@ const drawChart = () => {
   graph_value_excluded.value = 0
   // write data
   //for (const row in currentResult.value) {
-  if (Object.keys(currentResult.value).length === 1) {
+  if (Object.keys(currentTable.value).length === 1) {
     // one hit distributed on datasets
-    const rowItems: Dataset = currentResult.value[0]
+    const rowItems: Dataset = currentTable.value[0]
     for (const key in rowItems) {
       const key_number = Number(key)
       //console.log('OVERVIEW :', tableHeaders.value[key_number])
       // filter total column
       if (
-        tableHeaders.value[key_number].type === 'total' &&
-        'headerField' in tableHeaders.value[key_number]
+        currentHeaders.value[key_number].type === 'count' &&
+        'headerField' in currentHeaders.value[key_number]
       ) {
         const category: string =
-          lexicalStorage.datasetLabels[tableHeaders.value[key_number].headerValue]
+          lexicalStorage.datasetLabels[currentHeaders.value[key_number].headerValue]
         //const category: string = tableHeaders.value[key_number].headerValue
         const value: number = Number(rowItems[key])
         //console.log('row=', row, 'category=', category, 'value=', value)
@@ -466,13 +481,12 @@ const drawChart = () => {
       }
     }
   } else {
-    for (const row in currentResult.value) {
+    for (const row in currentTable.value) {
       // multiple hits
-      const row2 = currentResult.value[row]
+      const row2 = currentTable.value[row]
       const category: string = <string>row2[0] // first # is always category
-      const row2_length = row2.length
-      const value: number = <number>(<unknown>row2[<number>(<unknown>row2_length) - 1]) // last # is always total
-      // last # is always total
+      // total is 2nd value
+      const value: number = <number>(<unknown>row2[1])
       //console.log('row=', row, 'category=', category, 'value=', value)
       if (
         value >= graph_threshold_min.value &&
@@ -763,7 +777,7 @@ const updateOverview = () => {
         </div>
         -->
       </div>
-      <div v-if="currentResult.length">
+      <div v-if="currentTable.length">
         <div>
           <button @click="exportCSV()" class="export-button">
             {{ $t('statistics.exportCSV') }}
@@ -867,32 +881,31 @@ const updateOverview = () => {
         {{ $t('message.nodatasetselected') }}
       </p>
 
-      <table v-if="currentResult.length" class="fancy-table">
+      <table v-if="currentTable.length" class="fancy-table">
         <thead>
           <!-- show number of hits -->
           <tr>
             <td colspan="100%" class="dataset-label">
               {{ $t('statistics.numberOfHits') }}:
-              {{ currentResult.length }}
+              {{ currentTable.length }}
             </td>
           </tr>
-
+          <!-- show header row -->
           <tr>
             <th
-              v-for="(key, index) in tableHeaders"
+              v-for="(key, index) in currentHeaders"
               :key="index"
               @click="sortTable(String(index))"
               :class="{
                 'header-list': lexicalStorage.isList(key.columnField),
+                'header-count': key.type == 'count',
                 'header-total': key.type == 'total',
                 'header-compile': key.type == 'compile',
               }"
             >
               <div class="header-content">
                 <template v-if="key.type == 'compile'">
-                  <span>
-                    {{ lexicalStorage.localizeField(key.columnField) }}
-                  </span>
+                  <span> {{ lexicalStorage.localizeField(key.columnField) }}</span>
                   <!--
                   <span>
                     {{
@@ -937,7 +950,7 @@ const updateOverview = () => {
                     </div>
                   </div>
                 </template>
-                <template v-if="key.type == 'total'">
+                <template v-if="key.type == 'total' || key.type == 'count'">
                   <!--
                   <span v-if="columnCount && selectedColumns.length > 0">
                     <template v-if="key.headerField">
@@ -968,24 +981,38 @@ const updateOverview = () => {
           </tr>
         </thead>
         <tbody>
+          <!-- show totals -->
+          <tr class="total">
+            <template v-for="(item, index) in currentTotals" :key="index">
+              <td v-if="index == 0" class="total">&Sigma;</td>
+              <td v-else class="total numeric">{{ item }}</td>
+            </template>
+          </tr>
           <!-- show data -->
           <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
-            <td v-for="(value, key) in item" :key="key">
-              <template v-if="showExpanded">
-                <span v-html="formatCell(value)"></span>
+            <template v-for="(value, key) in item" :key="key">
+              <template v-if="isNumber(value)">
+                <td class="numeric" :class="{ 'total-column': key == 1 }">{{ value }}</td>
               </template>
               <template v-else>
-                <MaxHeight :max-height="ROW_MAX_HEIGHT">
-                  <span v-html="formatCell(value)"></span>
-                </MaxHeight>
+                <td :class="{ 'total-column': key == 1 }">
+                  <template v-if="showExpanded">
+                    <span v-html="formatCell(value)"></span>
+                  </template>
+                  <template v-else>
+                    <MaxHeight :max-height="ROW_MAX_HEIGHT">
+                      <span v-html="formatCell(value)"></span>
+                    </MaxHeight>
+                  </template>
+                </td>
               </template>
-            </td>
+            </template>
           </tr>
         </tbody>
       </table>
 
       <!-- show pagers -->
-      <div v-if="currentResult.length" class="pagination">
+      <div v-if="currentTable.length" class="pagination">
         <button @click="firstPage" :disabled="currentPage === 1">
           <i class="material-icons">first_page</i>
         </button>
@@ -1130,6 +1157,22 @@ const updateOverview = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+tr {
+  vertical-align: top;
+}
+
+tr:nth-child(even) {
+  background-color: var(--table-row-even-bg);
+}
+
+tr:nth-child(odd) {
+  background-color: var(--table-row-odd-bg);
+}
+
+tr:hover {
+  background-color: var(--color-border-hover);
+}
+
 th,
 td {
   padding-top: 0.1rem;
@@ -1147,8 +1190,24 @@ th {
   vertical-align: top;
 }
 
-th .resource {
+th.resource {
   font-style: italic;
+}
+
+tr.total {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+}
+
+td.total-column {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+}
+
+.numeric {
+  text-align: right;
 }
 
 .dataset-label {
@@ -1209,6 +1268,11 @@ th .resource {
   color: black;
 }
 
+.header-count {
+  background-color: var(--sb-grey-dark);
+  color: white;
+}
+
 .header-total {
   background-color: black;
   color: white;
@@ -1226,24 +1290,6 @@ th .resource {
 
 input[type='checkbox'][disabled] + label {
   color: #505050;
-}
-
-/* table */
-
-tr {
-  vertical-align: top;
-}
-
-tr:nth-child(even) {
-  background-color: var(--table-row-even-bg);
-}
-
-tr:nth-child(odd) {
-  background-color: var(--table-row-odd-bg);
-}
-
-tr:hover {
-  background-color: var(--color-border-hover);
 }
 
 /* pagination */

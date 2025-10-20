@@ -167,11 +167,12 @@ export const getStatisticsData = async (
       params: params,
       signal: signal,
     })
-    const tableData = response.data.table
     const headers = response.data.headers
+    const table = response.data.table
+    const totals = response.data.total
     lexicalStorage.decIsLoading()
 
-    return { tableData, headers }
+    return { headers, table, totals }
   } catch (error) {
     let errMsg = ''
     lexicalStorage.decIsLoading()
