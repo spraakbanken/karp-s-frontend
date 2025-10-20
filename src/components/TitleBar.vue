@@ -46,10 +46,10 @@ onMounted(() => {
     <div class="left-area">
       <div @click="resetApp()" class="logo-box pointer">
         <div v-if="$i18n.locale == 'sv'">
-          <img :src="logoKarp" alt="Karp-S logo" width="300" />
+          <img :src="logoKarp" alt="Karp-s logo" width="300" />
         </div>
         <div v-else>
-          <img :src="logoKarpEn" alt="Karp-S logo" width="300" />
+          <img :src="logoKarpEn" alt="Karp-s logo" width="300" />
         </div>
       </div>
     </div>
