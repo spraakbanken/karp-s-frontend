@@ -32,7 +32,7 @@ interface SearchRedux {
   sortOrder: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
-  abortController: AbortController
+  abortController: AbortController | null
   pageStart: number
   pageSize: number
   isData: boolean
@@ -68,7 +68,7 @@ export const lexicalStore = defineStore('dataset', {
     sortOrder: 'asc',
     datasetLabels: {},
     datasetDates: [],
-    abortController: new AbortController(),
+    abortController: null,
     pageStart: 1,
     pageSize: 25,
     //listLimit: 5,

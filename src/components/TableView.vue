@@ -68,8 +68,9 @@ const errorMessage = ref('')
 
 const fetchData = async () => {
   // abort any current running queries
-  lexicalStorage.abortController.abort()
-
+  if (lexicalStorage.abortController !== null) {
+    lexicalStorage.abortController.abort()
+  }
   // convert checkboxes to search "position"
   for (const sf in lexicalStorage.selectedFields) {
     if (lexicalStorage.selectedFields[sf].positionMedial) {
@@ -187,7 +188,9 @@ watch(
 watch(
   () => currentTab.value,
   () => {
-    lexicalStorage.abortController.abort()
+    if (lexicalStorage.abortController !== null) {
+      lexicalStorage.abortController.abort()
+    }
     lexicalStorage.resetIsLoading()
     if (currentTab.value === 'table') {
       fetchData()
@@ -199,9 +202,8 @@ watch(
 watch(
   () => lexicalStorage.isSearch,
   () => {
-    console.log('Watch isSearch!')
-
     if (lexicalStorage.isSearch) {
+      console.log('TableView - Watch isSearch!')
       lexicalStorage.setIsSearch(false)
       //setTimeout(function () {
       currentPage.value = 1

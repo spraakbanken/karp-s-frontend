@@ -320,7 +320,7 @@ const filterDatasets = computed(() => {
 watch(
   () => selectedDatasets,
   (newDatasets, oldDatasets) => {
-    //console.log('WATCH: DataSelection selectedDatasets', newDatasets)
+    console.log('WATCH: DataSelection selectedDatasets', newDatasets)
 
     if (oldDatasets.value.length === 0) {
       // set "ingångsord" to default, also for statistics

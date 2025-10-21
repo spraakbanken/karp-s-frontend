@@ -2,7 +2,7 @@ import axios from 'axios'
 //import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
 import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
-import type { forEach } from 'es-toolkit/compat'
+//import type { forEach } from 'es-toolkit/compat'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
 
@@ -76,7 +76,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
       params: params,
       signal: signal,
     })
-    lexicalStorage.decIsLoading()
+    lexicalStorage.resetIsLoading()
     return response.data
   } catch (error) {
     let errMsg = ''
@@ -170,7 +170,8 @@ export const getStatisticsData = async (
     const headers = response.data.headers
     const table = response.data.table
     const totals = response.data.total
-    lexicalStorage.decIsLoading()
+    lexicalStorage.resetIsLoading()
+    lexicalStorage.abortController = null
 
     return { headers, table, totals }
   } catch (error) {
@@ -180,9 +181,11 @@ export const getStatisticsData = async (
     //console.log(axios.isCancel(error), error)
     if (axios.isCancel(error)) {
       // request was cancelled "by user", no error, return empty data
-      const tableData = []
-      const headers = []
-      return { tableData, headers }
+      const header = []
+      const table = []
+      const totals = []
+
+      return { headers, table, totals }
     } else {
       if (error.response?.data?.detail !== undefined) {
         const d = error.response.data.detail

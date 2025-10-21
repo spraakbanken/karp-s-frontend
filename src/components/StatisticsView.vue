@@ -48,6 +48,7 @@ const toggleDropdownCompileFields = () => {
   }
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownCompileFields.value) {
+    console.log('toggleDropdownCompileFields - setIsSearch')
     lexicalStorage.setIsSearch(true)
     isSearchChanged.value = false
   }
@@ -66,6 +67,7 @@ const toggleDropdownColumns = () => {
   }
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownColumns.value) {
+    console.log('toggleDropdownColumns - setIsSearch')
     lexicalStorage.setIsSearch(true)
     isSearchChanged.value = false
   }
@@ -82,6 +84,8 @@ const handleClickOutsideS = (event: MouseEvent) => {
     }
     // trigger search
     if (isSearchChanged.value) {
+      console.log('handleClickOutsideS - setIsSearch')
+
       lexicalStorage.setIsSearch(true)
       isSearchChanged.value = false
     }
@@ -155,14 +159,16 @@ const errorMessage = ref('')
 
 const fetchData = async () => {
   // abort any current running queries
-  lexicalStorage.abortController.abort()
-
+  if (lexicalStorage.abortController !== null) {
+    //lexicalStorage.abortController.abort()
+  }
   currentTable.value = []
   currentTotals.value = []
   const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
   lexicalStorage.setIsData(false)
+  currentPage.value = 1
 
   //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (newFields && newCompileFields.length > 0 && lexicalStorage.selectedDatasets.length > 0) {
@@ -204,7 +210,9 @@ const fetchData = async () => {
 watch(
   () => currentTab.value,
   () => {
-    lexicalStorage.abortController.abort()
+    if (lexicalStorage.abortController !== null) {
+      lexicalStorage.abortController.abort()
+    }
     lexicalStorage.resetIsLoading()
     if (currentTab.value === 'statistics') {
       fetchData()
@@ -242,15 +250,12 @@ watch(
 watch(
   () => lexicalStorage.isSearch,
   async () => {
-    console.log('Watch isSearch!')
-
     if (lexicalStorage.isSearch) {
+      console.log('StatisticsView - Watch isSearch!')
       lexicalStorage.setIsSearch(false)
-      {
-        await fetchData()
-        //console.log('upd overview')
-        updateOverview() // draw graph
-      }
+      await fetchData()
+      //console.log('upd overview')
+      updateOverview() // draw graph
     }
   },
   { immediate: true },

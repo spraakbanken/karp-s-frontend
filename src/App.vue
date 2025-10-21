@@ -18,7 +18,7 @@ onMounted(async () => {
     lexicalStorage.setDefault(datasets)
     if (syncStoreWithRouter(router)) {
       lexicalStorage.setIsStart(false)
-      lexicalStorage.setIsSearch(true)
+      //TODO lexicalStorage.setIsSearch(true)
     }
   } catch (error) {
     console.error(error)
