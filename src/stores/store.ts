@@ -246,6 +246,27 @@ export const lexicalStore = defineStore('dataset', {
       this.setSelectedCompileFields([entryWordField])
       this.setSelectedColumns([])
 
+      // sync selectedTags with selectedDatasets
+      // ie make sure only tags that have all their datasets selected
+      // are selected
+      this.selectedTags = []
+      for (const t of this.currentTags) {
+        //console.log('hasTags: ', t, rid)
+        let includeTag = true
+        for (const c of this.currentConfig.resources) {
+          if (c.hasOwnProperty('tags')) {
+            if (c.tags.includes(t)) {
+              if (!this.selectedDatasets.includes(c.resourceId)) {
+                includeTag = false
+              }
+            }
+          }
+        }
+        if (includeTag) {
+          this.selectedTags.push(t)
+        }
+      }
+
       //}
     },
     /*
