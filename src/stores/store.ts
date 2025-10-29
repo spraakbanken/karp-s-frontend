@@ -7,6 +7,7 @@ import {
   type DatasetDates,
   entryWordField,
 } from '@/types/datasetConfig.ts'
+import { ROWS_PER_PAGE } from '@/utils/constants'
 
 interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
@@ -70,7 +71,7 @@ export const lexicalStore = defineStore('dataset', {
     datasetDates: [],
     abortController: null,
     pageStart: 1,
-    pageSize: 25,
+    pageSize: ROWS_PER_PAGE,
     //listLimit: 5,
     isData: false,
     isSearch: false,

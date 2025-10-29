@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import {
-  ROW_MAX_HEIGHT,
-  ROW_SHOW_EXPANDED_DEFAULT,
-  ROWS_PER_PAGE,
-  GRAPH_BARWIDTH,
-} from '@/utils/constants'
+import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT, GRAPH_BARWIDTH } from '@/utils/constants'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
@@ -23,13 +18,24 @@ const lexicalStorage = lexicalStore()
 const currentHeaders = ref<CountHeadersColumn[]>([])
 const currentTable = ref<Dataset[]>([])
 const currentTotals = ref<number[]>([])
-const currentPage = ref(1)
-const itemsPerPage = ref(ROWS_PER_PAGE)
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeResultTab)
 const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 const columnCount = ref(false)
+
+// pages
+
+const currentPageStart = computed({
+  get: () => lexicalStorage.pageStart,
+  set: (value) => (lexicalStorage.pageStart = value),
+})
+const currentPageSize = computed({
+  get: () => lexicalStorage.pageSize,
+  set: (value) => (lexicalStorage.pageSize = value),
+})
+
+// UI
 
 const isDropdownColumns = ref(false)
 const isDropdownCompileFields = ref(false)
@@ -91,12 +97,7 @@ const handleClickOutsideS = (event: MouseEvent) => {
     }
   }
 }
-/*
-const selectedDatasets = computed({
-  get: () => lexicalStorage.selectedDatasets,
-  set: (value) => lexicalStorage.setSelectedDataset(value),
-})
-*/
+
 const selectedCompileFields = computed({
   get: () => lexicalStorage.selectedCompileFields,
   set: (value) => lexicalStorage.setSelectedCompileFields(value),
@@ -106,10 +107,10 @@ const selectedColumns = computed({
   set: (value) => lexicalStorage.setSelectedColumns(value),
 })
 
-//const currentFields = computed(() => lexicalStorage.currentFields)
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 
 // sort column
+
 const sortField = ref(lexicalStorage.sortField)
 
 const doSort = (s: string) => {
@@ -154,6 +155,8 @@ const updateShowHits = () => {
 // show overview switch
 const showOverview = ref(false)
 
+// data
+
 const isSearchChanged = ref(false)
 const errorMessage = ref('')
 
@@ -168,7 +171,6 @@ const fetchData = async () => {
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
   lexicalStorage.setIsData(false)
-  currentPage.value = 1
 
   //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (newFields && newCompileFields.length > 0 && lexicalStorage.selectedDatasets.length > 0) {
@@ -199,6 +201,10 @@ const fetchData = async () => {
         lexicalStorage.setIsData(true)
       }
       currentTotals.value = totals
+      // make sure pageStart is not beyond data
+      if (currentTable.value.length < (currentPageSize.value - 1) * currentPageStart.value) {
+        currentPageStart.value = Math.floor(currentTable.value.length / currentPageSize.value + 1)
+      }
     } catch (error) {
       errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
@@ -237,12 +243,7 @@ watch(
 watch(
   () => [lexicalStorage.selectedCompileFields, lexicalStorage.selectedColumns, columnCount],
   async () => {
-    //console.log('WATCH compile, column, count')
     isSearchChanged.value = true
-    /*
-      await fetchData()
-      updateOverview() // draw graph
-    */
   },
   { deep: true },
 )
@@ -251,10 +252,13 @@ watch(
   () => lexicalStorage.isSearch,
   async () => {
     if (lexicalStorage.isSearch) {
-      console.log('StatisticsView - Watch isSearch!')
+      console.log(
+        'StatisticsView - Watch isSearch!',
+        currentPageStart.value,
+        lexicalStorage.pageStart,
+      )
       lexicalStorage.setIsSearch(false)
       await fetchData()
-      //console.log('upd overview')
       updateOverview() // draw graph
     }
   },
@@ -263,57 +267,68 @@ watch(
 
 const sortedData = computed(() => {
   //console.log('Recalc!', sortKey.value)
-  if (!sortKey.value) return currentTable.value
+  if (!sortKey.value) {
+    return currentTable.value
+  } else {
+    return [...currentTable.value].sort((a, b) => {
+      //const aValue = a[sortKey.value]
+      //const bValue = b[sortKey.value]
+      // data is of format a[0] = "name", a[1] = number
+      const aValue = a[1]
+      const bValue = b[1]
+      //console.log('Sort', aValue, bValue, a, b)
+      if (aValue === bValue) return 0
 
-  return [...currentTable.value].sort((a, b) => {
-    //const aValue = a[sortKey.value]
-    //const bValue = b[sortKey.value]
-    // data is of format a[0] = "name", a[1] = number
-    const aValue = a[1]
-    const bValue = b[1]
-    //console.log('Sort', aValue, bValue, a, b)
-    if (aValue === bValue) return 0
+      const order = sortOrder.value === 'asc' ? 1 : -1
 
-    const order = sortOrder.value === 'asc' ? 1 : -1
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return aValue.localeCompare(bValue) * order
+      }
 
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return aValue.localeCompare(bValue) * order
-    }
-
-    return (aValue as unknown as number) > (bValue as unknown as number) ? order : -order
-  })
+      return (aValue as unknown as number) > (bValue as unknown as number) ? order : -order
+    })
+  }
 })
+
+// pages
 
 const paginatedData = computed(() => {
   //console.log('paginatedData!')
-
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
+  const start = (currentPageStart.value - 1) * currentPageSize.value
+  const end = start + currentPageSize.value
   return sortedData.value.slice(start, end)
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(currentTable.value.length / itemsPerPage.value)
+  return Math.ceil(currentTable.value.length / currentPageSize.value)
 })
 
+const firstPage = () => {
+  currentPageStart.value = 1
+}
+
 const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
+  if (currentPageStart.value > 1) {
+    currentPageStart.value--
   }
 }
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
+  if (currentPageStart.value < totalPages.value) {
+    currentPageStart.value++
   }
 }
 
-const firstPage = () => {
-  currentPage.value = 1
+const lastPage = () => {
+  currentPageStart.value = totalPages.value
 }
 
-const lastPage = () => {
-  currentPage.value = totalPages.value
+const itemsPerPage = () => {
+  currentPageStart.value = Math.ceil(
+    currentPageStart.value * (lexicalStorage.pageStart / currentPageStart.value),
+  )
+  lexicalStorage.pageStart = currentPageStart.value
+  lexicalStorage.pageSize = currentPageSize.value
 }
 
 const sortTable = (key: string) => {
@@ -426,10 +441,10 @@ const exportCSV = () => {
   anchor.download = 'karp-s-export.csv'
   anchor.click()
 }
+
 /*
   Graph/Overview
 */
-//const graph_max_number_of_values = 100
 
 const graph_threshold_min = ref<number>(1)
 const graph_threshold_max = ref<unknown>('')
@@ -1018,21 +1033,28 @@ const updateOverview = () => {
 
       <!-- show pagers -->
       <div v-if="currentTable.length" class="pagination">
-        <button @click="firstPage" :disabled="currentPage === 1">
+        <button @click="firstPage" :disabled="currentPageStart === 1">
           <i class="material-icons">first_page</i>
         </button>
-        <button @click="prevPage" :disabled="currentPage === 1">
+        <button @click="prevPage" :disabled="currentPageStart === 1">
           <i class="material-icons">chevron_left</i>
         </button>
-        <span style="color: var(--color-text)"> {{ currentPage }} of {{ totalPages }} </span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">
+        <span style="color: var(--color-text)">
+          {{ currentPageStart }} {{ $t('table.of') }} {{ totalPages }}
+        </span>
+        <button @click="nextPage" :disabled="currentPageStart === totalPages">
           <i class="material-icons">chevron_right</i>
         </button>
-        <button @click="lastPage" :disabled="currentPage === totalPages">
+        <button @click="lastPage" :disabled="currentPageStart === totalPages">
           <i class="material-icons">last_page</i>
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
-        <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
+        <select
+          @click="itemsPerPage"
+          id="itemsPerPage"
+          v-model="currentPageSize"
+          class="items-per-page"
+        >
           <option v-for="option in [10, 20, 50, 100, 1000]" :key="option" :value="option">
             {{ option }}
           </option>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT, ROWS_PER_PAGE } from '@/utils/constants'
+import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT } from '@/utils/constants'
 import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { getTableData } from '@/api/apiService'
@@ -17,11 +17,11 @@ import MaxHeight from '@/components/MaxHeight.vue'
 //import { template } from 'es-toolkit/compat'
 import { groupBy } from 'es-toolkit'
 
-//import SubTableView from '@/components/SubTableView.vue'
-//import type { forEach } from 'es-toolkit/compat'
 const { t } = useI18n()
 
 const lexicalStorage = lexicalStore()
+
+// result
 
 const currentResult = ref<DatasetResult>({
   hits: [],
@@ -35,10 +35,11 @@ const currentResultGrp = ref<Record<string, { entry: Entry; resourceId: string }
 // with rows sorted and put in (ordered) array
 const currentResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: string }[]>>({})
 
-//const currentFields = computed(() => lexicalStorage.currentFields)
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
+
 // sort column
 const sortField = ref(lexicalStorage.sortField)
+
 // always show expanded rows (no "View more" button)
 const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 
@@ -58,11 +59,6 @@ const doSort = (s: string) => {
 
   console.log('doSort()', sortField.value)
 }
-
-//const currentValues = ref<Dataset[]>([])
-const currentTab = ref(lexicalStorage.activeResultTab)
-const currentPage = ref(1)
-const itemsPerPage = ref(ROWS_PER_PAGE)
 
 const errorMessage = ref('')
 
@@ -89,7 +85,7 @@ const fetchData = async () => {
   if (newDatasets.length > 0) {
     try {
       errorMessage.value = ''
-      const data = await getTableData(currentPage.value, itemsPerPage.value)
+      const data = await getTableData(currentPageStart.value, currentPageSize.value)
       if (Object.keys(data).length !== 0) {
         currentResult.value = data
         currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
@@ -145,26 +141,34 @@ const fetchData = async () => {
     //currentValues.value = []
   }
 }
-
+/*
 watch(
-  () => currentPage.value,
-  () => {
-    //lexicalStorage.pageStart = currentPage.value
-    console.log('WATCH currentPage.value', currentPage.value)
-    fetchData()
+  () => currentPageStart.value,
+  (newPageStart, oldPageStart) => {
+    if (oldPageStart !== undefined) {
+      //lexicalStorage.pageStart = currentPage.value
+      console.log('WATCH currentPageStart', currentPageStart.value)
+      lexicalStorage.pageStart = currentPageStart.value
+      //fetchData()
+    }
   },
 )
 
 watch(
-  () => itemsPerPage.value,
-  (newItemsPerPage, oldItemsPerPage) => {
-    //lexicalStorage.pageSize = itemsPerPage.value
-    console.log('WATCH itemsPerPage.value', itemsPerPage.value)
-    currentPage.value = Math.ceil(currentPage.value * (oldItemsPerPage / newItemsPerPage))
-    fetchData()
+  () => currentPageSize.value,
+  (newPageSize, oldPageSize) => {
+    if (oldPageSize !== undefined) {
+      //lexicalStorage.pageSize = itemsPerPage.value
+      console.log('WATCH currentPageSize', currentPageSize.value, oldPageSize, newPageSize)
+      lexicalStorage.pageSize = currentPageSize.value
+      currentPageStart.value = Math.ceil(currentPageStart.value * (oldPageSize / newPageSize))
+      console.log('WATCH currentPageSize, currentPageStart: ', currentPageStart.value)
+      lexicalStorage.pageStart = currentPageStart.value
+      //fetchData()
+    }
   },
 )
-
+*/
 watch(
   () => lexicalStorage.isData,
   (newIsData) => {
@@ -184,6 +188,8 @@ watch(
     }
   },
 )
+
+const currentTab = ref(lexicalStorage.activeResultTab)
 
 watch(
   () => currentTab.value,
@@ -206,7 +212,7 @@ watch(
       console.log('TableView - Watch isSearch!')
       lexicalStorage.setIsSearch(false)
       //setTimeout(function () {
-      currentPage.value = 1
+      //currentPageStart.value = 1
       fetchData()
       //}, 1000)
     }
@@ -240,32 +246,52 @@ const picsbar = (ds: string) => {
       hitCount += currentResult.value.resourceHits[currentResult.value.resourceOrder[index]]
     }
   }
-  currentPage.value = Math.floor(hitCount / itemsPerPage.value) + 1
+  currentPageStart.value = Math.floor(hitCount / currentPageSize.value) + 1
   //console.log('Page: ', currentPage.value, hitCount)
 }
 
+// pages
+
+const currentPageStart = computed({
+  get: () => lexicalStorage.pageStart,
+  set: (value) => (lexicalStorage.pageStart = value),
+})
+
+const currentPageSize = computed({
+  get: () => lexicalStorage.pageSize,
+  set: (value) => (lexicalStorage.pageSize = value),
+})
+
 const totalPages = computed(() => {
-  return Math.ceil(currentResult.value.total / itemsPerPage.value)
+  return Math.ceil(currentResult.value.total / currentPageSize.value)
 })
 
 const firstPage = () => {
-  currentPage.value = 1
+  currentPageStart.value = 1
 }
 
 const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
+  if (currentPageStart.value > 1) {
+    currentPageStart.value--
   }
 }
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
+  if (currentPageStart.value < totalPages.value) {
+    currentPageStart.value++
   }
 }
 
 const lastPage = () => {
-  currentPage.value = totalPages.value
+  currentPageStart.value = totalPages.value
+}
+
+const itemsPerPage = () => {
+  currentPageStart.value = Math.ceil(
+    currentPageStart.value * (lexicalStorage.pageStart / currentPageStart.value),
+  )
+  lexicalStorage.pageStart = currentPageStart.value
+  lexicalStorage.pageSize = currentPageSize.value
 }
 </script>
 
@@ -399,23 +425,28 @@ const lastPage = () => {
       </template>
       <div class="pagination">
         <!--<div v-if="props.data.length" class="pagination">-->
-        <button @click="firstPage" :disabled="currentPage === 1">
+        <button @click="firstPage" :disabled="currentPageStart === 1">
           <i class="material-icons">first_page</i>
         </button>
-        <button @click="prevPage" :disabled="currentPage === 1">
+        <button @click="prevPage" :disabled="currentPageStart === 1">
           <i class="material-icons">chevron_left</i>
         </button>
         <span style="color: var(--color-text)"
-          >{{ currentPage }} {{ $t('table.of') }} {{ totalPages }}</span
+          >{{ currentPageStart }} {{ $t('table.of') }} {{ totalPages }}</span
         >
-        <button @click="nextPage" :disabled="currentPage === totalPages">
+        <button @click="nextPage" :disabled="currentPageStart === totalPages">
           <i class="material-icons">chevron_right</i>
         </button>
-        <button @click="lastPage" :disabled="currentPage === totalPages">
+        <button @click="lastPage" :disabled="currentPageStart === totalPages">
           <i class="material-icons">last_page</i>
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
-        <select id="itemsPerPage" v-model="itemsPerPage" class="items-per-page">
+        <select
+          @click="itemsPerPage"
+          id="itemsPerPage"
+          v-model="currentPageSize"
+          class="items-per-page"
+        >
           <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
             {{ option }}
           </option>

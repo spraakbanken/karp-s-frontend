@@ -8,7 +8,7 @@ export function syncStoreWithRouter(router: Router): boolean {
   const lexicalStorage = lexicalStore()
 
   const updateRouterQuery = () => {
-    console.log('updateRouterQuery.')
+    console.log('updateRouterQuery, lexicalStorage.pageStart:', lexicalStorage.pageStart)
     const currentQuery = router.currentRoute.value.query
     let queryString = ''
     if (lexicalStorage.activeSearchTab == 'advanced') {
@@ -44,8 +44,8 @@ export function syncStoreWithRouter(router: Router): boolean {
       tab: lexicalStorage.activeResultTab,
       searchtab: lexicalStorage.activeSearchTab,
       sort: lexicalStorage.sortField + '|' + lexicalStorage.sortOrder,
-      //pagestart: lexicalStorage.pageStart,
-      //pagesize: lexicalStorage.pageSize,
+      pageStart: lexicalStorage.pageStart,
+      pageSize: lexicalStorage.pageSize,
     }
 
     const filteredQuery = Object.fromEntries(
@@ -69,10 +69,12 @@ export function syncStoreWithRouter(router: Router): boolean {
       searchTab: lexicalStorage.activeSearchTab,
       sortField: lexicalStorage.sortField,
       sortOrder: lexicalStorage.sortOrder,
-      //pagestart: lexicalStorage.pageStart,
-      //pagesize: lexicalStorage.pageSize,
+      pageStart: lexicalStorage.pageStart,
+      pageSize: lexicalStorage.pageSize,
     }),
-    updateRouterQuery,
+    () => {
+      updateRouterQuery()
+    },
     { deep: true },
   )
 
@@ -136,33 +138,29 @@ export function syncStoreWithRouter(router: Router): boolean {
     }
     if (query.has('compile')) {
       const selectedCompileParams = query.get('compile')!.split(',')
-      //console.log('initializeStoreFromQuery: selectedCompileParams=', selectedCompileParams)
       lexicalStorage.setSelectedCompileFields(selectedCompileParams)
-      //lexicalStorage.selectedCompileFields = selectedCompileParams
     }
     if (query.has('columns')) {
       const selectedColumns = query.get('columns')!.split(',')
-      //console.log('initializeStoreFromQuery: selectedColumns=', selectedColumns)
       lexicalStorage.setSelectedColumns(selectedColumns)
-      //lexicalStorage.selectedColumns = selectedColumns
     }
     if (query.has('tab')) {
-      //console.log('initializeStoreFromQuery: tab=', query.get('tab'))
       lexicalStorage.setActiveResultTab(query.get('tab')!)
     }
     if (query.has('sort')) {
-      //console.log('initializeStoreFromQuery: tab=', query.get('tab'))
       lexicalStorage.setSort(query.get('sort')!)
     }
-    /*
-    if (query.has('pagestart')) {
-      lexicalStorage.pageStart = Number(query.get('pagestart'))
-      console.log('iSFQ: ', lexicalStorage.pageStart)
+    if (query.has('pageStart')) {
+      lexicalStorage.pageStart = Number(query.get('pageStart'))
     }
-    if (query.has('pagesize')) {
-      lexicalStorage.pageSize = Number(query.get('pagesize'))
+    if (query.has('pageSize')) {
+      lexicalStorage.pageSize = Number(query.get('pageSize'))
     }
-    */
+
+    if (gotQuery) {
+      lexicalStorage.setIsSearch(true)
+    }
+
     return gotQuery
   }
 

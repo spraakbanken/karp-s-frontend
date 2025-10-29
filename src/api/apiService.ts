@@ -53,7 +53,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
             } else {
               params['q'] = 'or(' + queryParam + ')'
             }
-            console.log('gtd: ', lexicalStorage.searchExtendedOp, params['q'])
+            //console.log('gtd: ', lexicalStorage.searchExtendedOp, params['q'])
           }
         }
       }
@@ -71,7 +71,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
 
     lexicalStorage.abortController = new AbortController()
     const signal = lexicalStorage.abortController.signal
-
+    //console.log('getTableData: ', params)
     const response = await axiosInstance.get(`/search`, {
       params: params,
       signal: signal,
@@ -114,7 +114,7 @@ export const getStatisticsData = async (
   compileParams: string[],
   columns: string[],
   columnCount: boolean,
-) => {
+): Promise<{ headers: []; table: []; totals: [] }> => {
   const lexicalStorage = lexicalStore()
   try {
     // request was cancelled "by user", no error, return empty data
@@ -167,13 +167,14 @@ export const getStatisticsData = async (
       params: params,
       signal: signal,
     })
-    const headers = response.data.headers
-    const table = response.data.table
-    const totals = response.data.total
     lexicalStorage.resetIsLoading()
     lexicalStorage.abortController = null
 
-    return { headers, table, totals }
+    return {
+      headers: response.data.headers,
+      table: response.data.table,
+      totals: response.data.total,
+    }
   } catch (error) {
     let errMsg = ''
     lexicalStorage.decIsLoading()
@@ -181,11 +182,7 @@ export const getStatisticsData = async (
     //console.log(axios.isCancel(error), error)
     if (axios.isCancel(error)) {
       // request was cancelled "by user", no error, return empty data
-      const header = []
-      const table = []
-      const totals = []
-
-      return { headers, table, totals }
+      return { headers: [], table: [], totals: [] }
     } else {
       if (error.response?.data?.detail !== undefined) {
         const d = error.response.data.detail
