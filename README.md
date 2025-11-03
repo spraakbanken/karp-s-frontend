@@ -20,6 +20,8 @@ Customize configuration: See [Vite Configuration Reference](https://vite.dev/con
 
 ### Build
 
+Increment version number in package.json.
+
 ```sh
 npm run build:production
 ```

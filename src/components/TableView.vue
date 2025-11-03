@@ -43,6 +43,52 @@ const sortField = ref(lexicalStorage.sortField)
 // always show expanded rows (no "View more" button)
 const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 
+// pages
+
+const currentPageStart = computed({
+  get: () => lexicalStorage.pageStart,
+  set: (value) => (lexicalStorage.pageStart = value),
+})
+
+const currentPageSize = computed({
+  get: () => lexicalStorage.pageSize,
+  set: (value) => (lexicalStorage.pageSize = value),
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(currentResult.value.total / currentPageSize.value)
+})
+
+const firstPage = () => {
+  currentPageStart.value = 1
+}
+
+const prevPage = () => {
+  if (currentPageStart.value > 1) {
+    currentPageStart.value--
+  }
+}
+
+const nextPage = () => {
+  if (currentPageStart.value < totalPages.value) {
+    currentPageStart.value++
+  }
+}
+
+const lastPage = () => {
+  currentPageStart.value = totalPages.value
+}
+
+const itemsPerPage = () => {
+  currentPageStart.value = Math.ceil(
+    currentPageStart.value * (lexicalStorage.pageStart / currentPageStart.value),
+  )
+  lexicalStorage.pageStart = currentPageStart.value
+  lexicalStorage.pageSize = currentPageSize.value
+}
+
+// sort columns
+
 const doSort = (s: string) => {
   sortField.value = s
   if (sortField.value == lexicalStorage.sortField) {
@@ -194,6 +240,7 @@ const currentTab = ref(lexicalStorage.activeResultTab)
 watch(
   () => currentTab.value,
   () => {
+    console.log('WATCH currentTab')
     if (lexicalStorage.abortController !== null) {
       lexicalStorage.abortController.abort()
     }
@@ -248,50 +295,6 @@ const picsbar = (ds: string) => {
   }
   currentPageStart.value = Math.floor(hitCount / currentPageSize.value) + 1
   //console.log('Page: ', currentPage.value, hitCount)
-}
-
-// pages
-
-const currentPageStart = computed({
-  get: () => lexicalStorage.pageStart,
-  set: (value) => (lexicalStorage.pageStart = value),
-})
-
-const currentPageSize = computed({
-  get: () => lexicalStorage.pageSize,
-  set: (value) => (lexicalStorage.pageSize = value),
-})
-
-const totalPages = computed(() => {
-  return Math.ceil(currentResult.value.total / currentPageSize.value)
-})
-
-const firstPage = () => {
-  currentPageStart.value = 1
-}
-
-const prevPage = () => {
-  if (currentPageStart.value > 1) {
-    currentPageStart.value--
-  }
-}
-
-const nextPage = () => {
-  if (currentPageStart.value < totalPages.value) {
-    currentPageStart.value++
-  }
-}
-
-const lastPage = () => {
-  currentPageStart.value = totalPages.value
-}
-
-const itemsPerPage = () => {
-  currentPageStart.value = Math.ceil(
-    currentPageStart.value * (lexicalStorage.pageStart / currentPageStart.value),
-  )
-  lexicalStorage.pageStart = currentPageStart.value
-  lexicalStorage.pageSize = currentPageSize.value
 }
 </script>
 
@@ -348,6 +351,7 @@ const itemsPerPage = () => {
       >
 
       <!-- table -->
+      {{ 'CRGrpS: ' + String(currentResult.total) }}
       <template v-for="(item, key, index) in currentResultGrpSorted" :key="index">
         <table v-if="currentResult.total > 0" class="fancy-table">
           <tbody>

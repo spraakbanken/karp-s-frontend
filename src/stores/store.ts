@@ -418,15 +418,18 @@ export const lexicalStore = defineStore('dataset', {
       return value
     },
     areDatasetsInConfig(keys: string[]): boolean {
+      return keys.every((k) => this.currentDatasets.includes(k))
+      /*
       let allIncluded: boolean = true
       for (const k of keys) {
         if (!this.currentDatasets.includes(k)) {
-          console.log('areDatasetsInConfig:', k, this.currentDatasets)
+          //console.log('areDatasetsInConfig:', k, this.currentDatasets)
           allIncluded = false
           break
         }
       }
       return allIncluded
+      */
     },
   },
 })

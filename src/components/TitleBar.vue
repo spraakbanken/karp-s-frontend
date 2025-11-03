@@ -7,8 +7,6 @@ const logoKarp = ref('')
 const logoSB = ref('')
 const logoGU = ref('')
 const logoKarpEn = ref('')
-const apiUrl = import.meta.env.VITE_API_URL
-// const lexicalStorage = lexicalStore()
 
 function resetApp() {
   // console.log('Pathname ', window.location.pathname)
@@ -54,10 +52,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="middle-area">
-      <div class="version">
-        {{ $t('titlebar.version') }}<br />
-        <span class="version-url">{{ apiUrl }}</span>
-      </div>
+      <div class="version">{{ $t('titlebar.version') }}<br /></div>
     </div>
     <div class="right-area">
       <div class="middle-right">

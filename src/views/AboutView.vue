@@ -4,6 +4,8 @@ import { onMounted } from 'vue'
 import AdditionsList from '@/components/AdditionsList.vue'
 import NewsList from '@/components/NewsList.vue'
 import { lexicalStore } from '@/stores/store'
+import packageJson from '../../package.json'
+const apiUrl = import.meta.env.VITE_API_URL
 
 const lexicalStorage = lexicalStore()
 
@@ -29,6 +31,8 @@ onMounted(async () => {
         <div>
           <h2>{{ $t('about.about.title') }}</h2>
           <p v-html="$t('about.about.text')"></p>
+          <p>Front-end: {{ packageJson.version }}</p>
+          <p>Back-end: {{ apiUrl }}</p>
         </div>
       </div>
       <div class="col">
@@ -89,5 +93,9 @@ onMounted(async () => {
   flex-basis: 100%;
   flex: 1;
   margin-right: 2rem;
+}
+
+p {
+  margin-bottom: 0.5rem;
 }
 </style>
