@@ -104,5 +104,6 @@
   "error.nodata": "Det finns inget att visa.",
   "error.fetching.data": "Fel uppstod vid hämtning av data.",
   "message.loading": "Hämtar data...",
-  "message.nodatasetselected": "Ingen datamängd vald"
+  "message.nodatasetselected": "Ingen datamängd vald",
+  "url.dataset.unknown": "Okänd datamängd i URL. Väljer standard datamängder."
 }

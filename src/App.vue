@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { lexicalStore } from '@/stores/store'
 
 import { RouterView } from 'vue-router'
@@ -8,17 +8,22 @@ import router from '@/router'
 import TitleBar from './components/TitleBar.vue'
 import FooterView from './components/FooterView.vue'
 import { getLexicalDatasets } from '@/api/apiService'
-import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
+import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
 
 const lexicalStorage = lexicalStore()
+const syncResult = ref<SyncResult>(SyncResult.SYNC_RESULT_NOT_SYNCED)
 
 onMounted(async () => {
   try {
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
-    if (syncStoreWithRouter(router)) {
+    syncResult.value = syncStoreWithRouter(router)
+    console.log('syncResult:', syncResult.value)
+    if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
       //TODO lexicalStorage.setIsSearch(true)
+    } else if (syncResult.value === SyncResult.SYNC_RESULT_DATASET_UNKNOWN) {
+      lexicalStorage.setDefault(datasets)
     }
   } catch (error) {
     console.error(error)
@@ -31,6 +36,12 @@ onMounted(async () => {
     <header>
       <TitleBar />
     </header>
+    <div
+      v-if="syncResult === SyncResult.SYNC_RESULT_DATASET_UNKNOWN && lexicalStorage.isStart"
+      class="message-error"
+    >
+      {{ $t('url.dataset.unknown') }}
+    </div>
     <div class="main">
       <RouterView />
     </div>

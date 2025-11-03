@@ -8,7 +8,7 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 import VueMatomo from 'vue-matomo'
-import { syncStoreWithRouter } from './router/syncStoreWithRouter'
+//import { syncStoreWithRouter } from './router/syncStoreWithRouter'
 
 // load translations
 import en from '@/locales/en.json'

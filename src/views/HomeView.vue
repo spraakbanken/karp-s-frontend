@@ -8,11 +8,11 @@ import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import DataSelection from '@/components/DataSelection.vue'
 
-import { getLexicalDatasets } from '@/api/apiService'
+//import { getLexicalDatasets } from '@/api/apiService'
 import { th, getDate } from '@/utils/utils'
 
-import router from '@/router'
-import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
+//import router from '@/router'
+//import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
 
 const lexicalStorage = lexicalStore()
 

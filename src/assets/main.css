@@ -60,6 +60,7 @@ a,
 .message-error {
   background-color: var(--sb-error-background);
   margin: auto;
+  margin-bottom: 0.5rem;
   text-align: center;
   color: var(--sb-error-text);
   width: 600px;
