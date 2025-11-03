@@ -351,7 +351,6 @@ const picsbar = (ds: string) => {
       >
 
       <!-- table -->
-      {{ 'CRGrpS: ' + String(currentResult.total) }}
       <template v-for="(item, key, index) in currentResultGrpSorted" :key="index">
         <table v-if="currentResult.total > 0" class="fancy-table">
           <tbody>
