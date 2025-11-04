@@ -1033,7 +1033,12 @@ const updateOverview = () => {
           <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
             <template v-for="(value, key) in item" :key="key">
               <template v-if="isNumber(value)">
-                <td class="numeric" :class="{ 'total-column': key == 1 }">{{ value }}</td>
+                <td
+                  class="numeric"
+                  :class="{ 'total-column': key == 1, 'total-null': value === 0 }"
+                >
+                  {{ value }}
+                </td>
               </template>
               <template v-else>
                 <td :class="{ 'total-column': key == 1 }">
@@ -1252,6 +1257,14 @@ td.total-column {
   background-color: black;
   color: white;
   font-weight: bold;
+}
+
+td.total-null {
+  color: #e0e0e0;
+}
+
+tr:nth-child(odd) td.total-null {
+  color: #c0c0c0;
 }
 
 .numeric {

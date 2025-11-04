@@ -88,12 +88,38 @@ const lastPage = () => {
 }
 
 const itemsPerPage = () => {
-  currentPageStart.value = Math.ceil(
-    currentPageStart.value * (lexicalStorage.pageStart / currentPageStart.value),
-  )
-  lexicalStorage.pageStart = currentPageStart.value
-  lexicalStorage.pageSize = currentPageSize.value
+  //fetchData()
 }
+
+watch(
+  () => currentPageStart.value,
+  () => {
+    //lexicalStorage.pageStart = currentPage.value
+    console.log('WATCH currentPageStart.value', currentPageStart.value)
+    fetchData()
+  },
+)
+
+watch(
+  () => currentPageSize.value,
+  (newItemsPerPage, oldItemsPerPage) => {
+    //lexicalStorage.pageSize = itemsPerPage.value
+    console.log('WATCH itemsPerPage.value', currentPageSize.value)
+    //currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
+    //tableResult.total
+    console.log(
+      'NEW pagestart',
+      currentPageStart.value,
+      //Math.ceil(currentPageStart.value * (lexicalStorage.pageSize / currentPageSize.value)),
+      Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage)),
+    )
+    currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
+
+    lexicalStorage.pageStart = currentPageStart.value
+    lexicalStorage.pageSize = currentPageSize.value
+    fetchData()
+  },
+)
 
 // sort columns
 
