@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+//import { onMounted } from 'vue'
 
 import AdditionsList from '@/components/AdditionsList.vue'
 import NewsList from '@/components/NewsList.vue'
-import { lexicalStore } from '@/stores/store'
+//import { lexicalStore } from '@/stores/store'
 import packageJson from '../../package.json'
 const apiUrl = import.meta.env.VITE_API_URL
 
-const lexicalStorage = lexicalStore()
+//const lexicalStorage = lexicalStore()
 
 const ex1 = encodeURI(
   '/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=table&q=startswith|entry_word|blom',
@@ -18,9 +18,11 @@ const ex2 = encodeURI(
   '/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=statistics&q=startswith|entry_word|blom&compile=entry_word&columns=entry_word',
 )
 //  'https://spraakbanken.gu.se/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol6,saol7,saol8,so2009&tab=graph&q=startswith|normaliserat_ord|blom&compile=normaliserat_ord',
+/*
 onMounted(async () => {
   lexicalStorage.setIsStart(false)
 })
+  */
 </script>
 
 <template>
@@ -31,8 +33,8 @@ onMounted(async () => {
         <div>
           <h2>{{ $t('about.about.title') }}</h2>
           <p v-html="$t('about.about.text')"></p>
-          <p>Front-end: {{ packageJson.version }}</p>
-          <p>Back-end: {{ apiUrl }}</p>
+          <p><b>Front-end:</b> {{ packageJson.version }}</p>
+          <p><b>Back-end:</b> {{ apiUrl }}</p>
         </div>
       </div>
       <div class="col">
@@ -76,7 +78,9 @@ onMounted(async () => {
 
 <style scoped>
 .about {
+  margin: auto;
   padding: 2rem;
+  width: 800px;
 }
 
 .row {
@@ -84,15 +88,18 @@ onMounted(async () => {
   flex-direction: row;
   flex-wrap: wrap;
   width: 100%;
-  margin-bottom: 2rem;
+  @media (width < 640px) {
+    width: 400px;
+    flex-direction: column;
+  }
 }
 
 .col {
   display: flex;
   flex-direction: column;
-  flex-basis: 100%;
   flex: 1;
   margin-right: 2rem;
+  margin-bottom: 2rem;
 }
 
 p {

@@ -171,7 +171,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       }
 
       //if (syncResult === SyncResult.SYNC_RESULT_SYNCED) {
-      lexicalStorage.setIsSearch(true)
+      lexicalStorage.setIsSearch(true, true)
       //}
     }
 

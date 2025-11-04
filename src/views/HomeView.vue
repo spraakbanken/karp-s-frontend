@@ -6,6 +6,7 @@ import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
+import AboutView from '@/components/AboutView.vue'
 import DataSelection from '@/components/DataSelection.vue'
 
 //import { getLexicalDatasets } from '@/api/apiService'
@@ -110,6 +111,7 @@ watch(
     <div>
       <TableView v-if="activeResultTab === 'table'" />
       <StatisticsView v-if="activeResultTab === 'statistics'" />
+      <AboutView v-if="lexicalStorage.isStart" />
     </div>
   </main>
 </template>

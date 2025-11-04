@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+//import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 import { lexicalStore } from '@/stores/store'
@@ -35,8 +35,10 @@ onMounted(() => {
 
 <template>
   <nav>
+    <!--
     <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
     <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
+    -->
     <button id="theme-toggle" class="nav-button button-mode">
       <span class="material-icons theme-icon" v-if="themeCurrent === 'light'">light_mode</span>
       <span class="material-icons theme-icon" v-else>dark_mode</span>
@@ -57,11 +59,13 @@ onMounted(() => {
 <style scoped>
 nav {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
+  align-items: top;
+  vertical-align: top;
+  justify-content: right;
   width: 100%;
   font-size: 15px;
-  text-align: center;
+  text-align: right;
   margin-top: 1rem;
 }
 

@@ -26,25 +26,21 @@ onMounted(async () => {
           {{ getDate(item.created) }}
         </time>
       </header>
-      <div class="newsbody" v-html="th(item.body)"></div>
+      <div v-html="th(item.body)"></div>
     </article>
   </div>
 </template>
 
 <style scoped>
-@media (min-width: 1024px) {
-  .newsarticle {
-    margin-bottom: 0.5rem;
-  }
+.newsarticle {
+  margin-bottom: 0.5rem;
+}
 
-  .newstitle {
-  }
+.newstitle {
+  color: var(--sb-orange);
+}
 
-  .newsdate {
-    font-style: italic;
-  }
-
-  .newsbody {
-  }
+.newsdate {
+  font-style: italic;
 }
 </style>

@@ -4,7 +4,7 @@ import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
-import type { SelectedFieldConfig, CountHeadersColumn } from '@/types/datasetConfig.ts'
+import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
 import MaxHeight from '@/components/MaxHeight.vue'
 import { formatCell } from '@/utils/utils'
@@ -15,9 +15,25 @@ const { t } = useI18n()
 
 const lexicalStorage = lexicalStore()
 
-const currentHeaders = ref<CountHeadersColumn[]>([])
-const currentTable = ref<Dataset[]>([])
-const currentTotals = ref<number[]>([])
+//const statisticsHeaders = ref<CountHeadersColumn[]>([])
+//const statisticsResult = ref<Dataset[]>([])
+//const statisticsTotals = ref<number[]>([])
+
+const statisticsHeaders = computed({
+  get: () => lexicalStorage.statisticsHeaders,
+  set: (value) => (lexicalStorage.statisticsHeaders = value),
+})
+
+const statisticsResult = computed({
+  get: () => lexicalStorage.statisticsResult,
+  set: (value) => (lexicalStorage.statisticsResult = value),
+})
+
+const statisticsTotals = computed({
+  get: () => lexicalStorage.statisticsTotals,
+  set: (value) => (lexicalStorage.statisticsTotals = value),
+})
+
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
 const currentTab = ref(lexicalStorage.activeResultTab)
@@ -55,7 +71,7 @@ const toggleDropdownCompileFields = () => {
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownCompileFields.value) {
     console.log('toggleDropdownCompileFields - setIsSearch')
-    lexicalStorage.setIsSearch(true)
+    lexicalStorage.setIsStatisticsSearch(true)
     isSearchChanged.value = false
   }
 }
@@ -74,7 +90,7 @@ const toggleDropdownColumns = () => {
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownColumns.value) {
     console.log('toggleDropdownColumns - setIsSearch')
-    lexicalStorage.setIsSearch(true)
+    lexicalStorage.setIsStatisticsSearch(true)
     isSearchChanged.value = false
   }
 }
@@ -92,7 +108,7 @@ const handleClickOutsideS = (event: MouseEvent) => {
     if (isSearchChanged.value) {
       console.log('handleClickOutsideS - setIsSearch')
 
-      lexicalStorage.setIsSearch(true)
+      lexicalStorage.setIsStatisticsSearch(true)
       isSearchChanged.value = false
     }
   }
@@ -165,8 +181,8 @@ const fetchData = async () => {
   if (lexicalStorage.abortController !== null) {
     //lexicalStorage.abortController.abort()
   }
-  currentTable.value = []
-  currentTotals.value = []
+  statisticsResult.value = []
+  statisticsTotals.value = []
   const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
@@ -183,45 +199,50 @@ const fetchData = async () => {
         newColumns as string[],
         columnCount.value as boolean,
       )
-      currentHeaders.value = headers
+      statisticsHeaders.value = headers
       // make sure any appearences of "entryWord" i headers
       // are replaced by "entry_word"
       // ie replace entryWordFieldCamel with entryWordField
-      currentHeaders.value.forEach((f, i) => {
+      statisticsHeaders.value.forEach((f, i) => {
         if (f.columnField == entryWordFieldCamel) {
-          currentHeaders.value[i].columnField = entryWordField
+          statisticsHeaders.value[i].columnField = entryWordField
         }
         if (f.headerField == entryWordFieldCamel) {
-          currentHeaders.value[i].headerField = entryWordField
+          statisticsHeaders.value[i].headerField = entryWordField
         }
       })
       //console.log('tableHeaders', currentHeaders.value)
-      currentTable.value = table
-      if (currentTable.value.length > 0) {
+      statisticsResult.value = table
+      if (statisticsResult.value.length > 0) {
         lexicalStorage.setIsData(true)
       }
-      currentTotals.value = totals
+      statisticsTotals.value = totals
       // make sure pageStart is not beyond data
-      if (currentTable.value.length < (currentPageSize.value - 1) * currentPageStart.value) {
-        currentPageStart.value = Math.floor(currentTable.value.length / currentPageSize.value + 1)
+      if (statisticsResult.value.length < (currentPageSize.value - 1) * currentPageStart.value) {
+        currentPageStart.value = Math.floor(
+          statisticsResult.value.length / currentPageSize.value + 1,
+        )
       }
     } catch (error) {
       errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
   } else {
-    currentTable.value = []
+    statisticsResult.value = []
   }
 }
 
 watch(
   () => currentTab.value,
   () => {
-    if (lexicalStorage.abortController !== null) {
-      lexicalStorage.abortController.abort()
-    }
-    lexicalStorage.resetIsLoading()
     if (currentTab.value === 'statistics') {
-      fetchData()
+      if (lexicalStorage.isStatisticsSearch) {
+        if (lexicalStorage.abortController !== null) {
+          lexicalStorage.abortController.abort()
+        }
+        lexicalStorage.resetIsLoading()
+        fetchData()
+        lexicalStorage.setIsStatisticsSearch(false)
+      }
     }
   },
   { immediate: true },
@@ -232,7 +253,7 @@ watch(
   (newDatasets, oldDatasets) => {
     //console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
     if (newDatasets.length === 0) {
-      currentTable.value = []
+      statisticsResult.value = []
       lexicalStorage.setIsData(false)
     }
     selectedCompileFields.value = [entryWordField]
@@ -249,15 +270,15 @@ watch(
 )
 
 watch(
-  () => lexicalStorage.isSearch,
+  () => lexicalStorage.isStatisticsSearch,
   async () => {
-    if (lexicalStorage.isSearch) {
+    if (lexicalStorage.isStatisticsSearch) {
       console.log(
         'StatisticsView - Watch isSearch!',
         currentPageStart.value,
         lexicalStorage.pageStart,
       )
-      lexicalStorage.setIsSearch(false)
+      lexicalStorage.setIsStatisticsSearch(false)
       await fetchData()
       updateOverview() // draw graph
     }
@@ -268,9 +289,9 @@ watch(
 const sortedData = computed(() => {
   //console.log('Recalc!', sortKey.value)
   if (!sortKey.value) {
-    return currentTable.value
+    return statisticsResult.value
   } else {
-    return [...currentTable.value].sort((a, b) => {
+    return [...statisticsResult.value].sort((a, b) => {
       //const aValue = a[sortKey.value]
       //const bValue = b[sortKey.value]
       // data is of format a[0] = "name", a[1] = number
@@ -300,7 +321,7 @@ const paginatedData = computed(() => {
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(currentTable.value.length / currentPageSize.value)
+  return Math.ceil(statisticsResult.value.length / currentPageSize.value)
 })
 
 const firstPage = () => {
@@ -356,39 +377,39 @@ const exportCSV = () => {
   let csv = ''
 
   // write headers
-  for (const key in currentHeaders.value) {
-    if (currentHeaders.value[key].type == 'compile') {
-      csv += lexicalStorage.localizeField(currentHeaders.value[key].columnField) + ','
-    } else if (currentHeaders.value[key].type == 'value') {
+  for (const key in statisticsHeaders.value) {
+    if (statisticsHeaders.value[key].type == 'compile') {
+      csv += lexicalStorage.localizeField(statisticsHeaders.value[key].columnField) + ','
+    } else if (statisticsHeaders.value[key].type == 'value') {
       csv +=
-        lexicalStorage.localizeField(currentHeaders.value[key].columnField) +
+        lexicalStorage.localizeField(statisticsHeaders.value[key].columnField) +
         ' (' +
-        lexicalStorage.datasetLabels[currentHeaders.value[key].headerValue] +
+        lexicalStorage.datasetLabels[statisticsHeaders.value[key].headerValue] +
         '),'
     } else if (
-      currentHeaders.value[key].type == 'total' ||
-      currentHeaders.value[key].type == 'count'
+      statisticsHeaders.value[key].type == 'total' ||
+      statisticsHeaders.value[key].type == 'count'
     ) {
       // mirror template headers
       if (columnCount.value && selectedColumns.value.length > 0) {
-        if (currentHeaders.value[key].headerField) {
+        if (statisticsHeaders.value[key].headerField) {
           csv +=
-            lexicalStorage.localizeField(currentHeaders.value[key].headerField) +
+            lexicalStorage.localizeField(statisticsHeaders.value[key].headerField) +
             ' (' +
-            currentHeaders.value[key].headerValue +
+            statisticsHeaders.value[key].headerValue +
             '),'
         } else {
           csv += t('statistics.total') + ','
         }
-      } else if (currentHeaders.value[key].headerField) {
+      } else if (statisticsHeaders.value[key].headerField) {
         if (selectedColumns.value.length > 0) {
           csv +=
-            lexicalStorage.localizeField(currentHeaders.value[key].headerField) +
+            lexicalStorage.localizeField(statisticsHeaders.value[key].headerField) +
             ' (' +
-            currentHeaders.value[key].headerValue +
+            statisticsHeaders.value[key].headerValue +
             '),'
         } else {
-          csv += lexicalStorage.datasetLabels[currentHeaders.value[key].headerValue] + ','
+          csv += lexicalStorage.datasetLabels[statisticsHeaders.value[key].headerValue] + ','
         }
       } else {
         csv += t('statistics.total') + ','
@@ -405,13 +426,13 @@ const exportCSV = () => {
   }
 
   // write data
-  for (const row in currentTable.value) {
-    const rowItems: Dataset = currentTable.value[row]
+  for (const row in statisticsResult.value) {
+    const rowItems: Dataset = statisticsResult.value[row]
     // value could be array
     for (const key in rowItems) {
       const key_number = Number(key)
-      if ('columnField' in currentHeaders.value[key_number]) {
-        if (collectionColumn.includes(currentHeaders.value[key_number].columnField)) {
+      if ('columnField' in statisticsHeaders.value[key_number]) {
+        if (collectionColumn.includes(statisticsHeaders.value[key_number].columnField)) {
           console.log('Columnfield:', rowItems[key])
           csv += '"' + formatCell(rowItems[key], '; ') + '\",'
         } else {
@@ -425,10 +446,10 @@ const exportCSV = () => {
   }
 
   // write totals
-  if (currentTotals.value.length > 0) {
+  if (statisticsTotals.value.length > 0) {
     csv += '\"' + t('statistics.total') + '\",'
-    for (let i: number = 1; i < currentTotals.value.length; i++) {
-      csv += '\"' + currentTotals.value[i] + '\",'
+    for (let i: number = 1; i < statisticsTotals.value.length; i++) {
+      csv += '\"' + statisticsTotals.value[i] + '\",'
     }
     csv += '\n'
   }
@@ -458,7 +479,7 @@ const graph_value_count = ref<number>(0)
 const graph_value_excluded = ref<number>(0)
 
 const drawChart = () => {
-  console.log('drawChart() ', currentTable.value.length)
+  console.log('drawChart() ', statisticsResult.value.length)
   interface dict {
     [key: string]: string | number
   }
@@ -468,19 +489,19 @@ const drawChart = () => {
   graph_value_excluded.value = 0
   // write data
   //for (const row in currentResult.value) {
-  if (Object.keys(currentTable.value).length === 1) {
+  if (Object.keys(statisticsResult.value).length === 1) {
     // one hit distributed on datasets
-    const rowItems: Dataset = currentTable.value[0]
+    const rowItems: Dataset = statisticsResult.value[0]
     for (const key in rowItems) {
       const key_number = Number(key)
       //console.log('OVERVIEW :', tableHeaders.value[key_number])
       // filter total column
       if (
-        currentHeaders.value[key_number].type === 'count' &&
-        'headerField' in currentHeaders.value[key_number]
+        statisticsHeaders.value[key_number].type === 'count' &&
+        'headerField' in statisticsHeaders.value[key_number]
       ) {
         const category: string =
-          lexicalStorage.datasetLabels[currentHeaders.value[key_number].headerValue]
+          lexicalStorage.datasetLabels[statisticsHeaders.value[key_number].headerValue]
         //const category: string = tableHeaders.value[key_number].headerValue
         const value: number = Number(rowItems[key])
         //console.log('row=', row, 'category=', category, 'value=', value)
@@ -501,9 +522,9 @@ const drawChart = () => {
       }
     }
   } else {
-    for (const row in currentTable.value) {
+    for (const row in statisticsResult.value) {
       // multiple hits
-      const row2 = currentTable.value[row]
+      const row2 = statisticsResult.value[row]
       const category: string = <string>row2[0] // first # is always category
       // total is 2nd value
       const value: number = <number>(<unknown>row2[1])
@@ -797,7 +818,7 @@ const updateOverview = () => {
         </div>
         -->
       </div>
-      <div v-if="currentTable.length">
+      <div v-if="statisticsResult.length">
         <div>
           <button @click="exportCSV()" class="export-button">
             {{ $t('statistics.exportCSV') }}
@@ -901,19 +922,19 @@ const updateOverview = () => {
         {{ $t('message.nodatasetselected') }}
       </p>
 
-      <table v-if="currentTable.length" class="fancy-table">
+      <table v-if="statisticsResult.length" class="fancy-table">
         <thead>
           <!-- show number of hits -->
           <tr>
             <td colspan="100%" class="dataset-label">
               {{ $t('statistics.numberOfHits') }}:
-              {{ currentTable.length }}
+              {{ statisticsResult.length }}
             </td>
           </tr>
           <!-- show header row -->
           <tr>
             <th
-              v-for="(key, index) in currentHeaders"
+              v-for="(key, index) in statisticsHeaders"
               :key="index"
               @click="sortTable(String(index))"
               :class="{
@@ -1003,7 +1024,7 @@ const updateOverview = () => {
         <tbody>
           <!-- show totals -->
           <tr class="total">
-            <template v-for="(item, index) in currentTotals" :key="index">
+            <template v-for="(item, index) in statisticsTotals" :key="index">
               <td v-if="index == 0" class="total">&Sigma;</td>
               <td v-else class="total numeric">{{ item }}</td>
             </template>
@@ -1032,7 +1053,7 @@ const updateOverview = () => {
       </table>
 
       <!-- show pagers -->
-      <div v-if="currentTable.length" class="pagination">
+      <div v-if="statisticsResult.length" class="pagination">
         <button @click="firstPage" :disabled="currentPageStart === 1">
           <i class="material-icons">first_page</i>
         </button>

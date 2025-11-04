@@ -4,7 +4,6 @@ import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { getTableData } from '@/api/apiService'
 import {
-  type DatasetResult,
   type DatasetEntry,
   type Entry,
   type EntryS,
@@ -23,17 +22,26 @@ const lexicalStorage = lexicalStore()
 
 // result
 
-const currentResult = ref<DatasetResult>({
+/*
+const tableResult = ref<DatasetResult>({
   hits: [],
   resourceHits: {},
   resourceOrder: {},
   total: 0,
 })
+*/
+
+//const tableResult = ref<DatasetResult>(lexicalStorage.tableResult)
+
+const tableResult = computed({
+  get: () => lexicalStorage.tableResult,
+  set: (value) => (lexicalStorage.tableResult = value),
+})
 
 // currentResult as returned from groupBy()
-const currentResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]>>({})
+const tableResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]>>({})
 // with rows sorted and put in (ordered) array
-const currentResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: string }[]>>({})
+const tableResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: string }[]>>({})
 
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 
@@ -56,7 +64,7 @@ const currentPageSize = computed({
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(currentResult.value.total / currentPageSize.value)
+  return Math.ceil(tableResult.value.total / currentPageSize.value)
 })
 
 const firstPage = () => {
@@ -133,60 +141,65 @@ const fetchData = async () => {
       errorMessage.value = ''
       const data = await getTableData(currentPageStart.value, currentPageSize.value)
       if (Object.keys(data).length !== 0) {
-        currentResult.value = data
-        currentResultGrp.value = groupBy(currentResult.value.hits, (item) => item.resourceId)
-        currentResultGrpSorted.value = {}
-        //console.log('fetchdata() - after getTableData()', data, currentResultGrp.value)
-
-        // sort columns based on config
-        // transform key,value-pairs to (ordered) array of key,value-pairs
-        for (const resId in currentResultGrp.value) {
-          // original
-          const dataset_unsorted: DatasetEntry[] = currentResultGrp.value[resId]
-          // with sorted rows
-          currentResultGrpSorted.value[resId] = []
-
-          // we will fill the first column with the value of the entryword
-          const resIndex = lexicalStorage.currentConfig.resources.findIndex(
-            (item) => item.resourceId === resId,
-          )
-          const entryWord = lexicalStorage.currentConfig.resources[resIndex].entryWord.field
-
-          // for each unsorted row
-          for (let i = 0; i < dataset_unsorted.length; i++) {
-            // unsorted row
-            const e0: Entry = dataset_unsorted[i].entry
-            //for (const key in e0) {
-            //  console.log('ORDERO: ', key, e0[key])
-            //}
-            // fields in correct order
-            const fieldsFromConfig: FieldConfig[] =
-              lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
-            // sorted row
-            const e1: EntryS[] = []
-
-            // add entryword as first column
-            e1.push({ name: entryWordField, value: e0[entryWord] })
-
-            // loop over config, when field is found, add value to new row/array
-            for (const key in fieldsFromConfig) {
-              //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
-              e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
-            }
-            // add new row/array to sorted result
-            currentResultGrpSorted.value[resId].push({ entry: e1, resourceId: resId })
-          }
-        }
+        tableResult.value = data
+        groupData()
       }
-      lexicalStorage.setIsData(currentResult.value.total > 0)
+      lexicalStorage.setIsData(tableResult.value.total > 0)
     } catch (error) {
       errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
   } else {
-    currentResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
+    tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
     //currentValues.value = []
   }
 }
+
+const groupData = () => {
+  tableResultGrp.value = groupBy(tableResult.value.hits, (item) => item.resourceId)
+  tableResultGrpSorted.value = {}
+  //console.log('fetchdata() - after getTableData()', data, currentResultGrp.value)
+
+  // sort columns based on config
+  // transform key,value-pairs to (ordered) array of key,value-pairs
+  for (const resId in tableResultGrp.value) {
+    // original
+    const dataset_unsorted: DatasetEntry[] = tableResultGrp.value[resId]
+    // with sorted rows
+    tableResultGrpSorted.value[resId] = []
+
+    // we will fill the first column with the value of the entryword
+    const resIndex = lexicalStorage.currentConfig.resources.findIndex(
+      (item) => item.resourceId === resId,
+    )
+    const entryWord = lexicalStorage.currentConfig.resources[resIndex].entryWord.field
+
+    // for each unsorted row
+    for (let i = 0; i < dataset_unsorted.length; i++) {
+      // unsorted row
+      const e0: Entry = dataset_unsorted[i].entry
+      //for (const key in e0) {
+      //  console.log('ORDERO: ', key, e0[key])
+      //}
+      // fields in correct order
+      const fieldsFromConfig: FieldConfig[] =
+        lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
+      // sorted row
+      const e1: EntryS[] = []
+
+      // add entryword as first column
+      e1.push({ name: entryWordField, value: e0[entryWord] })
+
+      // loop over config, when field is found, add value to new row/array
+      for (const key in fieldsFromConfig) {
+        //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
+        e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
+      }
+      // add new row/array to sorted result
+      tableResultGrpSorted.value[resId].push({ entry: e1, resourceId: resId })
+    }
+  }
+}
+
 /*
 watch(
   () => currentPageStart.value,
@@ -219,7 +232,7 @@ watch(
   () => lexicalStorage.isData,
   (newIsData) => {
     if (!newIsData) {
-      currentResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
+      tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
       //currentValues.value = []
     }
   },
@@ -229,7 +242,7 @@ watch(
   () => lexicalStorage.selectedDatasets,
   (newDatasets) => {
     if (newDatasets.length === 0) {
-      currentResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
+      tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
       //currentValues.value = []
     }
   },
@@ -240,7 +253,8 @@ const currentTab = ref(lexicalStorage.activeResultTab)
 watch(
   () => currentTab.value,
   () => {
-    console.log('WATCH currentTab')
+    console.log('WATCH currentTab, tableResult:', tableResult.value.hits)
+    /*
     if (lexicalStorage.abortController !== null) {
       lexicalStorage.abortController.abort()
     }
@@ -248,16 +262,18 @@ watch(
     if (currentTab.value === 'table') {
       fetchData()
     }
+    */
+    groupData()
   },
   { immediate: true },
 )
 
 watch(
-  () => lexicalStorage.isSearch,
+  () => lexicalStorage.isTableSearch,
   () => {
-    if (lexicalStorage.isSearch) {
+    if (lexicalStorage.isTableSearch) {
       console.log('TableView - Watch isSearch!')
-      lexicalStorage.setIsSearch(false)
+      lexicalStorage.setIsTableSearch(false)
       //setTimeout(function () {
       //currentPageStart.value = 1
       fetchData()
@@ -286,11 +302,11 @@ const picsbar = (ds: string) => {
   // add count until found
   // so we should go to page: count / itemsPerPage.value
   let hitCount: number = 0
-  for (const index in currentResult.value.resourceOrder) {
-    if (currentResult.value.resourceOrder[index] === ds) {
+  for (const index in tableResult.value.resourceOrder) {
+    if (tableResult.value.resourceOrder[index] === ds) {
       break
     } else {
-      hitCount += currentResult.value.resourceHits[currentResult.value.resourceOrder[index]]
+      hitCount += tableResult.value.resourceHits[tableResult.value.resourceOrder[index]]
     }
   }
   currentPageStart.value = Math.floor(hitCount / currentPageSize.value) + 1
@@ -324,19 +340,19 @@ const picsbar = (ds: string) => {
       <table class="picsbar">
         <tbody>
           <tr class="picsbar-row">
-            <template v-for="(value, key) in currentResult.resourceOrder" :key="key">
+            <template v-for="(value, key) in tableResult.resourceOrder" :key="key">
               <td
-                v-if="currentResult.resourceHits[value] > 0"
+                v-if="tableResult.resourceHits[value] > 0"
                 class="picsbar-tooltip"
-                :style="{ width: currentResult.resourceHits[value] / currentResult.total + '%' }"
+                :style="{ width: tableResult.resourceHits[value] / tableResult.total + '%' }"
                 @click="picsbar(value)"
               >
-                <template v-if="Object.keys(currentResult.resourceOrder).length < 6">
+                <template v-if="Object.keys(tableResult.resourceOrder).length < 6">
                   {{ lexicalStorage.datasetLabels[value] }}
                 </template>
                 <span class="picsbar-tooltiptext"
                   >{{ lexicalStorage.datasetLabels[value] }}:
-                  {{ currentResult.resourceHits[value] }}</span
+                  {{ tableResult.resourceHits[value] }}</span
                 >
               </td>
             </template>
@@ -351,14 +367,14 @@ const picsbar = (ds: string) => {
       >
 
       <!-- table -->
-      <template v-for="(item, key, index) in currentResultGrpSorted" :key="index">
-        <table v-if="currentResult.total > 0" class="fancy-table">
+      <template v-for="(item, key, index) in tableResultGrpSorted" :key="index">
+        <table v-if="tableResult.total > 0" class="fancy-table">
           <tbody>
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
                 {{ lexicalStorage.datasetLabels[key] }}:
-                {{ currentResult.resourceHits[key] }}
+                {{ tableResult.resourceHits[key] }}
               </td>
             </tr>
             <!-- column names -->

@@ -4,7 +4,10 @@ import { defineStore } from 'pinia'
 import {
   type FieldConfig,
   type Config,
+  type CountHeadersColumn,
+  type Dataset,
   type DatasetDates,
+  type DatasetResult,
   entryWordField,
 } from '@/types/datasetConfig.ts'
 import { ROWS_PER_PAGE } from '@/utils/constants'
@@ -26,6 +29,12 @@ interface SearchRedux {
   selectedColumns: string[] // statistics, field we show totals on
   searchQuery: string
   searchExtendedOp: boolean
+  selectedFieldsArray: string[]
+  searchField: Record<string, SelectedFieldConfig>
+  tableResult: DatasetResult
+  statisticsHeaders: CountHeadersColumn[]
+  statisticsResult: Dataset[]
+  statisticsTotals: number[]
   activeSearchTab: string
   activeResultTab: string
   activeLocale: string
@@ -37,7 +46,8 @@ interface SearchRedux {
   pageStart: number
   pageSize: number
   isData: boolean
-  isSearch: boolean // trigger a search (call server)
+  isTableSearch: boolean // trigger a search (call server)
+  isStatisticsSearch: boolean // trigger a search (call server)
   isStart: boolean // is app in start mode? (do not show anything except dataselection/datasearch boxes)
   isLoading: number
 }
@@ -62,6 +72,12 @@ export const lexicalStore = defineStore('dataset', {
     selectedColumns: [],
     searchQuery: '',
     searchExtendedOp: true,
+    selectedFieldsArray: [],
+    searchField: {},
+    tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
+    statisticsHeaders: [],
+    statisticsResult: [],
+    statisticsTotals: [],
     activeSearchTab: 'simple',
     activeResultTab: 'table',
     activeLocale: 'sv',
@@ -74,7 +90,8 @@ export const lexicalStore = defineStore('dataset', {
     pageSize: ROWS_PER_PAGE,
     //listLimit: 5,
     isData: false,
-    isSearch: false,
+    isTableSearch: false,
+    isStatisticsSearch: false,
     isStart: true,
     isLoading: 0,
   }),
@@ -153,6 +170,9 @@ export const lexicalStore = defineStore('dataset', {
     },
     setSearchQuery(query: string) {
       this.searchQuery = query
+    },
+    setSearchField(x: Record<string, SelectedFieldConfig>) {
+      this.searchField = x
     },
     setSearchExtendedOp(x: boolean) {
       this.searchExtendedOp = x
@@ -337,6 +357,12 @@ export const lexicalStore = defineStore('dataset', {
           }, {})
       }
     },
+    setCurrentFields(x: FieldConfig[]) {
+      this.currentFields = x
+    },
+    setSelectedFieldsArray(x: string[]) {
+      this.selectedFieldsArray = x
+    },
     setSelectedFields(fields: Record<string, SelectedFieldConfig>) {
       // console.log('setSelectedFields: ', JSON.parse(JSON.stringify(fields)))
       this.selectedFields = fields
@@ -369,8 +395,15 @@ export const lexicalStore = defineStore('dataset', {
     setIsData(x: boolean) {
       this.isData = x
     },
-    setIsSearch(x: boolean) {
-      this.isSearch = x
+    setIsSearch(x: boolean, y: boolean) {
+      this.isTableSearch = x
+      this.isStatisticsSearch = y
+    },
+    setIsTableSearch(x: boolean) {
+      this.isTableSearch = x
+    },
+    setIsStatisticsSearch(x: boolean) {
+      this.isStatisticsSearch = x
     },
     setIsStart(x: boolean) {
       this.isStart = x

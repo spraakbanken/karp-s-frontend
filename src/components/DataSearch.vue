@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import type { entryWordField, SelectedFieldConfig } from '@/types/datasetConfig'
+//import type { SelectedFieldConfig } from '@/types/datasetConfig'
 
 /*
 watch(
@@ -35,16 +35,29 @@ const selectedFields = computed({
   set: (value) => lexicalStorage.setSelectedFields(value),
 })
 
-const currentFields = computed(() => lexicalStorage.currentFields)
+const currentFields = computed({
+  get: () => lexicalStorage.currentFields,
+  set: (value) => lexicalStorage.setCurrentFields(value),
+})
 
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
-const selectedFieldsArray = ref<string[]>([])
+//const selectedFieldsArray = ref<string[]>([])
+const selectedFieldsArray = computed({
+  get: () => lexicalStorage.selectedFieldsArray,
+  set: (value) => lexicalStorage.setSelectedFieldsArray(value),
+})
 
-const searchField = ref<Record<string, SelectedFieldConfig>>({})
+//const searchField = ref<Record<string, SelectedFieldConfig>>({})
+const searchField = computed({
+  get: () => lexicalStorage.searchField,
+  set: (value) => lexicalStorage.setSearchField(value),
+})
+
 const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
+
 const searchFieldPositionText = [
   'dataselector.parameter.position.startswith',
   'dataselector.parameter.position.endswith',
@@ -52,11 +65,12 @@ const searchFieldPositionText = [
   'dataselector.parameter.position.equals',
   'dataselector.parameter.position.regex',
 ]
+
 const searchExtendedOp = computed({
   get: () => lexicalStorage.searchExtendedOp,
   set: (x) => lexicalStorage.setSearchExtendedOp(x),
 })
-//const searchFieldPositionEnabled = [true, true, true, true, false]
+
 const searchQuery = computed({
   get: () => lexicalStorage.searchQuery,
   set: (x) => lexicalStorage.setSearchQuery(x),
@@ -164,10 +178,9 @@ const handlePos = (f: string, pos: number) => {
 const updateData = () => {
   //if (currentFields.value.length > 0) {
   lexicalStorage.setSelectedFields(searchField.value)
-  lexicalStorage.setIsSearch(true)
+  lexicalStorage.setIsSearch(true, true)
   lexicalStorage.setIsStart(false)
   lexicalStorage.pageStart = 1
-  console.log('updateData, isSearch:', lexicalStorage.isSearch)
   //}
 }
 
@@ -214,7 +227,7 @@ watch(
   () => lexicalStorage.selectedFields,
   (newSelectedFields) => {
     //console.log('WATCH: lexicalStorage.selectedFields', newSelectedFields)
-    selectedFieldsArray.value = Object.keys(newSelectedFields)
+    lexicalStorage.setSelectedFieldsArray(Object.keys(newSelectedFields))
     //console.log('-- WATCH: lexicalStorage.selectedFields', newSelectedFields, selectedFieldsArray.value,searchField,)
     Object.keys(newSelectedFields).forEach((param) => {
       //console.log('-- param', param)
