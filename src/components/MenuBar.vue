@@ -39,9 +39,12 @@ onMounted(() => {
     <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
     <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
     -->
+    <a href="https://spraakbanken.gu.se/karp/">
+      <span class="material-icons">mode_edit</span>{{ $t('menu.editmode') }}
+    </a>
     <button id="theme-toggle" class="nav-button button-mode">
-      <span class="material-icons theme-icon" v-if="themeCurrent === 'light'">light_mode</span>
-      <span class="material-icons theme-icon" v-else>dark_mode</span>
+      <span class="material-icons" v-if="themeCurrent === 'light'">light_mode</span>
+      <span class="material-icons" v-else>dark_mode</span>
     </button>
     <div class="dropdown">
       <div class="dropdown-toggle">
@@ -147,9 +150,5 @@ nav button.button-mode {
 
 .material-icons {
   font-size: 20px;
-}
-
-.theme-icon {
-  /* color: var(--color-icon-mode); */
 }
 </style>
