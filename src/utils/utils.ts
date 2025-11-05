@@ -53,6 +53,17 @@ export const camelify = (p: string): string => {
   return p.toLowerCase().replace(/(_\w)/g, (m) => m.toUpperCase().substring(1))
 }
 
+function getFilenameFromUrl(url: string): string | null {
+  try {
+    const parsedUrl = new URL(url)
+    const pathSegments = parsedUrl.pathname.split('/')
+    return pathSegments[pathSegments.length - 1] || null // Return last segment or null if not found
+  } catch (error) {
+    console.error('Invalid URL:', error)
+    return null // Handle invalid URLs
+  }
+}
+
 export const formatCell = (x: string | string[], divider: string = '<br>'): string => {
   let value = ''
   if (Array.isArray(x)) {
@@ -60,6 +71,8 @@ export const formatCell = (x: string | string[], divider: string = '<br>'): stri
       value = value + (value ? divider : '') + item
       return true
     })
+  } else if (typeof x === 'string' && x.startsWith('https://')) {
+    value = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
   } else {
     value = x
   }
