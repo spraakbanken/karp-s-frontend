@@ -73,7 +73,6 @@ watch(
   >
     <!-- <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>-->
     <div class="search">
-      <DataSelection />
       <DataSearch />
     </div>
 

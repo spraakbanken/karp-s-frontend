@@ -83,7 +83,7 @@
   "search.field.notcommon.short": "ej gemensamt",
   "search.advanced.label": "Sök med frågespråk:",
   "search.advanced.placeholder": "<frågespråk>",
-  "table.show.expanded": "Visa alla rader i fält",
+  "table.show.expanded": "Visa allt",
   "table.header.list": "lista",
   "table.footer.itemsperpage": "Träffar per sida",
   "statistics.exportCSV": "Exportera CSV",

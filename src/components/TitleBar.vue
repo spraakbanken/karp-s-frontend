@@ -2,6 +2,7 @@
 import MenuBar from './MenuBar.vue'
 // import { lexicalStore } from '../stores/store'
 import { ref, onMounted } from 'vue'
+import DataSelection from '@/components/DataSelection.vue'
 
 const logoKarp = ref('')
 const logoSB = ref('')
@@ -53,6 +54,7 @@ onMounted(() => {
     </div>
     <div class="middle-area">
       <!--<div class="version">{{ $t('titlebar.version') }}<br /></div>-->
+      <DataSelection />
     </div>
     <div class="right-area">
       <div class="middle-right">
@@ -78,37 +80,33 @@ onMounted(() => {
 .header-area {
   display: flex;
   flex-direction: row;
+  flex: 1;
   flex-wrap: wrap;
   justify-content: space-between;
   padding-top: 2rem;
   padding-bottom: 1rem;
   padding-right: 2rem;
   padding-left: 2rem;
-  margin-left: auto;
-  margin-right: auto;
   background-color: var(--color-bg);
-  box-sizing: border-box;
-  width: 100%;
 }
 
 .header-area .left-area {
   display: flex;
-  box-sizing: border-box;
+  flex: 1;
 }
 
 .header-area .logo-box {
-  box-sizing: border-box;
   margin-right: 1rem;
 }
 
 .header-area .middle-area {
   display: flex;
-  box-sizing: border-box;
+  flex: 1;
 }
 
 .header-area .right-area {
   display: flex;
-  box-sizing: border-box;
+  flex: 1;
 }
 
 .header-area .right-area .middle-right {

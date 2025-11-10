@@ -10,12 +10,12 @@ const apiUrl = import.meta.env.VITE_API_URL
 //const lexicalStorage = lexicalStore()
 
 const ex1 = encodeURI(
-  '/karplabb/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=table&q=startswith|entry_word|blom',
+  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,so2009-ord,saol6-faksimil&tab=table&q=startswith|entry_word|blom',
 )
 //  '/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=statistics&q=startswith|ursprungligt_ord|blom&compile=normaliserat_ord',
 
 const ex2 = encodeURI(
-  '/karplabb/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol7,saol8,so2009,saol6&tab=statistics&q=startswith|entry_word|blom&compile=entry_word&columns=entry_word',
+  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,so2009-ord,saol6-faksimil&tab=statistics&q=startswith|entry_word|blom&compile=entry_word&columns=entry_word',
 )
 //  'https://spraakbanken.gu.se/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol6,saol7,saol8,so2009&tab=graph&q=startswith|normaliserat_ord|blom&compile=normaliserat_ord',
 /*

@@ -1248,14 +1248,14 @@ th.resource {
 }
 
 tr.total {
-  background-color: black;
-  color: white;
+  background-color: var(--sb-grey-light);
+  color: black;
   font-weight: bold;
 }
 
 td.total-column {
-  background-color: black;
-  color: white;
+  background-color: var(--sb-grey-light);
+  color: black;
   font-weight: bold;
 }
 
@@ -1298,7 +1298,7 @@ tr:nth-child(odd) td.total-null {
 }
 
 .header-sortable {
-  color: var(--sb-grey-medium);
+  color: var(--sb-grey-light);
   cursor: pointer;
 }
 
@@ -1330,13 +1330,13 @@ tr:nth-child(odd) td.total-null {
 }
 
 .header-count {
-  background-color: var(--sb-grey-dark);
-  color: white;
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
 }
 
 .header-total {
-  background-color: black;
-  color: white;
+  background-color: var(--sb-grey-light);
+  color: black;
 }
 
 /* elements */
