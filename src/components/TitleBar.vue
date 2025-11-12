@@ -107,6 +107,7 @@ onMounted(() => {
 .header-area .right-area {
   display: flex;
   flex: 1;
+  justify-content: flex-end;
 }
 
 .header-area .right-area .middle-right {

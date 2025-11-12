@@ -81,6 +81,7 @@ export interface DatasetDates {
   resourceId: string
   label: string
   updated: string
+  resourceUrl: string
 }
 
 export type Entry = {

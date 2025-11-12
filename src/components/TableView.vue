@@ -54,13 +54,13 @@ const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 // pages
 
 const currentPageStart = computed({
-  get: () => lexicalStorage.pageStart,
-  set: (value) => (lexicalStorage.pageStart = value),
+  get: () => lexicalStorage.tablePageStart,
+  set: (value) => (lexicalStorage.tablePageStart = value),
 })
 
 const currentPageSize = computed({
-  get: () => lexicalStorage.pageSize,
-  set: (value) => (lexicalStorage.pageSize = value),
+  get: () => lexicalStorage.tablePageSize,
+  set: (value) => (lexicalStorage.tablePageSize = value),
 })
 
 const totalPages = computed(() => {
@@ -115,8 +115,8 @@ watch(
     )
     currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
 
-    lexicalStorage.pageStart = currentPageStart.value
-    lexicalStorage.pageSize = currentPageSize.value
+    lexicalStorage.tablePageStart = currentPageStart.value
+    lexicalStorage.tablePageSize = currentPageSize.value
     fetchData()
   },
 )

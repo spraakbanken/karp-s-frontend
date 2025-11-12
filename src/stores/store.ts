@@ -43,8 +43,10 @@ interface SearchRedux {
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
   abortController: AbortController | null
-  pageStart: number
-  pageSize: number
+  tablePageStart: number
+  tablePageSize: number
+  statisticsPageStart: number
+  statisticsPageSize: number
   isData: boolean
   isTableSearch: boolean // trigger a search (call server)
   isStatisticsSearch: boolean // trigger a search (call server)
@@ -86,8 +88,10 @@ export const lexicalStore = defineStore('dataset', {
     datasetLabels: {},
     datasetDates: [],
     abortController: null,
-    pageStart: 1,
-    pageSize: ROWS_PER_PAGE,
+    tablePageStart: 1,
+    tablePageSize: ROWS_PER_PAGE,
+    statisticsPageStart: 1,
+    statisticsPageSize: ROWS_PER_PAGE,
     //listLimit: 5,
     isData: false,
     isTableSearch: false,
@@ -128,6 +132,7 @@ export const lexicalStore = defineStore('dataset', {
         resourceId: c.resourceId,
         label: this.datasetLabels[c.resourceId],
         updated: c.updated,
+        resourceUrl: c.link,
       }))
       this.datasetDates.sort(function (a, b) {
         return parseInt(b.updated) - parseInt(a.updated)

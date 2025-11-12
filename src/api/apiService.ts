@@ -2,6 +2,7 @@ import axios from 'axios'
 //import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
 import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
+import { BEErrorCode, BEErrorMessage } from '@/utils/constants'
 //import type { forEach } from 'es-toolkit/compat'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
@@ -116,6 +117,7 @@ export const getStatisticsData = async (
   columnCount: boolean,
 ): Promise<{ headers: []; table: []; totals: [] }> => {
   const lexicalStorage = lexicalStore()
+
   try {
     // request was cancelled "by user", no error, return empty data
     lexicalStorage.incIsLoading()
@@ -184,6 +186,11 @@ export const getStatisticsData = async (
       // request was cancelled "by user", no error, return empty data
       return { headers: [], table: [], totals: [] }
     } else {
+      console.log('Error - message:', error.response.data.message)
+      console.log('Error - code:', error.response.data.code)
+      if (Number(error.response?.data?.code) > 0) {
+        errMsg += BEErrorMessage(Number(error.response?.data?.code) as BEErrorCode) + '. '
+      }
       if (error.response?.data?.detail !== undefined) {
         const d = error.response.data.detail
         if (Array.isArray(d)) {
@@ -198,7 +205,7 @@ export const getStatisticsData = async (
           })
         }
       } else {
-        errMsg = (error as Error).message
+        errMsg += (error as Error).message
       }
       throw new Error(errMsg ? errMsg : 'unknown')
     }

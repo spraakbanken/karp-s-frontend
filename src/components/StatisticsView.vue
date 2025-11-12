@@ -43,12 +43,12 @@ const columnCount = ref(false)
 // pages
 
 const currentPageStart = computed({
-  get: () => lexicalStorage.pageStart,
-  set: (value) => (lexicalStorage.pageStart = value),
+  get: () => lexicalStorage.statisticsPageStart,
+  set: (value) => (lexicalStorage.statisticsPageStart = value),
 })
 const currentPageSize = computed({
-  get: () => lexicalStorage.pageSize,
-  set: (value) => (lexicalStorage.pageSize = value),
+  get: () => lexicalStorage.statisticsPageSize,
+  set: (value) => (lexicalStorage.statisticsPageSize = value),
 })
 
 // UI
@@ -211,7 +211,7 @@ const fetchData = async () => {
           statisticsHeaders.value[i].headerField = entryWordField
         }
       })
-      //console.log('tableHeaders', currentHeaders.value)
+      console.log('statisticsResult', statisticsResult.value)
       statisticsResult.value = table
       if (statisticsResult.value.length > 0) {
         lexicalStorage.setIsData(true)
@@ -276,7 +276,7 @@ watch(
       console.log(
         'StatisticsView - Watch isSearch!',
         currentPageStart.value,
-        lexicalStorage.pageStart,
+        lexicalStorage.statisticsPageStart,
       )
       lexicalStorage.setIsStatisticsSearch(false)
       await fetchData()
@@ -346,10 +346,10 @@ const lastPage = () => {
 
 const itemsPerPage = () => {
   currentPageStart.value = Math.ceil(
-    currentPageStart.value * (lexicalStorage.pageStart / currentPageStart.value),
+    currentPageStart.value * (lexicalStorage.statisticsPageStart / currentPageStart.value),
   )
-  lexicalStorage.pageStart = currentPageStart.value
-  lexicalStorage.pageSize = currentPageSize.value
+  lexicalStorage.statisticsPageStart = currentPageStart.value
+  lexicalStorage.statisticsPageSize = currentPageSize.value
 }
 
 const sortTable = (key: string) => {
@@ -1026,22 +1026,29 @@ const updateOverview = () => {
           <tr class="total">
             <template v-for="(item, index) in statisticsTotals" :key="index">
               <td v-if="index == 0" class="total">&Sigma;</td>
-              <td v-else class="total numeric">{{ item }}</td>
+              <td v-else class="total numeric">
+                <span v-html="formatCell(item, '', true)"></span>
+              </td>
             </template>
           </tr>
           <!-- show data -->
-          <tr v-for="(item, index) in paginatedData" :key="item + '-' + index">
-            <template v-for="(value, key) in item" :key="key">
+          <tr v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
+            <template v-for="(value, tableCol) in item" :key="tableCol">
               <template v-if="isNumber(value)">
                 <td
                   class="numeric"
-                  :class="{ 'total-column': key == 1, 'total-null': value === 0 }"
+                  :class="{ 'total-column': tableCol == 1, 'total-null': value === 0 }"
                 >
                   {{ value }}
                 </td>
               </template>
               <template v-else>
-                <td :class="{ 'total-column': key == 1 }">
+                <td
+                  :class="{
+                    'total-column': tableCol == 1,
+                    numeric: selectedColumns.length == 0 && Number(tableCol) > 0,
+                  }"
+                >
                   <template v-if="showExpanded">
                     <span v-html="formatCell(value)"></span>
                   </template>
@@ -1089,6 +1096,12 @@ const updateOverview = () => {
     </div>
   </div>
 </template>
+
+<style>
+.sum-right {
+  float: right;
+}
+</style>
 
 <style scoped>
 .statistics {

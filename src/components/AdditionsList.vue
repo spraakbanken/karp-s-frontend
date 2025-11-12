@@ -9,7 +9,12 @@ const lexicalStorage = lexicalStore()
 <template>
   <div v-for="(value, index) in lexicalStorage.datasetDates" :key="index" class="latest-box">
     <div v-if="index < 5" class="latest-row">
-      <span class="latest-label">{{ value.label }}</span>
+      <a :href="value.resourceUrl" target="_blank">
+        <img src="@/assets/sb_symbol_info.svg" class="datasets-icon" />
+      </a>
+      <a :href="'/karplabb/?resources=' + value.resourceId"
+        ><span class="latest-label">{{ value.label }}</span>
+      </a>
       <span class="latest-date">{{ secondsToDate(value.updated) }}</span>
     </div>
   </div>
@@ -25,5 +30,11 @@ const lexicalStorage = lexicalStore()
 }
 .latest-date {
   float: right;
+}
+
+.datasets-icon {
+  height: 18px;
+  width: 2rem;
+  vertical-align: text-bottom;
 }
 </style>

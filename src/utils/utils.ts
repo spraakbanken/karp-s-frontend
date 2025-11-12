@@ -1,6 +1,11 @@
 import type { ByLang } from '@/types/util.types'
 import { useI18n } from 'vue-i18n'
 import { clone } from 'es-toolkit'
+import {
+  BE_STATISTICS_VALUES_ID,
+  BE_STATISTICS_VALUE_ID,
+  BE_STATISTICS_COUNT_ID,
+} from '@/utils/constants.ts'
 
 // Return propeer text according to locale
 export const th = (x?: ByLang | string): string | undefined => {
@@ -64,9 +69,82 @@ function getFilenameFromUrl(url: string): string | null {
   }
 }
 
+export const formatCell = (
+  x: number | string | string[] | object,
+  divider: string = '<br>',
+  solo: boolean = false,
+): string => {
+  let cell: string = ''
+  //let count: number = 0
+
+  if (typeof x === 'object' && x !== null) {
+    // value(s)
+    if (BE_STATISTICS_VALUES_ID in x) {
+      x.values.forEach((v) => {
+        if (typeof v === 'object') {
+          let vvalue: string = ''
+          let vcount: number = 0
+          if (BE_STATISTICS_VALUE_ID in v) {
+            vvalue = v[BE_STATISTICS_VALUE_ID]
+          }
+          if (BE_STATISTICS_COUNT_ID in v) {
+            vcount = v[BE_STATISTICS_COUNT_ID]
+          }
+          cell = cell + (cell ? ', ' : '') + vvalue + '/' + String(vcount)
+        }
+      })
+    }
+    // base count
+    if (BE_STATISTICS_COUNT_ID in x) {
+      cell =
+        cell +
+        '<span class="sum-right"><b>' +
+        (!solo ? (cell ? ' ' : '') : '') +
+        String(x[BE_STATISTICS_COUNT_ID]) +
+        '</b></span>'
+    }
+  } else if (Array.isArray(x)) {
+    x.every((item) => {
+      cell = cell + (cell ? divider : '') + item
+      return true
+    })
+  } else if (typeof x === 'string' && x.startsWith('https://')) {
+    cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
+  } else {
+    cell = String(x)
+  }
+  return cell
+}
+
+/*
 export const formatCell = (x: string | string[], divider: string = '<br>'): string => {
   let value = ''
-  if (Array.isArray(x)) {
+  if (typeof x === 'object' && x !== null) {
+    if ('values' in x) {
+      Object.entries(x.values).forEach(([k, v]) => {
+        if (typeof v === 'object') {
+          Object.entries(v).forEach(([k2, v2]) => {
+            if (k2 === BE_STATISTICS_COUNT_ID) {
+              value = value + (value ? '/' : '') + v2
+            } else {
+              value = value + (value ? ', ' : '') + v2
+            }
+          })
+        } else {
+          value = value + (value ? divider : '') + v
+        }
+        return true
+      })
+    } else {
+      Object.entries(x).forEach(([k2, v2]) => {
+        if (k2 === BE_STATISTICS_COUNT_ID) {
+          value = value + (value ? '/' : '') + v2
+        } else {
+          value = value + (value ? ', ' : '') + v2
+        }
+      })
+    }
+  } else if (Array.isArray(x)) {
     x.every((item) => {
       value = value + (value ? divider : '') + item
       return true
@@ -78,6 +156,7 @@ export const formatCell = (x: string | string[], divider: string = '<br>'): stri
   }
   return value
 }
+*/
 
 /** The number of milliseconds in a full day. */
 const DAY_MS = 24 * 60 * 60 * 1000

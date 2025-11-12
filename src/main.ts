@@ -3,32 +3,12 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createI18n } from 'vue-i18n'
+import { i18n } from '@/i18n.ts'
 
 import App from './App.vue'
 import router from './router'
 import VueMatomo from 'vue-matomo'
 //import { syncStoreWithRouter } from './router/syncStoreWithRouter'
-
-// load translations
-import en from '@/locales/en.json'
-import sv from '@/locales/sv.json'
-
-const i18n = createI18n({
-  locale: 'sv',
-  fallbackLocale: 'en',
-  legacy: false,
-  warnHtmlMessage: false,
-  warnHtmlInMessage: 'off', // disable of the Detected HTML in message
-  messages: {
-    en: {
-      ...en,
-    },
-    sv: {
-      ...sv,
-    },
-  },
-})
 
 const app = createApp(App)
 

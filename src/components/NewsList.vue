@@ -10,6 +10,7 @@ const items = reactive<NewsItem[]>([])
 onMounted(async () => {
   try {
     const items_ = await fetchNews()
+    console.log('News:', items_)
     items.push(...items_)
   } catch (error) {
     console.error('Could not fetch and parse news', error)

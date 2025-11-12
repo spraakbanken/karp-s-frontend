@@ -1,12 +1,15 @@
 import { i18n } from '@/i18n.ts'
 
-// misc constants
-
+// UI
 export const ROW_MAX_HEIGHT: number = 32 // if shortening columns, how high should they be
 export const ROW_SHOW_EXPANDED_DEFAULT: boolean = true // default for shortening columns or expand them
 export const ROWS_PER_PAGE: number = 100 // how many rows to show for each page (default)
 export const GRAPH_BARWIDTH: number = 60 // default bar width of overview graph
+
+// BE statistics data
+export const BE_STATISTICS_VALUES_ID: string = 'values' // and for value
 export const BE_STATISTICS_COUNT_ID: string = 'count' // what BE sends in statistics data for count value in object
+export const BE_STATISTICS_VALUE_ID: string = 'value' // and for value
 
 // error messages
 
