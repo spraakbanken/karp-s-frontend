@@ -30,7 +30,7 @@ const [expanded, toggleExpanded] = useToggle()
         <slot />
       </div>
     </div>
-    <div v-if="height > maxHeight" class="text-center p-2 text-sm">
+    <div v-if="height > maxHeight" class="button-div">
       <ActionButton class="button-slim" @click="toggleExpanded()">
         <PhCaretDoubleUp v-if="expanded" class="button-detail" />
         <PhCaretDoubleDown v-else class="button-detail" />
@@ -47,5 +47,20 @@ const [expanded, toggleExpanded] = useToggle()
 }
 .button-detail {
   display: inline;
+}
+
+.overflow-auto {
+  overflow: hidden;
+}
+
+.button-div {
+  text-align: left;
+  padding: 2px;
+  font-size: small;
+}
+
+.button-slim {
+}
+.button-detail {
 }
 </style>

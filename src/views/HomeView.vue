@@ -7,7 +7,7 @@ import DataSearch from '@/components/DataSearch.vue'
 import TableView from '@/components/TableView.vue'
 import StatisticsView from '@/components/StatisticsView.vue'
 import AboutView from '@/components/AboutView.vue'
-import DataSelection from '@/components/DataSelection.vue'
+//import DataSelection from '@/components/DataSelection.vue'
 
 //import { getLexicalDatasets } from '@/api/apiService'
 import { th, getDate } from '@/utils/utils'

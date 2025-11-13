@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT, GRAPH_BARWIDTH } from '@/utils/constants'
+import {
+  ROW_MAX_HEIGHT,
+  ROW_SHOW_EXPANDED_DEFAULT,
+  GRAPH_BARWIDTH,
+  BE_STATISTICS_VALUES_ID,
+} from '@/utils/constants'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
@@ -1013,9 +1018,7 @@ const updateOverview = () => {
                     {{ lexicalStorage.datasetLabels[key.headerValue] }}
                     <!--</span>-->
                   </span>
-                  <span v-else>
-                    {{ t('statistics.total') }}
-                  </span>
+                  <span v-else> {{ t('statistics.total') }} </span>
                 </template>
               </div>
             </th>
@@ -1034,21 +1037,31 @@ const updateOverview = () => {
           <!-- show data -->
           <tr v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
             <template v-for="(value, tableCol) in item" :key="tableCol">
+              <!-- is value just a number? -->
               <template v-if="isNumber(value)">
-                <td
-                  class="numeric"
-                  :class="{ 'total-column': tableCol == 1, 'total-null': value === 0 }"
-                >
+                <td :class="{ 'total-column': tableCol == 1, 'total-null': value.count === 0 }">
                   {{ value }}
                 </td>
               </template>
-              <template v-else>
+              <!-- is value just a number in an object? -->
+              <template
+                v-else-if="
+                  typeof value === 'object' &&
+                  ((BE_STATISTICS_VALUES_ID in value &&
+                    value[BE_STATISTICS_VALUES_ID].length === 0) ||
+                    !(BE_STATISTICS_VALUES_ID in value))
+                "
+              >
                 <td
-                  :class="{
-                    'total-column': tableCol == 1,
-                    numeric: selectedColumns.length == 0 && Number(tableCol) > 0,
-                  }"
+                  class="numeric"
+                  :class="{ 'total-column': tableCol == 1, 'total-null': value.count === 0 }"
                 >
+                  {{ value.count }}
+                </td>
+              </template>
+              <!-- other -->
+              <template v-else>
+                <td>
                   <template v-if="showExpanded">
                     <span v-html="formatCell(value)"></span>
                   </template>
@@ -1270,10 +1283,12 @@ td.total-column {
   background-color: var(--sb-grey-light);
   color: black;
   font-weight: bold;
+  text-align: right;
 }
 
 td.total-null {
   color: #e0e0e0;
+  text-align: right;
 }
 
 tr:nth-child(odd) td.total-null {
@@ -1292,10 +1307,12 @@ tr:nth-child(odd) td.total-null {
 }
 
 .header-content {
+  /*
   display: flex;
   align-items: top;
   flex-direction: row;
   justify-content: space-between;
+  */
 }
 
 .header-value-col {
@@ -1350,6 +1367,7 @@ tr:nth-child(odd) td.total-null {
 .header-total {
   background-color: var(--sb-grey-light);
   color: black;
+  text-align: right;
 }
 
 /* elements */

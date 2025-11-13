@@ -454,7 +454,7 @@ const picsbar = (ds: string) => {
             <template v-for="(value1, key) in item" :key="key">
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
-                  <template v-if="showExpanded">
+                  <template v-if="showExpanded || key === 0">
                     <span v-html="formatCell(value2.value)"></span>
                   </template>
                   <template v-else>

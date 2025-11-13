@@ -76,42 +76,48 @@ export const formatCell = (
 ): string => {
   let cell: string = ''
   //let count: number = 0
-
-  if (typeof x === 'object' && x !== null) {
-    // value(s)
-    if (BE_STATISTICS_VALUES_ID in x) {
-      x.values.forEach((v) => {
-        if (typeof v === 'object') {
-          let vvalue: string = ''
-          let vcount: number = 0
-          if (BE_STATISTICS_VALUE_ID in v) {
-            vvalue = v[BE_STATISTICS_VALUE_ID]
+  if (x !== null) {
+    //console.log('formatCell: ', x, typeof x, Array.isArray(x))
+    if (Array.isArray(x)) {
+      if (x.length > 0) {
+        x.every((item) => {
+          cell = cell + (cell ? divider : '') + item
+          return true
+        })
+      }
+    } else if (typeof x === 'object' && x !== null) {
+      // value(s)
+      //let x = y.valueOf
+      if (BE_STATISTICS_VALUES_ID in x) {
+        //console.log('IN', x)
+        x.values.forEach((v) => {
+          if (typeof v === 'object') {
+            let vvalue: string = ''
+            let vcount: number = 0
+            if (BE_STATISTICS_VALUE_ID in v) {
+              vvalue = v[BE_STATISTICS_VALUE_ID]
+            }
+            if (BE_STATISTICS_COUNT_ID in v) {
+              vcount = v[BE_STATISTICS_COUNT_ID]
+            }
+            cell = cell + (cell ? ', ' : '') + vvalue + '/' + String(vcount)
           }
-          if (BE_STATISTICS_COUNT_ID in v) {
-            vcount = v[BE_STATISTICS_COUNT_ID]
-          }
-          cell = cell + (cell ? ', ' : '') + vvalue + '/' + String(vcount)
-        }
-      })
+        })
+      }
+      // base count
+      if (BE_STATISTICS_COUNT_ID in x) {
+        cell =
+          cell +
+          '<span class="sum-right"><b>' +
+          (!solo ? (cell ? ' ' : '') : '') +
+          String(x[BE_STATISTICS_COUNT_ID]) +
+          '</b></span>'
+      }
+    } else if (typeof x === 'string' && x.startsWith('https://')) {
+      cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
+    } else {
+      cell = String(x)
     }
-    // base count
-    if (BE_STATISTICS_COUNT_ID in x) {
-      cell =
-        cell +
-        '<span class="sum-right"><b>' +
-        (!solo ? (cell ? ' ' : '') : '') +
-        String(x[BE_STATISTICS_COUNT_ID]) +
-        '</b></span>'
-    }
-  } else if (Array.isArray(x)) {
-    x.every((item) => {
-      cell = cell + (cell ? divider : '') + item
-      return true
-    })
-  } else if (typeof x === 'string' && x.startsWith('https://')) {
-    cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
-  } else {
-    cell = String(x)
   }
   return cell
 }

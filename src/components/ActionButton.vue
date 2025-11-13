@@ -1,11 +1,11 @@
 <script setup lang="ts">
 defineProps<{
-  disabled?: boolean;
-}>();
+  disabled?: boolean
+}>()
 </script>
 
 <template>
-  <button class="inline-block mink-button" :disabled="disabled">
+  <button class="inline-block" :disabled="disabled">
     <slot />
   </button>
 </template>
