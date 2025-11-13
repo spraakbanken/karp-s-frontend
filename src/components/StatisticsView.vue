@@ -436,16 +436,35 @@ const exportCSV = () => {
     // value could be array
     for (const key in rowItems) {
       const key_number = Number(key)
+      const cell = rowItems[key]
+      csv += '"'
       if ('columnField' in statisticsHeaders.value[key_number]) {
         if (collectionColumn.includes(statisticsHeaders.value[key_number].columnField)) {
-          console.log('Columnfield:', rowItems[key])
-          csv += '"' + formatCell(rowItems[key], '; ') + '\",'
+          csv += '"' + formatCell(cell, '; ') + '\",'
         } else {
-          csv += '"' + rowItems[key] + '\",'
+          if (statisticsHeaders.value[key_number].type === 'value') {
+            //csv += cell.count
+            // does if have a .values[] with .count and .value?
+            let cell_values = ''
+            if (BE_STATISTICS_VALUES_ID in cell && cell[BE_STATISTICS_VALUES_ID].length > 0) {
+              cell[BE_STATISTICS_VALUES_ID].forEach((v) => {
+                cell_values +=
+                  cell_values != ''
+                    ? ', ' + v.value + '\/' + cell.count
+                    : v.value + '\/' + cell.count
+              })
+            }
+            csv += cell_values
+          } else if (statisticsHeaders.value[key_number].type === 'count') {
+            csv += cell.count
+          } else {
+            csv += cell
+          }
         }
       } else {
-        csv += '"' + rowItems[key] + '\",'
+        csv += cell
       }
+      csv += '\",'
     }
     csv += '\n'
   }
@@ -453,8 +472,9 @@ const exportCSV = () => {
   // write totals
   if (statisticsTotals.value.length > 0) {
     csv += '\"' + t('statistics.total') + '\",'
-    for (let i: number = 1; i < statisticsTotals.value.length; i++) {
-      csv += '\"' + statisticsTotals.value[i] + '\",'
+    csv += '\"' + statisticsTotals.value[1] + '\",'
+    for (let i: number = 2; i < statisticsTotals.value.length; i++) {
+      csv += '\"' + statisticsTotals.value[i].count + '\",'
     }
     csv += '\n'
   }
@@ -484,7 +504,12 @@ const graph_value_count = ref<number>(0)
 const graph_value_excluded = ref<number>(0)
 
 const drawChart = () => {
-  console.log('drawChart() ', statisticsResult.value.length)
+  console.log(
+    'drawChart() ',
+    statisticsResult.value.length,
+    statisticsResult.value,
+    lexicalStorage.statisticsResult.length,
+  )
   interface dict {
     [key: string]: string | number
   }
@@ -494,7 +519,8 @@ const drawChart = () => {
   graph_value_excluded.value = 0
   // write data
   //for (const row in currentResult.value) {
-  if (Object.keys(statisticsResult.value).length === 1) {
+  //  if (Object.keys(statisticsResult.value).length === 1) {
+  if (statisticsResult.value.length === 1) {
     // one hit distributed on datasets
     const rowItems: Dataset = statisticsResult.value[0]
     for (const key in rowItems) {
@@ -508,7 +534,7 @@ const drawChart = () => {
         const category: string =
           lexicalStorage.datasetLabels[statisticsHeaders.value[key_number].headerValue]
         //const category: string = tableHeaders.value[key_number].headerValue
-        const value: number = Number(rowItems[key])
+        const value: number = Number(rowItems[key].count)
         //console.log('row=', row, 'category=', category, 'value=', value)
         if (
           value >= graph_threshold_min.value &&
