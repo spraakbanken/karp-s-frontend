@@ -109,6 +109,7 @@ export type DatasetResultGrp = {
   resourceId: string
   hits: DatasetEntry[]
 }
+
 // OLD - are they used?
 
 export type Dataset = {
@@ -136,3 +137,13 @@ export type Datasets = {
   [key: string]: DatasetConfig
 }
 */
+
+export type TableResultGrpSorted = Record<string, { entry: EntryS[]; resourceId: string }[]>
+
+export type TabRefSetup = {
+  resourceId: string[]
+  columnField: string
+  columnValue: string
+  /*  tableResult: DatasetResult */
+  tableResultGrpSorted: TableResultGrpSorted
+}

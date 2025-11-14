@@ -41,7 +41,11 @@ const statisticsTotals = computed({
 
 const sortKey = ref('')
 const sortOrder = ref<'asc' | 'desc'>('asc')
-const currentTab = ref(lexicalStorage.activeResultTab)
+//const currentTab = ref(lexicalStorage.activeResultTab)
+const currentTab = computed({
+  get: () => lexicalStorage.activeResultTab,
+  set: (value) => (lexicalStorage.activeResultTab = value),
+})
 const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
 const columnCount = ref(false)
 
@@ -216,7 +220,7 @@ const fetchData = async () => {
           statisticsHeaders.value[i].headerField = entryWordField
         }
       })
-      console.log('statisticsResult', statisticsResult.value)
+      //console.log('statisticsResult', statisticsResult.value)
       statisticsResult.value = table
       if (statisticsResult.value.length > 0) {
         lexicalStorage.setIsData(true)
@@ -764,6 +768,22 @@ const updateOverview = () => {
     drawChart()
   }
 }
+
+const refClick = (tRow: number, tCol: number) => {
+  if (tCol === 0) {
+    const xValue = paginatedData.value[tRow][tCol]
+    const xField = statisticsHeaders.value[tCol].columnField
+    const xTables = lexicalStorage.selectedDatasets
+    console.log('CLICK0: ', xValue, xField, xTables)
+    lexicalStorage.addTabRef(xTables, xField, xValue)
+  } else {
+    const xValue = paginatedData.value[tRow][tCol].values[0].value
+    const xField = statisticsHeaders.value[tCol].columnField
+    const xTables = statisticsHeaders.value[tCol].headerValue
+    console.log('CLICK: ', tRow, tCol, xValue, xField, xTables)
+    lexicalStorage.addTabRef([xTables], xField, xValue)
+  }
+}
 </script>
 
 <template>
@@ -825,6 +845,7 @@ const updateOverview = () => {
             <input type="checkbox" v-model="updateShowHitsCheckbox" @change="updateShowHits" />
             {{ $t('dataselector.statistics.nocolumns') }}
           </label>
+          <p class="statistics-dropdown-hr"></p>
           <label
             v-for="param in currentCommonFields"
             :key="param.name"
@@ -1089,7 +1110,11 @@ const updateOverview = () => {
               <template v-else>
                 <td>
                   <template v-if="showExpanded">
-                    <span v-html="formatCell(value)"></span>
+                    <span
+                      v-html="formatCell(value)"
+                      @click="refClick(Number(tableRow), Number(tableCol))"
+                      class="cell-clickable"
+                    ></span>
                   </template>
                   <template v-else>
                     <MaxHeight :max-height="ROW_MAX_HEIGHT">
@@ -1144,7 +1169,7 @@ const updateOverview = () => {
 
 <style scoped>
 .statistics {
-  background-color: var(--sb-grey-light);
+  background-color: var(--sb-orange-light);
   padding: 0.5rem;
   color: black;
   display: flex;
@@ -1208,6 +1233,14 @@ const updateOverview = () => {
 
 .statistics-dropdown-item input {
   margin-right: 0.5rem;
+}
+
+.statistics-dropdown-hr {
+  border-top: 1px dotted var(--sb-orange); /* Style for the divider line */
+  margin: 5px 0; /* Spacing around the line */
+  display: block; /* Ensures the line takes space */
+  height: 0; /* Height adjustment for the line */
+  pointer-events: none; /* Prevent interaction with the line */
 }
 
 .overview-wrapper {
@@ -1323,6 +1356,11 @@ tr:nth-child(odd) td.total-null {
 
 .numeric {
   text-align: right;
+}
+
+.cell-clickable {
+  color: var(--sb-link);
+  cursor: pointer;
 }
 
 .dataset-label {

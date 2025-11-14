@@ -1,13 +1,14 @@
-import type { SelectedFieldConfig } from '@/types/datasetConfig'
 import { defineStore } from 'pinia'
 
 import {
+  type SelectedFieldConfig,
   type FieldConfig,
   type Config,
   type CountHeadersColumn,
   type Dataset,
   type DatasetDates,
   type DatasetResult,
+  type TabRefSetup,
   entryWordField,
 } from '@/types/datasetConfig.ts'
 import { ROWS_PER_PAGE } from '@/utils/constants'
@@ -35,6 +36,8 @@ interface SearchRedux {
   statisticsHeaders: CountHeadersColumn[]
   statisticsResult: Dataset[]
   statisticsTotals: number[]
+  tabRefSetup: Record<number, TabRefSetup>
+  tabRefSetupCounter: number
   activeSearchTab: string
   activeResultTab: string
   activeLocale: string
@@ -80,6 +83,8 @@ export const lexicalStore = defineStore('dataset', {
     statisticsHeaders: [],
     statisticsResult: [],
     statisticsTotals: [],
+    tabRefSetup: {},
+    tabRefSetupCounter: 2,
     activeSearchTab: 'simple',
     activeResultTab: 'table',
     activeLocale: 'sv',
@@ -468,6 +473,19 @@ export const lexicalStore = defineStore('dataset', {
       }
       return allIncluded
       */
+    },
+    addTabRef(aResourceId: string[], aColumnField: string, aColumnValue: string) {
+      this.tabRefSetupCounter++
+      this.tabRefSetup[this.tabRefSetupCounter] = {
+        resourceId: aResourceId,
+        columnField: aColumnField,
+        columnValue: aColumnValue,
+        tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
+        tableResultGrpSorted: [],
+      }
+    },
+    delTabRef(id: number) {
+      delete this.tabRefSetup[id]
     },
   },
 })

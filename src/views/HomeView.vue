@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, reactive } from 'vue'
+import { onMounted, ref, watch, reactive, computed } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
 
 import { lexicalStore } from '../stores/store'
@@ -11,11 +11,14 @@ import AboutView from '@/components/AboutView.vue'
 
 //import { getLexicalDatasets } from '@/api/apiService'
 import { th, getDate } from '@/utils/utils'
+import TabRefView from '@/components/TabRefView.vue'
 
 //import router from '@/router'
 //import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
 
 const lexicalStorage = lexicalStore()
+
+const tabRefSetup = reactive(lexicalStorage.tabRefSetup)
 
 /*
 onMounted(async () => {
@@ -50,11 +53,13 @@ onMounted(async () => {
 })
 
 const activeResultTab = ref(lexicalStorage.activeResultTab)
+
 const setActiveResultTab = (tab: string) => {
   lexicalStorage.setActiveResultTab(tab)
   activeResultTab.value = tab
 }
 
+/*
 watch(
   () => lexicalStorage.activeResultTab,
   (newTab) => {
@@ -62,6 +67,12 @@ watch(
     //console.log('WATCH lexicalStorage.activeResultTab', activeResultTab.value)
   },
 )
+*/
+
+const tabRefClose = (id: number) => {
+  lexicalStorage.delTabRef(id)
+  setActiveResultTab('statistics')
+}
 </script>
 
 <template>
@@ -104,12 +115,27 @@ watch(
         >
           {{ $t('tab.statistics') }}
         </button>
+        <template v-for="(tabRef, key) in tabRefSetup" :key="key">
+          <button :class="{ active: activeResultTab === 'ref' + key }">
+            <span @click="setActiveResultTab('ref' + key)"> {{ '🡪' + tabRef.columnValue }}</span
+            >&nbsp;<span @click="tabRefClose(Number(key))">✖</span>
+          </button>
+        </template>
       </div>
     </template>
 
     <div>
       <TableView v-if="activeResultTab === 'table'" />
       <StatisticsView v-if="activeResultTab === 'statistics'" />
+      <div v-for="(tabRef, key) in tabRefSetup" :key="key">
+        <TabRefView
+          v-if="activeResultTab === 'ref' + key"
+          :id="Number(key)"
+          :resourceId="tabRef.resourceId"
+          :columnField="tabRef.columnField"
+          :columnValue="tabRef.columnValue"
+        />
+      </div>
       <AboutView v-if="lexicalStorage.isStart" />
     </div>
   </main>
@@ -171,7 +197,7 @@ watch(
   /*border-bottom: 2px solid var(--border-color);*/
   padding-left: 1rem;
   padding-top: 0.5rem;
-  background-color: var(--color-complement);
+  /*background-color: var(--sb-grey-light); */ /*var(--color-complement);*/
   height: 2.5rem;
 }
 
@@ -180,11 +206,15 @@ watch(
   padding: 0.5rem 1rem;
   margin: 0;
   border: none;
-  color: var(--button-inactive-text-color);
-  background-color: var(--button-inactive-bg-color);
+  color: black; /*var(--button-inactive-text-color);*/
+  background-color: var(--sb-grey-light); /*var(--button-inactive-bg-color);*/
   cursor: pointer;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  border-color: white;
+  border-top-style: solid;
+  border-left-style: solid;
+  border-right-style: solid;
   font-size: var(--font-size);
   font-weight: bold;
   transition:
@@ -200,7 +230,7 @@ watch(
     color: var(--button-active-text-color);
   background-color: var(--button-active-bg-color);
   */
-  background-color: white;
+  background-color: var(--sb-orange-light);
 }
 
 /* News, featured */

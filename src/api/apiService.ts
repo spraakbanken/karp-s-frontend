@@ -211,3 +211,32 @@ export const getStatisticsData = async (
     }
   }
 }
+
+export const getTabRefData = async (
+  resourceId: string[],
+  columneField: string,
+  columnValue: string,
+  pageStart: number,
+  pageSize: number,
+) => {
+  try {
+    const params: Record<string, string> = {}
+
+    // datasets
+    params['resources'] = resourceId.join(',')
+
+    // query/field parameters
+    params['q'] = 'equals|' + columneField + '|' + columnValue
+
+    params['from'] = ((pageStart - 1) * pageSize).toString()
+    params['size'] = pageSize.toString()
+
+    const response = await axiosInstance.get(`/search`, {
+      params: params,
+    })
+    return response.data
+  } catch (error) {
+    console.log('Error catch:', error)
+    //throw error
+  }
+}

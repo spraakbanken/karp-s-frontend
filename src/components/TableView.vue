@@ -513,6 +513,7 @@ const picsbar = (ds: string) => {
   border-color: var(--color-complement);
   border-width: 0.5rem 0 0 0;
   */
+  background-color: var(--sb-orange-light);
 }
 
 .table-container {

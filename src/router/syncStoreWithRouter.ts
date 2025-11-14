@@ -13,7 +13,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
   const lexicalStorage = lexicalStore()
 
   const updateRouterQuery = () => {
-    console.log('updateRouterQuery, lexicalStorage.pageStart:', lexicalStorage.pageStart)
+    //console.log('updateRouterQuery, lexicalStorage.pageStart:', lexicalStorage.pageStart)
     const currentQuery = router.currentRoute.value.query
     let queryString = ''
     if (lexicalStorage.activeSearchTab == 'advanced') {
@@ -46,11 +46,15 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       q: queryString,
       compile: lexicalStorage.selectedCompileFields.join(','),
       columns: lexicalStorage.selectedColumns.join(','),
-      tab: lexicalStorage.activeResultTab,
+      tab: ['table', 'statistics'].includes(lexicalStorage.activeResultTab)
+        ? lexicalStorage.activeResultTab
+        : 'statistics',
       searchtab: lexicalStorage.activeSearchTab,
       sort: lexicalStorage.sortField + '|' + lexicalStorage.sortOrder,
-      pageStart: lexicalStorage.pageStart,
-      pageSize: lexicalStorage.pageSize,
+      tablePageStart: lexicalStorage.tablePageStart,
+      tablePageSize: lexicalStorage.tablePageStart,
+      statisticsPageStart: lexicalStorage.statisticsPageStart,
+      statisticsPageSize: lexicalStorage.statisticsPageSize,
     }
 
     const filteredQuery = Object.fromEntries(
@@ -74,8 +78,10 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       searchTab: lexicalStorage.activeSearchTab,
       sortField: lexicalStorage.sortField,
       sortOrder: lexicalStorage.sortOrder,
-      pageStart: lexicalStorage.pageStart,
-      pageSize: lexicalStorage.pageSize,
+      tablePageStart: lexicalStorage.tablePageStart,
+      tablePageSize: lexicalStorage.tablePageStart,
+      statisticsPageStart: lexicalStorage.statisticsPageStart,
+      statisticsPageSize: lexicalStorage.statisticsPageSize,
     }),
     () => {
       updateRouterQuery()
@@ -163,11 +169,17 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       if (query.has('sort')) {
         lexicalStorage.setSort(query.get('sort')!)
       }
-      if (query.has('pageStart')) {
-        lexicalStorage.pageStart = Number(query.get('pageStart'))
+      if (query.has('tablePageStart')) {
+        lexicalStorage.tablePageStart = Number(query.get('tablePageStart'))
       }
-      if (query.has('pageSize')) {
-        lexicalStorage.pageSize = Number(query.get('pageSize'))
+      if (query.has('tablePageSize')) {
+        lexicalStorage.tablePageSize = Number(query.get('tablePageSize'))
+      }
+      if (query.has('statisticsPageStart')) {
+        lexicalStorage.statisticsPageStart = Number(query.get('statisticsPageStart'))
+      }
+      if (query.has('statisticsPageSize')) {
+        lexicalStorage.statisticsPageSize = Number(query.get('statisticsPageSize'))
       }
 
       //if (syncResult === SyncResult.SYNC_RESULT_SYNCED) {
