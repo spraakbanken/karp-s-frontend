@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   ROW_MAX_HEIGHT,
-  ROW_SHOW_EXPANDED_DEFAULT,
+  ROW_SHOW_COMPACT_DEFAULT,
   GRAPH_BARWIDTH,
   BE_STATISTICS_VALUES_ID,
 } from '@/utils/constants'
@@ -46,7 +46,7 @@ const currentTab = computed({
   get: () => lexicalStorage.activeResultTab,
   set: (value) => (lexicalStorage.activeResultTab = value),
 })
-const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
+const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
 const columnCount = ref(false)
 
 // pages
@@ -890,8 +890,8 @@ const refClick = (tRow: number, tCol: number) => {
         </div>
         <div>
           <!-- show all cells expanded -->
-          <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />&nbsp;
-          <label for="showExpanded">{{ $t('table.show.expanded') }} </label>
+          <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />&nbsp;
+          <label for="showCompact">{{ $t('table.show.compact') }} </label>
         </div>
       </div>
     </div>
@@ -1109,17 +1109,21 @@ const refClick = (tRow: number, tCol: number) => {
               <!-- other -->
               <template v-else>
                 <td>
-                  <template v-if="showExpanded">
+                  <template v-if="showCompact">
+                    <MaxHeight :max-height="ROW_MAX_HEIGHT">
+                      <span
+                        v-html="formatCell(value)"
+                        @click="refClick(Number(tableRow), Number(tableCol))"
+                        class="cell-clickable"
+                      ></span>
+                    </MaxHeight>
+                  </template>
+                  <template v-else>
                     <span
                       v-html="formatCell(value)"
                       @click="refClick(Number(tableRow), Number(tableCol))"
                       class="cell-clickable"
                     ></span>
-                  </template>
-                  <template v-else>
-                    <MaxHeight :max-height="ROW_MAX_HEIGHT">
-                      <span v-html="formatCell(value)"></span>
-                    </MaxHeight>
                   </template>
                 </td>
               </template>
@@ -1131,19 +1135,19 @@ const refClick = (tRow: number, tCol: number) => {
       <!-- show pagers -->
       <div v-if="statisticsResult.length" class="pagination">
         <button @click="firstPage" :disabled="currentPageStart === 1">
-          <i class="material-icons">first_page</i>
+          <span class="material-icons">first_page</span>
         </button>
         <button @click="prevPage" :disabled="currentPageStart === 1">
-          <i class="material-icons">chevron_left</i>
+          <span class="material-icons">chevron_left</span>
         </button>
         <span style="color: var(--color-text)">
           {{ currentPageStart }} {{ $t('table.of') }} {{ totalPages }}
         </span>
         <button @click="nextPage" :disabled="currentPageStart === totalPages">
-          <i class="material-icons">chevron_right</i>
+          <span class="material-icons">chevron_right</span>
         </button>
         <button @click="lastPage" :disabled="currentPageStart === totalPages">
-          <i class="material-icons">last_page</i>
+          <span class="material-icons">last_page</span>
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
         <select
@@ -1469,14 +1473,13 @@ input[type='checkbox'][disabled] + label {
   border: none;
   background-color: transparent;
   color: inherit;
-  cursor: pointer;
+  /* cursor: pointer; */
   border-radius: 4px;
 }
 
-.pagination button:disabled {
-  background-color: transparent;
-  color: #ccc;
-  cursor: not-allowed;
+.pagination button:disabled span {
+  color: var(--sb-grey-medium);
+  /* cursor: not-allowed; */
 }
 
 .pagination span {

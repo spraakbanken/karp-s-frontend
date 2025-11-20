@@ -22,7 +22,7 @@ const [expanded, toggleExpanded] = useToggle()
       :class="{ mask: !expanded && height > maxHeight }"
       :style="{
         // Set max height to slightly less than requested, to avoid ridiculously small differences between closed and expanded heights.
-        maxHeight: !expanded ? maxHeight + 'px' : undefined,
+        maxHeight: !expanded ? maxHeight - 5 + 'px' : undefined,
       }"
     >
       <!-- Inner wrapper, of which height is measured (content's intrinsic height) -->
@@ -60,6 +60,9 @@ const [expanded, toggleExpanded] = useToggle()
 }
 
 .button-slim {
+  background-color: var(--sb-grey-dark);
+  color: white;
+  font-weight: bold;
 }
 .button-detail {
 }

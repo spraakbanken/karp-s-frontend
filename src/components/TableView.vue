@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROW_MAX_HEIGHT, ROW_SHOW_EXPANDED_DEFAULT } from '@/utils/constants'
+import { ROW_MAX_HEIGHT, ROW_SHOW_COMPACT_DEFAULT } from '@/utils/constants'
 import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { getTableData } from '@/api/apiService'
@@ -49,7 +49,7 @@ const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 const sortField = ref(lexicalStorage.sortField)
 
 // always show expanded rows (no "View more" button)
-const showExpanded = ref(ROW_SHOW_EXPANDED_DEFAULT)
+const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
 
 // pages
 
@@ -386,11 +386,18 @@ const picsbar = (ds: string) => {
         </tbody>
       </table>
 
-      <!-- show all cells expanded -->
-      <label for="showExpanded">
-        <input type="checkbox" id="showExpanded" value="true" v-model="showExpanded" />
-        {{ $t('table.show.expanded') }}</label
-      >
+      <div class="info-control">
+        <!-- total # of hits -->
+        <span>
+          <b>{{ $t('table.total.pre') }}:</b> {{ tableResult.total }}
+          {{ $t('table.total.post') }}
+        </span>
+        <!-- show all cells expanded -->
+        <label for="showCompact">
+          <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />
+          {{ $t('table.show.compact') }}
+        </label>
+      </div>
 
       <!-- table -->
       <template v-for="(item, key, index) in tableResultGrpSorted" :key="index">
@@ -454,13 +461,13 @@ const picsbar = (ds: string) => {
             <template v-for="(value1, key) in item" :key="key">
               <tr>
                 <td v-for="(value2, key) in value1.entry" :key="key">
-                  <template v-if="showExpanded || key === 0">
-                    <span v-html="formatCell(value2.value)"></span>
-                  </template>
-                  <template v-else>
+                  <template v-if="showCompact && key !== 0">
                     <MaxHeight :max-height="ROW_MAX_HEIGHT">
                       <span v-html="formatCell(value2.value)"></span>
                     </MaxHeight>
+                  </template>
+                  <template v-else>
+                    <span v-html="formatCell(value2.value)"></span>
                   </template>
                 </td>
               </tr>
@@ -471,19 +478,19 @@ const picsbar = (ds: string) => {
       <div class="pagination">
         <!--<div v-if="props.data.length" class="pagination">-->
         <button @click="firstPage" :disabled="currentPageStart === 1">
-          <i class="material-icons">first_page</i>
+          <span class="material-icons">first_page</span>
         </button>
         <button @click="prevPage" :disabled="currentPageStart === 1">
-          <i class="material-icons">chevron_left</i>
+          <span class="material-icons">chevron_left</span>
         </button>
         <span style="color: var(--color-text)"
           >{{ currentPageStart }} {{ $t('table.of') }} {{ totalPages }}</span
         >
         <button @click="nextPage" :disabled="currentPageStart === totalPages">
-          <i class="material-icons">chevron_right</i>
+          <span class="material-icons">chevron_right</span>
         </button>
         <button @click="lastPage" :disabled="currentPageStart === totalPages">
-          <i class="material-icons">last_page</i>
+          <span class="material-icons">last_page</span>
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
         <select
@@ -622,6 +629,23 @@ const picsbar = (ds: string) => {
   white-space: normal;
 }
 
+/* Info and control before table */
+.info-control {
+  background-color: var(--sb-grey-dark);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  display: inline-flex;
+  flex-direction: row;
+  padding: 0.5rem;
+  margin: 0.5rem;
+}
+
+.info-control span {
+  margin-right: 1rem;
+}
+
 /* table */
 
 .fancy-table {
@@ -729,20 +753,12 @@ tr:hover {
   border: none;
   background-color: transparent;
   color: inherit;
-  cursor: pointer;
   border-radius: 4px;
 }
 
-.pagination button:disabled {
-  background-color: transparent;
-  color: #ccc;
-  cursor: not-allowed;
-}
-
-.pagination span {
-  margin: 0 0.5rem;
-  background-color: transparent;
-  color: black;
+.pagination button:disabled span {
+  color: var(--sb-grey-medium);
+  /* cursor: not-allowed; */
 }
 
 .pagination select {

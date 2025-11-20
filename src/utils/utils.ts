@@ -100,7 +100,7 @@ export const formatCell = (
             if (BE_STATISTICS_COUNT_ID in v) {
               vcount = v[BE_STATISTICS_COUNT_ID]
             }
-            cell = cell + (cell ? ', ' : '') + vvalue + '/' + String(vcount)
+            cell = cell + (cell ? ', ' : '') + vvalue + ': ' + String(vcount)
           }
         })
       }

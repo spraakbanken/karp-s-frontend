@@ -52,7 +52,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       searchtab: lexicalStorage.activeSearchTab,
       sort: lexicalStorage.sortField + '|' + lexicalStorage.sortOrder,
       tablePageStart: lexicalStorage.tablePageStart,
-      tablePageSize: lexicalStorage.tablePageStart,
+      tablePageSize: lexicalStorage.tablePageSize,
       statisticsPageStart: lexicalStorage.statisticsPageStart,
       statisticsPageSize: lexicalStorage.statisticsPageSize,
     }
@@ -79,7 +79,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       sortField: lexicalStorage.sortField,
       sortOrder: lexicalStorage.sortOrder,
       tablePageStart: lexicalStorage.tablePageStart,
-      tablePageSize: lexicalStorage.tablePageStart,
+      tablePageSize: lexicalStorage.tablePageSize,
       statisticsPageStart: lexicalStorage.statisticsPageStart,
       statisticsPageSize: lexicalStorage.statisticsPageSize,
     }),
