@@ -162,16 +162,17 @@ const updateCompileParams = () => {
 
 // update state from URL
 const updateColumns = () => {
-  updateShowHitsCheckbox.value = false
+  //updateShowHitsCheckbox.value = false
   lexicalStorage.setSelectedColumns(selectedColumns.value)
 }
 
-const updateShowHitsCheckbox = ref(selectedColumns.value.length == 0)
+//const updateShowHitsCheckbox = ref(selectedColumns.value.length == 0)
+const updateShowHitsCheckbox = ref(true)
 // UI show hits choice in "Additonal columns" dropdown
 const updateShowHits = () => {
   //console.log('CHKBOX:', updateShowHitsCheckbox.value)
   if (updateShowHitsCheckbox.value) {
-    selectedColumns.value = []
+    //selectedColumns.value = []
   } else {
     //selectedColumns.value = [entryWordField]
   }
@@ -1112,7 +1113,7 @@ const refClick = (tRow: number, tCol: number) => {
                   <template v-if="showCompact">
                     <MaxHeight :max-height="ROW_MAX_HEIGHT">
                       <span
-                        v-html="formatCell(value)"
+                        v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"
                         @click="refClick(Number(tableRow), Number(tableCol))"
                         class="cell-clickable"
                       ></span>
@@ -1120,7 +1121,7 @@ const refClick = (tRow: number, tCol: number) => {
                   </template>
                   <template v-else>
                     <span
-                      v-html="formatCell(value)"
+                      v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"
                       @click="refClick(Number(tableRow), Number(tableCol))"
                       class="cell-clickable"
                     ></span>

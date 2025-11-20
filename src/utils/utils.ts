@@ -73,6 +73,7 @@ export const formatCell = (
   x: number | string | string[] | object,
   divider: string = '<br>',
   solo: boolean = false,
+  showCount: boolean = true,
 ): string => {
   let cell: string = ''
   //let count: number = 0
@@ -93,25 +94,28 @@ export const formatCell = (
         x.values.forEach((v) => {
           if (typeof v === 'object') {
             let vvalue: string = ''
-            let vcount: number = 0
+            let vcount: number = -1
             if (BE_STATISTICS_VALUE_ID in v) {
               vvalue = v[BE_STATISTICS_VALUE_ID]
             }
             if (BE_STATISTICS_COUNT_ID in v) {
               vcount = v[BE_STATISTICS_COUNT_ID]
             }
-            cell = cell + (cell ? ', ' : '') + vvalue + ': ' + String(vcount)
+            console.log(showCount)
+            cell = cell + (cell ? ', ' : '') + vvalue + (showCount ? ': ' + String(vcount) : '')
           }
         })
       }
       // base count
-      if (BE_STATISTICS_COUNT_ID in x) {
-        cell =
-          cell +
-          '<span class="sum-right"><b>' +
-          (!solo ? (cell ? ' ' : '') : '') +
-          String(x[BE_STATISTICS_COUNT_ID]) +
-          '</b></span>'
+      if (showCount) {
+        if (BE_STATISTICS_COUNT_ID in x) {
+          cell =
+            cell +
+            '<span class="sum-right"><b>' +
+            (!solo ? (cell ? ' ' : '') : '') +
+            String(x[BE_STATISTICS_COUNT_ID]) +
+            '</b></span>'
+        }
       }
     } else if (typeof x === 'string' && x.startsWith('https://')) {
       cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
