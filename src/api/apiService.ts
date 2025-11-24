@@ -68,7 +68,8 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     }
 
     params['size'] = pageSize.toString()
-    params['from'] = ((pageStart - 1) * pageSize).toString()
+    //params['from'] = ((pageStart - 1) * pageSize).toString()
+    params['from'] = pageStart.toString()
 
     lexicalStorage.abortController = new AbortController()
     const signal = lexicalStorage.abortController.signal

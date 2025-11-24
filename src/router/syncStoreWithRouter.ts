@@ -51,7 +51,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
         : 'statistics',
       searchtab: lexicalStorage.activeSearchTab,
       sort: lexicalStorage.sortField + '|' + lexicalStorage.sortOrder,
-      tablePageStart: lexicalStorage.tablePageStart,
+      tablePageRowStart: lexicalStorage.tablePageRowStart,
       tablePageSize: lexicalStorage.tablePageSize,
       statisticsPageStart: lexicalStorage.statisticsPageStart,
       statisticsPageSize: lexicalStorage.statisticsPageSize,
@@ -78,7 +78,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       searchTab: lexicalStorage.activeSearchTab,
       sortField: lexicalStorage.sortField,
       sortOrder: lexicalStorage.sortOrder,
-      tablePageStart: lexicalStorage.tablePageStart,
+      tablePageRowStart: lexicalStorage.tablePageRowStart,
       tablePageSize: lexicalStorage.tablePageSize,
       statisticsPageStart: lexicalStorage.statisticsPageStart,
       statisticsPageSize: lexicalStorage.statisticsPageSize,
@@ -169,8 +169,8 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       if (query.has('sort')) {
         lexicalStorage.setSort(query.get('sort')!)
       }
-      if (query.has('tablePageStart')) {
-        lexicalStorage.tablePageStart = Number(query.get('tablePageStart'))
+      if (query.has('tablePageRowStart')) {
+        lexicalStorage.tablePageRowStart = Number(query.get('tablePageRowStart'))
       }
       if (query.has('tablePageSize')) {
         lexicalStorage.tablePageSize = Number(query.get('tablePageSize'))

@@ -180,7 +180,7 @@ const updateData = () => {
   lexicalStorage.setSelectedFields(searchField.value)
   lexicalStorage.setIsSearch(true, true)
   lexicalStorage.setIsStart(false)
-  lexicalStorage.tablePageStart = 1
+  lexicalStorage.tablePageRowStart = 0
   lexicalStorage.statisticsPageStart = 1
   //}
 }

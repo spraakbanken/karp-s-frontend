@@ -46,7 +46,7 @@ interface SearchRedux {
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
   abortController: AbortController | null
-  tablePageStart: number
+  tablePageRowStart: number
   tablePageSize: number
   statisticsPageStart: number
   statisticsPageSize: number
@@ -93,7 +93,7 @@ export const lexicalStore = defineStore('dataset', {
     datasetLabels: {},
     datasetDates: [],
     abortController: null,
-    tablePageStart: 1,
+    tablePageRowStart: 0,
     tablePageSize: ROWS_PER_PAGE,
     statisticsPageStart: 1,
     statisticsPageSize: ROWS_PER_PAGE,

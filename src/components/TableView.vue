@@ -55,9 +55,9 @@ const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
 
 // pages
 
-const currentPageStart = computed({
-  get: () => lexicalStorage.tablePageStart,
-  set: (value) => (lexicalStorage.tablePageStart = value),
+const currentPageRowStart = computed({
+  get: () => lexicalStorage.tablePageRowStart,
+  set: (value) => (lexicalStorage.tablePageRowStart = value),
 })
 
 const currentPageSize = computed({
@@ -70,23 +70,29 @@ const totalPages = computed(() => {
 })
 
 const firstPage = () => {
-  currentPageStart.value = 1
+  currentPageRowStart.value = 0
 }
 
 const prevPage = () => {
-  if (currentPageStart.value > 1) {
-    currentPageStart.value--
+  if (currentPageRowStart.value > 0) {
+    currentPageRowStart.value -= currentPageSize.value
+    if (currentPageRowStart.value < 0) {
+      currentPageRowStart.value = 0
+    } else if (currentPageRowStart.value < currentPageSize.value) {
+      currentPageRowStart.value = 0
+    }
   }
 }
 
 const nextPage = () => {
-  if (currentPageStart.value < totalPages.value) {
-    currentPageStart.value++
+  if (currentPageRowStart.value < tableResult.value.total - 1) {
+    currentPageRowStart.value += currentPageSize.value
   }
 }
 
 const lastPage = () => {
-  currentPageStart.value = totalPages.value
+  currentPageRowStart.value =
+    Math.floor((tableResult.value.total - 1) / currentPageSize.value) * currentPageSize.value
 }
 
 const itemsPerPage = () => {
@@ -94,10 +100,10 @@ const itemsPerPage = () => {
 }
 
 watch(
-  () => currentPageStart.value,
+  () => currentPageRowStart.value,
   () => {
     //lexicalStorage.pageStart = currentPage.value
-    console.log('WATCH currentPageStart.value', currentPageStart.value)
+    console.log('WATCH currentPageStart.value', currentPageRowStart.value)
     fetchData()
   },
 )
@@ -111,13 +117,13 @@ watch(
     //tableResult.total
     console.log(
       'NEW pagestart',
-      currentPageStart.value,
+      currentPageRowStart.value,
       //Math.ceil(currentPageStart.value * (lexicalStorage.pageSize / currentPageSize.value)),
-      Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage)),
+      Math.ceil(currentPageRowStart.value * (oldItemsPerPage / newItemsPerPage)),
     )
-    currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
+    //currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
 
-    lexicalStorage.tablePageStart = currentPageStart.value
+    //lexicalStorage.tablePageRowStart = currentPageRowStart.value
     lexicalStorage.tablePageSize = currentPageSize.value
     fetchData()
   },
@@ -167,7 +173,7 @@ const fetchData = async () => {
   if (newDatasets.length > 0) {
     try {
       errorMessage.value = ''
-      const data = await getTableData(currentPageStart.value, currentPageSize.value)
+      const data = await getTableData(currentPageRowStart.value, currentPageSize.value)
       if (Object.keys(data).length !== 0) {
         tableResult.value = data
         groupData()
@@ -337,7 +343,7 @@ const picsbar = (ds: string) => {
       hitCount += tableResult.value.resourceHits[tableResult.value.resourceOrder[index]]
     }
   }
-  currentPageStart.value = Math.floor(hitCount / currentPageSize.value) + 1
+  currentPageRowStart.value = hitCount
   //console.log('Page: ', currentPage.value, hitCount)
 }
 </script>
@@ -479,19 +485,22 @@ const picsbar = (ds: string) => {
       </template>
       <div class="pagination">
         <!--<div v-if="props.data.length" class="pagination">-->
-        <button @click="firstPage" :disabled="currentPageStart === 1">
+        <button @click="firstPage" :disabled="currentPageRowStart === 1">
           <span class="material-icons">first_page</span>
         </button>
-        <button @click="prevPage" :disabled="currentPageStart === 1">
+        <button @click="prevPage" :disabled="currentPageRowStart === 1">
           <span class="material-icons">chevron_left</span>
         </button>
         <span style="color: var(--color-text)"
-          >{{ currentPageStart }} {{ $t('table.of') }} {{ totalPages }}</span
+          >{{ $t('table.footer.page') }}:
+          {{ Math.floor(currentPageRowStart / currentPageSize) + 1 }} {{ $t('table.of') }}
+          {{ totalPages }} ({{ $t('table.footer.hit') }}: {{ currentPageRowStart + 1 }}
+          {{ $t('table.of') }} {{ tableResult.total }})</span
         >
-        <button @click="nextPage" :disabled="currentPageStart === totalPages">
+        <button @click="nextPage" :disabled="currentPageRowStart >= tableResult.total - 1">
           <span class="material-icons">chevron_right</span>
         </button>
-        <button @click="lastPage" :disabled="currentPageStart === totalPages">
+        <button @click="lastPage" :disabled="currentPageRowStart >= tableResult.total - 1">
           <span class="material-icons">last_page</span>
         </button>
         <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
@@ -759,7 +768,7 @@ tr:hover {
 }
 
 .pagination button:disabled span {
-  color: var(--sb-grey-medium);
+  color: var(--sb-grey-light);
   /* cursor: not-allowed; */
 }
 

@@ -88,6 +88,8 @@
   "table.show.compact": "Limit visible content",
   "table.header.list": "list",
   "table.footer.itemsperpage": "Items per page",
+  "table.footer.page": "Page",
+  "table.footer.hit": "Hit",
   "statistics.exportCSV": "Export CSV",
   "statistics.showOverview": "Show overview",
   "statistics.showColumnCount": "Show count for fields",
