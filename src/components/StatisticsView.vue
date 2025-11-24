@@ -871,7 +871,7 @@ const refClick = (tRow: number, tCol: number) => {
         </div>
         -->
       </div>
-      <div v-if="statisticsResult.length">
+      <div v-if="statisticsResult.length" class="info-control">
         <div>
           <button @click="exportCSV()" class="export-button">
             {{ $t('statistics.exportCSV') }}
@@ -1248,39 +1248,6 @@ const refClick = (tRow: number, tCol: number) => {
   pointer-events: none; /* Prevent interaction with the line */
 }
 
-.overview-wrapper {
-  display: grid;
-  position: relative;
-  /* margin-top: 2rem; */
-  padding: 0.5rem;
-}
-
-.overview-settings {
-  padding: 0.5rem;
-  background-color: var(--sb-orange-light);
-}
-
-.overview-setting {
-  padding-right: 1rem;
-}
-
-.overview-max {
-  margin-top: 1rem;
-}
-
-.tab {
-  display: inline-block;
-  padding: 0.7rem 1rem;
-  background-color: var(--table-head-bg);
-  color: var(--color-heading);
-  font-weight: bold;
-  border: 1px solid var(--color-border);
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  width: fit-content;
-}
-
 /* table */
 
 .table-wrapper {
@@ -1441,16 +1408,65 @@ tr:nth-child(odd) td.total-null {
 
 /* elements */
 
+.tab {
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
+  font-weight: bold;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  width: fit-content;
+}
+
+.info-control {
+  background-color: var(--sb-grey-dark);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  display: inline-flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  margin: 0.5rem;
+}
+
 .export-button {
   margin-top: 0rem;
 }
 
-.overview-settings .export-button {
-  margin: 0;
+input[type='checkbox'][disabled] + label {
+  color: var(--sb-grey-light);
 }
 
-input[type='checkbox'][disabled] + label {
-  color: #505050;
+/* overview/graph */
+
+.overview-wrapper {
+  display: grid;
+  position: relative;
+  /* margin-top: 2rem; */
+  padding: 0.5rem;
+}
+
+.overview-settings {
+  padding: 0.5rem;
+  background-color: var(--sb-grey-dark);
+  color: white;
+  font-weight: bold;
+}
+
+.overview-setting {
+  padding-right: 1rem;
+}
+
+.overview-max {
+  margin-top: 1rem;
+}
+
+.overview-settings .export-button {
+  margin: 0;
 }
 
 /* pagination */

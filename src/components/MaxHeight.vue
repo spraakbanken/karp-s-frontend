@@ -19,10 +19,10 @@ const [expanded, toggleExpanded] = useToggle()
     <!-- Outer wrapper, whose height gets limited -->
     <div
       class="overflow-auto"
-      :class="{ mask: !expanded && height > maxHeight }"
+      :class="{ mask: !expanded && height > maxHeight * 2 }"
       :style="{
         // Set max height to slightly less than requested, to avoid ridiculously small differences between closed and expanded heights.
-        maxHeight: !expanded ? maxHeight - 5 + 'px' : undefined,
+        maxHeight: !expanded && height > maxHeight * 2 ? maxHeight - 5 + 'px' : undefined,
       }"
     >
       <!-- Inner wrapper, of which height is measured (content's intrinsic height) -->
@@ -30,7 +30,7 @@ const [expanded, toggleExpanded] = useToggle()
         <slot />
       </div>
     </div>
-    <div v-if="height > maxHeight" class="button-div">
+    <div v-if="height > maxHeight * 2" class="button-div">
       <ActionButton class="button-slim" @click="toggleExpanded()">
         <PhCaretDoubleUp v-if="expanded" class="button-detail" />
         <PhCaretDoubleDown v-else class="button-detail" />
