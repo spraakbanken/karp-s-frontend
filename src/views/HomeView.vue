@@ -59,7 +59,6 @@ const setActiveResultTab = (tab: string) => {
   activeResultTab.value = tab
 }
 
-/*
 watch(
   () => lexicalStorage.activeResultTab,
   (newTab) => {
@@ -67,7 +66,6 @@ watch(
     //console.log('WATCH lexicalStorage.activeResultTab', activeResultTab.value)
   },
 )
-*/
 
 const tabRefClose = (id: number) => {
   lexicalStorage.delTabRef(id)
@@ -117,8 +115,13 @@ const tabRefClose = (id: number) => {
         </button>
         <template v-for="(tabRef, key) in tabRefSetup" :key="key">
           <button :class="{ active: activeResultTab === 'ref' + key }">
-            <span @click="setActiveResultTab('ref' + key)"> {{ '🡪' + tabRef.columnValue }}</span
-            >&nbsp;<span @click="tabRefClose(Number(key))">✖</span>
+            <span @click="setActiveResultTab('ref' + key)">
+              <span class="material-icons icon-placement">arrow_forward</span
+              >{{ tabRef.columnValue }}</span
+            >&nbsp;
+            <span @click="tabRefClose(Number(key))" class="material-icons icon-placement"
+              >close</span
+            >
           </button>
         </template>
       </div>
@@ -231,6 +234,11 @@ const tabRefClose = (id: number) => {
   background-color: var(--button-active-bg-color);
   */
   background-color: var(--sb-orange-light);
+}
+
+.icon-placement {
+  vertical-align: top;
+  font-size: 22px;
 }
 
 /* News, featured */

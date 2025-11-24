@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { lexicalStore } from '@/stores/store'
 import { useI18n } from 'vue-i18n'
 
 import { groupBy } from 'es-toolkit'
 
-import { lexicalStore } from '@/stores/store'
-import { getTabRefData } from '@/api/apiService'
 import {
   type DatasetEntry,
   type Entry,
   type EntryS,
   type FieldConfig,
   entryWordField,
-  type TableResultGrpSorted,
 } from '@/types/datasetConfig'
+import { getTabRefData } from '@/api/apiService'
 import { formatCell } from '@/utils/utils'
 
 const props = defineProps<{
@@ -42,12 +41,14 @@ const tableResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]
 const tableResultGrpSorted = ref(lexicalStorage.tabRefSetup[props.id].tableResultGrpSorted)
 
 const fetchData = async () => {
+  lexicalStorage.tabRefSetup[props.id].isLoading = true
   const data = await getTabRefData(props.resourceId, props.columnField, props.columnValue, 1, 9999)
   if (Object.keys(data).length > 0) {
     tableResult.value = data
     groupData()
     // save data
     lexicalStorage.tabRefSetup[props.id].tableResultGrpSorted = tableResultGrpSorted.value
+    lexicalStorage.tabRefSetup[props.id].isLoading = false
   }
   //    tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
 }
@@ -103,6 +104,10 @@ onMounted(async () => {
 
 <template>
   <div class="table-wrapper">
+    <p v-if="lexicalStorage.tabRefSetup[props.id].isLoading" class="message-big">
+      {{ $t('message.loading') }}
+    </p>
+
     <template v-for="(rItem, key, index) in tableResultGrpSorted" :key="index">
       <table class="fancy-table">
         <tbody>
@@ -156,6 +161,7 @@ onMounted(async () => {
     </template>
   </div>
 </template>
+
 <style scoped>
 .table-wrapper {
   display: grid;

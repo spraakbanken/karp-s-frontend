@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ROW_MAX_HEIGHT, ROW_SHOW_COMPACT_DEFAULT } from '@/utils/constants'
 import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import { getTableData } from '@/api/apiService'
+import { useI18n } from 'vue-i18n'
+
+import { groupBy } from 'es-toolkit'
+
+import { ROW_MAX_HEIGHT, ROW_SHOW_COMPACT_DEFAULT } from '@/utils/constants'
 import {
   type DatasetEntry,
   type Entry,
@@ -10,11 +13,10 @@ import {
   type FieldConfig,
   entryWordField,
 } from '@/types/datasetConfig'
+import { getTableData } from '@/api/apiService'
 import { formatCell } from '@/utils/utils'
-import { useI18n } from 'vue-i18n'
+
 import MaxHeight from '@/components/MaxHeight.vue'
-//import { template } from 'es-toolkit/compat'
-import { groupBy } from 'es-toolkit'
 
 const { t } = useI18n()
 

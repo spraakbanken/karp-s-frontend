@@ -146,4 +146,5 @@ export type TabRefSetup = {
   columnValue: string
   /*  tableResult: DatasetResult */
   tableResultGrpSorted: TableResultGrpSorted
+  isLoading: boolean
 }
