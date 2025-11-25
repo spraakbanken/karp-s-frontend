@@ -485,25 +485,36 @@ const picsbar = (ds: string) => {
       </template>
       <div class="pagination">
         <!--<div v-if="props.data.length" class="pagination">-->
-        <button @click="firstPage" :disabled="currentPageRowStart === 1">
+        <button @click="firstPage" :disabled="currentPageRowStart === 0">
           <span class="material-icons">first_page</span>
         </button>
-        <button @click="prevPage" :disabled="currentPageRowStart === 1">
+        <button @click="prevPage" :disabled="currentPageRowStart === 0">
           <span class="material-icons">chevron_left</span>
         </button>
         <span style="color: var(--color-text)"
           >{{ $t('table.footer.page') }}:
           {{ Math.floor(currentPageRowStart / currentPageSize) + 1 }} {{ $t('table.of') }}
-          {{ totalPages }} ({{ $t('table.footer.hit') }}: {{ currentPageRowStart + 1 }}
+          {{ totalPages }} ({{ $t('table.footer.hit') }}: {{ currentPageRowStart + 1 }}-{{
+            currentPageRowStart + currentPageSize > tableResult.total
+              ? tableResult.total
+              : currentPageRowStart + currentPageSize
+          }}
           {{ $t('table.of') }} {{ tableResult.total }})</span
         >
-        <button @click="nextPage" :disabled="currentPageRowStart >= tableResult.total - 1">
+        <button
+          @click="nextPage"
+          :disabled="currentPageRowStart + currentPageSize >= tableResult.total - 1"
+        >
           <span class="material-icons">chevron_right</span>
         </button>
-        <button @click="lastPage" :disabled="currentPageRowStart >= tableResult.total - 1">
+        <button
+          @click="lastPage"
+          :disabled="currentPageRowStart + currentPageSize >= tableResult.total - 1"
+        >
           <span class="material-icons">last_page</span>
         </button>
-        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
+        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label
+        >:
         <select
           @click="itemsPerPage"
           id="itemsPerPage"
@@ -657,6 +668,10 @@ const picsbar = (ds: string) => {
   margin-right: 1rem;
 }
 
+.info-control input {
+  cursor: pointer;
+}
+
 /* table */
 
 .fancy-table {
@@ -743,13 +758,12 @@ tr:hover {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 
   background-color: var(--table-head-bg);
   color: var(--color-heading);
   font-weight: bold;
-  border: 1px solid var(--color-border);
-  border-bottom: none;
-  border-radius: 0 0 4px 4px;
 }
 
 .pagination button,
@@ -767,8 +781,13 @@ tr:hover {
   border-radius: 4px;
 }
 
+.pagination button,
+.pagination select {
+  cursor: pointer;
+}
+
 .pagination button:disabled span {
-  color: var(--sb-grey-light);
+  color: var(--sb-grey-medium);
   /* cursor: not-allowed; */
 }
 

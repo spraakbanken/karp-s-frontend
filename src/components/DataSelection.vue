@@ -585,6 +585,7 @@ watch(
 
 .dropdown-item input {
   margin-right: 0.5rem;
+  cursor: pointer;
 }
 
 .dropdown-tags {
@@ -611,6 +612,8 @@ watch(
   background-color: black;
   color: white;
   font-weight: bold;
+
+  cursor: pointer;
 }
 
 .dropdown-selectors .tags-button-action:disabled {
@@ -625,6 +628,7 @@ watch(
 .dropdown-group .tags-button {
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 
 .dropdown-group .tags-button-action {
@@ -647,6 +651,10 @@ watch(
 
 .dropdown-filter {
   color: black;
+}
+
+.dropdown-filter button {
+  cursor: pointer;
 }
 
 .dropdown-selectedfirst {

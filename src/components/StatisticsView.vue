@@ -1141,8 +1141,9 @@ const refClick = (tRow: number, tCol: number) => {
         <button @click="prevPage" :disabled="currentPageStart === 1">
           <span class="material-icons">chevron_left</span>
         </button>
-        <span style="color: var(--color-text)">
-          {{ currentPageStart }} {{ $t('table.of') }} {{ totalPages }}
+        <span style="color: var(--color-text)"
+          >{{ $t('table.footer.page') }}: {{ currentPageStart }} {{ $t('table.of') }}
+          {{ totalPages }}
         </span>
         <button @click="nextPage" :disabled="currentPageStart === totalPages">
           <span class="material-icons">chevron_right</span>
@@ -1150,7 +1151,8 @@ const refClick = (tRow: number, tCol: number) => {
         <button @click="lastPage" :disabled="currentPageStart === totalPages">
           <span class="material-icons">last_page</span>
         </button>
-        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label>
+        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label
+        >:
         <select
           @click="itemsPerPage"
           id="itemsPerPage"
@@ -1433,8 +1435,13 @@ tr:nth-child(odd) td.total-null {
   margin: 0.5rem;
 }
 
+.info-control input {
+  cursor: pointer;
+}
+
 .export-button {
   margin-top: 0rem;
+  cursor: pointer;
 }
 
 input[type='checkbox'][disabled] + label {
@@ -1475,7 +1482,12 @@ input[type='checkbox'][disabled] + label {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
+  font-weight: bold;
 }
 
 .pagination button,
@@ -1494,15 +1506,14 @@ input[type='checkbox'][disabled] + label {
   border-radius: 4px;
 }
 
+.pagination button,
+.pagination select {
+  cursor: pointer;
+}
+
 .pagination button:disabled span {
   color: var(--sb-grey-medium);
   /* cursor: not-allowed; */
-}
-
-.pagination span {
-  margin: 0 0.5rem;
-  background-color: transparent;
-  color: black;
 }
 
 .pagination select {

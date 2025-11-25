@@ -588,11 +588,12 @@ input:focus {
 
 .searchTabs button {
   padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
+  margin-right: 0.25rem;
   border: none;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   background-color: var(--sb-grey-light);
+  cursor: pointer;
 }
 
 .searchTabs button.active {
@@ -774,6 +775,7 @@ input:focus {
   @media (width < 640px) {
     width: 100%;
   }
+  cursor: pointer;
 }
 
 .search-button:hover {
@@ -804,5 +806,6 @@ input:focus {
   display: table-cell;
   vertical-align: middle;
   padding: 2px;
+  cursor: pointer;
 }
 </style>
