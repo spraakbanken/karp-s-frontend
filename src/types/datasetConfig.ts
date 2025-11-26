@@ -148,3 +148,8 @@ export type TabRefSetup = {
   tableResultGrpSorted: TableResultGrpSorted
   isLoading: boolean
 }
+
+export type ColumnVisField = {
+  columnField: string
+  vis: boolean
+}

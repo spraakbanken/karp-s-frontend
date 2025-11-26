@@ -10,6 +10,8 @@ import {
   type DatasetResult,
   type TabRefSetup,
   entryWordField,
+  type ColumnVisRes,
+  type ColumnVisField,
 } from '@/types/datasetConfig.ts'
 import { ROWS_PER_PAGE } from '@/utils/constants'
 
@@ -50,6 +52,7 @@ interface SearchRedux {
   tablePageSize: number
   statisticsPageStart: number
   statisticsPageSize: number
+  columnVis: Record<string, ColumnVisField[]>
   isData: boolean
   isTableSearch: boolean // trigger a search (call server)
   isStatisticsSearch: boolean // trigger a search (call server)
@@ -97,6 +100,7 @@ export const lexicalStore = defineStore('dataset', {
     tablePageSize: ROWS_PER_PAGE,
     statisticsPageStart: 1,
     statisticsPageSize: ROWS_PER_PAGE,
+    columnVis: {},
     //listLimit: 5,
     isData: false,
     isTableSearch: false,
@@ -297,6 +301,19 @@ export const lexicalStore = defineStore('dataset', {
           this.selectedTags.push(t)
         }
       }
+
+      // prepare column visibility fields
+      this.columnVis = {}
+      for (const ds of keys) {
+        // const cvf: ColumnVisField[] = { columnField: 'a', vis: true }
+        const result: ColumnVisField[] = this.fieldsInDatasets[ds].map((f) => ({
+          columnField: f.name,
+          vis: true,
+        }))
+        this.columnVis[ds] = [...result]
+        this.columnVis[ds].unshift({ columnField: entryWordField, vis: true })
+      }
+      console.log('columnVis: ', this.columnVis)
 
       //}
     },

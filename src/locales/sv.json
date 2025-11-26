@@ -90,6 +90,8 @@
   "table.footer.itemsperpage": "Träffar per sida",
   "table.footer.page": "Sida",
   "table.footer.hit": "Träff",
+  "table.columnVis.select.all": "Alla",
+  "table.columnVis.select.none": "Ingen",
   "statistics.exportCSV": "Exportera CSV",
   "statistics.showOverview": "Visa översikt",
   "statistics.showColumnCount": "Visa antal för fält",

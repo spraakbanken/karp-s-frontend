@@ -90,6 +90,8 @@
   "table.footer.itemsperpage": "Items per page",
   "table.footer.page": "Page",
   "table.footer.hit": "Hit",
+  "table.columnVis.select.all": "All",
+  "table.columnVis.select.none": "None",
   "statistics.exportCSV": "Export CSV",
   "statistics.showOverview": "Show overview",
   "statistics.showColumnCount": "Show count for fields",

@@ -17,6 +17,7 @@ import { getTableData } from '@/api/apiService'
 import { formatCell } from '@/utils/utils'
 
 import MaxHeight from '@/components/MaxHeight.vue'
+import ColumnVisDropDown from './ColumnVisDropDown.vue'
 
 const { t } = useI18n()
 
@@ -408,76 +409,88 @@ const picsbar = (ds: string) => {
       </div>
 
       <!-- table -->
-      <template v-for="(item, key, index) in tableResultGrpSorted" :key="index">
+      <template v-for="(item, ds, index) in tableResultGrpSorted" :key="index">
         <table v-if="tableResult.total > 0" class="fancy-table">
           <tbody>
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
-                {{ lexicalStorage.datasetLabels[key] }}:
-                {{ tableResult.resourceHits[key] }}
+                {{ lexicalStorage.datasetLabels[ds] }}:
+                {{ tableResult.resourceHits[ds] }}
+                <ColumnVisDropDown :resourceId="ds" />
+                <span v-for="(value, i) in item[0].entry" :key="i"> </span>
               </td>
             </tr>
             <!-- column names -->
             <tr>
-              <th
-                v-for="(value, key) in item[0].entry"
-                :key="key"
-                :class="{
-                  'header-list': lexicalStorage.isList(value.name),
-                  'header-compile': value.name == entryWordField,
-                }"
-              >
-                <div class="header-content">
-                  <span
-                    :class="{
-                      'header-list-text': lexicalStorage.isList(value.name),
-                    }"
-                    >{{ lexicalStorage.localizeField(value.name) }}
-                    <template v-if="value.name == entryWordField">
-                      {{
-                        '(' +
-                        lexicalStorage.localizeField(
-                          lexicalStorage.currentConfig.resources.find(
-                            (i) => i.resourceId === item[0]['resourceId'],
-                          )?.entryWord.field!,
-                        ) +
-                        ')'
-                      }}</template
-                    >
-                    <!--
+              <template v-for="(value, key) in item[0].entry">
+                <th
+                  v-if="lexicalStorage.columnVis[ds].find((f) => f.columnField === value.name)?.vis"
+                  :key="key"
+                  :class="{
+                    'header-list': lexicalStorage.isList(value.name),
+                    'header-compile': value.name == entryWordField,
+                  }"
+                >
+                  <div class="header-content">
+                    <span
+                      :class="{
+                        'header-list-text': lexicalStorage.isList(value.name),
+                      }"
+                      >{{ lexicalStorage.localizeField(value.name) }}
+                      <template v-if="value.name == entryWordField">
+                        {{
+                          '(' +
+                          lexicalStorage.localizeField(
+                            lexicalStorage.currentConfig.resources.find(
+                              (i) => i.resourceId === item[0]['resourceId'],
+                            )?.entryWord.field!,
+                          ) +
+                          ')'
+                        }}</template
+                      >
+                      <!--
                     {{
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
                     }}--></span
-                  >
-                  <span
-                    class="header-sortable"
-                    :class="{ 'header-sortable-selected': lexicalStorage.sortField == value.name }"
-                    v-if="currentCommonFields.find((obj) => obj.name === value.name)"
-                    @click="doSort(value.name)"
-                    >{{
-                      lexicalStorage.sortOrder == 'asc' || lexicalStorage.sortField != value.name
-                        ? '▼'
-                        : '▲'
-                    }}</span
-                  >
-                </div>
-              </th>
+                    >
+                    <span
+                      class="header-sortable"
+                      :class="{
+                        'header-sortable-selected': lexicalStorage.sortField == value.name,
+                      }"
+                      v-if="currentCommonFields.find((obj) => obj.name === value.name)"
+                      @click="doSort(value.name)"
+                      >{{
+                        lexicalStorage.sortOrder == 'asc' || lexicalStorage.sortField != value.name
+                          ? '▼'
+                          : '▲'
+                      }}</span
+                    >
+                  </div>
+                </th>
+              </template>
             </tr>
 
             <!-- show dataset entries -->
             <template v-for="(value1, key) in item" :key="key">
               <tr>
-                <td v-for="(value2, key) in value1.entry" :key="key">
-                  <template v-if="showCompact && key !== 0">
-                    <MaxHeight :max-height="ROW_MAX_HEIGHT">
+                <template v-for="(value2, key) in value1.entry" :key="key">
+                  <td
+                    v-if="
+                      lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)?.vis
+                    "
+                  >
+                    <template v-if="showCompact && key !== 0">
+                      <MaxHeight :max-height="ROW_MAX_HEIGHT">
+                        <span v-html="formatCell(value2.value)"></span>
+                      </MaxHeight>
+                    </template>
+                    <template v-else>
                       <span v-html="formatCell(value2.value)"></span>
-                    </MaxHeight>
-                  </template>
-                  <template v-else>
-                    <span v-html="formatCell(value2.value)"></span>
-                  </template>
-                </td>
+                    </template>
+                  </td>
+                </template>
               </tr>
             </template>
           </tbody>
