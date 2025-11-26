@@ -184,9 +184,10 @@ onMounted(async () => {
   border: 1px solid var(--color-border);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-size: 1rem;
-  margin: 0 0 0 0;
+  margin: 0 0 0.5rem 0;
   text-align: left;
-  width: 100%;
+  width: fit-content;
+  table-layout: auto;
 }
 
 th,
@@ -251,7 +252,7 @@ tr:hover {
 }
 
 .dataset-label {
-  text-align: center;
+  text-align: left;
   background-color: white;
   color: black;
   font-weight: bold;

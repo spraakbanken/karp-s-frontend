@@ -211,6 +211,7 @@ const tabRefClose = (id: number) => {
   border: none;
   color: black; /*var(--button-inactive-text-color);*/
   background-color: var(--sb-grey-light); /*var(--button-inactive-bg-color);*/
+  border-width: 0;
   cursor: pointer;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -223,6 +224,7 @@ const tabRefClose = (id: number) => {
   transition:
     background-color 0.3s,
     color 0.3s;
+  margin-right: 0.25rem;
 }
 
 .searchTabs button.active,
@@ -233,7 +235,7 @@ const tabRefClose = (id: number) => {
     color: var(--button-active-text-color);
   background-color: var(--button-active-bg-color);
   */
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-background-alt);
 }
 
 .icon-placement {

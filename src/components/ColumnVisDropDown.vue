@@ -81,6 +81,8 @@ onMounted(() => {
 .dropdown-button {
   cursor: pointer;
   background: none;
+  padding: 0;
+  margin: 0;
   /*
   padding: 10px 15px;
   color: white;
@@ -110,8 +112,8 @@ onMounted(() => {
 }
 .dropdown-menu {
   position: absolute;
-  background-color: #fff;
-  border: 1px solid var(--sb-orange);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
   z-index: 1;
   width: 200px;
   max-height: 250px;

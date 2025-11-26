@@ -415,9 +415,9 @@ const picsbar = (ds: string) => {
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
+                <ColumnVisDropDown :resourceId="ds" />
                 {{ lexicalStorage.datasetLabels[ds] }}:
                 {{ tableResult.resourceHits[ds] }}
-                <ColumnVisDropDown :resourceId="ds" />
                 <span v-for="(value, i) in item[0].entry" :key="i"> </span>
               </td>
             </tr>
@@ -438,6 +438,7 @@ const picsbar = (ds: string) => {
                         'header-list-text': lexicalStorage.isList(value.name),
                       }"
                       >{{ lexicalStorage.localizeField(value.name) }}
+
                       <template v-if="value.name == entryWordField">
                         {{
                           '(' +
@@ -447,13 +448,15 @@ const picsbar = (ds: string) => {
                             )?.entryWord.field!,
                           ) +
                           ')'
-                        }}</template
-                      >
+                        }}
+                      </template>
+
                       <!--
                     {{
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
                     }}--></span
                     >
+
                     <span
                       class="header-sortable"
                       :class="{
@@ -465,8 +468,8 @@ const picsbar = (ds: string) => {
                         lexicalStorage.sortOrder == 'asc' || lexicalStorage.sortField != value.name
                           ? '▼'
                           : '▲'
-                      }}</span
-                    >
+                      }}
+                    </span>
                   </div>
                 </th>
               </template>
@@ -555,7 +558,7 @@ const picsbar = (ds: string) => {
   border-color: var(--color-complement);
   border-width: 0.5rem 0 0 0;
   */
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-background-alt);
 }
 
 .table-container {
@@ -596,15 +599,15 @@ const picsbar = (ds: string) => {
 }
 
 .tabs button.active {
-  background-color: none;
   font-weight: bold;
-  background-color: white;
+  background-color: var(--color-background-alt);
 }
 
 /* picsbar */
 .picsbar {
   table-layout: fixed;
   overflow-x: clip;
+  margin: 0;
 }
 
 .picsbar tr {
@@ -674,7 +677,7 @@ const picsbar = (ds: string) => {
   display: inline-flex;
   flex-direction: row;
   padding: 0.5rem;
-  margin: 0.5rem;
+  margin: 0.5rem 0 0.5rem 0;
 }
 
 .info-control span {
@@ -692,9 +695,10 @@ const picsbar = (ds: string) => {
   border: 1px solid var(--color-border);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-size: 1rem;
-  margin: 0 0 0 0;
+  margin: 0 0 0.5rem 0;
   text-align: left;
-  width: 100%;
+  width: fit-content;
+  table-layout: auto;
 }
 
 th,
@@ -723,12 +727,16 @@ th {
 }
 
 .header-sortable {
-  color: var(--sb-grey-medium);
   cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.header-sortable .icon {
+  color: var(--sb-grey-medium);
 }
 
 .header-sortable-selected {
-  color: var(--sb-orange);
+  color: black;
 }
 
 .header-list {
@@ -759,9 +767,9 @@ tr:hover {
 }
 
 .dataset-label {
-  text-align: center;
-  background-color: white;
-  color: black;
+  text-align: left;
+  background-color: var(--color-background);
+  color: var(--color-text);
   font-weight: bold;
 }
 

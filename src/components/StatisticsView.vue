@@ -1176,7 +1176,7 @@ const refClick = (tRow: number, tCol: number) => {
 
 <style scoped>
 .statistics {
-  background-color: var(--sb-orange-light);
+  background-color: var(--color-background-alt);
   padding: 0.5rem;
   color: black;
   display: flex;
@@ -1333,7 +1333,7 @@ tr:nth-child(odd) td.total-null {
 }
 
 .cell-clickable {
-  color: var(--sb-link);
+  color: var(--text-link);
   cursor: pointer;
 }
 

@@ -735,6 +735,7 @@ input:focus {
 .search-input:focus {
   outline-color: var(--sb-orange);
   outline-style: solid;
+  outline-width: 1px;
 }
 
 .operator-button {
