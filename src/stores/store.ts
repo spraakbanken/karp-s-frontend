@@ -10,7 +10,6 @@ import {
   type DatasetResult,
   type TabRefSetup,
   entryWordField,
-  type ColumnVisRes,
   type ColumnVisField,
 } from '@/types/datasetConfig.ts'
 import { ROWS_PER_PAGE } from '@/utils/constants'

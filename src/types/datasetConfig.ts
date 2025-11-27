@@ -147,6 +147,9 @@ export type TabRefSetup = {
   /*  tableResult: DatasetResult */
   tableResultGrpSorted: TableResultGrpSorted
   isLoading: boolean
+  tablePageRowStart: number
+  tablePageSize: number
+  tableTotal: number
 }
 
 export type ColumnVisField = {

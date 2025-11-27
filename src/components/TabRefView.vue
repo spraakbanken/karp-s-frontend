@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch, type Ref } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { useI18n } from 'vue-i18n'
 
 import { groupBy } from 'es-toolkit'
 
+import { ROWS_PER_PAGE } from '@/utils/constants'
 import {
   type DatasetEntry,
+  type DatasetResult,
   type Entry,
   type EntryS,
   type FieldConfig,
@@ -33,7 +35,12 @@ const tableResult = computed({
 })
 */
 
-const tableResult = ref({})
+const tableResult: Ref<DatasetResult> = ref({
+  hits: [],
+  resourceHits: {},
+  resourceOrder: {},
+  total: 0,
+})
 
 // currentResult as returned from groupBy()
 const tableResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]>>({})
@@ -42,21 +49,26 @@ const tableResultGrpSorted = ref(lexicalStorage.tabRefSetup[props.id].tableResul
 
 const fetchData = async () => {
   lexicalStorage.tabRefSetup[props.id].isLoading = true
-  const data = await getTabRefData(props.resourceId, props.columnField, props.columnValue, 1, 9999)
+  const data = await getTabRefData(
+    props.resourceId,
+    props.columnField,
+    props.columnValue,
+    tablePageRowStart.value,
+    tablePageSize.value,
+  )
   if (Object.keys(data).length > 0) {
     tableResult.value = data
+    lexicalStorage.tabRefSetup[props.id].tableTotal = tableResult.value.total
     groupData()
     // save data
     lexicalStorage.tabRefSetup[props.id].tableResultGrpSorted = tableResultGrpSorted.value
     lexicalStorage.tabRefSetup[props.id].isLoading = false
   }
-  //    tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
 }
 
 const groupData = () => {
   tableResultGrp.value = groupBy(tableResult.value.hits, (item) => item.resourceId)
   tableResultGrpSorted.value = {}
-  //console.log('fetchdata() - after getTableData()', tableResultGrp.value)
 
   // sort columns based on config
   // transform key,value-pairs to (ordered) array of key,value-pairs
@@ -95,9 +107,70 @@ const groupData = () => {
   }
 }
 
-onMounted(async () => {
-  if (Object.keys(tableResultGrpSorted.value).length === 0) {
+const tablePageRowStart = ref(lexicalStorage.tabRefSetup[props.id].tablePageRowStart)
+const tablePageSize = ref(lexicalStorage.tabRefSetup[props.id].tablePageSize)
+
+const totalPages = computed(() => {
+  return Math.ceil(lexicalStorage.tabRefSetup[props.id].tableTotal / tablePageSize.value)
+})
+
+const firstPage = () => {
+  tablePageRowStart.value = 0
+}
+
+const prevPage = () => {
+  if (tablePageRowStart.value > 0) {
+    tablePageRowStart.value -= tablePageSize.value
+    if (tablePageRowStart.value < 0) {
+      tablePageRowStart.value = 0
+    } else if (tablePageRowStart.value < tablePageSize.value) {
+      tablePageRowStart.value = 0
+    }
+  }
+}
+
+const nextPage = () => {
+  if (tablePageRowStart.value < lexicalStorage.tabRefSetup[props.id].tableTotal - 1) {
+    tablePageRowStart.value += tablePageSize.value
+  }
+}
+
+const lastPage = () => {
+  tablePageRowStart.value =
+    Math.floor((lexicalStorage.tabRefSetup[props.id].tableTotal - 1) / tablePageSize.value) *
+    tablePageSize.value
+}
+
+const itemsPerPage = () => {
+  //fetchData()
+  // handled by watch()
+}
+
+watch(
+  () => tablePageRowStart.value,
+  () => {
+    lexicalStorage.tabRefSetup[props.id].tablePageRowStart = tablePageRowStart.value
     fetchData()
+  },
+)
+
+watch(
+  () => tablePageSize.value,
+  () => {
+    lexicalStorage.tabRefSetup[props.id].tablePageSize = tablePageSize.value
+    fetchData()
+  },
+)
+
+onMounted(async () => {
+  // query only on first showing
+  if (Object.keys(tableResultGrpSorted.value).length === 0) {
+    tablePageRowStart.value = 0
+    tablePageSize.value = ROWS_PER_PAGE
+    fetchData()
+  } else {
+    tablePageRowStart.value = lexicalStorage.tabRefSetup[props.id].tablePageRowStart
+    tablePageSize.value = lexicalStorage.tabRefSetup[props.id].tablePageSize
   }
 })
 </script>
@@ -159,6 +232,55 @@ onMounted(async () => {
         </tbody>
       </table>
     </template>
+
+    <!-- pagination -->
+    <div class="pagination">
+      <!--<div v-if="props.data.length" class="pagination">-->
+      <button @click="firstPage" :disabled="tablePageRowStart === 0">
+        <span class="material-icons">first_page</span>
+      </button>
+      <button @click="prevPage" :disabled="tablePageRowStart === 0">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <span style="color: var(--color-text)"
+        >{{ $t('table.footer.page') }}: {{ Math.floor(tablePageRowStart / tablePageSize) + 1 }}
+        {{ $t('table.of') }} {{ totalPages }} ({{ $t('table.footer.hit') }}:
+        {{ tablePageRowStart + 1 }}-{{
+          tablePageRowStart + tablePageSize > lexicalStorage.tabRefSetup[props.id].tableTotal
+            ? lexicalStorage.tabRefSetup[props.id].tableTotal
+            : tablePageRowStart + tablePageSize
+        }}
+        {{ $t('table.of') }} {{ lexicalStorage.tabRefSetup[props.id].tableTotal }})</span
+      >
+      <button
+        @click="nextPage"
+        :disabled="
+          tablePageRowStart + tablePageSize >= lexicalStorage.tabRefSetup[props.id].tableTotal - 1
+        "
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+      <button
+        @click="lastPage"
+        :disabled="
+          tablePageRowStart + tablePageSize >= lexicalStorage.tabRefSetup[props.id].tableTotal - 1
+        "
+      >
+        <span class="material-icons">last_page</span>
+      </button>
+      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label
+      >:
+      <select
+        @click="itemsPerPage"
+        id="itemsPerPage"
+        v-model="tablePageSize"
+        class="items-per-page"
+      >
+        <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </div>
   </div>
 </template>
 
@@ -256,5 +378,68 @@ tr:hover {
   background-color: white;
   color: black;
   font-weight: bold;
+}
+
+/* pagination */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+
+  background-color: var(--table-head-bg);
+  color: var(--color-heading);
+  font-weight: bold;
+}
+
+.pagination button,
+.pagination span,
+.pagination select {
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  border-radius: 4px;
+}
+
+.pagination button,
+.pagination select {
+  cursor: pointer;
+}
+
+.pagination button:disabled span {
+  color: var(--sb-grey-medium);
+  /* cursor: not-allowed; */
+}
+
+.pagination select {
+  background-color: white;
+  color: black;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding-right: 2rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.pagination-controls label {
+  margin-right: 0.5rem;
 }
 </style>

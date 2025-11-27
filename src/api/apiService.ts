@@ -68,7 +68,6 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     }
 
     params['size'] = pageSize.toString()
-    //params['from'] = ((pageStart - 1) * pageSize).toString()
     params['from'] = pageStart.toString()
 
     lexicalStorage.abortController = new AbortController()
@@ -213,6 +212,7 @@ export const getStatisticsData = async (
   }
 }
 
+// pageStart starts at 0 in this function
 export const getTabRefData = async (
   resourceId: string[],
   columneField: string,
@@ -229,7 +229,7 @@ export const getTabRefData = async (
     // query/field parameters
     params['q'] = 'equals|' + columneField + '|' + columnValue
 
-    params['from'] = ((pageStart - 1) * pageSize).toString()
+    params['from'] = pageStart.toString()
     params['size'] = pageSize.toString()
 
     const response = await axiosInstance.get(`/search`, {

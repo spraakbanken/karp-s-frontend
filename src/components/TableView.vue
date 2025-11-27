@@ -235,34 +235,6 @@ const groupData = () => {
   }
 }
 
-/*
-watch(
-  () => currentPageStart.value,
-  (newPageStart, oldPageStart) => {
-    if (oldPageStart !== undefined) {
-      //lexicalStorage.pageStart = currentPage.value
-      console.log('WATCH currentPageStart', currentPageStart.value)
-      lexicalStorage.pageStart = currentPageStart.value
-      //fetchData()
-    }
-  },
-)
-
-watch(
-  () => currentPageSize.value,
-  (newPageSize, oldPageSize) => {
-    if (oldPageSize !== undefined) {
-      //lexicalStorage.pageSize = itemsPerPage.value
-      console.log('WATCH currentPageSize', currentPageSize.value, oldPageSize, newPageSize)
-      lexicalStorage.pageSize = currentPageSize.value
-      currentPageStart.value = Math.ceil(currentPageStart.value * (oldPageSize / newPageSize))
-      console.log('WATCH currentPageSize, currentPageStart: ', currentPageStart.value)
-      lexicalStorage.pageStart = currentPageStart.value
-      //fetchData()
-    }
-  },
-)
-*/
 watch(
   () => lexicalStorage.isData,
   (newIsData) => {
@@ -499,6 +471,8 @@ const picsbar = (ds: string) => {
           </tbody>
         </table>
       </template>
+
+      <!-- pagination -->
       <div class="pagination">
         <!--<div v-if="props.data.length" class="pagination">-->
         <button @click="firstPage" :disabled="currentPageRowStart === 0">
