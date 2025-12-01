@@ -5,6 +5,7 @@ export const ROW_MAX_HEIGHT: number = 32 // if shortening columns, how high shou
 export const ROW_SHOW_COMPACT_DEFAULT: boolean = true // default for shortening columns or expand them
 export const ROWS_PER_PAGE: number = 100 // how many rows to show for each page (default)
 export const GRAPH_BARWIDTH: number = 60 // default bar width of overview graph
+export const TABREFCOUNT_MAX: number = 10 // how many tabrefs can we create?
 
 // BE statistics data
 export const BE_STATISTICS_VALUES_ID: string = 'values' // and for value

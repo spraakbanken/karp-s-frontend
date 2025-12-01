@@ -37,6 +37,9 @@ onMounted(async () => {
 
 const items = reactive<NewsItem[]>([])
 
+const limit_tabref = (t: string) => {
+  return t.length > 15 ? t.substring(0, 15) + '...' : t
+}
 onMounted(async () => {
   /*
   if (syncStoreWithRouter(router)) {
@@ -115,12 +118,12 @@ const tabRefClose = (id: number) => {
         </button>
         <template v-for="(tabRef, key) in tabRefSetup" :key="key">
           <button :class="{ active: activeResultTab === 'ref' + key }">
-            <span @click="setActiveResultTab('ref' + key)">
-              <span class="material-icons icon-placement">arrow_forward</span
-              >{{ tabRef.columnValue }}</span
-            >&nbsp;
             <span @click="tabRefClose(Number(key))" class="material-icons icon-placement"
               >close</span
+            >
+            <span @click="setActiveResultTab('ref' + key)">
+              <span class="material-icons icon-placement">arrow_forward</span
+              >{{ limit_tabref(tabRef.columnValue) }}</span
             >
           </button>
         </template>
@@ -225,6 +228,7 @@ const tabRefClose = (id: number) => {
     background-color 0.3s,
     color 0.3s;
   margin-right: 0.25rem;
+  overflow: hidden;
 }
 
 .searchTabs button.active,

@@ -11,10 +11,9 @@ import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datas
 import { getStatisticsData } from '@/api/apiService'
 import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
-import MaxHeight from '@/components/MaxHeight.vue'
 import { formatCell } from '@/utils/utils'
-import { isNumber } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
+import StatisticsRowCompact from './StatisticsRowCompact.vue'
 
 const { t } = useI18n()
 
@@ -769,22 +768,23 @@ const updateOverview = () => {
     drawChart()
   }
 }
-
+/*
 const refClick = (tRow: number, tCol: number) => {
   if (tCol === 0) {
     const xValue = paginatedData.value[tRow][tCol]
     const xField = statisticsHeaders.value[tCol].columnField
     const xTables = lexicalStorage.selectedDatasets
-    console.log('CLICK0: ', xValue, xField, xTables)
+    //console.log('CLICK0: ', xValue, xField, xTables)
     lexicalStorage.addTabRef(xTables, xField, xValue)
   } else {
     const xValue = paginatedData.value[tRow][tCol].values[0].value
     const xField = statisticsHeaders.value[tCol].columnField
     const xTables = statisticsHeaders.value[tCol].headerValue
-    console.log('CLICK: ', tRow, tCol, xValue, xField, xTables)
+    //console.log('CLICK: ', tRow, tCol, xValue, xField, xTables)
     lexicalStorage.addTabRef([xTables], xField, xValue)
   }
 }
+*/
 </script>
 
 <template>
@@ -1083,53 +1083,16 @@ const refClick = (tRow: number, tCol: number) => {
             </template>
           </tr>
           <!-- show data -->
-          <tr v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
-            <template v-for="(value, tableCol) in item" :key="tableCol">
-              <!-- is value just a number? -->
-              <template v-if="isNumber(value)">
-                <td :class="{ 'total-column': tableCol == 1, 'total-null': value.count === 0 }">
-                  {{ value }}
-                </td>
-              </template>
-              <!-- is value just a number in an object? -->
-              <template
-                v-else-if="
-                  typeof value === 'object' &&
-                  ((BE_STATISTICS_VALUES_ID in value &&
-                    value[BE_STATISTICS_VALUES_ID].length === 0) ||
-                    !(BE_STATISTICS_VALUES_ID in value))
-                "
-              >
-                <td
-                  class="numeric"
-                  :class="{ 'total-column': tableCol == 1, 'total-null': value.count === 0 }"
-                >
-                  {{ value.count }}
-                </td>
-              </template>
-              <!-- other -->
-              <template v-else>
-                <td>
-                  <template v-if="showCompact">
-                    <MaxHeight :max-height="ROW_MAX_HEIGHT">
-                      <span
-                        v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"
-                        @click="refClick(Number(tableRow), Number(tableCol))"
-                        class="cell-clickable"
-                      ></span>
-                    </MaxHeight>
-                  </template>
-                  <template v-else>
-                    <span
-                      v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"
-                      @click="refClick(Number(tableRow), Number(tableCol))"
-                      class="cell-clickable"
-                    ></span>
-                  </template>
-                </td>
-              </template>
-            </template>
-          </tr>
+          <template v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
+            <StatisticsRowCompact
+              :item="item"
+              :tableRow="tableRow"
+              :showCompact="showCompact"
+              :updateShowHitsCheckbox="updateShowHitsCheckbox"
+              :paginatedDataRow="paginatedData[tableRow]"
+            >
+            </StatisticsRowCompact>
+          </template>
         </tbody>
       </table>
 
@@ -1167,6 +1130,8 @@ const refClick = (tRow: number, tCol: number) => {
     </div>
   </div>
 </template>
+
+<style src="@/assets/table.css" scoped></style>
 
 <style>
 .sum-right {
@@ -1252,56 +1217,6 @@ const refClick = (tRow: number, tCol: number) => {
 
 /* table */
 
-.table-wrapper {
-  display: grid;
-  position: relative;
-  /* margin-top: 2rem; */
-  padding-left: 0.5rem;
-  padding-top: 0.5rem;
-}
-
-.fancy-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;
-  font-size: 1rem;
-  text-align: left;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-tr {
-  vertical-align: top;
-}
-
-tr:nth-child(even) {
-  background-color: var(--table-row-even-bg);
-}
-
-tr:nth-child(odd) {
-  background-color: var(--table-row-odd-bg);
-}
-
-tr:hover {
-  background-color: var(--color-border-hover);
-}
-
-th,
-td {
-  padding-top: 0.1rem;
-  padding-bottom: 0.1rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  border: 1px solid var(--color-border);
-}
-
-th {
-  background-color: var(--table-head-bg);
-  color: var(--color-heading);
-  font-weight: bold;
-  /* cursor: pointer; */
-  vertical-align: top;
-}
-
 th.resource {
   font-style: italic;
 }
@@ -1330,11 +1245,6 @@ tr:nth-child(odd) td.total-null {
 
 .numeric {
   text-align: right;
-}
-
-.cell-clickable {
-  color: var(--text-link);
-  cursor: pointer;
 }
 
 .dataset-label {
@@ -1408,20 +1318,7 @@ tr:nth-child(odd) td.total-null {
   text-align: right;
 }
 
-/* elements */
-
-.tab {
-  display: inline-block;
-  padding: 0.7rem 1rem;
-  background-color: var(--table-head-bg);
-  color: var(--color-heading);
-  font-weight: bold;
-  border: 1px solid var(--color-border);
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  width: fit-content;
-}
+/* info/settings */
 
 .info-control {
   background-color: var(--sb-grey-dark);
@@ -1474,69 +1371,5 @@ input[type='checkbox'][disabled] + label {
 
 .overview-settings .export-button {
   margin: 0;
-}
-
-/* pagination */
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-
-  background-color: var(--table-head-bg);
-  color: var(--color-heading);
-  font-weight: bold;
-}
-
-.pagination button,
-.pagination span,
-.pagination select {
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-  border: none;
-  background-color: transparent;
-  color: inherit;
-  /* cursor: pointer; */
-  border-radius: 4px;
-}
-
-.pagination button,
-.pagination select {
-  cursor: pointer;
-}
-
-.pagination button:disabled span {
-  color: var(--sb-grey-medium);
-  /* cursor: not-allowed; */
-}
-
-.pagination select {
-  background-color: white;
-  color: black;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  padding-right: 2rem;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1rem;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-}
-
-.pagination-controls label {
-  margin-right: 0.5rem;
 }
 </style>

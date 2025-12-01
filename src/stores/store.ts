@@ -12,7 +12,7 @@ import {
   entryWordField,
   type ColumnVisField,
 } from '@/types/datasetConfig.ts'
-import { ROWS_PER_PAGE } from '@/utils/constants'
+import { ROWS_PER_PAGE, TABREFCOUNT_MAX } from '@/utils/constants'
 
 interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
@@ -491,13 +491,15 @@ export const lexicalStore = defineStore('dataset', {
       */
     },
     addTabRef(aResourceId: string[], aColumnField: string, aColumnValue: string) {
-      this.tabRefSetupCounter++
-      this.tabRefSetup[this.tabRefSetupCounter] = {
-        resourceId: aResourceId,
-        columnField: aColumnField,
-        columnValue: aColumnValue,
-        tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
-        tableResultGrpSorted: [],
+      if (this.tabRefSetupCounter < TABREFCOUNT_MAX) {
+        this.tabRefSetupCounter++
+        this.tabRefSetup[this.tabRefSetupCounter] = {
+          resourceId: aResourceId,
+          columnField: aColumnField,
+          columnValue: aColumnValue,
+          tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
+          tableResultGrpSorted: [],
+        }
       }
     },
     delTabRef(id: number) {

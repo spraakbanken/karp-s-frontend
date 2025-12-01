@@ -1,0 +1,82 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useToggle } from '@vueuse/core'
+import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
+import { formatCell } from '@/utils/utils'
+
+const props = defineProps<{
+  /** Maximum height (px). */
+  maxHeight: number
+  value1: {
+    entry: EntryS[]
+    resourceId: string
+  }
+  fa: ColumnVisField[]
+}>()
+
+const thflag = ref(false)
+const tdRefs = ref([])
+const isTooTall = () => {
+  if (tdRefs.value.length > 0) {
+    let h = 0
+    tdRefs.value.forEach((element) => (h = element.offsetHeight > h ? element.offsetHeight : h))
+    //console.log('tdrefs len:', tdRefs.value.length, h, props.value1.resourceId)
+    thflag.value = h > props.maxHeight
+    return h > props.maxHeight
+  } else {
+    return false
+  }
+}
+const [expanded, toggleExpanded] = useToggle()
+</script>
+
+<template>
+  <tr :class="{ 'limited-height': !expanded && isTooTall() }">
+    <template v-for="(value2, key) in value1.entry" :key="key">
+      <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
+        <div :class="{ 'mhr-div': !expanded && thflag }">
+          <span
+            v-if="thflag && key === 0"
+            class="button-span material-icons"
+            @click="toggleExpanded()"
+          >
+            {{ expanded ? 'expand_less' : 'expand_more' }}
+          </span>
+          <span v-html="formatCell(value2.value)"></span>
+        </div>
+      </td>
+    </template>
+  </tr>
+</template>
+
+<style src="@/assets/table.css" scoped></style>
+
+<style scoped>
+.limited-height {
+  max-height: 29px;
+  overflow: hidden;
+}
+
+.mhr-div {
+  max-height: 29px;
+  overflow: hidden;
+}
+
+.overflow-auto {
+  overflow: hidden;
+}
+
+.button-span {
+  margin-right: 0.25rem;
+  cursor: pointer;
+  vertical-align: text-bottom;
+  font-size: 22px;
+}
+
+.button-slim {
+  background-color: var(--sb-grey-dark);
+  color: white;
+  font-weight: bolder;
+  font-size: larger;
+}
+</style>

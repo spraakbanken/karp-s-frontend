@@ -41,10 +41,11 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
       lexicalStorage.activeSearchTab == 'extended'
     ) {
       const queryParam = Object.entries(lexicalStorage.selectedFields)
-        .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+        .map(([key, value]) => `${value.position}|${key}|"${value.value.replace(/"/g, '\\"')}"`)
         .join('||')
+      console.log('queryParam: ', queryParam)
       if (queryParam) {
-        if (!queryParam.endsWith('|')) {
+        if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
           if (Object.keys(lexicalStorage.selectedFields).length == 1) {
             params['q'] = queryParam
           } else {
@@ -130,10 +131,10 @@ export const getStatisticsData = async (
 
     // query/field parameters
     const queryParam = Object.entries(query)
-      .map(([key, value]) => `${value.position}|${key}|${value.value}`)
+      .map(([key, value]) => `${value.position}|${key}|"${value.value.replace(/"/g, '\\"')}"`)
       .join('||')
     if (queryParam) {
-      if (!queryParam.endsWith('|')) {
+      if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
         if (Object.keys(lexicalStorage.selectedFields).length == 1) {
           params['q'] = queryParam
         } else {
@@ -215,7 +216,7 @@ export const getStatisticsData = async (
 // pageStart starts at 0 in this function
 export const getTabRefData = async (
   resourceId: string[],
-  columneField: string,
+  columnField: string,
   columnValue: string,
   pageStart: number,
   pageSize: number,
@@ -227,7 +228,7 @@ export const getTabRefData = async (
     params['resources'] = resourceId.join(',')
 
     // query/field parameters
-    params['q'] = 'equals|' + columneField + '|' + columnValue
+    params['q'] = 'equals|' + columnField + '|"' + columnValue.replace(/"/g, '\\"') + '"'
 
     params['from'] = pageStart.toString()
     params['size'] = pageSize.toString()

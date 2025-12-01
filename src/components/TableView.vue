@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import { groupBy } from 'es-toolkit'
 
-import { ROW_MAX_HEIGHT, ROW_SHOW_COMPACT_DEFAULT } from '@/utils/constants'
+import { ROW_SHOW_COMPACT_DEFAULT } from '@/utils/constants'
 import {
   type DatasetEntry,
   type Entry,
@@ -16,7 +16,7 @@ import {
 import { getTableData } from '@/api/apiService'
 import { formatCell } from '@/utils/utils'
 
-import MaxHeight from '@/components/MaxHeight.vue'
+import TableRowCompact from '@/components/TableRowCompact.vue'
 import ColumnVisDropDown from './ColumnVisDropDown.vue'
 
 const { t } = useI18n()
@@ -251,6 +251,8 @@ watch(
     if (newDatasets.length === 0) {
       tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
       //currentValues.value = []
+    } else if (newDatasets.length === 1) {
+      showCompact.value = false
     }
   },
 )
@@ -371,7 +373,7 @@ const picsbar = (ds: string) => {
         <!-- total # of hits -->
         <span>
           <b>{{ $t('table.total.pre') }}:</b> {{ tableResult.total }}
-          {{ $t('table.total.post') }}
+          {{ $t('table.total.hits') }}
         </span>
         <!-- show all cells expanded -->
         <label for="showCompact">
@@ -388,8 +390,10 @@ const picsbar = (ds: string) => {
             <tr>
               <td colspan="100%" class="dataset-label">
                 <ColumnVisDropDown :resourceId="ds" />
-                {{ lexicalStorage.datasetLabels[ds] }}:
-                {{ tableResult.resourceHits[ds] }}
+                {{ lexicalStorage.datasetLabels[ds] }}: {{ tableResult.resourceHits[ds] }}
+                {{
+                  tableResult.resourceHits[ds] > 1 ? $t('table.total.hits') : $t('table.total.hit')
+                }}
                 <span v-for="(value, i) in item[0].entry" :key="i"> </span>
               </td>
             </tr>
@@ -449,24 +453,28 @@ const picsbar = (ds: string) => {
 
             <!-- show dataset entries -->
             <template v-for="(value1, key) in item" :key="key">
-              <tr>
-                <template v-for="(value2, key) in value1.entry" :key="key">
-                  <td
-                    v-if="
-                      lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)?.vis
-                    "
-                  >
-                    <template v-if="showCompact && key !== 0">
-                      <MaxHeight :max-height="ROW_MAX_HEIGHT">
-                        <span v-html="formatCell(value2.value)"></span>
-                      </MaxHeight>
-                    </template>
-                    <template v-else>
+              <template v-if="showCompact">
+                <TableRowCompact
+                  :maxHeight="33"
+                  :value1="value1"
+                  :fa="lexicalStorage.columnVis[ds]"
+                >
+                </TableRowCompact>
+              </template>
+
+              <template v-else>
+                <tr>
+                  <template v-for="(value2, key) in value1.entry" :key="key">
+                    <td
+                      v-if="
+                        lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)?.vis
+                      "
+                    >
                       <span v-html="formatCell(value2.value)"></span>
-                    </template>
-                  </td>
-                </template>
-              </tr>
+                    </td>
+                  </template>
+                </tr>
+              </template>
             </template>
           </tbody>
         </table>
@@ -520,21 +528,9 @@ const picsbar = (ds: string) => {
   </div>
 </template>
 
-<style scoped>
-.table-wrapper {
-  display: grid;
-  position: relative;
-  /* margin-top: 2rem; */
-  padding-left: 0.5rem;
-  padding-top: 0.5rem;
-  /*
-  border-style: solid;
-  border-color: var(--color-complement);
-  border-width: 0.5rem 0 0 0;
-  */
-  background-color: var(--color-background-alt);
-}
+<style src="@/assets/table.css" scoped></style>
 
+<style scoped>
 .table-container {
   margin-bottom: 0rem;
 }
@@ -578,6 +574,7 @@ const picsbar = (ds: string) => {
 }
 
 /* picsbar */
+
 .picsbar {
   table-layout: fixed;
   overflow-x: clip;
@@ -642,6 +639,7 @@ const picsbar = (ds: string) => {
 }
 
 /* Info and control before table */
+
 .info-control {
   background-color: var(--sb-grey-dark);
   color: white;
@@ -663,32 +661,6 @@ const picsbar = (ds: string) => {
 }
 
 /* table */
-
-.fancy-table {
-  border-collapse: collapse;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 1rem;
-  margin: 0 0 0.5rem 0;
-  text-align: left;
-  width: fit-content;
-  table-layout: auto;
-}
-
-th,
-td {
-  padding-top: 0.1rem;
-  padding-bottom: 0.1rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  border: 1px solid var(--color-border);
-}
-
-th {
-  background-color: var(--table-head-bg);
-  color: var(--color-heading);
-  font-weight: bold;
-}
 
 .header-content {
   display: flex;
@@ -724,89 +696,10 @@ th {
   color: white;
 }
 
-tr {
-  vertical-align: top;
-}
-
-tr:nth-child(even) {
-  background-color: var(--table-row-even-bg);
-}
-
-tr:nth-child(odd) {
-  background-color: var(--table-row-odd-bg);
-}
-
-tr:hover {
-  background-color: var(--color-border-hover);
-}
-
 .dataset-label {
   text-align: left;
   background-color: var(--color-background);
   color: var(--color-text);
   font-weight: bold;
-}
-
-/* pagination */
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-
-  background-color: var(--table-head-bg);
-  color: var(--color-heading);
-  font-weight: bold;
-}
-
-.pagination button,
-.pagination span,
-.pagination select {
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-  border: none;
-  background-color: transparent;
-  color: inherit;
-  border-radius: 4px;
-}
-
-.pagination button,
-.pagination select {
-  cursor: pointer;
-}
-
-.pagination button:disabled span {
-  color: var(--sb-grey-medium);
-  /* cursor: not-allowed; */
-}
-
-.pagination select {
-  background-color: white;
-  color: black;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  padding-right: 2rem;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1rem;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-}
-
-.pagination-controls label {
-  margin-right: 0.5rem;
 }
 </style>
