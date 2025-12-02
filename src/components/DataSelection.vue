@@ -470,13 +470,15 @@ watch(
           <div class="datasets-list">
             <div v-for="dataset in filteredDatasets" :key="dataset" class="dropdown-item">
               <div>
-                <input
-                  type="checkbox"
-                  :value="dataset"
-                  v-model="selectedDatasets"
-                  @change="selectDataset"
-                />
-                {{ lexicalStorage.datasetLabels[dataset] }}
+                <label>
+                  <input
+                    type="checkbox"
+                    :value="dataset"
+                    v-model="selectedDatasets"
+                    @change="selectDataset"
+                  />
+                  {{ lexicalStorage.datasetLabels[dataset] }}
+                </label>
               </div>
               <img
                 src="@/assets/sb_symbol_info.svg"

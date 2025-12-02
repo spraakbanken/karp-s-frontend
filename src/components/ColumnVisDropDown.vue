@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { useI18n } from 'vue-i18n'
+import { entryWordField } from '@/types/datasetConfig'
 
 const props = defineProps<{
   resourceId: string
@@ -17,8 +18,16 @@ const toggleDropdown = () => {
 }
 
 const toggleItem = (index: number) => {
+  /*
+  const visible = lexicalStorage.columnVis[props.resourceId][index].vis
+  const visibleCount = lexicalStorage.columnVis[props.resourceId].reduce((count, item) => {
+    return item.vis ? count + 1 : count
+  }, 0)
+  if (!visible || visibleCount > 1) {
+  */
   lexicalStorage.columnVis[props.resourceId][index].vis =
     !lexicalStorage.columnVis[props.resourceId][index].vis
+  //}
 }
 
 const selectAll = () => {
@@ -27,6 +36,13 @@ const selectAll = () => {
 
 const selectNone = () => {
   lexicalStorage.columnVis[props.resourceId].forEach((f) => (f.vis = false))
+  /*
+  lexicalStorage.columnVis[props.resourceId].forEach((f) => {
+    if (f.columnField === entryWordField) {
+      f.vis = true
+    }
+  })
+  */
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -43,7 +59,8 @@ onMounted(() => {
 <template>
   <div class="dropdown" ref="dropdownRef">
     <button class="dropdown-button" @click="toggleDropdown">
-      <span class="material-icons icon-placement">view_column</span>
+      <!--      <span class="material-icons icon-placement">view_column</span>-->
+      {{ $t('table.columnVis.select.button') }}
     </button>
     <div v-if="isOpen" class="dropdown-menu">
       <div class="dropdown-selectors">
@@ -70,6 +87,13 @@ onMounted(() => {
         </label>
       </div>
     </div>
+    {{
+      lexicalStorage.columnVis[props.resourceId].reduce((count, item) => {
+        return item.vis ? count + 1 : count
+      }, 0)
+    }}
+    {{ $t('table.columnVis.selected.of') }} {{ lexicalStorage.columnVis[props.resourceId].length }}
+    {{ $t('table.columnVis.selected.selected') }}
   </div>
 </template>
 
@@ -80,15 +104,13 @@ onMounted(() => {
 }
 .dropdown-button {
   cursor: pointer;
-  background: none;
-  padding: 0;
-  margin: 0;
-  /*
-  padding: 10px 15px;
-  color: white;
-  */
   border: none;
-  border-radius: 5px;
+  /* border-radius: 5px; */
+  margin: 0 0rem 0rem 0.5rem;
+  padding: 0.5;
+  background-color: black;
+  color: white;
+  font-weight: bold;
 }
 .icon-placement {
   vertical-align: text-bottom;

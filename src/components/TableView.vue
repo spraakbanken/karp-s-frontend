@@ -389,94 +389,107 @@ const picsbar = (ds: string) => {
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
-                <ColumnVisDropDown :resourceId="ds" />
                 {{ lexicalStorage.datasetLabels[ds] }}: {{ tableResult.resourceHits[ds] }}
                 {{
                   tableResult.resourceHits[ds] > 1 ? $t('table.total.hits') : $t('table.total.hit')
                 }}
+                <ColumnVisDropDown :resourceId="ds" />
                 <span v-for="(value, i) in item[0].entry" :key="i"> </span>
               </td>
             </tr>
-            <!-- column names -->
-            <tr>
-              <!-- empty cell for expand_more/less -->
-              <th v-if="showCompact" class="header-compile"></th>
-              <template v-for="(value, key) in item[0].entry">
-                <th
-                  v-if="lexicalStorage.columnVis[ds].find((f) => f.columnField === value.name)?.vis"
-                  :key="key"
-                  :class="{
-                    'header-list': lexicalStorage.isList(value.name),
-                    'header-compile': value.name == entryWordField,
-                  }"
-                >
-                  <div class="header-content">
-                    <span
-                      :class="{
-                        'header-list-text': lexicalStorage.isList(value.name),
-                      }"
-                      >{{ lexicalStorage.localizeField(value.name) }}
+            <!-- if at least one column is visible -->
+            <template
+              v-if="
+                lexicalStorage.columnVis[ds].reduce((count, item) => {
+                  return item.vis ? count + 1 : count
+                }, 0) > 0
+              "
+            >
+              <!-- column names -->
+              <tr>
+                <!-- empty cell for expand_more/less -->
+                <th v-if="showCompact" class="header-compile"></th>
+                <template v-for="(value, key) in item[0].entry">
+                  <th
+                    v-if="
+                      lexicalStorage.columnVis[ds].find((f) => f.columnField === value.name)?.vis
+                    "
+                    :key="key"
+                    :class="{
+                      'header-list': lexicalStorage.isList(value.name),
+                      'header-compile': value.name == entryWordField,
+                    }"
+                  >
+                    <div class="header-content">
+                      <span
+                        :class="{
+                          'header-list-text': lexicalStorage.isList(value.name),
+                        }"
+                        >{{ lexicalStorage.localizeField(value.name) }}
 
-                      <template v-if="value.name == entryWordField">
-                        {{
-                          '(' +
-                          lexicalStorage.localizeField(
-                            lexicalStorage.currentConfig.resources.find(
-                              (i) => i.resourceId === item[0]['resourceId'],
-                            )?.entryWord.field!,
-                          ) +
-                          ')'
-                        }}
-                      </template>
+                        <template v-if="value.name == entryWordField">
+                          {{
+                            '(' +
+                            lexicalStorage.localizeField(
+                              lexicalStorage.currentConfig.resources.find(
+                                (i) => i.resourceId === item[0]['resourceId'],
+                              )?.entryWord.field!,
+                            ) +
+                            ')'
+                          }}
+                        </template>
 
-                      <!--
+                        <!--
                     {{
                       lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
                     }}--></span
-                    >
+                      >
 
-                    <span
-                      class="header-sortable"
-                      :class="{
-                        'header-sortable-selected': lexicalStorage.sortField == value.name,
-                      }"
-                      v-if="currentCommonFields.find((obj) => obj.name === value.name)"
-                      @click="doSort(value.name)"
-                      >{{
-                        lexicalStorage.sortOrder == 'asc' || lexicalStorage.sortField != value.name
-                          ? '▼'
-                          : '▲'
-                      }}
-                    </span>
-                  </div>
-                </th>
-              </template>
-            </tr>
+                      <span
+                        class="header-sortable"
+                        :class="{
+                          'header-sortable-selected': lexicalStorage.sortField == value.name,
+                        }"
+                        v-if="currentCommonFields.find((obj) => obj.name === value.name)"
+                        @click="doSort(value.name)"
+                        >{{
+                          lexicalStorage.sortOrder == 'asc' ||
+                          lexicalStorage.sortField != value.name
+                            ? '▼'
+                            : '▲'
+                        }}
+                      </span>
+                    </div>
+                  </th>
+                </template>
+              </tr>
 
-            <!-- show dataset entries -->
-            <template v-for="(value1, key) in item" :key="key">
-              <template v-if="showCompact">
-                <TableRowCompact
-                  :maxHeight="33"
-                  :value1="value1"
-                  :fa="lexicalStorage.columnVis[ds]"
-                  :showCompact="showCompact"
-                >
-                </TableRowCompact>
-              </template>
+              <!-- show dataset entries -->
+              <template v-for="(value1, key) in item" :key="key">
+                <template v-if="showCompact">
+                  <TableRowCompact
+                    :maxHeight="33"
+                    :value1="value1"
+                    :fa="lexicalStorage.columnVis[ds]"
+                    :showCompact="showCompact"
+                  >
+                  </TableRowCompact>
+                </template>
 
-              <template v-else>
-                <tr>
-                  <template v-for="(value2, key) in value1.entry" :key="key">
-                    <td
-                      v-if="
-                        lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)?.vis
-                      "
-                    >
-                      <span v-html="formatCell(value2.value)"></span>
-                    </td>
-                  </template>
-                </tr>
+                <template v-else>
+                  <tr>
+                    <template v-for="(value2, key) in value1.entry" :key="key">
+                      <td
+                        v-if="
+                          lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)
+                            ?.vis
+                        "
+                      >
+                        <span v-html="formatCell(value2.value)"></span>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
               </template>
             </template>
           </tbody>
