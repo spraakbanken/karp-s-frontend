@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
 import { formatCell } from '@/utils/utils'
+import { isNumber } from 'es-toolkit/compat'
 
 const props = defineProps<{
   /** Maximum height (px). */
@@ -12,6 +13,7 @@ const props = defineProps<{
     resourceId: string
   }
   fa: ColumnVisField[]
+  showCompact: boolean
 }>()
 
 const thflag = ref(false)
@@ -33,15 +35,12 @@ const [expanded, toggleExpanded] = useToggle()
 <template>
   <tr :class="{ 'limited-height': !expanded && isTooTall() }">
     <template v-for="(value2, key) in value1.entry" :key="key">
+      <td v-if="thflag && key === 0" class="button-span material-icons" @click="toggleExpanded()">
+        {{ expanded ? 'expand_less' : 'expand_more' }}
+      </td>
+      <td v-else-if="key === 0 && showCompact"></td>
       <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
-        <div :class="{ 'mhr-div': !expanded && thflag }">
-          <span
-            v-if="thflag && key === 0"
-            class="button-span material-icons"
-            @click="toggleExpanded()"
-          >
-            {{ expanded ? 'expand_less' : 'expand_more' }}
-          </span>
+        <div :class="{ 'mhr-div': !expanded && thflag, numeric: isNumber(value2.value) }">
           <span v-html="formatCell(value2.value)"></span>
         </div>
       </td>
@@ -67,10 +66,12 @@ const [expanded, toggleExpanded] = useToggle()
 }
 
 .button-span {
-  margin-right: 0.25rem;
+  margin: 0;
+  padding: 0;
   cursor: pointer;
   vertical-align: text-bottom;
   font-size: 22px;
+  border: none;
 }
 
 .button-slim {
@@ -78,5 +79,9 @@ const [expanded, toggleExpanded] = useToggle()
   color: white;
   font-weight: bolder;
   font-size: larger;
+}
+
+.numeric {
+  text-align: right;
 }
 </style>

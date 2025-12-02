@@ -45,8 +45,17 @@ const currentTab = computed({
   get: () => lexicalStorage.activeResultTab,
   set: (value) => (lexicalStorage.activeResultTab = value),
 })
-const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
 const columnCount = ref(false)
+
+// compact
+
+const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
+
+watch(
+  () => showCompact.value,
+  () => {},
+  { immediate: true },
+)
 
 // pages
 
@@ -282,11 +291,7 @@ watch(
   () => lexicalStorage.isStatisticsSearch,
   async () => {
     if (lexicalStorage.isStatisticsSearch) {
-      console.log(
-        'StatisticsView - Watch isSearch!',
-        currentPageStart.value,
-        lexicalStorage.statisticsPageStart,
-      )
+      // console.log('StatisticsView - Watch isSearch!', lexicalStorage.statisticsPageStart )
       lexicalStorage.setIsStatisticsSearch(false)
       await fetchData()
       updateOverview() // draw graph
@@ -980,12 +985,14 @@ const refClick = (tRow: number, tCol: number) => {
           <!-- show number of hits -->
           <tr>
             <td colspan="100%" class="dataset-label">
-              {{ $t('statistics.numberOfHits') }}:
               {{ statisticsResult.length }}
+              {{ $t('statistics.numberOfHits') }}
             </td>
           </tr>
           <!-- show header row -->
           <tr>
+            <!-- empty cell for expand_more/less -->
+            <th v-if="showCompact" class="header-compile"></th>
             <th
               v-for="(key, index) in statisticsHeaders"
               :key="index"
@@ -1075,6 +1082,8 @@ const refClick = (tRow: number, tCol: number) => {
         <tbody>
           <!-- show totals -->
           <tr class="total">
+            <!-- empty cell for expand_more/less -->
+            <td v-if="showCompact"></td>
             <template v-for="(item, index) in statisticsTotals" :key="index">
               <td v-if="index == 0" class="total">&Sigma;</td>
               <td v-else class="total numeric">
@@ -1248,7 +1257,7 @@ tr:nth-child(odd) td.total-null {
 }
 
 .dataset-label {
-  text-align: center;
+  text-align: left;
   background-color: white;
   color: black;
   font-weight: bold;

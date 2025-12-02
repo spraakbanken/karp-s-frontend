@@ -19,7 +19,7 @@ const props = defineProps<{
 const lexicalStorage = lexicalStore()
 
 const refClick = (tRow: number, tCol: number) => {
-  if (tCol === 0) {
+  if (tCol < lexicalStorage.selectedCompileFields.length) {
     const xValue = props.paginatedDataRow[tCol]
     const xField = lexicalStorage.statisticsHeaders[tCol].columnField
     const xTables = lexicalStorage.selectedDatasets
@@ -46,7 +46,7 @@ const isTooTall = () => {
     return false
   }
 }
-const [expanded, toggleExpanded] = useToggle()
+const [expanded, toggleExpanded] = useToggle(!props.showCompact)
 </script>
 
 <template>
@@ -54,7 +54,12 @@ const [expanded, toggleExpanded] = useToggle()
     <template v-for="(value, tableCol) in item" :key="tableCol">
       <!-- is value just a number? -->
       <template v-if="isNumber(value)">
-        <td :class="{ 'total-column': tableCol == 1, 'total-null': value.count === 0 }">
+        <td
+          :class="{
+            'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
+            'total-null': value.count === 0,
+          }"
+        >
           {{ value }}
         </td>
       </template>
@@ -68,22 +73,26 @@ const [expanded, toggleExpanded] = useToggle()
       >
         <td
           class="numeric"
-          :class="{ 'total-column': tableCol == 1, 'total-null': value.count === 0 }"
+          :class="{
+            'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
+            'total-null': value.count === 0,
+          }"
         >
           {{ value.count }}
         </td>
       </template>
       <!-- other -->
       <template v-else>
+        <td
+          v-if="thflag && tableCol === 0 && showCompact"
+          class="button-span material-icons"
+          @click="toggleExpanded()"
+        >
+          {{ expanded ? 'expand_less' : 'expand_more' }}
+        </td>
+        <td v-else-if="tableCol === 0 && showCompact"></td>
         <td ref="tdRefs">
           <div :class="{ 'mhr-div': !expanded && thflag }">
-            <span
-              v-if="thflag && tableCol === 0"
-              class="button-span material-icons"
-              @click="toggleExpanded()"
-            >
-              {{ expanded ? 'expand_less' : 'expand_more' }}
-            </span>
             <span
               v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"
               @click="refClick(Number(tableRow), Number(tableCol))"
@@ -100,7 +109,7 @@ const [expanded, toggleExpanded] = useToggle()
 
 <style scoped>
 .limited-height {
-  max-height: 29px;
+  max-height: 33px;
   overflow: hidden;
 }
 
@@ -114,10 +123,12 @@ const [expanded, toggleExpanded] = useToggle()
 }
 
 .button-span {
-  margin-right: 0.25rem;
+  margin: 0;
+  padding: 0;
   cursor: pointer;
   vertical-align: text-bottom;
   font-size: 22px;
+  border: none;
 }
 
 .button-slim {

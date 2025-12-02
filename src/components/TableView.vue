@@ -399,6 +399,8 @@ const picsbar = (ds: string) => {
             </tr>
             <!-- column names -->
             <tr>
+              <!-- empty cell for expand_more/less -->
+              <th v-if="showCompact" class="header-compile"></th>
               <template v-for="(value, key) in item[0].entry">
                 <th
                   v-if="lexicalStorage.columnVis[ds].find((f) => f.columnField === value.name)?.vis"
@@ -458,6 +460,7 @@ const picsbar = (ds: string) => {
                   :maxHeight="33"
                   :value1="value1"
                   :fa="lexicalStorage.columnVis[ds]"
+                  :showCompact="showCompact"
                 >
                 </TableRowCompact>
               </template>

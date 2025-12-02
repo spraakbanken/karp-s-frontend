@@ -96,7 +96,7 @@
   "statistics.exportCSV": "Exportera CSV",
   "statistics.showOverview": "Visa översikt",
   "statistics.showColumnCount": "Visa antal för fält",
-  "statistics.numberOfHits": "Antal rader",
+  "statistics.numberOfHits": "rader",
   "statistics.total": "Total",
   "graphs.bar": "Stapeldiagram",
   "graphs.circle": "Cirkeldiagram",
