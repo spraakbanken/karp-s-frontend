@@ -25,11 +25,16 @@ export interface EntryWord {
   description: string | Description
 }
 
+export interface FieldInfo {
+  name: string
+  primary: boolean
+}
+
 export interface Resource {
   resourceId: string
   label: Label
   description: Description
-  fields: string[] // WAS: FieldConfig[], but it isn't when we get it from the BE
+  fields: FieldInfo[] // was string[] before BE v16
   link: string
   size: string
   tags: string[]
@@ -41,7 +46,7 @@ export interface Resource {
 export interface ResourceLocalized {
   label: string
   description: string
-  fields: string[]
+  fields: FieldInfo[] // was string[] before BE v16
   link: string
   size: string
   tags: string[]

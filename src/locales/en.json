@@ -93,6 +93,7 @@
   "table.footer.hit": "Hit",
   "table.columnVis.select.button": "Fields",
   "table.columnVis.select.all": "All",
+  "table.columnVis.select.primary": "Primary",
   "table.columnVis.select.none": "None",
   "table.columnVis.selected.of": "of",
   "table.columnVis.selected.selected": "selected",

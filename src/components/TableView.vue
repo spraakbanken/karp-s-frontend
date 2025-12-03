@@ -18,6 +18,7 @@ import { formatCell } from '@/utils/utils'
 
 import TableRowCompact from '@/components/TableRowCompact.vue'
 import ColumnVisDropDown from './ColumnVisDropDown.vue'
+import GlobalColumnsVisDropDown from './GlobalColumnsVisDropDown.vue'
 
 const { t } = useI18n()
 
@@ -248,12 +249,27 @@ watch(
 watch(
   () => lexicalStorage.selectedDatasets,
   (newDatasets) => {
+    console.log('WATCH TableView: selectedDatasets', lexicalStorage.selectedDatasets)
     if (newDatasets.length === 0) {
       tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
       //currentValues.value = []
     } else if (newDatasets.length === 1) {
       showCompact.value = false
     }
+    // set all column visibility to primary, secondary fields will not be visible
+    /*
+    for (const ds of lexicalStorage.selectedDatasets) {
+      const res = lexicalStorage.currentConfig.resources.find((item) => item.resourceId === ds)
+      if (res !== undefined) {
+        for (const fi of res.fields) {
+          const colfi = lexicalStorage.columnVis[ds].find((item) => item.columnField === fi.name)
+          if (colfi !== undefined) {
+            colfi.vis = fi.primary
+          }
+        }
+      }
+    }
+    */
   },
 )
 
@@ -262,16 +278,7 @@ const currentTab = ref(lexicalStorage.activeResultTab)
 watch(
   () => currentTab.value,
   () => {
-    console.log('WATCH currentTab, tableResult:', tableResult.value.hits)
-    /*
-    if (lexicalStorage.abortController !== null) {
-      lexicalStorage.abortController.abort()
-    }
-    lexicalStorage.resetIsLoading()
-    if (currentTab.value === 'table') {
-      fetchData()
-    }
-    */
+    // console.log('WATCH currentTab, tableResult:', tableResult.value.hits)
     groupData()
   },
   { immediate: true },
@@ -281,29 +288,13 @@ watch(
   () => lexicalStorage.isTableSearch,
   () => {
     if (lexicalStorage.isTableSearch) {
-      console.log('TableView - Watch isSearch!')
+      // console.log('TableView - Watch isSearch!')
       lexicalStorage.setIsTableSearch(false)
-      //setTimeout(function () {
-      //currentPageStart.value = 1
       fetchData()
-      //}, 1000)
     }
   },
   { immediate: true },
 )
-
-/*
-watch(
-  () => [lexicalStorage.selectedDatasets, lexicalStorage.selectedFields],
-  () => {
-    console.log('Watch lexical!')
-    fetchData()
-  },
-  {
-    deep: true,
-  },
-)
-*/
 
 const picsbar = (ds: string) => {
   // ds = name of dataset
@@ -380,6 +371,7 @@ const picsbar = (ds: string) => {
           <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />
           {{ $t('table.show.compact') }}
         </label>
+        <GlobalColumnsVisDropDown></GlobalColumnsVisDropDown>
       </div>
 
       <!-- table -->

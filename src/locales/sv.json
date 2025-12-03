@@ -93,6 +93,7 @@
   "table.footer.hit": "Träff",
   "table.columnVis.select.button": "Fält",
   "table.columnVis.select.all": "Alla",
+  "table.columnVis.select.primary": "Primära",
   "table.columnVis.select.none": "Ingen",
   "table.columnVis.selected.of": "av",
   "table.columnVis.selected.selected": "valda",

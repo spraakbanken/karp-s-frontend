@@ -152,7 +152,7 @@ export const lexicalStore = defineStore('dataset', {
       this.fieldsInDatasets = config.resources.reduce(
         (acc, c) => {
           // we want the FieldConfig for f, not f name (string)
-          acc[c.resourceId] = c.fields.map((f) => config.fields[f])
+          acc[c.resourceId] = c.fields.map((f) => config.fields[f.name])
           return acc
         },
         {} as Record<string, FieldConfig[]>,
@@ -217,6 +217,7 @@ export const lexicalStore = defineStore('dataset', {
       //console.log('setSelectedDataset, keys:', keys)
       this.selectedDatasets = keys
       this.setUnionAndIntersectionFields(this.selectedDatasets)
+
       // so now we have all fields that are in all selected datasets, union and intersection
       // and add the "ingångsord"
       this.currentFields.unshift({
@@ -304,15 +305,22 @@ export const lexicalStore = defineStore('dataset', {
       // prepare column visibility fields
       this.columnVis = {}
       for (const ds of keys) {
-        // const cvf: ColumnVisField[] = { columnField: 'a', vis: true }
         const result: ColumnVisField[] = this.fieldsInDatasets[ds].map((f) => ({
           columnField: f.name,
           vis: true,
         }))
         this.columnVis[ds] = [...result]
         this.columnVis[ds].unshift({ columnField: entryWordField, vis: true })
+        const res = this.currentConfig.resources.find((item) => item.resourceId === ds)
+        if (res !== undefined) {
+          for (const fi of res.fields) {
+            const colfi = this.columnVis[ds].find((item) => item.columnField === fi.name)
+            if (colfi !== undefined) {
+              colfi.vis = fi.primary
+            }
+          }
+        }
       }
-      console.log('columnVis: ', this.columnVis)
 
       //}
     },
@@ -497,8 +505,12 @@ export const lexicalStore = defineStore('dataset', {
           resourceId: aResourceId,
           columnField: aColumnField,
           columnValue: aColumnValue,
-          tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
-          tableResultGrpSorted: [],
+          tableResultGrpSorted: {},
+          isLoading: false,
+          tablePageRowStart: 0,
+          tablePageSize: ROWS_PER_PAGE,
+          tableTotal: 0,
+          //tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
         }
       }
     },
