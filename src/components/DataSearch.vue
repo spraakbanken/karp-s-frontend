@@ -350,21 +350,21 @@ watch(
 
             <div class="dropdown-menu" v-if="isDropdownParams">
               <div v-for="param in currentFields" :key="param.name" class="dropdown-item">
-                <label> </label>
-
-                <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
-                {{ lexicalStorage.localizeField(param.name) }}&nbsp;
-                <span style="float: right">
-                  <img
-                    height="16px"
-                    src="@/assets/sb_symbol_exclamation.svg"
-                    class="datasets-icon"
-                    v-if="
-                      !lexicalStorage.currentCommonFields.find((item) => item.name === param.name)
-                    "
-                    :title="$t('search.field.notcommon')"
-                  />
-                </span>
+                <label>
+                  <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
+                  {{ lexicalStorage.localizeField(param.name) }}&nbsp;
+                  <span style="float: right">
+                    <img
+                      height="16px"
+                      src="@/assets/sb_symbol_exclamation.svg"
+                      class="datasets-icon"
+                      v-if="
+                        !lexicalStorage.currentCommonFields.find((item) => item.name === param.name)
+                      "
+                      :title="$t('search.field.notcommon')"
+                    />
+                  </span>
+                </label>
               </div>
             </div>
           </div>
@@ -459,8 +459,8 @@ watch(
                       value="startswith"
                       v-model="searchField[param].positionInitial"
                     />
-                    {{ $t(searchFieldPositionText[0]) }}</label
-                  >
+                    {{ $t(searchFieldPositionText[0]) }}
+                  </label>
                   <label for="pos2">
                     <input
                       @click="handlePos(param, 2)"
@@ -469,8 +469,8 @@ watch(
                       value="contains"
                       v-model="searchField[param].positionMedial"
                     />
-                    {{ $t(searchFieldPositionText[2]) }}</label
-                  >
+                    {{ $t(searchFieldPositionText[2]) }}
+                  </label>
                   <label for="pos1">
                     <input
                       @click="handlePos(param, 1)"
@@ -479,8 +479,8 @@ watch(
                       value="endswith"
                       v-model="searchField[param].positionFinal"
                     />
-                    {{ $t(searchFieldPositionText[1]) }}</label
-                  >
+                    {{ $t(searchFieldPositionText[1]) }}
+                  </label>
                 </div>
               </div>
             </div>

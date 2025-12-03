@@ -99,7 +99,7 @@
   "statistics.exportCSV": "Export CSV",
   "statistics.showOverview": "Show overview",
   "statistics.showColumnCount": "Show count for fields",
-  "statistics.numberOfHits": "hits",
+  "statistics.numberOfHits": "rows",
   "statistics.total": "Total",
   "graphs.bar": "Bar diagram",
   "graphs.circle": "Circle diagram",
