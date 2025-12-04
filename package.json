@@ -1,6 +1,6 @@
 {
   "name": "karp-s-frontend",
-  "version": "0.15.7",
+  "version": "0.16.2",
   "private": true,
   "type": "module",
   "scripts": {

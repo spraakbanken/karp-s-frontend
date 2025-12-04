@@ -101,6 +101,7 @@
   "statistics.showOverview": "Visa översikt",
   "statistics.showColumnCount": "Visa antal för fält",
   "statistics.numberOfHits": "rader",
+  "statistics.numberOfHits.singular": "rad",
   "statistics.total": "Total",
   "graphs.bar": "Stapeldiagram",
   "graphs.circle": "Cirkeldiagram",

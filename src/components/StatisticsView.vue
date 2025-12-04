@@ -14,6 +14,7 @@ import * as d3 from 'd3'
 import { formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
 import StatisticsRowCompact from './StatisticsRowCompact.vue'
+import StatisticsPagination from './StatisticsPagination.vue'
 
 const { t } = useI18n()
 
@@ -56,17 +57,6 @@ watch(
   () => {},
   { immediate: true },
 )
-
-// pages
-
-const currentPageStart = computed({
-  get: () => lexicalStorage.statisticsPageStart,
-  set: (value) => (lexicalStorage.statisticsPageStart = value),
-})
-const currentPageSize = computed({
-  get: () => lexicalStorage.statisticsPageSize,
-  set: (value) => (lexicalStorage.statisticsPageSize = value),
-})
 
 // UI
 
@@ -235,12 +225,8 @@ const fetchData = async () => {
         lexicalStorage.setIsData(true)
       }
       statisticsTotals.value = totals
-      // make sure pageStart is not beyond data
-      if (statisticsResult.value.length < (currentPageSize.value - 1) * currentPageStart.value) {
-        currentPageStart.value = Math.floor(
-          statisticsResult.value.length / currentPageSize.value + 1,
-        )
-      }
+      // reset
+      lexicalStorage.statisticsPageStart = 1
     } catch (error) {
       errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
@@ -329,42 +315,10 @@ const sortedData = computed(() => {
 
 const paginatedData = computed(() => {
   //console.log('paginatedData!')
-  const start = (currentPageStart.value - 1) * currentPageSize.value
-  const end = start + currentPageSize.value
+  const start = (lexicalStorage.statisticsPageStart - 1) * lexicalStorage.statisticsPageSize
+  const end = start + lexicalStorage.statisticsPageSize
   return sortedData.value.slice(start, end)
 })
-
-const totalPages = computed(() => {
-  return Math.ceil(statisticsResult.value.length / currentPageSize.value)
-})
-
-const firstPage = () => {
-  currentPageStart.value = 1
-}
-
-const prevPage = () => {
-  if (currentPageStart.value > 1) {
-    currentPageStart.value--
-  }
-}
-
-const nextPage = () => {
-  if (currentPageStart.value < totalPages.value) {
-    currentPageStart.value++
-  }
-}
-
-const lastPage = () => {
-  currentPageStart.value = totalPages.value
-}
-
-const itemsPerPage = () => {
-  currentPageStart.value = Math.ceil(
-    currentPageStart.value * (lexicalStorage.statisticsPageStart / currentPageStart.value),
-  )
-  lexicalStorage.statisticsPageStart = currentPageStart.value
-  lexicalStorage.statisticsPageSize = currentPageSize.value
-}
 
 const sortTable = (key: string) => {
   // console.log(key)
@@ -980,13 +934,20 @@ const refClick = (tRow: number, tCol: number) => {
         {{ $t('message.nodatasetselected') }}
       </p>
 
+      <!-- pagination -->
+      <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
+
       <table v-if="statisticsResult.length" class="fancy-table">
         <thead>
           <!-- show number of hits -->
           <tr>
             <td colspan="100%" class="dataset-label">
               {{ statisticsResult.length }}
-              {{ $t('statistics.numberOfHits') }}
+              {{
+                statisticsResult.length > 1
+                  ? $t('statistics.numberOfHits')
+                  : $t('statistics.numberOfHits.singular')
+              }}
             </td>
           </tr>
           <!-- show header row -->
@@ -1105,7 +1066,9 @@ const refClick = (tRow: number, tCol: number) => {
         </tbody>
       </table>
 
-      <!-- show pagers -->
+      <!-- pagination -->
+      <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
+      <!--
       <div v-if="statisticsResult.length" class="pagination">
         <button @click="firstPage" :disabled="currentPageStart === 1">
           <span class="material-icons">first_page</span>
@@ -1131,22 +1094,17 @@ const refClick = (tRow: number, tCol: number) => {
           v-model="currentPageSize"
           class="items-per-page"
         >
-          <option v-for="option in [10, 20, 50, 100, 1000]" :key="option" :value="option">
+          <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
             {{ option }}
           </option>
         </select>
       </div>
+      -->
     </div>
   </div>
 </template>
 
 <style src="@/assets/table.css" scoped></style>
-
-<style>
-.sum-right {
-  float: right;
-}
-</style>
 
 <style scoped>
 .statistics {
@@ -1222,45 +1180,6 @@ const refClick = (tRow: number, tCol: number) => {
   display: block; /* Ensures the line takes space */
   height: 0; /* Height adjustment for the line */
   pointer-events: none; /* Prevent interaction with the line */
-}
-
-/* table */
-
-th.resource {
-  font-style: italic;
-}
-
-tr.total {
-  background-color: var(--sb-grey-light);
-  color: black;
-  font-weight: bold;
-}
-
-td.total-column {
-  background-color: var(--sb-grey-light);
-  color: black;
-  font-weight: bold;
-  text-align: right;
-}
-
-td.total-null {
-  color: #e0e0e0;
-  text-align: right;
-}
-
-tr:nth-child(odd) td.total-null {
-  color: #c0c0c0;
-}
-
-.numeric {
-  text-align: right;
-}
-
-.dataset-label {
-  text-align: left;
-  background-color: white;
-  color: black;
-  font-weight: bold;
 }
 
 .header-content {
@@ -1380,5 +1299,11 @@ input[type='checkbox'][disabled] + label {
 
 .overview-settings .export-button {
   margin: 0;
+}
+</style>
+
+<style>
+.sum-right {
+  float: right;
 }
 </style>

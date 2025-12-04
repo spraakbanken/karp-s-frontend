@@ -167,7 +167,7 @@ onMounted(() => {
   border: none;
   margin: 0 0rem 0rem 1rem;
   padding: 0.5;
-  background-color: black;
+  background-color: var(--sb-grey-dark);
   color: white;
   font-weight: bold;
   border: 1px solid var(--color-border);

@@ -153,4 +153,43 @@ td.total-column {
 .numeric {
   text-align: right;
 }
+
+/* table */
+
+th.resource {
+  font-style: italic;
+}
+
+tr.total {
+  background-color: var(--sb-grey-light);
+  color: black;
+  font-weight: bold;
+}
+
+td.total-column {
+  background-color: var(--sb-grey-light);
+  color: black;
+  font-weight: bold;
+  text-align: right;
+}
+
+td.total-null {
+  color: var(--sb-grey-light);
+  text-align: right;
+}
+
+tr:nth-child(odd) td.total-null {
+  color: #c0c0c0;
+}
+
+.numeric {
+  text-align: right;
+}
+
+.dataset-label {
+  text-align: left;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
 </style>

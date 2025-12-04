@@ -101,6 +101,7 @@
   "statistics.showOverview": "Show overview",
   "statistics.showColumnCount": "Show count for fields",
   "statistics.numberOfHits": "rows",
+  "statistics.numberOfHits.singular": "row",
   "statistics.total": "Total",
   "graphs.bar": "Bar diagram",
   "graphs.circle": "Circle diagram",

@@ -19,6 +19,7 @@ import { formatCell } from '@/utils/utils'
 import TableRowCompact from '@/components/TableRowCompact.vue'
 import ColVisDropDown from './ColVisDropDown.vue'
 import ColVisGlobalDropDown from './ColVisGlobalDropDown.vue'
+import TablePagination from './TablePagination.vue'
 
 const { t } = useI18n()
 
@@ -80,9 +81,9 @@ const prevPage = () => {
     currentPageRowStart.value -= currentPageSize.value
     if (currentPageRowStart.value < 0) {
       currentPageRowStart.value = 0
-    } else if (currentPageRowStart.value < currentPageSize.value) {
+    } /* else if (currentPageRowStart.value < currentPageSize.value) {
       currentPageRowStart.value = 0
-    }
+    }*/
   }
 }
 
@@ -361,11 +362,6 @@ const picsbar = (ds: string) => {
       </table>
 
       <div class="info-control">
-        <!-- total # of hits -->
-        <span>
-          <b>{{ $t('table.total.pre') }}:</b> {{ tableResult.total }}
-          {{ $t('table.total.hits') }}
-        </span>
         <!-- show all cells expanded -->
         <label for="showCompact">
           <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />
@@ -373,7 +369,7 @@ const picsbar = (ds: string) => {
         </label>
         <ColVisGlobalDropDown />
       </div>
-
+      <TablePagination :tableResultTotal="tableResult.total"></TablePagination>
       <!-- table -->
       <template v-for="(item, ds, index) in tableResultGrpSorted" :key="index">
         <table v-if="tableResult.total > 0" class="fancy-table">
@@ -489,49 +485,7 @@ const picsbar = (ds: string) => {
       </template>
 
       <!-- pagination -->
-      <div class="pagination">
-        <!--<div v-if="props.data.length" class="pagination">-->
-        <button @click="firstPage" :disabled="currentPageRowStart === 0">
-          <span class="material-icons">first_page</span>
-        </button>
-        <button @click="prevPage" :disabled="currentPageRowStart === 0">
-          <span class="material-icons">chevron_left</span>
-        </button>
-        <span style="color: var(--color-text)"
-          >{{ $t('table.footer.page') }}:
-          {{ Math.floor(currentPageRowStart / currentPageSize) + 1 }} {{ $t('table.of') }}
-          {{ totalPages }} ({{ $t('table.footer.hit') }}: {{ currentPageRowStart + 1 }}-{{
-            currentPageRowStart + currentPageSize > tableResult.total
-              ? tableResult.total
-              : currentPageRowStart + currentPageSize
-          }}
-          {{ $t('table.of') }} {{ tableResult.total }})</span
-        >
-        <button
-          @click="nextPage"
-          :disabled="currentPageRowStart + currentPageSize >= tableResult.total - 1"
-        >
-          <span class="material-icons">chevron_right</span>
-        </button>
-        <button
-          @click="lastPage"
-          :disabled="currentPageRowStart + currentPageSize >= tableResult.total - 1"
-        >
-          <span class="material-icons">last_page</span>
-        </button>
-        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label
-        >:
-        <select
-          @click="itemsPerPage"
-          id="itemsPerPage"
-          v-model="currentPageSize"
-          class="items-per-page"
-        >
-          <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
+      <TablePagination :tableResultTotal="tableResult.total"></TablePagination>
     </div>
   </div>
 </template>
