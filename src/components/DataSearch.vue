@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
+import { entryWordField } from '@/types/datasetConfig'
 //import type { SelectedFieldConfig } from '@/types/datasetConfig'
 
 /*
@@ -16,8 +17,11 @@ watch(
 const setActiveSearchTab = (tab: string) => {
   if (tab == 'simple') {
     // remove any additional fields we search on
-    // TODO this removes any search data, so improve this
-    lexicalStorage.setStartField()
+    if (lexicalStorage.selectedFieldsArray[0] === entryWordField) {
+      lexicalStorage.setStartField(lexicalStorage.selectedFields[entryWordField].value)
+    } else {
+      lexicalStorage.setStartField()
+    }
   }
   lexicalStorage.setActiveSearchTab(tab)
 }
@@ -353,6 +357,7 @@ watch(
                 <label>
                   <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
                   {{ lexicalStorage.localizeField(param.name) }}&nbsp;
+                  <!-- common? -->
                   <span style="float: right">
                     <img
                       height="16px"
@@ -393,14 +398,8 @@ watch(
           </div>
         </div>
         <!-- Search a field -->
-        <!--
-        <div v-if="lexicalStorage.activeSearchTab == 'extended'">
-          <i>Obs! Sök f n enbart i gemensamma fält.</i>
-        </div>
-        -->
         <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
           <!-- Search-box -->
-          <div v-if="lexicalStorage.activeSearchTab == 'extended'"></div>
           <hr v-if="lexicalStorage.activeSearchTab == 'extended'" class="search-repeat-hr" />
           <span :for="param">
             <span v-if="lexicalStorage.activeSearchTab == 'extended'">

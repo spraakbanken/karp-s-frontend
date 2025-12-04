@@ -17,8 +17,8 @@ import { getTableData } from '@/api/apiService'
 import { formatCell } from '@/utils/utils'
 
 import TableRowCompact from '@/components/TableRowCompact.vue'
-import ColumnVisDropDown from './ColumnVisDropDown.vue'
-import GlobalColumnsVisDropDown from './GlobalColumnsVisDropDown.vue'
+import ColVisDropDown from './ColVisDropDown.vue'
+import ColVisGlobalDropDown from './ColVisGlobalDropDown.vue'
 
 const { t } = useI18n()
 
@@ -371,7 +371,7 @@ const picsbar = (ds: string) => {
           <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />
           {{ $t('table.show.compact') }}
         </label>
-        <GlobalColumnsVisDropDown></GlobalColumnsVisDropDown>
+        <ColVisGlobalDropDown />
       </div>
 
       <!-- table -->
@@ -385,7 +385,7 @@ const picsbar = (ds: string) => {
                 {{
                   tableResult.resourceHits[ds] > 1 ? $t('table.total.hits') : $t('table.total.hit')
                 }}
-                <ColumnVisDropDown :resourceId="ds" />
+                <ColVisDropDown :resourceId="ds" />
                 <span v-for="(value, i) in item[0].entry" :key="i"> </span>
               </td>
             </tr>

@@ -180,7 +180,6 @@ export const lexicalStore = defineStore('dataset', {
       // prepare column visibility fields
       this.columnVis = {}
       for (const ds of this.currentDatasets) {
-        console.log('fieldsInDatasets:', ds, this.fieldsInDatasets)
         const result: ColumnVisField[] = this.fieldsInDatasets[ds].map((f) => ({
           columnField: f.name,
           vis: true,
@@ -401,12 +400,12 @@ export const lexicalStore = defineStore('dataset', {
       // console.log('setSelectedFields: ', JSON.parse(JSON.stringify(fields)))
       this.selectedFields = fields
     },
-    setStartField() {
+    setStartField(val: string = '') {
       // set "ingångsord" to default, also for statistics
       //console.log('setStartField()')
       const fields: Record<string, SelectedFieldConfig> = {}
       fields[entryWordField] = {
-        value: '',
+        value: val,
         position: 'equals',
         positionInitial: false,
         positionMedial: false,

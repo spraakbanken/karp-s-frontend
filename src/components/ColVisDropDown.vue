@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { useI18n } from 'vue-i18n'
-import { entryWordField } from '@/types/datasetConfig'
 
 const props = defineProps<{
   resourceId: string
