@@ -507,7 +507,7 @@ watch(
             <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
             <div class="">
               <div v-for="item in datasetInfo.fields" :key="item">
-                {{ lexicalStorage.localizeField(item) }}
+                {{ lexicalStorage.localizeField(item.name) }}
               </div>
             </div>
           </div>
@@ -581,7 +581,7 @@ watch(
 .dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0rem 1rem;
+  padding: 0rem 0.5rem;
   color: var(--color-text);
 }
 
@@ -602,7 +602,7 @@ watch(
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0rem 1rem;
+  padding: 0rem 0.5rem;
   margin-bottom: 0.5rem;
   color: var(--color-text);
 }
@@ -681,13 +681,13 @@ watch(
 
 .datasets-list {
   max-height: 100%;
-  width: 470px;
+  width: 390px;
   background-color: var(--color-background);
   overflow-y: auto;
 }
 
 .datasets-list-wider {
-  width: 736px;
+  width: 706px;
 }
 
 .datasets-icon {
@@ -701,7 +701,7 @@ watch(
 .datasets-info {
   background-color: var(--color-background);
   padding: 0.5rem;
-  width: 260px;
+  width: 300px;
   white-space: pre-line;
   overflow-y: auto;
 }

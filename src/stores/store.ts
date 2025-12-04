@@ -176,6 +176,28 @@ export const lexicalStore = defineStore('dataset', {
           }
         }
       })
+
+      // prepare column visibility fields
+      this.columnVis = {}
+      for (const ds of this.currentDatasets) {
+        console.log('fieldsInDatasets:', ds, this.fieldsInDatasets)
+        const result: ColumnVisField[] = this.fieldsInDatasets[ds].map((f) => ({
+          columnField: f.name,
+          vis: true,
+        }))
+        this.columnVis[ds] = [...result]
+        this.columnVis[ds].unshift({ columnField: entryWordField, vis: true })
+        const res = this.currentConfig.resources.find((item) => item.resourceId === ds)
+        if (res !== undefined) {
+          for (const fi of res.fields) {
+            const colfi = this.columnVis[ds].find((item) => item.columnField === fi.name)
+            if (colfi !== undefined) {
+              colfi.vis = fi.primary
+            }
+          }
+        }
+      }
+
       // setup default datasets for first run = select all except "Fula ordboken" ("fulaord")
       this.setSelectedDataset(this.currentDatasets.filter((element) => element !== 'fulaord'))
       // and select all tags
@@ -301,28 +323,6 @@ export const lexicalStore = defineStore('dataset', {
           this.selectedTags.push(t)
         }
       }
-
-      // prepare column visibility fields
-      this.columnVis = {}
-      for (const ds of keys) {
-        const result: ColumnVisField[] = this.fieldsInDatasets[ds].map((f) => ({
-          columnField: f.name,
-          vis: true,
-        }))
-        this.columnVis[ds] = [...result]
-        this.columnVis[ds].unshift({ columnField: entryWordField, vis: true })
-        const res = this.currentConfig.resources.find((item) => item.resourceId === ds)
-        if (res !== undefined) {
-          for (const fi of res.fields) {
-            const colfi = this.columnVis[ds].find((item) => item.columnField === fi.name)
-            if (colfi !== undefined) {
-              colfi.vis = fi.primary
-            }
-          }
-        }
-      }
-
-      //}
     },
     /*
     setSelectedTag(tags: string[]) {
