@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {
-  ROW_MAX_HEIGHT,
   ROW_SHOW_COMPACT_DEFAULT,
   GRAPH_BARWIDTH,
   BE_STATISTICS_VALUES_ID,
+  SORT_ORDER_ASCENDING,
+  SORT_ORDER_DESCENDING,
 } from '@/utils/constants'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
@@ -39,9 +40,10 @@ const statisticsTotals = computed({
   set: (value) => (lexicalStorage.statisticsTotals = value),
 })
 
-const sortKey = ref('')
-const sortOrder = ref<'asc' | 'desc'>('asc')
-//const currentTab = ref(lexicalStorage.activeResultTab)
+// sort column
+//const sortField = ref(lexicalStorage.tableSortField)
+//const sortOrder = ref<typeof SORT_ORDER_ASCENDING | typeof SORT_ORDER_DESCENDING>(SORT_ORDER_ASCENDING)
+
 const currentTab = computed({
   get: () => lexicalStorage.activeResultTab,
   set: (value) => (lexicalStorage.activeResultTab = value),
@@ -132,25 +134,28 @@ const selectedColumns = computed({
 
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 
-// sort column
+// sort column selection
 
-const sortField = ref(lexicalStorage.sortField)
-
-const doSort = (s: string) => {
-  sortField.value = s
+const doSort = (field: string, order: string) => {
+  lexicalStorage.statisticsSortField = field
+  lexicalStorage.statisticsSortOrder = order
+  /*
   if (sortField.value == lexicalStorage.sortField) {
-    if (lexicalStorage.sortOrder == 'asc') {
-      lexicalStorage.sortOrder = 'desc'
+    if (lexicalStorage.sortOrder == SORT_ORDER_ASCENDING) {
+      lexicalStorage.sortOrder = SORT_ORDER_DESCENDING
     } else {
-      lexicalStorage.sortOrder = 'asc'
+      lexicalStorage.sortOrder = SORT_ORDER_ASCENDING
     }
   } else {
-    lexicalStorage.sortOrder = 'asc'
+    lexicalStorage.sortOrder = SORT_ORDER_ASCENDING
   }
-  lexicalStorage.sortField = sortField.value
-  fetchData()
+  */
 
-  console.log('doSort()', sortField.value)
+  // TODO: not really necessary as we sort in FE
+  //fetchData()
+  lexicalStorage.statisticsPageStart = 1
+
+  console.log('doSort()', lexicalStorage.statisticsSortField)
 }
 
 // update state from URL
@@ -208,7 +213,7 @@ const fetchData = async () => {
         columnCount.value as boolean,
       )
       statisticsHeaders.value = headers
-      // make sure any appearences of "entryWord" i headers
+      // make sure any appearences of "entryWord" in headers
       // are replaced by "entry_word"
       // ie replace entryWordFieldCamel with entryWordField
       statisticsHeaders.value.forEach((f, i) => {
@@ -287,20 +292,19 @@ watch(
 )
 
 const sortedData = computed(() => {
-  //console.log('Recalc!', sortKey.value)
-  if (!sortKey.value) {
+  console.log('sortedData compute: ', lexicalStorage.statisticsSortField)
+  const order = lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING ? 1 : -1
+  if (!lexicalStorage.statisticsSortField) {
     return statisticsResult.value
   } else {
     return [...statisticsResult.value].sort((a, b) => {
       //const aValue = a[sortKey.value]
       //const bValue = b[sortKey.value]
       // data is of format a[0] = "name", a[1] = number
-      const aValue = a[1]
-      const bValue = b[1]
+      const aValue = a[0]
+      const bValue = b[0]
       //console.log('Sort', aValue, bValue, a, b)
       if (aValue === bValue) return 0
-
-      const order = sortOrder.value === 'asc' ? 1 : -1
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return aValue.localeCompare(bValue) * order
@@ -320,15 +324,20 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(start, end)
 })
 
+/*
 const sortTable = (key: string) => {
-  // console.log(key)
-  if (sortKey.value === key) {
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  console.log('sortTable, key:', key)
+  if (lexicalStorage.statisticsSortField === key) {
+    lexicalStorage.statisticsSortOrder =
+      lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING
+        ? SORT_ORDER_DESCENDING
+        : SORT_ORDER_ASCENDING
   } else {
-    sortKey.value = key
-    sortOrder.value = 'asc'
+    lexicalStorage.statisticsSortField = key
+    lexicalStorage.statisticsSortOrder = SORT_ORDER_ASCENDING
   }
 }
+*/
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutsideS)
@@ -957,7 +966,6 @@ const refClick = (tRow: number, tCol: number) => {
             <th
               v-for="(key, index) in statisticsHeaders"
               :key="index"
-              @click="sortTable(String(index))"
               :class="{
                 'header-list': lexicalStorage.isList(key.columnField),
                 'header-count': key.type == 'count',
@@ -987,22 +995,6 @@ const refClick = (tRow: number, tCol: number) => {
                             ? '(' + t('table.header.list') + ')'
                             : ''
                       }}-->
-                      </span>
-
-                      <span
-                        class="header-sortable"
-                        :class="{
-                          'header-sortable-selected': lexicalStorage.sortField == key.columnField,
-                        }"
-                        v-if="currentCommonFields.find((obj) => obj.name === key.columnField)"
-                        @click="doSort(key.columnField)"
-                      >
-                        {{
-                          lexicalStorage.sortOrder == 'asc' ||
-                          lexicalStorage.sortField != key.columnField
-                            ? '▼'
-                            : '▲'
-                        }}
                       </span>
                     </div>
                     <div>
@@ -1037,6 +1029,31 @@ const refClick = (tRow: number, tCol: number) => {
                   <span v-else> {{ t('statistics.total') }} </span>
                 </template>
               </div>
+              {{ key.columnField }}
+              <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
+                <span class="header-sortable material-icons">
+                  <span
+                    @click="doSort(key.columnField, SORT_ORDER_ASCENDING)"
+                    :class="{
+                      'header-sortable-selected':
+                        lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
+                        lexicalStorage.statisticsSortField == key.columnField,
+                    }"
+                  >
+                    {{ 'keyboard_arrow_down' }}
+                  </span>
+                  <span
+                    @click="doSort(key.columnField, SORT_ORDER_DESCENDING)"
+                    :class="{
+                      'header-sortable-selected':
+                        lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
+                        lexicalStorage.statisticsSortField == key.columnField,
+                    }"
+                  >
+                    {{ 'keyboard_arrow_up' }}
+                  </span>
+                </span>
+              </template>
             </th>
           </tr>
         </thead>
@@ -1204,12 +1221,13 @@ const refClick = (tRow: number, tCol: number) => {
 }
 
 .header-sortable {
-  color: var(--sb-grey-light);
   cursor: pointer;
+  margin-left: 0.5rem;
+  color: var(--sb-grey-medium);
 }
 
 .header-sortable-selected {
-  color: var(--sb-orange);
+  color: black;
 }
 
 /*

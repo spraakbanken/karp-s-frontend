@@ -12,7 +12,7 @@ import {
   entryWordField,
   type ColumnVisField,
 } from '@/types/datasetConfig.ts'
-import { ROWS_PER_PAGE, TABREFCOUNT_MAX } from '@/utils/constants'
+import { ROWS_PER_PAGE, SORT_ORDER_ASCENDING, TABREFCOUNT_MAX } from '@/utils/constants'
 
 interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
@@ -42,8 +42,10 @@ interface SearchRedux {
   activeSearchTab: string
   activeResultTab: string
   activeLocale: string
-  sortField: string
-  sortOrder: string
+  tableSortField: string
+  tableSortOrder: string
+  statisticsSortField: string
+  statisticsSortOrder: string
   datasetLabels: Record<string, string>
   datasetDates: DatasetDates[]
   abortController: AbortController | null
@@ -90,8 +92,10 @@ export const lexicalStore = defineStore('dataset', {
     activeSearchTab: 'simple',
     activeResultTab: 'table',
     activeLocale: 'sv',
-    sortField: '',
-    sortOrder: 'asc',
+    tableSortField: '',
+    tableSortOrder: SORT_ORDER_ASCENDING,
+    statisticsSortField: '',
+    statisticsSortOrder: SORT_ORDER_ASCENDING,
     datasetLabels: {},
     datasetDates: [],
     abortController: null,
@@ -198,7 +202,9 @@ export const lexicalStore = defineStore('dataset', {
       }
 
       // setup default datasets for first run = select all except "Fula ordboken" ("fulaord")
-      this.setSelectedDataset(this.currentDatasets.filter((element) => element !== 'fulaord'))
+      this.setSelectedDataset(
+        this.currentDatasets.filter((element) => element !== 'fulaord' && element !== 'flex'),
+      )
       // and select all tags
       this.setSelectedTags(this.currentTags)
     },
@@ -297,8 +303,8 @@ export const lexicalStore = defineStore('dataset', {
         this.selectedDatasetsSize = 0
         return []
       }
-      this.sortField = entryWordField
-      this.sortOrder = 'asc'
+      this.tableSortField = entryWordField
+      this.tableSortOrder = SORT_ORDER_ASCENDING
       this.setSelectedCompileFields([entryWordField])
       this.setSelectedColumns([])
 
@@ -418,9 +424,9 @@ export const lexicalStore = defineStore('dataset', {
       if (sf) {
         const sortParams: string[] = sf.split('|')
         if (sortParams.length > 1) {
-          this.sortField = sortParams[0]
+          this.tableSortField = sortParams[0]
           if (sortParams.length > 2) {
-            this.sortOrder = sortParams[1]
+            this.tableSortOrder = sortParams[1]
           }
         }
       }

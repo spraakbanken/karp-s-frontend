@@ -12,6 +12,10 @@ export const BE_STATISTICS_VALUES_ID: string = 'values' // and for value
 export const BE_STATISTICS_COUNT_ID: string = 'count' // what BE sends in statistics data for count value in object
 export const BE_STATISTICS_VALUE_ID: string = 'value' // and for value
 
+// sortering
+export const SORT_ORDER_ASCENDING: string = 'asc'
+export const SORT_ORDER_DESCENDING: string = 'desc'
+
 // error messages
 
 export enum BEErrorCode {

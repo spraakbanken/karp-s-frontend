@@ -5,7 +5,11 @@ import { useI18n } from 'vue-i18n'
 
 import { groupBy } from 'es-toolkit'
 
-import { ROW_SHOW_COMPACT_DEFAULT } from '@/utils/constants'
+import {
+  ROW_SHOW_COMPACT_DEFAULT,
+  SORT_ORDER_ASCENDING,
+  SORT_ORDER_DESCENDING,
+} from '@/utils/constants'
 import {
   type DatasetEntry,
   type Entry,
@@ -51,7 +55,7 @@ const tableResultGrpSorted = ref<Record<string, { entry: EntryS[]; resourceId: s
 const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 
 // sort column
-const sortField = ref(lexicalStorage.sortField)
+const sortField = ref(lexicalStorage.tableSortField)
 
 // always show expanded rows (no "View more" button)
 const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
@@ -67,40 +71,6 @@ const currentPageSize = computed({
   get: () => lexicalStorage.tablePageSize,
   set: (value) => (lexicalStorage.tablePageSize = value),
 })
-
-const totalPages = computed(() => {
-  return Math.ceil(tableResult.value.total / currentPageSize.value)
-})
-
-const firstPage = () => {
-  currentPageRowStart.value = 0
-}
-
-const prevPage = () => {
-  if (currentPageRowStart.value > 0) {
-    currentPageRowStart.value -= currentPageSize.value
-    if (currentPageRowStart.value < 0) {
-      currentPageRowStart.value = 0
-    } /* else if (currentPageRowStart.value < currentPageSize.value) {
-      currentPageRowStart.value = 0
-    }*/
-  }
-}
-
-const nextPage = () => {
-  if (currentPageRowStart.value < tableResult.value.total - 1) {
-    currentPageRowStart.value += currentPageSize.value
-  }
-}
-
-const lastPage = () => {
-  currentPageRowStart.value =
-    Math.floor((tableResult.value.total - 1) / currentPageSize.value) * currentPageSize.value
-}
-
-const itemsPerPage = () => {
-  //fetchData()
-}
 
 watch(
   () => currentPageRowStart.value,
@@ -132,9 +102,13 @@ watch(
   },
 )
 
-// sort columns
+// sort column selection
 
-const doSort = (s: string) => {
+const doSort = (field: string, sortOrder: string) => {
+  sortField.value = field
+  lexicalStorage.tableSortField = field
+  lexicalStorage.tableSortOrder = sortOrder
+  /*
   sortField.value = s
   if (sortField.value == lexicalStorage.sortField) {
     if (lexicalStorage.sortOrder == 'asc') {
@@ -145,10 +119,10 @@ const doSort = (s: string) => {
   } else {
     lexicalStorage.sortOrder = 'asc'
   }
-  lexicalStorage.sortField = sortField.value
+  */
   fetchData()
 
-  console.log('doSort()', sortField.value)
+  //console.log('doSort()', sortField.value)
 }
 
 const errorMessage = ref('')
@@ -426,27 +400,31 @@ const picsbar = (ds: string) => {
                             ')'
                           }}
                         </template>
-
-                        <!--
-                    {{
-                      lexicalStorage.isList(value.name) ? '(' + t('table.header.list') + ')' : ''
-                    }}--></span
-                      >
-
-                      <span
-                        class="header-sortable"
-                        :class="{
-                          'header-sortable-selected': lexicalStorage.sortField == value.name,
-                        }"
-                        v-if="currentCommonFields.find((obj) => obj.name === value.name)"
-                        @click="doSort(value.name)"
-                        >{{
-                          lexicalStorage.sortOrder == 'asc' ||
-                          lexicalStorage.sortField != value.name
-                            ? '▼'
-                            : '▲'
-                        }}
                       </span>
+                      <template v-if="currentCommonFields.find((obj) => obj.name === value.name)">
+                        <span class="header-sortable material-icons">
+                          <span
+                            @click="doSort(value.name, SORT_ORDER_ASCENDING)"
+                            :class="{
+                              'header-sortable-selected':
+                                lexicalStorage.tableSortOrder == SORT_ORDER_ASCENDING &&
+                                lexicalStorage.tableSortField == value.name,
+                            }"
+                          >
+                            {{ 'keyboard_arrow_down' }}
+                          </span>
+                          <span
+                            @click="doSort(value.name, SORT_ORDER_DESCENDING)"
+                            :class="{
+                              'header-sortable-selected':
+                                lexicalStorage.tableSortOrder == SORT_ORDER_DESCENDING &&
+                                lexicalStorage.tableSortField == value.name,
+                            }"
+                          >
+                            {{ 'keyboard_arrow_up' }}
+                          </span>
+                        </span>
+                      </template>
                     </div>
                   </th>
                 </template>
@@ -637,9 +615,6 @@ const picsbar = (ds: string) => {
 .header-sortable {
   cursor: pointer;
   margin-left: 0.5rem;
-}
-
-.header-sortable .icon {
   color: var(--sb-grey-medium);
 }
 
