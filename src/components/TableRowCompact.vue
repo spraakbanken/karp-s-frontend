@@ -36,7 +36,7 @@ const [expanded, toggleExpanded] = useToggle()
   <tr :class="{ 'limited-height': !expanded && isTooTall() }">
     <template v-for="(value2, key) in value1.entry" :key="key">
       <td v-if="thflag && key === 0" class="button-span material-icons" @click="toggleExpanded()">
-        {{ expanded ? 'expand_less' : 'expand_more' }}
+        {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
       </td>
       <td v-else-if="key === 0 && showCompact"></td>
       <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
@@ -70,7 +70,7 @@ const [expanded, toggleExpanded] = useToggle()
   padding: 0;
   cursor: pointer;
   vertical-align: text-bottom;
-  font-size: 22px;
+  font-size: 30px;
   border: none;
 }
 

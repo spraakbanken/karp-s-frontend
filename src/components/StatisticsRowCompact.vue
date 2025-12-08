@@ -88,7 +88,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
           class="button-span material-icons"
           @click="toggleExpanded()"
         >
-          {{ expanded ? 'expand_less' : 'expand_more' }}
+          {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <td ref="tdRefs">
@@ -127,7 +127,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
   padding: 0;
   cursor: pointer;
   vertical-align: text-bottom;
-  font-size: 22px;
+  font-size: 30px;
   border: none;
 }
 
