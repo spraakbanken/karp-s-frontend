@@ -105,7 +105,7 @@ onMounted(() => {
   cursor: pointer;
   border: none;
   /* border-radius: 5px; */
-  margin: 0 0rem 0rem 0.5rem;
+  margin: 0;
   padding: 0.5;
   background-color: var(--sb-grey-dark);
   color: white;

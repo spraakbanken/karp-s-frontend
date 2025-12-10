@@ -53,7 +53,6 @@ onMounted(async () => {
 
 <style scoped>
 .wrapper {
-  height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -61,7 +60,7 @@ onMounted(async () => {
 header {
   line-height: 1.5;
   max-height: 100vh;
-  width: 100vw;
+  /*width: 100vw;*/
   /* border-bottom: 2px solid var(--border-color); */
 }
 

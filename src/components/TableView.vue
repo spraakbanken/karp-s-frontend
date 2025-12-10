@@ -42,6 +42,14 @@ const tableResult = ref<DatasetResult>({
 
 //const tableResult = ref<DatasetResult>(lexicalStorage.tableResult)
 
+// open window at url link for given resourceId (ds)
+const clickResourceInfo = (ds: string) => {
+  const url = lexicalStorage.currentConfig.resources.find((x) => x.resourceId === ds)
+  if (url !== undefined) {
+    window.open(url.link, '_blank')
+  }
+}
+
 const tableResult = computed({
   get: () => lexicalStorage.tableResult,
   set: (value) => (lexicalStorage.tableResult = value),
@@ -351,10 +359,16 @@ const picsbar = (ds: string) => {
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
-                {{ lexicalStorage.datasetLabels[ds] }}: {{ tableResult.resourceHits[ds] }}
-                {{
-                  tableResult.resourceHits[ds] > 1 ? $t('table.total.hits') : $t('table.total.hit')
-                }}
+                {{ lexicalStorage.datasetLabels[ds] }}
+                <button class="button" @click="clickResourceInfo(ds)">Info</button>
+                <span class="hits">
+                  {{ tableResult.resourceHits[ds] }}
+                  {{
+                    tableResult.resourceHits[ds] > 1
+                      ? $t('table.total.hits')
+                      : $t('table.total.hit')
+                  }}
+                </span>
                 <ColVisDropDown :resourceId="ds" />
                 <span v-for="(value, i) in item[0].entry" :key="i"> </span>
               </td>
@@ -471,10 +485,13 @@ const picsbar = (ds: string) => {
 <style src="@/assets/table.css" scoped></style>
 
 <style scoped>
+.table-wrapper {
+}
+/*
 .table-container {
   margin-bottom: 0rem;
 }
-
+*/
 .graph-parameter {
   margin-top: 0.5rem;
   margin-left: 0.5rem;
@@ -637,5 +654,13 @@ const picsbar = (ds: string) => {
   background-color: var(--color-background);
   color: var(--color-text);
   font-weight: bold;
+}
+
+.dataset-label button {
+  margin-right: 0.25rem;
+}
+
+.dataset-label .hits {
+  margin-right: 0.25rem;
 }
 </style>

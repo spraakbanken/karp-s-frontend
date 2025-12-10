@@ -1,5 +1,11 @@
 @import url('sb.css');
 
+/* help for finding boxes/overflow
+* {
+  outline: 1px solid #f00 !important;
+}
+*/
+
 /* Define light mode variables */
 :root {
   --color-background: #ffffff;
@@ -88,16 +94,20 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
 
+  box-sizing: border-box;
+  margin: 0;
+}
+/*
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   margin: 0;
-  /*font-weight: normal;*/
 }
+*/
 
+/*
 table {
   width: 100%;
   border-collapse: collapse;
@@ -135,7 +145,7 @@ tr:hover {
   color: var(--color-icon);
   font-size: 20px;
 }
-
+*/
 .arrow-down {
   border: solid black;
   border-width: 0 2px 2px 0;
@@ -145,4 +155,14 @@ tr:hover {
   vertical-align: 3px;
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+h2 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+h3 {
+  margin-top: 0.25rem;
+  margin-bottom: 0rem;
 }

@@ -490,7 +490,8 @@ watch(
 
           <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
             <div class="datasets-info-label">{{ datasetInfo.label }}</div>
-            <div class="">{{ datasetInfo.description }}</div>
+            <!-- 'description' can contain HTML -->
+            <div class="" v-html="datasetInfo.description"></div>
             <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
             <div class="">{{ datasetInfo.updated }}</div>
             <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
@@ -585,6 +586,9 @@ watch(
   color: var(--color-text);
 }
 
+.dropdown-item img {
+  height: 20px;
+}
 .dropdown-item input {
   margin-right: 0.5rem;
   cursor: pointer;

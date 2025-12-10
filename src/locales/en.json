@@ -19,6 +19,8 @@
   "about.additions.text": "Latest additions:",
   "about.news.title": "News",
   "about.news.text": "Latest news:",
+  "additions.button.info": "Info",
+  "additions.button.search": "Search in",
   "tab.tables": "Tables",
   "tab.statistics": "Statistics",
   "tab.graph": "Overview",

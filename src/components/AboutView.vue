@@ -85,11 +85,10 @@ onMounted(async () => {
 
 .row {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   width: 100%;
-  @media (width < 640px) {
-    width: 400px;
+  @media (width < 800px) {
+    width: 480px;
     flex-direction: column;
   }
 }

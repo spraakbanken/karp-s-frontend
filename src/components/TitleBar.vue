@@ -180,11 +180,11 @@ onMounted(() => {
 @media (max-width: 800px) {
   .header-area {
     flex-direction: column;
-    justify-content: left;
+    align-items: center;
   }
   .middle-area,
   .right-area {
-    justify-content: left;
+    align-items: center;
   }
 }
 </style>

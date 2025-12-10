@@ -21,23 +21,6 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
-  /* body {
-    display: flex;
-    place-items: center;
-  } */
-
-  #app {
-    display: grid;
-    /* grid-template-rows: 1fr 5fr 1fr; */
-    /* padding: 0 2rem; */
-  }
-
-  #app > *:not(:first-child) {
-    border-top: 1px solid #ddd;
-  }
-}
-
 /* Info and error messages */
 
 .message {
@@ -48,14 +31,11 @@ a,
 
 .message-featured {
   background-color: var(--sb-message-background);
-  box-sizing: content-box;
   margin: auto;
   text-align: center;
   color: black;
   width: 600px;
   padding: 1rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
 }
 
 .message-error {

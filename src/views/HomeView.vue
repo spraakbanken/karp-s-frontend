@@ -131,7 +131,7 @@ const tabRefClose = (id: number) => {
     </template>
 
     <div>
-      <TableView v-if="activeResultTab === 'table'" />
+      <TableView v-if="activeResultTab === 'table' && !lexicalStorage.isStart" />
       <StatisticsView v-if="activeResultTab === 'statistics'" />
       <div v-for="(tabRef, key) in tabRefSetup" :key="key">
         <TabRefView
@@ -168,7 +168,6 @@ const tabRefClose = (id: number) => {
   gap: 0.5rem;
   align-items: center;
   justify-content: flex-start;
-  width: 100vw;
 }
 
 .column-left {
@@ -248,6 +247,10 @@ const tabRefClose = (id: number) => {
 }
 
 /* News, featured */
+
+.message-featured {
+  padding-top: 0.25rem;
+}
 
 .newsarticle {
   margin-bottom: 0.5rem;
