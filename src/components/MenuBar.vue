@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 //import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -16,7 +16,25 @@ function ChangeLocale(aLocale: string) {
 
 const themeCurrent = ref('light')
 
+const isDropDownLanguage = ref(false)
+const dropDownLanguageContainer = ref<HTMLElement | null>(null)
+
+const toggleDropdownLanguage = () => {
+  isDropDownLanguage.value = !isDropDownLanguage.value
+}
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (
+    dropDownLanguageContainer.value &&
+    !dropDownLanguageContainer.value.contains(event.target as Node)
+  ) {
+    isDropDownLanguage.value = false
+  }
+}
+
 onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+
   const themeToggle = document.getElementById('theme-toggle')
 
   if (themeToggle) {
@@ -31,6 +49,10 @@ onMounted(() => {
     })
   }
 })
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -39,21 +61,42 @@ onMounted(() => {
     <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
     <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
     -->
-    <a href="https://spraakbanken.gu.se/karp/">
-      <span class="material-icons">mode_edit</span>{{ $t('menu.editmode') }}
-    </a>
+    <span class="icon-adjust">
+      <a href="https://spraakbanken.gu.se/karp/">
+        <span class="material-icons">mode_edit</span>{{ $t('menu.editmode') }}
+      </a>
+    </span>
     <button id="theme-toggle" class="nav-button button-mode">
       <span class="material-icons" v-if="themeCurrent === 'light'">light_mode</span>
       <span class="material-icons" v-else>dark_mode</span>
     </button>
-    <div class="dropdown">
-      <div class="dropdown-toggle">
+    <div
+      class="dropdown"
+      ref="dropDownLanguageContainer"
+      :class="{ 'dropdown-open': isDropDownLanguage }"
+    >
+      <div class="dropdown-toggle" @click="toggleDropdownLanguage">
         <span class="material-icons">language</span>
-        <button class="nav-button">{{ $t('menu.' + locale) }}</button>
+        <span class="material-icons">keyboard_arrow_down</span>
+        <!--<button class="nav-button">{{ $t('menu.' + locale) }}</button>-->
       </div>
-      <div class="dropdown-content">
-        <a href="#" @click.prevent="ChangeLocale('en')">{{ $t('menu.en') }}</a>
-        <a href="#" @click.prevent="ChangeLocale('sv')">{{ $t('menu.sv') }}</a>
+      <div class="dropdown-content" v-if="isDropDownLanguage">
+        <a href="#" @click.prevent="ChangeLocale('en')">
+          <span
+            :class="{ hidden: locale === 'sv', visible: locale === 'en' }"
+            class="material-icons"
+            >check</span
+          >
+          {{ $t('menu.en') }}
+        </a>
+        <a href="#" @click.prevent="ChangeLocale('sv')">
+          <span
+            :class="{ hidden: locale === 'en', visible: locale === 'sv' }"
+            class="material-icons"
+            >check</span
+          >
+          {{ $t('menu.sv') }}
+        </a>
       </div>
     </div>
   </nav>
@@ -63,7 +106,7 @@ onMounted(() => {
 nav {
   display: flex;
   flex-direction: row;
-  align-items: top;
+  align-items: center;
   vertical-align: top;
   justify-content: right;
   width: 100%;
@@ -113,22 +156,28 @@ nav button.button-mode {
   margin-top: 2px;
 }
 
+/* language selection dropdown */
+
 .dropdown {
   position: relative;
-  display: inline-block;
+  color: black;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: baseline;
+  padding-left: 1rem;
+  cursor: pointer;
 }
 
 .dropdown-content {
-  display: none;
+  text-align: left;
   position: absolute;
   background-color: var(--color-background);
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
+  border: 1px solid var(--color-border);
+  overflow-y: auto;
+  width: 160px;
+  z-index: 1000;
 }
 
 .dropdown-content a {
@@ -138,17 +187,15 @@ nav button.button-mode {
   display: block;
 }
 
-.dropdown-content a:hover {
-  background-color: hsla(160, 100%, 37%, 0.2);
-}
-
-.dropdown-toggle {
-  display: flex;
-  align-items: center;
-  padding-left: 1rem;
-}
-
 .material-icons {
   font-size: 20px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
 }
 </style>

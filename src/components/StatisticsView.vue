@@ -1028,32 +1028,32 @@ const refClick = (tRow: number, tCol: number) => {
                   </span>
                   <span v-else> {{ t('statistics.total') }} </span>
                 </template>
+                <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
+                  <span class="header-sortable material-icons">
+                    <span
+                      @click="doSort(key.columnField, SORT_ORDER_ASCENDING)"
+                      :class="{
+                        'header-sortable-selected':
+                          lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
+                          lexicalStorage.statisticsSortField == key.columnField,
+                      }"
+                    >
+                      {{ 'keyboard_arrow_down' }}
+                    </span>
+                    <span> </span>
+                    <span
+                      @click="doSort(key.columnField, SORT_ORDER_DESCENDING)"
+                      :class="{
+                        'header-sortable-selected':
+                          lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
+                          lexicalStorage.statisticsSortField == key.columnField,
+                      }"
+                    >
+                      {{ 'keyboard_arrow_up' }}
+                    </span>
+                  </span>
+                </template>
               </div>
-              {{ key.columnField }}
-              <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
-                <span class="header-sortable material-icons">
-                  <span
-                    @click="doSort(key.columnField, SORT_ORDER_ASCENDING)"
-                    :class="{
-                      'header-sortable-selected':
-                        lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
-                        lexicalStorage.statisticsSortField == key.columnField,
-                    }"
-                  >
-                    {{ 'keyboard_arrow_down' }}
-                  </span>
-                  <span
-                    @click="doSort(key.columnField, SORT_ORDER_DESCENDING)"
-                    :class="{
-                      'header-sortable-selected':
-                        lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
-                        lexicalStorage.statisticsSortField == key.columnField,
-                    }"
-                  >
-                    {{ 'keyboard_arrow_up' }}
-                  </span>
-                </span>
-              </template>
             </th>
           </tr>
         </thead>
@@ -1200,12 +1200,14 @@ const refClick = (tRow: number, tCol: number) => {
 }
 
 .header-content {
-  /*
   display: flex;
   align-items: top;
   flex-direction: row;
   justify-content: space-between;
-  */
+}
+
+.header-content span {
+  display: flex;
 }
 
 .header-value-col {
@@ -1317,6 +1319,10 @@ input[type='checkbox'][disabled] + label {
 
 .overview-settings .export-button {
   margin: 0;
+}
+
+.material-icons {
+  font-size: 20px;
 }
 </style>
 

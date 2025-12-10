@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, reactive, computed } from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
 
 import { lexicalStore } from '../stores/store'
@@ -248,6 +248,7 @@ const tabRefClose = (id: number) => {
 }
 
 /* News, featured */
+
 .newsarticle {
   margin-bottom: 0.5rem;
   width: 600px;

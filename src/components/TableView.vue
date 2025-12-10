@@ -623,7 +623,6 @@ const picsbar = (ds: string) => {
 }
 
 .header-list {
-  font-style: italic;
   background-color: var(--sb-grey-light);
   color: black;
 }

@@ -305,6 +305,8 @@ export const lexicalStore = defineStore('dataset', {
       }
       this.tableSortField = entryWordField
       this.tableSortOrder = SORT_ORDER_ASCENDING
+      this.statisticsSortField = entryWordField
+      this.tableSortOrder = SORT_ORDER_ASCENDING
       this.setSelectedCompileFields([entryWordField])
       this.setSelectedColumns([])
 

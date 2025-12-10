@@ -54,7 +54,8 @@ a,
   color: black;
   width: 600px;
   padding: 1rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .message-error {
