@@ -326,13 +326,13 @@ watch(
       // set "ingångsord" to default, also for statistics
       lexicalStorage.setStartField()
     }
-    // console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
+    //console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
     if (newDatasets.value.length === 0) {
       fields.value = {}
       selectedFields.value = {}
       selectedColumns.value = []
       selectedCompileParams.value = []
-      lexicalStorage.setIsSearch(true)
+      lexicalStorage.setIsSearch(true, true)
     }
   },
 )
@@ -540,6 +540,7 @@ watch(
 
 .dropdown-open {
   border-color: var(--sb-orange);
+  border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .dropdown-group {
@@ -571,8 +572,8 @@ watch(
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
+  left: 0rem;
+  right: 0rem;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   max-height: 600px;

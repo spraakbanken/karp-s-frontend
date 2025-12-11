@@ -116,7 +116,7 @@
   "graphs.horizontal": "Horisontell",
   "graphs.maxnumberofvalues": "Endast de första {number} värdena visas",
   "graphs.excluded": "Värden som ej visas:",
-  "error.nodata": "Det finns inget att visa.",
+  "error.nodata": "Det finns inget att visa, gör en ny sökning.",
   "error.fetching.data": "Fel uppstod vid hämtning av data.",
   "error.code.1": "Antal kolumner blir för stort i sökningen. Välj andra kolumner eller sök fram färre rader.",
   "message.loading": "Hämtar data...",

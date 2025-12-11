@@ -232,7 +232,7 @@ watch(
 watch(
   () => lexicalStorage.selectedDatasets,
   (newDatasets) => {
-    console.log('WATCH TableView: selectedDatasets', lexicalStorage.selectedDatasets)
+    //console.log('WATCH TableView: selectedDatasets', lexicalStorage.selectedDatasets)
     if (newDatasets.length === 0) {
       tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
       //currentValues.value = []
@@ -295,6 +295,28 @@ const picsbar = (ds: string) => {
   currentPageRowStart.value = hitCount
   //console.log('Page: ', currentPage.value, hitCount)
 }
+
+// return fraction of total picsbar
+const picsbarFractionTotalClass = (ds: string) => {
+  // ds = name of dataset
+  // look up ds in currentResult.resourceHits
+  // add count until found
+  // so we should go to page: count / itemsPerPage.value
+  let hitCount: number = 0
+  for (const index in tableResult.value.resourceOrder) {
+    if (tableResult.value.resourceOrder[index] === ds) {
+      break
+    } else {
+      hitCount += tableResult.value.resourceHits[tableResult.value.resourceOrder[index]]
+    }
+  }
+  const fraction = hitCount / tableResult.value.total
+  return {
+    'picsbar-tooltiptext-r': fraction < 0.25,
+    'picsbar-tooltiptext-l': fraction > 0.75,
+    'picsbar-tooltiptext': fraction >= 0.25 && fraction <= 0.75,
+  }
+}
 </script>
 
 <template>
@@ -333,7 +355,7 @@ const picsbar = (ds: string) => {
                 <template v-if="Object.keys(tableResult.resourceOrder).length < 6">
                   {{ lexicalStorage.datasetLabels[value] }}
                 </template>
-                <span class="picsbar-tooltiptext"
+                <span :class="picsbarFractionTotalClass(value)"
                   >{{ lexicalStorage.datasetLabels[value] }}:
                   {{ tableResult.resourceHits[value] }}</span
                 >
@@ -579,18 +601,60 @@ const picsbar = (ds: string) => {
   z-index: 1;
 }
 
-.picsbar-tooltip .picsbar-tooltiptext::after {
+.picsbar-tooltip .picsbar-tooltiptext-r {
+  width: 120px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: 0px; /* Use half of the width (120/2 = 60), to center the tooltip */
+
+  visibility: hidden;
+  background-color: var(--sb-orange);
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 5px 0;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.picsbar-tooltip .picsbar-tooltiptext-l {
+  width: 120px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -120px; /* Use half of the width (120/2 = 60), to center the tooltip */
+
+  visibility: hidden;
+  background-color: var(--sb-orange);
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 5px 0;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+/*
+.picsbar-tooltip .picsbar-tooltiptext::after,
+.picsbar-tooltip .picsbar-tooltiptext-r::after,
+.picsbar-tooltip .picsbar-tooltiptext-l::after {
   content: ' ';
-  position: absolute; /* absolute */
-  top: 100%; /* At the bottom of the tooltip */
+  position: absolute;
+  top: 100%;
   left: 50%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
   border-color: var(--sb-orange) transparent transparent transparent;
 }
+*/
 
-.picsbar-tooltip:hover .picsbar-tooltiptext {
+.picsbar-tooltip:hover .picsbar-tooltiptext,
+.picsbar-tooltip:hover .picsbar-tooltiptext-r,
+.picsbar-tooltip:hover .picsbar-tooltiptext-l {
   visibility: visible;
   white-space: normal;
 }

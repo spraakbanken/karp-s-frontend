@@ -116,7 +116,7 @@
   "graphs.horizontal": "Horisontal",
   "graphs.maxnumberofvalues": "Only the first {number} values are shown",
   "graphs.excluded": "Values not shown:",
-  "error.nodata": "There is nothing to show.",
+  "error.nodata": "There is nothing to show, do a new search.",
   "error.fetching.data": "Error fetching data.",
   "error.code.1": "Too many rows per cell. Select other columns or filter fewer rows.",
   "message.loading": "Loading...",
