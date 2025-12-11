@@ -379,11 +379,7 @@ watch(
       </div>
 
       <!-- dropdown -->
-      <div
-        class="dropdown-menu"
-        v-if="isDropdownOpen"
-        :class="{ 'datasets-list-wider': datasetInfo['label'] !== '' }"
-      >
+      <div class="dropdown-menu" v-if="isDropdownOpen">
         <div class="dropdown-group">
           {{ $t('dataselector.tags.title') }}
           <!-- show tags -->
@@ -437,8 +433,10 @@ watch(
           </div>
           -->
         </div>
+        <!--
         <div class="dropdown-selectedfirst">
-          <!--
+
+
           <div>
             <input
               type="checkbox"
@@ -449,10 +447,12 @@ watch(
             {{ $t('dataselector.datasets.selectedfirst') }}
           </div>
           -->
-          <div v-if="listExcludedDatasets" class="datasets-excluded">
-            {{ $t('dataselector.datasets.excluded') }}
-          </div>
+        <div v-if="listExcludedDatasets" class="datasets-excluded">
+          {{ $t('dataselector.datasets.excluded') }}
         </div>
+        <!--
+        </div>
+        -->
         <div class="dropdown-selectors">
           <button @click="selectAllFiltered()" class="tags-button-action">
             {{ $t('dataselector.tags.select') }}
@@ -469,7 +469,17 @@ watch(
         <div class="datasets-group">
           <div class="datasets-list">
             <div v-for="dataset in filteredDatasets" :key="dataset" class="dropdown-item">
-              <div>
+              <div class="datasets-list-item">
+                <span class="datasets-icon material-icons" @click="datasetInfoFill(dataset)">
+                  {{ previousDataset === dataset ? 'arrow_drop_down' : 'arrow_right' }}
+                </span>
+                <!--
+                <img
+                  src="@/assets/sb_symbol_info.svg"
+                  @click="datasetInfoFill(dataset)"
+                  class="datasets-icon"
+                />
+-->
                 <label>
                   <input
                     type="checkbox"
@@ -479,36 +489,32 @@ watch(
                   />
                   {{ lexicalStorage.datasetLabels[dataset] }}
                 </label>
-              </div>
-              <img
-                src="@/assets/sb_symbol_info.svg"
-                @click="datasetInfoFill(dataset)"
-                class="datasets-icon"
-              />
-            </div>
-          </div>
-
-          <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
-            <div class="datasets-info-label">{{ datasetInfo.label }}</div>
-            <!-- 'description' can contain HTML -->
-            <div class="" v-html="datasetInfo.description"></div>
-            <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
-            <div class="">{{ datasetInfo.updated }}</div>
-            <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
-            <div class="">{{ datasetInfo.size }}</div>
-            <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
-            <div class="">
-              <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
-            </div>
-            <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
-            <div class="">{{ datasetInfo[entryWordProperty] }}</div>
-            <div class="datasets-info-description">
-              {{ datasetInfo[entryWordDescriptionProperty] }}
-            </div>
-            <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
-            <div class="">
-              <div v-for="item in datasetInfo.fields" :key="item">
-                {{ lexicalStorage.localizeField(item.name) }}
+                <div v-if="dataset !== '' && previousDataset === dataset">
+                  <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
+                    <div class="datasets-info-label">{{ datasetInfo.label }}</div>
+                    <!-- 'description' can contain HTML -->
+                    <div class="" v-html="datasetInfo.description"></div>
+                    <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
+                    <div class="">{{ datasetInfo.updated }}</div>
+                    <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
+                    <div class="">{{ datasetInfo.size }}</div>
+                    <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
+                    <div class="">
+                      <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
+                    </div>
+                    <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
+                    <div class="">{{ datasetInfo[entryWordProperty] }}</div>
+                    <div class="datasets-info-description">
+                      {{ datasetInfo[entryWordDescriptionProperty] }}
+                    </div>
+                    <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
+                    <div class="">
+                      <div v-for="item in datasetInfo.fields" :key="item">
+                        {{ lexicalStorage.localizeField(item.name) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -569,10 +575,12 @@ watch(
   right: 0;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
-  max-height: 500px;
-  scrollbar-width: 0;
+  max-height: 600px;
   overflow-y: visible;
   z-index: 1000;
+  /*
+    scrollbar-width: 0;
+*/
 }
 
 .dropdown-open .dropdown-menu {
@@ -582,13 +590,14 @@ watch(
 .dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0rem 0.5rem;
+  padding: 0rem 0.5rem 0 0;
   color: var(--color-text);
 }
 
 .dropdown-item img {
   height: 20px;
 }
+
 .dropdown-item input {
   margin-right: 0.5rem;
   cursor: pointer;
@@ -670,44 +679,57 @@ watch(
 
 .datasets-excluded {
   margin-top: 0.5rem;
+  margin-left: 0.5rem;
   font-style: italic;
 }
 
 .datasets-group {
+  /*
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  max-height: 240px;
   align-content: flex-start;
+  width: 390px;
   color: var(--color-text);
+  */
   overflow-y: scroll;
+  max-height: 400px;
 }
 
 .datasets-list {
+  /*
   max-height: 100%;
-  width: 390px;
   background-color: var(--color-background);
   overflow-y: auto;
+  */
 }
 
-.datasets-list-wider {
-  width: 706px;
+.datasets-list-item {
+  width: 100%;
 }
 
 .datasets-icon {
+  /*
   float: right;
-  display: block;
   margin-left: auto;
+  display: block;
   padding: 0.5rem;
   width: 2rem;
+  */
+  vertical-align: bottom;
+  cursor: pointer;
 }
 
 .datasets-info {
+  /*
   background-color: var(--color-background);
-  padding: 0.5rem;
   width: 300px;
   white-space: pre-line;
   overflow-y: auto;
+  */
+  background-color: var(--sb-grey-lighter);
+  margin: 0 1.5rem 1rem 1.5rem;
+  padding: 0.5rem;
 }
 
 .datasets-info-label {

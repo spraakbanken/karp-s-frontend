@@ -61,7 +61,7 @@ onBeforeUnmount(() => {
     <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
     <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
     -->
-    <span class="icon-adjust">
+    <span class="edit-mode">
       <a href="https://spraakbanken.gu.se/karp/">
         <span class="material-icons">mode_edit</span>{{ $t('menu.editmode') }}
       </a>
@@ -156,6 +156,9 @@ nav button.button-mode {
   margin-top: 2px;
 }
 
+nav .edit-mode {
+  white-space: nowrap;
+}
 /* language selection dropdown */
 
 .dropdown {
@@ -188,7 +191,7 @@ nav button.button-mode {
 }
 
 .material-icons {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .hidden {

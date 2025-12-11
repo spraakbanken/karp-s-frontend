@@ -177,7 +177,7 @@ onMounted(() => {
   font-size: x-small;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1000px) {
   .header-area {
     flex-direction: column;
     align-items: center;

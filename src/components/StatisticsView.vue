@@ -292,7 +292,7 @@ watch(
 )
 
 const sortedData = computed(() => {
-  console.log('sortedData compute: ', lexicalStorage.statisticsSortField)
+  //console.log('sortedData compute: ', lexicalStorage.statisticsSortField)
   const order = lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING ? 1 : -1
   if (!lexicalStorage.statisticsSortField) {
     return statisticsResult.value

@@ -18,7 +18,7 @@ onMounted(async () => {
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
     syncResult.value = syncStoreWithRouter(router)
-    console.log('syncResult:', syncResult.value)
+    //console.log('syncResult:', syncResult.value)
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
       //TODO lexicalStorage.setIsSearch(true)

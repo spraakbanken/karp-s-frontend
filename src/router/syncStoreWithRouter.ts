@@ -91,7 +91,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
 
   const initializeStoreFromQuery = (): SyncResult => {
     const query = new URLSearchParams(window.location.search)
-    console.log('initializeStoreFromQuery: query=', query)
+    //console.log('initializeStoreFromQuery: query=', query)
     let syncResult: SyncResult = SyncResult.SYNC_RESULT_NOT_SYNCED
 
     if (query.has('resources')) {
