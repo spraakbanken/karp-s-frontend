@@ -115,8 +115,7 @@ const handleClickOutsideS = (event: MouseEvent) => {
     }
     // trigger search
     if (isSearchChanged.value) {
-      console.log('handleClickOutsideS - setIsSearch')
-
+      //console.log('handleClickOutsideS - setIsSearch')
       lexicalStorage.setIsStatisticsSearch(true)
       isSearchChanged.value = false
     }
@@ -154,8 +153,7 @@ const doSort = (field: string, order: string) => {
   // TODO: not really necessary as we sort in FE
   //fetchData()
   lexicalStorage.statisticsPageStart = 1
-
-  console.log('doSort()', lexicalStorage.statisticsSortField)
+  //console.log('doSort()', lexicalStorage.statisticsSortField)
 }
 
 // update state from URL

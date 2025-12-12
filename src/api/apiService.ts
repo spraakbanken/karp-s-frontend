@@ -43,7 +43,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
       const queryParam = Object.entries(lexicalStorage.selectedFields)
         .map(([key, value]) => `${value.position}|${key}|"${value.value.replace(/"/g, '\\"')}"`)
         .join('||')
-      console.log('queryParam: ', queryParam)
+      //console.log('queryParam: ', queryParam)
       if (queryParam) {
         if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
           if (Object.keys(lexicalStorage.selectedFields).length == 1) {
@@ -64,9 +64,9 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     }
 
     // TODO: remove this if when it is working in the BE
-    if (lexicalStorage.tableSortField != entryWordField) {
-      params['sort'] = lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder
-    }
+    //if (lexicalStorage.tableSortField != entryWordField) {
+    params['sort'] = lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder
+    //}
 
     params['size'] = pageSize.toString()
     params['from'] = pageStart.toString()

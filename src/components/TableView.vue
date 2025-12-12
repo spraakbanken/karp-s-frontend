@@ -173,6 +173,7 @@ const fetchData = async () => {
   }
 }
 
+// group fetched result on dataset, and sort columns according to config column order
 const groupData = () => {
   tableResultGrp.value = groupBy(tableResult.value.hits, (item) => item.resourceId)
   tableResultGrpSorted.value = {}
