@@ -50,6 +50,18 @@ const [expanded, toggleExpanded] = useToggle()
 
 <style src="@/assets/table.css" scoped></style>
 
+<!-- fix styles in fields including HTML/style info, eg fula-ordboken -->
+<style>
+p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+p:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+</style>
+
 <style scoped>
 .limited-height {
   max-height: 29px;

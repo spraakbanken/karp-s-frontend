@@ -64,9 +64,9 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     }
 
     // TODO: remove this if when it is working in the BE
-    //if (lexicalStorage.tableSortField != entryWordField) {
-    params['sort'] = lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder
-    //}
+    if (lexicalStorage.tableSortField != entryWordField) {
+      params['sort'] = lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder
+    }
 
     params['size'] = pageSize.toString()
     params['from'] = pageStart.toString()
