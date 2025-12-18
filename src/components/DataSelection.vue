@@ -670,6 +670,11 @@ watch(
   color: var(--sb-grey-medium);
 }
 
+.dropdown-filter input {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
 .dropdown-filter input:focus {
   outline-color: var(--sb-orange);
   outline-style: solid;
