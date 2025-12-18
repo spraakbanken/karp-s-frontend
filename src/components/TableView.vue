@@ -382,6 +382,7 @@ const picsbarFractionTotalClass = (ds: string) => {
             <!-- show dataset name -->
             <tr>
               <td colspan="100%" class="dataset-label">
+                <span class="material-icons icon-placement">square</span>
                 {{ lexicalStorage.datasetLabels[ds] }}
                 <button class="button" @click="clickResourceInfo(ds)">Info</button>
                 <span class="hits">
@@ -737,5 +738,11 @@ const picsbarFractionTotalClass = (ds: string) => {
 
 .dataset-label .hits {
   margin-right: 0.25rem;
+}
+
+.icon-placement {
+  color: var(--sb-orange);
+  vertical-align: top;
+  font-size: 22px;
 }
 </style>

@@ -187,6 +187,7 @@ onMounted(async () => {
           <!-- show dataset name -->
           <tr>
             <td colspan="100%" class="dataset-label">
+              <span class="material-icons icon-placement">square</span>
               {{ lexicalStorage.datasetLabels[key] }}:
               {{ tableResultGrpSorted[key].length }}
             </td>
@@ -324,5 +325,11 @@ onMounted(async () => {
   background-color: var(--color-background);
   color: var(--color-text);
   font-weight: bold;
+}
+
+.icon-placement {
+  color: var(--sb-orange);
+  vertical-align: top;
+  font-size: 22px;
 }
 </style>
