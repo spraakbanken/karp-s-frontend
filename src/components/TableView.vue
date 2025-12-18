@@ -667,9 +667,8 @@ const picsbarFractionTotalClass = (ds: string) => {
 /* Info and control before table */
 
 .info-control {
-  background-color: var(--color-background-alt2);
-  color: var(--color-text);
-  font-weight: bold;
+  background-color: var(--color-infocontrol-bg);
+  color: var(--color-infocontrol-text);
   border: none;
   border-radius: 4px;
   display: inline-flex;

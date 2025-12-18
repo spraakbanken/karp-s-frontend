@@ -12,7 +12,13 @@
   --color-background-alt: var(--sb-orange-light);
   --color-background-alt2: var(--sb-grey-light);
   --color-background-hover: var(--sb-grey-medium);
-  --color-text: #000000;
+  --color-infocontrol-bg: var(--sb-grey-dark);
+  --color-infocontrol-text: white;
+  --color-infocontrol-button-bg: var(--sb-grey-light);
+  --color-infocontrol-button-text: black;
+  --color-infocontrol-input-bg: white;
+  --color-infocontrol-input-text: black;
+  --color-text: black;
   --color-border: var(--sb-orange);
   --color-border-open: var(--sb-orange);
   --color-border-hover: #ccc;
@@ -44,6 +50,12 @@
   --color-background-alt: var(--sb-grey-dark);
   --color-background-alt2: var(--sb-grey-darker);
   --color-background-hover: var(--sb-grey-medium);
+  --color-infocontrol-bg: var(--sb-grey-darker);
+  --color-infocontrol-text: white;
+  --color-infocontrol-button-bg: var(--sb-grey-light);
+  --color-infocontrol-button-text: black;
+  --color-infocontrol-input-bg: var(--sb-grey-dark);
+  --color-infocontrol-input-text: white;
   --color-text: #ffffff;
   --color-border: var(--sb-grey-dark);
   --color-border-open: var(--sb-grey-dark);

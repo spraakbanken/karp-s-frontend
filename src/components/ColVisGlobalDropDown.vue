@@ -167,8 +167,8 @@ onMounted(() => {
   border: none;
   margin: 0 0rem 0rem 1rem;
   padding: 0.5;
-  background-color: var(--button-action-bg-color);
-  color: var(--button-action-text-color);
+  background-color: var(--color-infocontrol-button-bg);
+  color: var(--color-infocontrol-button-text);
   border-radius: 4px;
   border: 0;
   font-weight: bold;

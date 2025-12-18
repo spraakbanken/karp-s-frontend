@@ -1124,6 +1124,12 @@ const refClick = (tRow: number, tCol: number) => {
 
 <style src="@/assets/table.css" scoped></style>
 
+<style>
+svg g text {
+  fill: var(--color-text);
+}
+</style>
+
 <style scoped>
 .statistics-wrapper {
   color: var(--color-text);
@@ -1172,10 +1178,10 @@ const refClick = (tRow: number, tCol: number) => {
 }
 
 .statistics-dropdown-menu {
-  /*position: absolute;
+  position: absolute;
   top: 100%;
   left: 0;
-  right: 0;*/
+  right: 0;
   background-color: var(--color-background);
   border: 1px solid var(--button-border);
   max-height: 400px;
@@ -1277,9 +1283,8 @@ const refClick = (tRow: number, tCol: number) => {
 /* info/settings */
 
 .info-control {
-  background-color: var(--color-background-alt2);
-  color: var(--color-text);
-  font-weight: bold;
+  background-color: var(--color-infocontrol-bg);
+  color: var(--color-infocontrol-text);
   border: none;
   border-radius: 4px;
   display: inline-flex;
@@ -1296,14 +1301,14 @@ const refClick = (tRow: number, tCol: number) => {
 .export-button {
   margin-top: 0rem;
   cursor: pointer;
-  color: var(--button-action-text-color);
-  background-color: var(--button-action-bg-color);
+  background-color: var(--color-infocontrol-button-bg);
+  color: var(--color-infocontrol-button-text);
   border-radius: 4px;
   font-weight: bold;
 }
 
 input[type='checkbox'][disabled] + label {
-  color: var(--sb-grey-light);
+  color: var(--sb-grey-medium);
 }
 
 /* overview/graph */
@@ -1317,9 +1322,13 @@ input[type='checkbox'][disabled] + label {
 
 .overview-settings {
   padding: 0.5rem;
-  background-color: var(--sb-grey-dark);
-  color: white;
-  font-weight: bold;
+  background-color: var(--color-infocontrol-bg);
+  color: var(--color-infocontrol-text);
+}
+
+.overview-setting input {
+  background-color: var(--color-infocontrol-input-bg);
+  color: var(--color-infocontrol-input-text);
 }
 
 .overview-setting {
@@ -1331,9 +1340,15 @@ input[type='checkbox'][disabled] + label {
 }
 
 .overview-settings .export-button {
+  background-color: var(--color-infocontrol-button-bg);
+  color: var(--color-infocontrol-button-text);
   margin: 0;
+  font-weight: bold;
+  border-radius: 4px;
+  border: 0;
 }
 
+/* misc */
 .material-icons {
   font-size: 20px;
 }
