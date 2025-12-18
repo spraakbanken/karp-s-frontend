@@ -71,7 +71,7 @@ onBeforeUnmount(() => {
       <span class="material-icons" v-else>dark_mode</span>
     </button>
     <div
-      class="dropdown"
+      class="dropdown nav-button"
       ref="dropDownLanguageContainer"
       :class="{ 'dropdown-open': isDropDownLanguage }"
     >
@@ -116,7 +116,7 @@ nav {
 }
 
 nav a,
-nav button.nav-button {
+.nav-button {
   color: var(--color-text);
   text-decoration: none;
   /* padding: 0.5rem 1rem; */
@@ -163,7 +163,6 @@ nav .edit-mode {
 
 .dropdown {
   position: relative;
-  color: black;
 }
 
 .dropdown-toggle {

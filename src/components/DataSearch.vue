@@ -527,7 +527,7 @@ input:focus {
 
 /* structure */
 .search-component {
-  color: black;
+  color: var(--color-text);
   margin-bottom: 1rem;
   display: flex;
   flex-wrap: wrap;
@@ -586,17 +586,18 @@ input:focus {
 }
 
 .searchTabs button {
+  color: var(--color-text);
+  background-color: var(--color-background-alt2);
   padding: 0.5rem 1rem;
   margin-right: 0.25rem;
   border: none;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  background-color: var(--sb-grey-light);
   cursor: pointer;
 }
 
 .searchTabs button.active {
-  background-color: var(--color-search-area);
+  background-color: var(--color-background-alt);
   font-weight: bold;
 }
 
@@ -610,9 +611,10 @@ input:focus {
   flex: auto;
   padding: 0.5rem;
   position: relative;
-  background-color: var(--sb-grey-light);
+  color: var(--color-text);
+  background-color: var(--color-background-alt2);
   border-radius: 0.5rem;
-  color: black;
+  border: 1px solid var(--button-border);
 }
 
 .dropdown-open {
@@ -680,7 +682,7 @@ input:focus {
 }
 
 .dropdown:hover {
-  background-color: white;
+  background-color: var(--color-background-hover);
 }
 /*
 .input-group {
@@ -729,6 +731,8 @@ input:focus {
   @media (width < 640px) {
     width: 300px;
   }
+  color: var(--color-text);
+  background-color: var(--color-background);
 }
 
 .search-input:focus {
@@ -739,7 +743,9 @@ input:focus {
 
 .operator-button {
   margin-left: 0.25rem;
+  accent-color: var(--sb-orange);
 }
+
 /* search-button */
 
 .search-advanced {
@@ -806,5 +812,6 @@ input:focus {
   vertical-align: middle;
   padding: 2px;
   cursor: pointer;
+  accent-color: var(--sb-orange);
 }
 </style>

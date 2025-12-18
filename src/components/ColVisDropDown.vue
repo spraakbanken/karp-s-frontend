@@ -107,9 +107,11 @@ onMounted(() => {
   /* border-radius: 5px; */
   margin: 0;
   padding: 0.5;
-  background-color: var(--sb-grey-dark);
-  color: white;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
   font-weight: bold;
+  border: 0;
+  border-radius: 4px;
 }
 .icon-placement {
   vertical-align: text-bottom;

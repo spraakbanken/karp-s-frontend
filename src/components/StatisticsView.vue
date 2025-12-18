@@ -754,7 +754,7 @@ const refClick = (tRow: number, tCol: number) => {
 </script>
 
 <template>
-  <div v-if="!lexicalStorage.isStart">
+  <div v-if="!lexicalStorage.isStart" class="statistics-wrapper">
     <!-- statistics settings -->
     <div class="statistics" ref="dropdownContainerS">
       <!-- chose field for compilation -->
@@ -773,6 +773,7 @@ const refClick = (tRow: number, tCol: number) => {
           <span v-else>{{
             selectedCompileFields.map((x) => lexicalStorage.localizeField(x)).join(', ')
           }}</span>
+          <i class="arrow-down"></i>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownCompileFields">
           <label
@@ -806,6 +807,7 @@ const refClick = (tRow: number, tCol: number) => {
           <span v-else
             >{{ selectedColumns.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
           </span>
+          <i class="arrow-down"></i>
         </div>
         <div class="statistics-dropdown-menu" v-if="isDropdownColumns">
           <label class="statistics-dropdown-item">
@@ -837,29 +839,30 @@ const refClick = (tRow: number, tCol: number) => {
         </div>
         -->
       </div>
-      <div v-if="statisticsResult.length" class="info-control">
-        <div>
-          <button @click="exportCSV()" class="export-button">
-            {{ $t('statistics.exportCSV') }}
-          </button>
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            id="showOverviewCheckbox"
-            v-model="showOverview"
-            v-bind:disabled="selectedColumns.length !== 0"
-            @change="updateOverview()"
-          />&nbsp;
-          <label for="showOverviewCheckbox" v-bind:disabled="selectedColumns.length !== 0">
-            {{ $t('statistics.showOverview') }}
-          </label>
-        </div>
-        <div>
-          <!-- show all cells expanded -->
-          <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />&nbsp;
-          <label for="showCompact">{{ $t('table.show.compact') }} </label>
-        </div>
+    </div>
+
+    <div v-if="statisticsResult.length" class="info-control">
+      <div style="margin-right: 0.5rem">
+        <!-- show all cells expanded -->
+        <input type="checkbox" id="showCompact" value="true" v-model="showCompact" />&nbsp;
+        <label for="showCompact">{{ $t('table.show.compact') }} </label>
+      </div>
+      <div style="margin-right: 0.5rem">
+        <button @click="exportCSV()" class="export-button">
+          {{ $t('statistics.exportCSV') }}
+        </button>
+      </div>
+      <div>
+        <input
+          type="checkbox"
+          id="showOverviewCheckbox"
+          v-model="showOverview"
+          v-bind:disabled="selectedColumns.length !== 0"
+          @change="updateOverview()"
+        />&nbsp;
+        <label for="showOverviewCheckbox" v-bind:disabled="selectedColumns.length !== 0">
+          {{ $t('statistics.showOverview') }}
+        </label>
       </div>
     </div>
 
@@ -1122,10 +1125,13 @@ const refClick = (tRow: number, tCol: number) => {
 <style src="@/assets/table.css" scoped></style>
 
 <style scoped>
-.statistics {
+.statistics-wrapper {
+  color: var(--color-text);
   background-color: var(--color-background-alt);
+}
+
+.statistics {
   padding: 0.5rem;
-  color: black;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -1142,6 +1148,7 @@ const refClick = (tRow: number, tCol: number) => {
   margin-bottom: 1rem;
   margin-right: 1rem;
   width: 400px;
+  color: var(--color-text);
 }
 
 .statistics-dropdown-open {
@@ -1159,16 +1166,18 @@ const refClick = (tRow: number, tCol: number) => {
   border: 1px solid var(--color-border);
   border-radius: 4px;
   cursor: pointer;
-  background-color: white;
+  background-color: var(--color-background-alt2);
+  color: var(--color-text);
+  border: 1px solid var(--button-border);
 }
 
 .statistics-dropdown-menu {
-  position: absolute;
+  /*position: absolute;
   top: 100%;
   left: 0;
-  right: 0;
+  right: 0;*/
   background-color: var(--color-background);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--button-border);
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
@@ -1183,6 +1192,7 @@ const refClick = (tRow: number, tCol: number) => {
   align-items: center;
   padding: 0.5rem 1rem;
   color: var(--color-text);
+  accent-color: var(--sb-orange);
 }
 
 .statistics-dropdown-item input {
@@ -1267,24 +1277,29 @@ const refClick = (tRow: number, tCol: number) => {
 /* info/settings */
 
 .info-control {
-  background-color: var(--sb-grey-dark);
-  color: white;
+  background-color: var(--color-background-alt2);
+  color: var(--color-text);
   font-weight: bold;
   border: none;
   border-radius: 4px;
   display: inline-flex;
-  flex-direction: column;
+  flex-direction: row;
   padding: 0.5rem;
   margin: 0.5rem;
 }
 
 .info-control input {
+  accent-color: var(--sb-orange);
   cursor: pointer;
 }
 
 .export-button {
   margin-top: 0rem;
   cursor: pointer;
+  color: var(--button-action-text-color);
+  background-color: var(--button-action-bg-color);
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 input[type='checkbox'][disabled] + label {

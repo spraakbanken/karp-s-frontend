@@ -204,6 +204,7 @@ const tabRefClose = (id: number) => {
   padding-top: 0.5rem;
   /*background-color: var(--sb-grey-light); */ /*var(--color-complement);*/
   height: 2.5rem;
+  background-color: var(--color-background);
 }
 
 .searchTabs button,
@@ -211,8 +212,8 @@ const tabRefClose = (id: number) => {
   padding: 0.5rem 1rem;
   margin: 0;
   border: none;
-  color: black; /*var(--button-inactive-text-color);*/
-  background-color: var(--sb-grey-light); /*var(--button-inactive-bg-color);*/
+  color: var(--color-text);
+  background-color: var(--color-background-alt2);
   border-width: 0;
   cursor: pointer;
   border-top-left-radius: 8px;
@@ -223,16 +224,12 @@ const tabRefClose = (id: number) => {
   border-right-style: solid;
   font-size: var(--font-size);
   font-weight: bold;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
   margin-right: 0.25rem;
   overflow: hidden;
 }
 
 .searchTabs button.active,
 .tabs button.active {
-  color: black;
   font-weight: bold;
   /*
     color: var(--button-active-text-color);

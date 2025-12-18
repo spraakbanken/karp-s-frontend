@@ -58,7 +58,7 @@ tr:hover {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
   margin-bottom: 0.25rem;
-  background-color: var(--table-head-bg);
+  background-color: var(--color-background-alt2);
   color: var(--color-heading);
   font-weight: bold;
 }

@@ -321,8 +321,8 @@ onMounted(async () => {
 
 .dataset-label {
   text-align: left;
-  background-color: white;
-  color: black;
+  background-color: var(--color-background);
+  color: var(--color-text);
   font-weight: bold;
 }
 </style>

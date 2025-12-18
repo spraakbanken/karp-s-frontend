@@ -527,7 +527,7 @@ const picsbarFractionTotalClass = (ds: string) => {
   /*border-bottom: 2px solid var(--border-color);*/
   padding-left: 1rem;
   padding-top: 0.5rem;
-  background-color: var(--color-complement);
+  background-color: var(--color-background-alt);
   height: 2.5rem;
 }
 
@@ -537,7 +537,8 @@ const picsbarFractionTotalClass = (ds: string) => {
   border: none;
   border: 1px solid white;
   border-bottom: none;
-  background-color: var(--color-complement);
+  color: var(--color-text);
+  background-color: var(--color-background-alt2);
   cursor: pointer;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -559,6 +560,8 @@ const picsbarFractionTotalClass = (ds: string) => {
   table-layout: fixed;
   overflow-x: clip;
   margin: 0;
+  border-color: var(--border-color);
+  border-spacing: 0;
 }
 
 .picsbar tr {
@@ -566,6 +569,7 @@ const picsbarFractionTotalClass = (ds: string) => {
 }
 
 .picsbar td {
+  border: 1px solid var(--border-color);
   max-height: 16px;
   text-align: center;
   white-space: nowrap;
@@ -663,8 +667,8 @@ const picsbarFractionTotalClass = (ds: string) => {
 /* Info and control before table */
 
 .info-control {
-  background-color: var(--sb-grey-dark);
-  color: white;
+  background-color: var(--color-background-alt2);
+  color: var(--color-text);
   font-weight: bold;
   border: none;
   border-radius: 4px;
@@ -680,6 +684,7 @@ const picsbarFractionTotalClass = (ds: string) => {
 
 .info-control input {
   cursor: pointer;
+  accent-color: var(--sb-orange);
 }
 
 /* table */
@@ -723,6 +728,12 @@ const picsbarFractionTotalClass = (ds: string) => {
 
 .dataset-label button {
   margin-right: 0.25rem;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
+  border-radius: 4px;
+  border: 0px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 .dataset-label .hits {

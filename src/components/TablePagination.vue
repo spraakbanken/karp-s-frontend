@@ -98,4 +98,7 @@ const itemsPerPage = () => {
 </template>
 <style src="@/assets/table.css" scoped></style>
 
-<style scoped></style>
+<style scoped>
+.pagination {
+}
+</style>

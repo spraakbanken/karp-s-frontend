@@ -532,10 +532,10 @@ watch(
 
 .dropdown {
   border-radius: 0.5rem;
-  background-color: var(--button-background-alt);
+  background-color: var(--color-search-area);
   margin-bottom: 1rem;
   position: relative;
-  color: black;
+  color: var(--color-text);
 }
 
 .dropdown-open {
@@ -544,8 +544,8 @@ watch(
 }
 
 .dropdown-group {
-  background-color: var(--sb-grey-light);
-  color: black;
+  background-color: var(--color-background-alt);
+  color: var(--color-text);
   padding-left: 0.5rem;
 }
 
@@ -624,11 +624,11 @@ watch(
 .dropdown-selectors .tags-button-action {
   margin-right: 0.5rem;
   margin-top: 0.5rem;
-
-  background-color: black;
-  color: white;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
+  border-radius: 4px;
+  border: 0;
   font-weight: bold;
-
   cursor: pointer;
 }
 
@@ -645,13 +645,18 @@ watch(
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
   cursor: pointer;
+  border-radius: 4px;
+  border: 0;
+  font-weight: bold;
 }
 
-.dropdown-group .tags-button-action {
+.tags-button-action {
   margin: 0 0.5rem 0.5rem 0rem;
   padding: 0.5;
-  background-color: black;
-  color: white;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
+  border-radius: 4px;
+  border: 0;
   font-weight: bold;
 }
 
@@ -665,8 +670,10 @@ watch(
   color: var(--sb-grey-medium);
 }
 
-.dropdown-filter {
-  color: black;
+.dropdown-filter input:focus {
+  outline-color: var(--sb-orange);
+  outline-style: solid;
+  outline-width: 1px;
 }
 
 .dropdown-filter button {
@@ -706,6 +713,7 @@ watch(
 }
 
 .datasets-list-item {
+  accent-color: var(--sb-orange);
   width: 100%;
 }
 
@@ -728,7 +736,7 @@ watch(
   white-space: pre-line;
   overflow-y: auto;
   */
-  background-color: var(--sb-grey-lighter);
+  background-color: var(--color-background-alt);
   margin: 0 1.5rem 1rem 1.5rem;
   padding: 0.5rem;
 }

@@ -167,10 +167,11 @@ onMounted(() => {
   border: none;
   margin: 0 0rem 0rem 1rem;
   padding: 0.5;
-  background-color: var(--sb-grey-dark);
-  color: white;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
+  border-radius: 4px;
+  border: 0;
   font-weight: bold;
-  border: 1px solid var(--color-border);
 }
 
 .icon-placement {
