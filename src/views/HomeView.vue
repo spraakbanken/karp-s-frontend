@@ -126,7 +126,7 @@ const tabRefClose = (id: number) => {
               @click="tabRefClose(Number(key))"
               class="material-icons icon-placement"
               style="margin-left: 0.5rem"
-              >remove_circle</span
+              >cancel</span
             >
           </button>
         </template>
