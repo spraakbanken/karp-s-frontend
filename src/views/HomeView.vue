@@ -118,12 +118,15 @@ const tabRefClose = (id: number) => {
         </button>
         <template v-for="(tabRef, key) in tabRefSetup" :key="key">
           <button :class="{ active: activeResultTab === 'ref' + key }">
-            <span @click="tabRefClose(Number(key))" class="material-icons icon-placement"
-              >close</span
-            >
             <span @click="setActiveResultTab('ref' + key)">
               <span class="material-icons icon-placement">arrow_forward</span
               >{{ limit_tabref(tabRef.columnValue) }}</span
+            >
+            <span
+              @click="tabRefClose(Number(key))"
+              class="material-icons icon-placement"
+              style="margin-left: 0.5rem"
+              >remove_circle</span
             >
           </button>
         </template>
