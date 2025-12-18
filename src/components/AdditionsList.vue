@@ -41,9 +41,15 @@ const clickResourceInfo = (url: string) => {
 <style scoped>
 .latest-box {
 }
+
 .latest-row button {
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
+  background-color: var(--color-infocontrol-button-bg);
+  color: var(--color-infocontrol-button-text);
+  border-radius: 4px;
+  border: 0;
 }
+
 .latest-label {
   font-weight: normal;
 }
