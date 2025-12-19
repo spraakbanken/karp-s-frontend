@@ -12,6 +12,7 @@ import AboutView from '@/components/AboutView.vue'
 //import { getLexicalDatasets } from '@/api/apiService'
 import { th, getDate } from '@/utils/utils'
 import TabRefView from '@/components/TabRefView.vue'
+import { useDark } from '@vueuse/core'
 
 //import router from '@/router'
 //import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
