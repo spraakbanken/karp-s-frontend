@@ -206,8 +206,8 @@ onMounted(() => {
   font-weight: normal;
   padding: 8px;
 }
+
 .dropdown-item {
-  color: black;
 }
 
 .dropdown-item:hover {

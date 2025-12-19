@@ -113,6 +113,7 @@ onMounted(() => {
   border: 0;
   border-radius: 4px;
 }
+
 .icon-placement {
   vertical-align: text-bottom;
   font-size: 22px;
