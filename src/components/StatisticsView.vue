@@ -194,18 +194,21 @@ const fetchData = async () => {
   }
   statisticsResult.value = []
   statisticsTotals.value = []
-  const newFields = lexicalStorage.selectedFields
+  //const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
   lexicalStorage.setIsData(false)
 
   //console.log('fetchData', newParams, newCompileParams, newColumns)
-  if (newFields && newCompileFields.length > 0 && lexicalStorage.selectedDatasets.length > 0) {
+  if (
+    lexicalStorage.selectedCompileFields &&
+    newCompileFields.length > 0 &&
+    lexicalStorage.selectedDatasets.length > 0
+  ) {
     try {
       errorMessage.value = ''
 
       const { headers, table, totals } = await getStatisticsData(
-        newFields as Record<string, SelectedFieldConfig>,
         newCompileFields as string[],
         newColumns as string[],
         columnCount.value as boolean,
