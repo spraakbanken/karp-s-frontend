@@ -24,7 +24,7 @@ onMounted(async () => {
     const datasets = await getLexicalDatasets()
     lexicalStorage.setDefault(datasets)
     syncResult.value = syncStoreWithRouter(router)
-    //console.log('syncResult:', syncResult.value)
+
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
       //TODO lexicalStorage.setIsSearch(true)
@@ -67,7 +67,6 @@ header {
   line-height: 1.5;
   max-height: 100vh;
   /*width: 100vw;*/
-  /* border-bottom: 2px solid var(--border-color); */
 }
 
 footer {
@@ -77,23 +76,4 @@ footer {
 .main {
   flex: 1;
 }
-/*
-@media (max-width: 1024px) {
-  .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: nowrap;
-    place-items: left;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-  */
 </style>

@@ -18,7 +18,7 @@ Customize configuration: See [Vite Configuration Reference](https://vite.dev/con
 
 ## Workflow
 
-### Build
+### Build and deploy
 
 Increment version number in package.json.
 

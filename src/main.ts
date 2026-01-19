@@ -8,7 +8,6 @@ import { i18n } from '@/i18n.ts'
 import App from './App.vue'
 import router from './router'
 import VueMatomo from 'vue-matomo'
-//import { syncStoreWithRouter } from './router/syncStoreWithRouter'
 
 const app = createApp(App)
 

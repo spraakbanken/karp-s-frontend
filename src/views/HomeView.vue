@@ -14,27 +14,9 @@ import { th, getDate } from '@/utils/utils'
 import TabRefView from '@/components/TabRefView.vue'
 import { useDark } from '@vueuse/core'
 
-//import router from '@/router'
-//import { syncStoreWithRouter } from '@/router/syncStoreWithRouter'
-
 const lexicalStorage = lexicalStore()
 
 const tabRefSetup = reactive(lexicalStorage.tabRefSetup)
-
-/*
-onMounted(async () => {
-  try {
-    const datasets = await getLexicalDatasets()
-    lexicalStorage.setDefault(datasets)
-    if (syncStoreWithRouter(router)) {
-      lexicalStorage.setIsStart(false)
-      lexicalStorage.setIsSearch(true)
-    }
-  } catch (error) {
-    console.error(error)
-  }
-})
-*/
 
 const items = reactive<NewsItem[]>([])
 
@@ -42,12 +24,6 @@ const limit_tabref = (t: string) => {
   return t.length > 15 ? t.substring(0, 15) + '...' : t
 }
 onMounted(async () => {
-  /*
-  if (syncStoreWithRouter(router)) {
-    lexicalStorage.setIsStart(false)
-    lexicalStorage.setIsSearch(true)
-  }
-*/
   try {
     const items_ = await fetchNews(true)
     items.push(...items_)
@@ -67,7 +43,6 @@ watch(
   () => lexicalStorage.activeResultTab,
   (newTab) => {
     activeResultTab.value = newTab
-    //console.log('WATCH lexicalStorage.activeResultTab', activeResultTab.value)
   },
 )
 
@@ -84,7 +59,6 @@ const tabRefClose = (id: number) => {
       'container-center': lexicalStorage.isStart,
     }"
   >
-    <!-- <div class="datasearch-header">{{ $t('dataselector.datasearch') }}</div>-->
     <div class="search">
       <DataSearch />
     </div>
@@ -203,10 +177,8 @@ const tabRefClose = (id: number) => {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 0rem;
-  /*border-bottom: 2px solid var(--border-color);*/
   padding-left: 1rem;
   padding-top: 0.5rem;
-  /*background-color: var(--sb-grey-light); */ /*var(--color-complement);*/
   height: 2.5rem;
   background-color: var(--color-background);
 }
@@ -235,10 +207,6 @@ const tabRefClose = (id: number) => {
 .searchTabs button.active,
 .tabs button.active {
   font-weight: bold;
-  /*
-    color: var(--button-active-text-color);
-  background-color: var(--button-active-bg-color);
-  */
   background-color: var(--color-background-alt);
 }
 

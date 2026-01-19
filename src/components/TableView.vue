@@ -84,7 +84,7 @@ watch(
   () => currentPageRowStart.value,
   () => {
     //lexicalStorage.pageStart = currentPage.value
-    console.log('WATCH currentPageStart.value', currentPageRowStart.value)
+    //console.log('WATCH currentPageStart.value', currentPageRowStart.value)
     fetchData()
   },
 )
@@ -93,15 +93,17 @@ watch(
   () => currentPageSize.value,
   (newItemsPerPage, oldItemsPerPage) => {
     //lexicalStorage.pageSize = itemsPerPage.value
-    console.log('WATCH itemsPerPage.value', currentPageSize.value)
+    //console.log('WATCH itemsPerPage.value', currentPageSize.value)
     //currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
     //tableResult.total
+    /*
     console.log(
       'NEW pagestart',
       currentPageRowStart.value,
       //Math.ceil(currentPageStart.value * (lexicalStorage.pageSize / currentPageSize.value)),
       Math.ceil(currentPageRowStart.value * (oldItemsPerPage / newItemsPerPage)),
     )
+    */
     //currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
 
     //lexicalStorage.tablePageRowStart = currentPageRowStart.value
@@ -345,12 +347,14 @@ const picsbarFractionTotalClass = (ds: string) => {
       <!-- picsbar -->
       <table class="picsbar">
         <tbody>
-          <tr class="picsbar-row">
+          <tr>
             <template v-for="(value, key) in tableResult.resourceOrder" :key="key">
               <td
                 v-if="tableResult.resourceHits[value] > 0"
                 class="picsbar-tooltip"
-                :style="{ width: tableResult.resourceHits[value] / tableResult.total + '%' }"
+                :style="{
+                  width: 100 * (tableResult.resourceHits[value] / tableResult.total) + '%',
+                }"
                 @click="picsbar(value)"
               >
                 <template v-if="Object.keys(tableResult.resourceOrder).length < 6">
@@ -365,7 +369,19 @@ const picsbarFractionTotalClass = (ds: string) => {
           </tr>
         </tbody>
       </table>
-
+      <!-- picsbar position indicator -->
+      <table class="picsbar-pos">
+        <tbody>
+          <tr>
+            <td :style="{ width: 100 * (currentPageRowStart / tableResult.total) + '%' }"></td>
+            <td
+              :style="{ width: 100 * (currentPageSize / tableResult.total) + '%' }"
+              style="background-color: var(--sb-orange)"
+            ></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
       <div class="info-control">
         <!-- show all cells expanded -->
         <label for="showCompact">
@@ -563,6 +579,7 @@ const picsbarFractionTotalClass = (ds: string) => {
   margin: 0;
   border-color: var(--border-color);
   border-spacing: 0;
+  width: 100%;
 }
 
 .picsbar tr {
@@ -575,8 +592,9 @@ const picsbarFractionTotalClass = (ds: string) => {
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
+  margin: 0;
+  padding: 0;
 }
-
 .picsbar td:nth-child(even) {
   background-color: var(--table-row-even-bg);
 }
@@ -663,6 +681,31 @@ const picsbarFractionTotalClass = (ds: string) => {
 .picsbar-tooltip:hover .picsbar-tooltiptext-l {
   visibility: visible;
   white-space: normal;
+}
+
+.picsbar-pos {
+  table-layout: fixed;
+  overflow-x: clip;
+  margin: 0;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.picsbar-pos tr {
+  height: 6px;
+  background-color: transparent;
+}
+
+.picsbar-pos td {
+  border: none;
+  text-align: center;
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+}
+
+.picsbar-pos tr:hover {
+  background-color: transparent;
 }
 
 /* Info and control before table */
