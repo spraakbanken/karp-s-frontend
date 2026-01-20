@@ -296,7 +296,6 @@ const picsbar = (ds: string) => {
     }
   }
   currentPageRowStart.value = hitCount
-  //console.log('Page: ', currentPage.value, hitCount)
 }
 
 // return fraction of total picsbar
@@ -375,7 +374,7 @@ const picsbarFractionTotalClass = (ds: string) => {
           <tr>
             <td :style="{ width: 100 * (currentPageRowStart / tableResult.total) + '%' }"></td>
             <td
-              :style="{ width: 100 * (currentPageSize / tableResult.total) + '%' }"
+              :style="{ width: Math.max(0.25, 100 * (currentPageSize / tableResult.total)) + '%' }"
               style="background-color: var(--sb-orange)"
             ></td>
             <td></td>
