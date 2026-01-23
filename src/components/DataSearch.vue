@@ -2,42 +2,24 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField } from '@/types/datasetConfig'
-//import type { SelectedFieldConfig } from '@/types/datasetConfig'
 
-/*
-watch(
-  () => [searchProps.searchExtended],
-  ([newValue, newItemsPerPage]) => {
-    console.log('searchProps.searchExtended', searchProps.searchExtended)
-  },
-  { immediate: true },
-)
-*/
+const lexicalStorage = lexicalStore()
 
 const setActiveSearchTab = (tab: string) => {
   if (tab == 'simple') {
-    // remove any additional fields we search on
-    if (lexicalStorage.selectedFieldsArray[0] === entryWordField) {
-      lexicalStorage.setStartField(lexicalStorage.selectedFields[entryWordField].value)
+    if (lexicalStorage.selectedFieldsCount > 0) {
+      // remove any additional fields we search on
+      if (lexicalStorage.selectedFields[0].name === entryWordField) {
+        lexicalStorage.setStartField(lexicalStorage.selectedFields[0].value)
+      } else {
+        lexicalStorage.setStartField()
+      }
     } else {
       lexicalStorage.setStartField()
     }
   }
   lexicalStorage.setActiveSearchTab(tab)
 }
-
-const lexicalStorage = lexicalStore()
-/*
-const selectedDatasets = computed({
-  get: () => lexicalStorage.selectedDatasets,
-  set: (value) => lexicalStorage.setSelectedDataset(value),
-})
-*/
-
-const selectedFields = computed({
-  get: () => lexicalStorage.selectedFields,
-  set: (value) => lexicalStorage.setSelectedFields(value),
-})
 
 const currentFields = computed({
   get: () => lexicalStorage.currentFields,
@@ -49,16 +31,13 @@ const isDropdownParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
 //const selectedFieldsArray = ref<string[]>([])
-const selectedFieldsArray = computed({
-  get: () => lexicalStorage.selectedFieldsArray,
-  set: (value) => lexicalStorage.setSelectedFieldsArray(value),
-})
-
 //const searchField = ref<Record<string, SelectedFieldConfig>>({})
-const searchField = computed({
-  get: () => lexicalStorage.searchField,
+/*
+const selectedFields = computed({
+  get: () => lexicalStorage.selectedFields,
   set: (value) => lexicalStorage.setSearchField(value),
 })
+*/
 
 const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
 
@@ -103,85 +82,89 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-const fixPos = (f: string) => {
+const fixPos = (index: number) => {
   if (
-    searchField.value[f].positionInitial &&
-    !searchField.value[f].positionMedial &&
-    !searchField.value[f].positionFinal
+    lexicalStorage.selectedFields[index].positionInitial &&
+    !lexicalStorage.selectedFields[index].positionMedial &&
+    !lexicalStorage.selectedFields[index].positionFinal
   ) {
     // startswith
-    searchField.value[f].position = searchFieldPosition[0]
+    lexicalStorage.selectedFields[index].position = searchFieldPosition[0]
   } else if (
-    !searchField.value[f].positionInitial &&
-    !searchField.value[f].positionMedial &&
-    searchField.value[f].positionFinal
+    !lexicalStorage.selectedFields[index].positionInitial &&
+    !lexicalStorage.selectedFields[index].positionMedial &&
+    lexicalStorage.selectedFields[index].positionFinal
   ) {
     // endswidth
-    searchField.value[f].position = searchFieldPosition[1]
+    lexicalStorage.selectedFields[index].position = searchFieldPosition[1]
   } else if (
-    searchField.value[f].positionInitial &&
-    searchField.value[f].positionMedial &&
-    searchField.value[f].positionFinal
+    lexicalStorage.selectedFields[index].positionInitial &&
+    lexicalStorage.selectedFields[index].positionMedial &&
+    lexicalStorage.selectedFields[index].positionFinal
   ) {
     // contains
-    searchField.value[f].position = searchFieldPosition[2]
+    lexicalStorage.selectedFields[index].position = searchFieldPosition[2]
   } else {
     // equals
-    searchField.value[f].position = searchFieldPosition[3]
+    lexicalStorage.selectedFields[index].position = searchFieldPosition[3]
   }
 }
 
-const handlePos = (f: string, pos: number) => {
-  if (pos == 0) {
-    // clicked start
-    // on
-    if (!searchField.value[f].positionInitial) {
-      if (searchField.value[f].positionFinal) {
-        searchField.value[f].positionMedial = true
+const handlePos = (fid: number, pos: number) => {
+  // lookup field with fid id
+  const index = lexicalStorage.selectedFields.findIndex((f) => f.id === fid)
+  if (index !== -1) {
+    if (pos == 0) {
+      // clicked start
+      // on
+      if (!lexicalStorage.selectedFields[index].positionInitial) {
+        if (lexicalStorage.selectedFields[index].positionFinal) {
+          lexicalStorage.selectedFields[index].positionMedial = true
+        }
+      } else {
+        // off
+        lexicalStorage.selectedFields[index].positionMedial = false
       }
-    } else {
-      // off
-      searchField.value[f].positionMedial = false
-    }
-  } else if (pos == 2) {
-    // clicked middle
-    // on
-    if (!searchField.value[f].positionMedial) {
-      searchField.value[f].positionInitial = true
-      searchField.value[f].positionFinal = true
-    } else {
-      // off
-      searchField.value[f].positionInitial = false
-      searchField.value[f].positionFinal = false
-    }
-  }
-  if (pos == 1) {
-    // clicked end
-    // on
-    if (!searchField.value[f].positionFinal) {
-      if (searchField.value[f].positionInitial) {
-        searchField.value[f].positionMedial = true
+    } else if (pos == 2) {
+      // clicked middle
+      // on
+      if (!lexicalStorage.selectedFields[index].positionMedial) {
+        lexicalStorage.selectedFields[index].positionInitial = true
+        lexicalStorage.selectedFields[index].positionFinal = true
+      } else {
+        // off
+        lexicalStorage.selectedFields[index].positionInitial = false
+        lexicalStorage.selectedFields[index].positionFinal = false
       }
-    } else {
-      // off
-      searchField.value[f].positionMedial = false
     }
-  }
-  // now translate this to .position
-  //console.log('P: ', searchField.value[f])
-  //console.log('P2', JSON.parse(JSON.stringify(searchField.value[f])))
+    if (pos == 1) {
+      // clicked end
+      // on
+      if (!lexicalStorage.selectedFields[index].positionFinal) {
+        if (lexicalStorage.selectedFields[index].positionInitial) {
+          lexicalStorage.selectedFields[index].positionMedial = true
+        }
+      } else {
+        // off
+        lexicalStorage.selectedFields[index].positionMedial = false
+      }
+    }
+    // now translate this to .position
+    //console.log('P: ', searchField.value[f])
+    //console.log('P2', JSON.parse(JSON.stringify(searchField.value[f])))
 
-  // we need a tick so all searchField.value[f].position* values get truly set
-  setTimeout(() => {
-    fixPos(f)
-  }, 0)
-  //console.log('handlePos: ', searchField.value[f], searchFieldPosition)
+    // we need a tick so all searchField.value[f].position* values get truly set
+    setTimeout(() => {
+      fixPos(index)
+    }, 0)
+    //console.log('handlePos: ', searchField.value[f], searchFieldPosition)
+  }
 }
 
 // click search button
 const updateData = () => {
   //if (currentFields.value.length > 0) {
-  lexicalStorage.setSelectedFields(searchField.value)
+  //lexicalStorage.setSelectedFields(searchField.value)
   lexicalStorage.setIsSearch(true, true)
   lexicalStorage.setIsStart(false)
   lexicalStorage.tablePageRowStart = 0
@@ -189,114 +172,57 @@ const updateData = () => {
   //}
 }
 
-watch(selectedFieldsArray, (newFields) => {
+const selectedFieldAdd = (fieldName: string) => {
   /*
-  console.log(
-    'WATCH: selectedFieldsArray:',
-    newFields,
-    JSON.parse(JSON.stringify(searchField.value)),
-  )
+  lexicalStorage.selectedFields[lexicalStorage.selectedFieldsCount] = {
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    name: fieldName,
+    value: '',
+    position: 'equals',
+    positionInitial: false,
+    positionMedial: false,
+    positionFinal: false,
+  }
+  lexicalStorage.selectedFieldsCount++
   */
-  // keep list of searchable fields synced with fields available
-  newFields.forEach((fieldName) => {
-    if (!searchField.value[fieldName]) {
-      searchField.value[fieldName] = {
-        value: '',
-        position: 'equals',
-        positionInitial: false,
-        positionMedial: false,
-        positionFinal: false,
-      }
-    }
+  lexicalStorage.setSelectedFieldsAdd({
+    id: 0,
+    name: fieldName,
+    value: '',
+    position: 'equals',
+    positionInitial: false,
+    positionMedial: false,
+    positionFinal: false,
   })
-  Object.keys(searchField.value).forEach((fieldName) => {
-    if (!newFields.includes(fieldName)) {
-      delete searchField.value[fieldName]
-    }
-  })
-})
+}
+
+const selectedFieldRemove = (fid: number) => {
+  /*
+  const index = lexicalStorage.selectedFields.findIndex((f) => f.id === fid)
+  if (index !== -1) {
+    lexicalStorage.selectedFieldsCount--
+    lexicalStorage.selectedFields.splice(index, 1)
+  }
+  */
+  lexicalStorage.setSelectedFieldsRemove(fid)
+}
 
 watch(
   () => currentFields.value,
   (newFields) => {
     //console.log('WATCH: currentFields.value', newFields)
     if (newFields.length === 0) {
-      searchField.value = {}
-      selectedFields.value = {}
+      //searchField.value = {}
+      //selectedFields.value = {}
       updateData()
     }
   },
 )
-
-watch(
-  () => lexicalStorage.selectedFields,
-  (newSelectedFields) => {
-    //console.log('WATCH: lexicalStorage.selectedFields', newSelectedFields)
-    lexicalStorage.setSelectedFieldsArray(Object.keys(newSelectedFields))
-    //console.log('-- WATCH: lexicalStorage.selectedFields', newSelectedFields, selectedFieldsArray.value,searchField,)
-    Object.keys(newSelectedFields).forEach((param) => {
-      //console.log('-- param', param)
-      if (!searchField.value[param]) {
-        // add
-        searchField.value[param] = {
-          value: newSelectedFields[param].value,
-          position: newSelectedFields[param].position,
-          positionInitial: newSelectedFields[param].positionInitial,
-          positionMedial: newSelectedFields[param].positionMedial,
-          positionFinal: newSelectedFields[param].positionFinal,
-        }
-      } else {
-        // update
-        searchField.value[param] = {
-          value: newSelectedFields[param].value,
-          position: newSelectedFields[param].position,
-          positionInitial: newSelectedFields[param].positionInitial,
-          positionMedial: newSelectedFields[param].positionMedial,
-          positionFinal: newSelectedFields[param].positionFinal,
-        }
-      }
-    })
-  },
-)
-
-/*
-watch(
-  () => lexicalStorage.selectedDatasets,
-  (newDatasets, oldDatasets) => {
-    // do not search if we select a dataset (with none previously)
-    // as we don't have anything to search for yet
-    let notEmpty = false
-    for (const [k, v] of Object.entries(searchField.value)) {
-      console.log('k, v', k, v)
-      if (v.value !== '') {
-        notEmpty = true
-      }
-    }
-    console.log(notEmpty, searchField.value)
-    if (notEmpty) {
-      setTimeout(function () {
-        updateData()
-      }, 1000)
-
-      //updateData()
-    }
-  },
-)
-*/
 </script>
 
 <template>
-  <!-- Select Simple/Advanced search
   <div class="search-component">
-    <input type="checkbox" id="advancedSearchCheckbox" v-model="searchExtended" />
-    <label for="advancedSearchCheckbox" class="search-advanced-label">{{
-      $t('dataselector.search.advanced')
-    }}</label>
-  </div>
-  -->
-
-  <div class="search-component">
-    <!-- prev advanced search -->
+    <!-- search tabs -->
     <div>
       <div class="searchTabs">
         <button
@@ -320,12 +246,14 @@ watch(
       </div>
     </div>
     <div class="search-container">
-      <!-- Select field(s) for search-->
+      <!-- simple and extended search -->
       <div
         v-if="
           lexicalStorage.activeSearchTab == 'simple' || lexicalStorage.activeSearchTab == 'extended'
         "
+        class="search-container-content"
       >
+        <!-- extended search, select fields to search -->
         <div v-if="lexicalStorage.activeSearchTab == 'extended'">
           <div
             ref="dropdownContainer"
@@ -343,11 +271,11 @@ watch(
               <span v-else-if="currentFields.length === 0">{{
                 $t('dataselector.datasets.nocommon')
               }}</span>
-              <span v-else-if="selectedFieldsArray.length === 0"
+              <span v-else-if="lexicalStorage.selectedFieldsCount === 0"
                 >{{ $t('dataselector.noparameters') }} <i class="arrow-down"></i>
               </span>
               <span v-else
-                >{{ selectedFieldsArray.map((x) => lexicalStorage.localizeField(x)).join(', ') }}
+                >{{ $t('search.field.add') }}
                 <i class="arrow-down"></i>
               </span>
             </div>
@@ -355,9 +283,12 @@ watch(
             <div class="dropdown-menu" v-if="isDropdownParams">
               <div v-for="param in currentFields" :key="param.name" class="dropdown-item">
                 <label>
-                  <input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />
+                  <button @click="selectedFieldAdd(param.name)" class="action-button">
+                    {{ $t('search.button.add') }}
+                  </button>
+                  <!--<input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />-->
                   {{ lexicalStorage.localizeField(param.name) }}&nbsp;
-                  <!-- common? -->
+                  <!-- if this field a common field? -->
                   <span style="float: right">
                     <img
                       height="16px"
@@ -373,13 +304,13 @@ watch(
               </div>
             </div>
           </div>
-          <div style="margin-top: 0.5rem">
+          <div v-if="lexicalStorage.selectedFieldsCount > 0" style="margin-top: 0.5rem">
             <span>{{ $t('search.operator.title') }}</span>
             <input
               class="operator-button"
               type="radio"
               id="searchExtendedOpAnd"
-              value="true"
+              :value="true"
               v-model="searchExtendedOp"
             />
             <label class="operator-button" for="searchExtendedOpAnd">{{
@@ -389,7 +320,7 @@ watch(
               class="operator-button"
               type="radio"
               id="searchExtendedOpOr"
-              value="false"
+              :value="false"
               v-model="searchExtendedOp"
             />
             <label class="operator-button" for="searchExtendedOpOr">{{
@@ -398,36 +329,33 @@ watch(
           </div>
         </div>
         <!-- Search a field -->
-        <div v-for="param in selectedFieldsArray" :key="param" class="search-repeat">
+        <div v-for="param in lexicalStorage.selectedFields" :key="param.id" class="search-repeat">
           <!-- Search-box -->
           <hr v-if="lexicalStorage.activeSearchTab == 'extended'" class="search-repeat-hr" />
           <span :for="param">
             <span v-if="lexicalStorage.activeSearchTab == 'extended'">
-              {{ lexicalStorage.localizeField(param) }}
+              <button @click="selectedFieldRemove(param.id)" class="action-button">
+                {{ $t('search.button.remove') }}
+              </button>
+              {{ lexicalStorage.localizeField(param.name) }}
               <i>{{
-                lexicalStorage.currentCommonFields.find((item) => item.name === param)
+                lexicalStorage.currentCommonFields.find((item) => item.name === param.name)
                   ? ''
                   : '(' + $t('search.field.notcommon') + ')'
               }}</i>
             </span>
             <div class="input-group">
-              <!--
-        <input
-          class="search-input"
-          type="text"
-          :id="param"
-          v-model="parameters[param].value"
-          :placeholder="$t('dataselector.parameters.placeholder')"
-        />
-        -->
+              <!-- input group, one per selected field -->
               <div>
                 <input
+                  v-focus
                   autofocus
+                  tabindex="0"
                   @keyup.enter="updateData"
                   class="search-input"
                   type="text"
-                  :id="param"
-                  v-model="searchField[param].value"
+                  :id="String(param.id)"
+                  v-model="param.value"
                   :placeholder="
                     lexicalStorage.activeSearchTab == 'extended'
                       ? $t('dataselector.parameters.placeholder')
@@ -435,48 +363,35 @@ watch(
                   "
                 />
               </div>
-              <!--
-        <select v-model="searchField[param].position">
-          <option
-            v-for="(position, index) in searchFieldPosition"
-            :key="position"
-            :value="position"
-            :hidden="!searchFieldPositionEnabled[index]"
-            :disabled="!searchFieldPositionEnabled[index]"
-          >
-            {{ $t(searchFieldPositionText[index]) }}
-          </option>
-        </select>
-        -->
               <div class="position">
                 <div class="group">
                   <label for="pos0">
                     <input
-                      @click="handlePos(param, 0)"
+                      @click="handlePos(param.id, 0)"
                       type="checkbox"
                       id="pos0"
                       value="startswith"
-                      v-model="searchField[param].positionInitial"
+                      v-model="param.positionInitial"
                     />
                     {{ $t(searchFieldPositionText[0]) }}
                   </label>
                   <label for="pos2">
                     <input
-                      @click="handlePos(param, 2)"
+                      @click="handlePos(param.id, 2)"
                       type="checkbox"
                       id="pos2"
                       value="contains"
-                      v-model="searchField[param].positionMedial"
+                      v-model="param.positionMedial"
                     />
                     {{ $t(searchFieldPositionText[2]) }}
                   </label>
                   <label for="pos1">
                     <input
-                      @click="handlePos(param, 1)"
+                      @click="handlePos(param.id, 1)"
                       type="checkbox"
                       id="pos1"
                       value="endswith"
-                      v-model="searchField[param].positionFinal"
+                      v-model="param.positionFinal"
                     />
                     {{ $t(searchFieldPositionText[1]) }}
                   </label>
@@ -486,6 +401,7 @@ watch(
           </span>
         </div>
       </div>
+      <!-- advanced search -->
       <div v-else-if="lexicalStorage.activeSearchTab == 'advanced'" class="search-advanced">
         <div class="label">
           {{ $t('search.advanced.label') }}
@@ -495,7 +411,6 @@ watch(
         </div>
         <div>
           <input
-            autofocus
             @keyup.enter="updateData"
             class="search-input"
             type="text"
@@ -554,6 +469,10 @@ input:focus {
   flex-direction: column;
   background-color: var(--color-search-area);
   width: 500px;
+}
+
+.search-container-content {
+  width: 100%;
 }
 
 .search-repeat {
@@ -650,7 +569,7 @@ input:focus {
   border: 1px solid var(--color-border);
   max-height: 400px;
   overflow-y: auto;
-  width: fit-content;
+  width: 100%; /* fit-content; */
   z-index: 1000;
 }
 
@@ -773,6 +692,7 @@ input:focus {
   background-color: var(--sb-orange);
   border: none;
   border-radius: 0.5rem;
+  margin-top: 1rem;
   padding: 0.5rem 1rem;
   text-align: center;
   font-weight: bold;
@@ -813,5 +733,16 @@ input:focus {
   padding: 2px;
   cursor: pointer;
   accent-color: var(--sb-orange);
+}
+
+.action-button {
+  margin: 0 0.5rem 0.5rem 0rem;
+  padding: 0.5;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
+  border-radius: 4px;
+  border: 0;
+  font-weight: bold;
+  cursor: pointer;
 }
 </style>

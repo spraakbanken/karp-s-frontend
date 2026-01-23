@@ -20,25 +20,40 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       queryString = lexicalStorage.searchQuery
     } else if (
       lexicalStorage.activeSearchTab == 'extended' &&
-      Object.keys(lexicalStorage.selectedFields).length > 1
+      lexicalStorage.selectedFieldsCount > 1
     ) {
-      if (lexicalStorage.searchExtendedOp == true) {
+      if (lexicalStorage.searchExtendedOp) {
         queryString = 'and'
       } else {
         queryString = 'or'
       }
+      /*
       queryString +=
         '(' +
-        Object.entries(lexicalStorage.selectedFields)
+        Object.entries(lexicalStorage.searchField)
           .map(([key, value]) => `${value.position}|${key}|${value.value}`)
           .join('||') +
         ')'
-    } else {
+      */
+      let queryParam = ''
+      for (let i = 0; i < lexicalStorage.selectedFieldsCount; i++) {
+        const sf = lexicalStorage.selectedFields[i]
+        const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
+        queryParam = queryParam === '' ? q : queryParam + '||' + q
+      }
+      queryString += '(' + queryParam + ')'
+    } else if (lexicalStorage.selectedFieldsCount >= 1) {
       // simple search
       // TODO not necessary as simple search only has one field
-      queryString = Object.entries(lexicalStorage.selectedFields)
+      /*
+      queryString = Object.entries(lexicalStorage.searchField)
         .map(([key, value]) => `${value.position}|${key}|${value.value}`)
         .join(',')
+      */
+      const i = 0
+      const sf = lexicalStorage.selectedFields[i]
+      const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
+      queryString += queryString === '' ? q : queryString + '||' + q
     }
     const newQuery = {
       ...currentQuery,
@@ -71,7 +86,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
   watch(
     () => ({
       resources: lexicalStorage.selectedDatasets,
-      q: lexicalStorage.selectedFields,
+      q: [lexicalStorage.selectedFields, lexicalStorage.searchExtendedOp],
       compile: lexicalStorage.selectedCompileFields,
       columns: lexicalStorage.selectedColumns,
       tab: lexicalStorage.activeResultTab,
@@ -119,39 +134,39 @@ export function syncStoreWithRouter(router: Router): SyncResult {
             const match = queryString.match(regex)
             if (match) {
               const activeFields = match[1].split('||').map((value) => value.trim())
-              //console.log('ISfQ:', activeFields) // Output: ['a', 'b', 'c']
-              const selectedFields: Record<string, SelectedFieldConfig> = {}
+              lexicalStorage.setSelectedFieldsClear()
               for (const field of activeFields) {
                 const [position, key, value] = field.split('|')
-                //console.log('ISfQ: activeParams=', activeFields, position, key, value)
-                selectedFields[key] = {
+                lexicalStorage.setSelectedFieldsAdd({
+                  id: 0,
+                  name: key,
                   value: value,
                   position: position,
                   positionInitial: position == 'startswith',
                   positionMedial: position == 'contains',
                   positionFinal: position == 'endswith',
-                }
+                })
               }
               lexicalStorage.setSearchExtendedOp(queryString.startsWith('and'))
-              lexicalStorage.setSelectedFields(selectedFields)
+              //lexicalStorage.setSearchField(searchField)
             }
           } else {
             // TODO no split should be necessary as this is simple search = only one field
             const activeFields = query.get('q')!.split(',')
-            const selectedFields: Record<string, SelectedFieldConfig> = {}
+            lexicalStorage.setSelectedFieldsClear()
             for (const field of activeFields) {
               const [position, key, value] = field.split('|')
-              //console.log('initializeStoreFromQuery: activeParams=', activeFields, position, key, value)
-              selectedFields[key] = {
+              lexicalStorage.setSelectedFieldsAdd({
+                id: 0,
+                name: key,
                 value: value,
                 position: position,
                 positionInitial: position == 'startswith',
                 positionMedial: position == 'contains',
                 positionFinal: position == 'endswith',
-              }
-              //console.log('iSFQ: ', JSON.parse(JSON.stringify(selectedFields)))
+              })
             }
-            lexicalStorage.setSelectedFields(selectedFields)
+            //lexicalStorage.setSearchField(searchField)
           }
         }
       }

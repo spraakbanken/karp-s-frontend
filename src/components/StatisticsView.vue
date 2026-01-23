@@ -477,12 +477,14 @@ const graph_value_count = ref<number>(0)
 const graph_value_excluded = ref<number>(0)
 
 const drawChart = () => {
+  /*
   console.log(
     'drawChart() ',
     statisticsResult.value.length,
     statisticsResult.value,
     lexicalStorage.statisticsResult.length,
   )
+  */
   interface dict {
     [key: string]: string | number
   }

@@ -143,7 +143,8 @@ const fetchData = async () => {
     lexicalStorage.abortController.abort()
   }
   // convert checkboxes to search "position"
-  for (const sf in lexicalStorage.selectedFields) {
+
+  for (let sf = 0; sf < lexicalStorage.selectedFieldsCount; sf++) {
     if (lexicalStorage.selectedFields[sf].positionMedial) {
       lexicalStorage.selectedFields[sf].position = 'contains'
     } else if (lexicalStorage.selectedFields[sf].positionInitial) {

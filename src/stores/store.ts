@@ -26,13 +26,12 @@ interface SearchRedux {
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets (union)
   currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
-  selectedFields: Record<string, SelectedFieldConfig> // fields we are searching in
+  selectedFields: SelectedFieldConfig[] // fields we are searching in
+  selectedFieldsCount: number
   selectedCompileFields: string[] // statistics, fields we compile on
   selectedColumns: string[] // statistics, field we show totals on
   searchQuery: string
   searchExtendedOp: boolean
-  selectedFieldsArray: string[]
-  searchField: Record<string, SelectedFieldConfig>
   tableResult: DatasetResult
   statisticsHeaders: CountHeadersColumn[]
   statisticsResult: Dataset[]
@@ -76,13 +75,12 @@ export const lexicalStore = defineStore('dataset', {
     fieldsInDatasets: {},
     currentFields: [],
     currentCommonFields: [],
-    selectedFields: {},
+    selectedFields: [],
+    selectedFieldsCount: 0,
     selectedCompileFields: [],
     selectedColumns: [],
     searchQuery: '',
     searchExtendedOp: true,
-    selectedFieldsArray: [],
-    searchField: {},
     tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
     statisticsHeaders: [],
     statisticsResult: [],
@@ -211,8 +209,31 @@ export const lexicalStore = defineStore('dataset', {
     setSearchQuery(query: string) {
       this.searchQuery = query
     },
-    setSearchField(x: Record<string, SelectedFieldConfig>) {
-      this.searchField = x
+    setSelectedField(sfc: SelectedFieldConfig) {
+      sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
+      this.selectedFields[0] = sfc
+      this.selectedFieldsCount = 1
+    },
+    setSelectedFieldsClear() {
+      this.selectedFieldsCount = 0
+    },
+    setSelectedFieldsAdd(sfc: SelectedFieldConfig) {
+      sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
+      this.selectedFields[this.selectedFieldsCount] = sfc
+      this.selectedFieldsCount++
+    },
+    setSelectedFieldN(index: number, sfc: SelectedFieldConfig) {
+      this.selectedFields[index] = sfc
+    },
+    setSelectedFieldsRemove(fid: number) {
+      const index = this.selectedFields.findIndex((f) => f.id === fid)
+      if (index !== -1) {
+        this.selectedFieldsCount--
+        this.selectedFields.splice(index, 1)
+      }
+    },
+    setSelectedFieldsCount(n: number) {
+      this.selectedFieldsCount = n
     },
     setSearchExtendedOp(x: boolean) {
       this.searchExtendedOp = x
@@ -263,24 +284,26 @@ export const lexicalStore = defineStore('dataset', {
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields
         // remove them from selectedFields
-        const newSelectedFields: Record<string, SelectedFieldConfig> = {}
-        for (const [k, v] of Object.entries(this.selectedFields)) {
+        const newSelectedFields: SelectedFieldConfig[] = []
+        //for (const [k, v] of Object.entries(this.selectedFields)) {
+        for (let i = 0; i < this.selectedFieldsCount; i++) {
           let bFound = false
           //console.log('k, v', k, v)
-          if (this.currentFields.find((f) => f.name === k)) {
+          if (this.currentFields.find((f) => f.name === this.selectedFields[i].name)) {
             bFound = true
           }
           if (bFound) {
-            newSelectedFields[k] = v
+            newSelectedFields.push(...this.selectedFields.slice(i, 1))
           }
         }
         this.selectedFields = newSelectedFields
+        this.selectedFieldsCount = this.selectedFields.length
         // and set "ingångsord" to default, also for statistics
         // but if selectedFields exists in all selected datasets don't do this
         let isEmpty = true
-        for (const [k, v] of Object.entries(this.selectedFields)) {
+        for (let i = 0; i < this.selectedFieldsCount; i++) {
           //console.log('k, v', k, v)
-          if (v.value !== '') {
+          if (this.selectedFields[i].value !== '') {
             isEmpty = false
           }
         }
@@ -401,25 +424,19 @@ export const lexicalStore = defineStore('dataset', {
     setCurrentFields(x: FieldConfig[]) {
       this.currentFields = x
     },
-    setSelectedFieldsArray(x: string[]) {
-      this.selectedFieldsArray = x
-    },
-    setSelectedFields(fields: Record<string, SelectedFieldConfig>) {
-      // console.log('setSelectedFields: ', JSON.parse(JSON.stringify(fields)))
-      this.selectedFields = fields
-    },
     setStartField(val: string = '') {
       // set "ingångsord" to default, also for statistics
       //console.log('setStartField()')
-      const fields: Record<string, SelectedFieldConfig> = {}
-      fields[entryWordField] = {
+      const fields: SelectedFieldConfig = {
+        id: 0,
+        name: entryWordField,
         value: val,
         position: 'equals',
         positionInitial: false,
         positionMedial: false,
         positionFinal: false,
       }
-      this.setSelectedFields(fields)
+      this.setSelectedField(fields)
       this.setSelectedCompileFields([entryWordField])
     },
     setSort(sf: string) {

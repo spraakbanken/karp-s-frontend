@@ -69,6 +69,8 @@ export interface FieldConfigArray {
 }
 
 export type SelectedFieldConfig = {
+  id: number
+  name: string
   value: string
   position: string
   positionInitial: boolean

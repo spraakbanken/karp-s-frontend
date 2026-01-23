@@ -11,6 +11,16 @@ import VueMatomo from 'vue-matomo'
 
 const app = createApp(App)
 
+// fix for autofocus of first text input
+// source: https://stackoverflow.com/questions/64774113/vue-js-3-use-autofocus-on-input-with-ref-inside-a-method
+app.directive('focus', {
+  // When the bound element is mounted into the DOM...
+  mounted(el) {
+    // Focus the element
+    el.focus()
+  },
+})
+
 // Use the Matomo plugin only if configured in env.
 if (import.meta.env.VITE_MATOMO_URL && import.meta.env.VITE_MATOMO_ID) {
   app.use(VueMatomo, {

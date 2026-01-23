@@ -40,16 +40,24 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
       lexicalStorage.activeSearchTab == 'simple' ||
       lexicalStorage.activeSearchTab == 'extended'
     ) {
+      /*
       const queryParam = Object.entries(lexicalStorage.selectedFields)
         .map(([key, value]) => `${value.position}|${key}|"${value.value.replace(/"/g, '\\"')}"`)
         .join('||')
+        */
+      let queryParam = ''
+      for (let i = 0; i < lexicalStorage.selectedFieldsCount; i++) {
+        const sf = lexicalStorage.selectedFields[i]
+        const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
+        queryParam = queryParam === '' ? q : queryParam + '||' + q
+      }
       if (queryParam) {
         if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
-          if (Object.keys(lexicalStorage.selectedFields).length == 1) {
+          if (lexicalStorage.selectedFieldsCount == 1) {
             params['q'] = queryParam
           } else {
             // more than one field, ie Extended search
-            if (lexicalStorage.searchExtendedOp == true) {
+            if (lexicalStorage.searchExtendedOp) {
               params['q'] = 'and(' + queryParam + ')'
             } else {
               params['q'] = 'or(' + queryParam + ')'
@@ -67,6 +75,8 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
 
     lexicalStorage.abortController = new AbortController()
     const signal = lexicalStorage.abortController.signal
+
+    //console.log('params:', params)
 
     const response = await axiosInstance.get(`/search`, {
       params: params,
@@ -110,16 +120,19 @@ export const getStatisticsData = async (
       lexicalStorage.activeSearchTab == 'simple' ||
       lexicalStorage.activeSearchTab == 'extended'
     ) {
-      const queryParam = Object.entries(lexicalStorage.selectedFields)
-        .map(([key, value]) => `${value.position}|${key}|"${value.value.replace(/"/g, '\\"')}"`)
-        .join('||')
+      let queryParam = ''
+      for (let i = 0; i < lexicalStorage.selectedFieldsCount; i++) {
+        const sf = lexicalStorage.selectedFields[i]
+        const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
+        queryParam = queryParam === '' ? q : queryParam + '||' + q
+      }
       if (queryParam) {
         if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
-          if (Object.keys(lexicalStorage.selectedFields).length == 1) {
+          if (lexicalStorage.selectedFieldsCount == 1) {
             params['q'] = queryParam
           } else {
             // more than one field, ie Extended search
-            if (lexicalStorage.searchExtendedOp == true) {
+            if (lexicalStorage.searchExtendedOp) {
               params['q'] = 'and(' + queryParam + ')'
             } else {
               params['q'] = 'or(' + queryParam + ')'
