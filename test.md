@@ -1,3 +1,0 @@
-### Headline
-And some text.
-
