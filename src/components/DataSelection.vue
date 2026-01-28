@@ -533,7 +533,7 @@ watch(
 .dropdown {
   border-radius: 0.5rem;
   background-color: var(--color-search-area);
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
   position: relative;
   color: var(--color-text);
 }

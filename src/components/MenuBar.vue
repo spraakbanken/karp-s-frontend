@@ -107,6 +107,7 @@ nav {
   display: flex;
   flex-direction: row;
   align-items: center;
+  align-self: end;
   vertical-align: top;
   justify-content: right;
   width: 100%;

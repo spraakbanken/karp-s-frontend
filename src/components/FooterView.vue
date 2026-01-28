@@ -1,33 +1,95 @@
 <script setup lang="ts">
-//import logoSB from '@/assets/sprakbanken_text_dark_theme.svg'
+import { onMounted, ref } from 'vue'
+
+const logoSB = ref('')
+const logoGU = ref('')
+const logoGUEn = ref('')
+
+function resetApp() {
+  // console.log('Pathname ', window.location.pathname)
+  // window.location.href = window.location.pathname
+  window.location.href = '/karplabb/'
+  //router.push('/')
+}
+
+const updateTheme = async () => {
+  const theme = document.documentElement.getAttribute('data-theme')
+  const isDarkMode = theme === 'dark'
+  logoSB.value = isDarkMode
+    ? (await import('@/assets/sprakbanken_text_dark_theme.svg')).default
+    : (await import('@/assets/sprakbanken_text_light_theme.svg')).default
+  logoGU.value = isDarkMode
+    ? (await import('@/assets/gu-horiz-sv-inv.svg')).default
+    : (await import('@/assets/gu-horiz-sv.svg')).default
+  logoGUEn.value = isDarkMode
+    ? (await import('@/assets/gu-horiz-en-inv.svg')).default
+    : (await import('@/assets/gu-horiz-en.svg')).default
+}
+
+onMounted(() => {
+  updateTheme()
+  const observer = new MutationObserver(updateTheme)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+})
 </script>
 
 <template>
   <div class="footer-area">
-    <div>
+    <div class="footer-area-left">
       <!--
       <a href="https://spraakbanken.gu.se"><img :src="logoSB" alt="Språkbanken Text logo" /></a>
       -->
+      <div class="sb-box">
+        <a href="https://spraakbanken.gu.se/" target="_new">
+          <img :src="logoSB" alt="Språkbanken Text" />
+        </a>
+      </div>
+      <template v-if="$i18n.locale == 'sv'">
+        <div>
+          <a href="https://spraakbanken.gu.se/om">{{ $t('footer.aboutus') }}</a>
+        </div>
+        <div>
+          <a href="https://spraakbanken.gu.se/aktuellt">{{ $t('footer.newsfromus') }}</a>
+        </div>
+        <div>
+          <a href="https://spraakbanken.gu.se/verktyg">{{ $t('footer.otherplatforms') }}</a>
+        </div>
+      </template>
+      <template v-if="$i18n.locale == 'en'">
+        <div>
+          <a href="https://spraakbanken.gu.se/en/about">{{ $t('footer.aboutus') }}</a>
+        </div>
+        <div>
+          <a href="https://spraakbanken.gu.se/en/news-and-events">{{ $t('footer.newsfromus') }}</a>
+        </div>
+        <div>
+          <a href="https://spraakbanken.gu.se/en/tools">{{ $t('footer.otherplatforms') }}</a>
+        </div>
+      </template>
     </div>
-    <div>
-      <p>
-        <strong>{{ $t('footer.about.title') }}</strong>
-        {{ '. ' }}
-        <i18n-t keypath="footer.about" scope="global">
-          <a href="https://spraakbanken.gu.se/en/resources" :title="$t('footer.about.sbdata.title')"
-            >Data</a
-          >
-          <a href="https://vlo.clarin.eu/" title="CLARIN Virtual Language Observatory"
-            >Virtual Language Observatory</a
-          >
-        </i18n-t>
-      </p>
-      <div class="contact">
-        {{ $t('footer.help') }}: <a href="mailto:sb-info@svenska.gu.se">sb-info@svenska.gu.se</a>
+    <div class="footer-area-middle">
+      <div>
+        <template v-if="$i18n.locale == 'sv'">
+          <a href="https://spraakbanken.gu.se/kontakt">{{ $t('footer.help') }}</a>
+        </template>
+        <template v-if="$i18n.locale == 'en'">
+          <a href="https://spraakbanken.gu.se/en/contact">{{ $t('footer.help') }}</a>
+        </template>
       </div>
     </div>
-    <div>
-      <p></p>
+    <div class="footer-area-right">
+      <div class="gu-box">
+        <div v-if="$i18n.locale == 'sv'">
+          <a href="https://gu.se/" target="_new">
+            <img :src="logoGU" alt="Göteborgs universitet" width="200px" />
+          </a>
+        </div>
+        <div v-else>
+          <a href="https://gu.se/en" target="_new">
+            <img :src="logoGUEn" alt="University of Gothenburg" width="200px" />
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +98,7 @@
 .footer-area {
   color: white;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -43,31 +106,67 @@
   padding-left: 2rem;
   margin-left: auto;
   margin-right: auto;
-  background-color: black;
+  background-color: var(--color-bg);
   box-sizing: border-box;
   width: 100%;
 }
 
-.footer-area > div {
+.footer-area-left {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: flex-start;
   color: white;
   flex: 1;
-  padding: 2rem;
+  padding: 0rem;
   box-sizing: border-box;
 }
 
-strong {
-  font-weight: bold;
-  float: left;
+.footer-area-middle {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  color: white;
+  flex: 1;
+  padding: 0rem;
+  box-sizing: border-box;
+}
+
+.footer-area-right {
+  display: flex;
+  justify-content: flex-end;
+  color: white;
+  flex: 1;
+  padding: 0rem;
+  box-sizing: border-box;
 }
 
 .footer-area a {
-  color: white;
+  color: var(--color-text);
   text-decoration: underline;
 }
 
 .footer-area .contact {
   color: var(--sb-orange);
-  margin-top: 1rem;
   text-align: center;
+}
+
+.sb-box {
+  box-sizing: border-box;
+}
+
+.sb-box img {
+  width: 14rem;
+}
+
+.gu-box {
+  box-sizing: border-box;
+}
+
+.gu-box img {
+  box-sizing: border-box;
 }
 </style>

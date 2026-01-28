@@ -444,6 +444,7 @@ input:focus {
 .search-component {
   color: var(--color-text);
   margin-bottom: 1rem;
+  margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
