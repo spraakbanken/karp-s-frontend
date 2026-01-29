@@ -577,7 +577,7 @@ const picsbarFractionTotalClass = (ds: string) => {
   table-layout: fixed;
   overflow-x: clip;
   margin: 0;
-  border-color: var(--border-color);
+  border-color: var(--color-border);
   border-spacing: 0;
   width: 100%;
 }
@@ -587,7 +587,7 @@ const picsbarFractionTotalClass = (ds: string) => {
 }
 
 .picsbar td {
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   max-height: 16px;
   text-align: center;
   white-space: nowrap;

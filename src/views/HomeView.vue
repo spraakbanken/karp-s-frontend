@@ -156,7 +156,7 @@ const tabRefClose = (id: number) => {
   padding: 0rem 0;
 }
 .column-left:nth-child(1) {
-  border-right: 2px solid var(--border-color);
+  border-right: 2px solid var(--color-border);
 }
 
 .search-container {

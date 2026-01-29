@@ -109,6 +109,7 @@ onMounted(() => {
   background-color: var(--color-bg);
   box-sizing: border-box;
   width: 100%;
+  border-top: 1px solid var(--color-background-alt2);
 }
 
 .footer-area-left {

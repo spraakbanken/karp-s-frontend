@@ -26,7 +26,6 @@
   --color-icon: #302d2d;
   --color-icon-light: var(--sb-orange-light);
   --color-icon-dark: #ffffff;
-  --border-color: var(--sb-orange);
   --table-head-bg: var(--sb-orange-light);
   --table-row-even-bg: #f9f9f9;
   --table-row-odd-bg: #e9e9e9;
@@ -57,13 +56,12 @@
   --color-infocontrol-input-bg: var(--sb-grey-dark);
   --color-infocontrol-input-text: white;
   --color-text: #ffffff;
-  --color-border: var(--sb-grey-dark);
+  --color-border: var(--sb-grey-medium);
   --color-border-open: var(--sb-grey-dark);
   --color-border-hover: #555;
   --color-heading: #f1f1f1;
   --color-icon: #ffffff;
   --color-icon-mode: var(--sb-blue-dark);
-  --border-color: var(--sb-grey-darker);
   --table-head-bg: var(--sb-grey-darker);
   --table-row-even-bg: var(--sb-grey-darker);
   --table-row-odd-bg: var(--sb-grey-dark);
