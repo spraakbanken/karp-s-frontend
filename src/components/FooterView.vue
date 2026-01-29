@@ -19,11 +19,11 @@ const updateTheme = async () => {
     ? (await import('@/assets/sprakbanken_text_dark_theme.svg')).default
     : (await import('@/assets/sprakbanken_text_light_theme.svg')).default
   logoGU.value = isDarkMode
-    ? (await import('@/assets/gu-horiz-sv-inv.svg')).default
-    : (await import('@/assets/gu-horiz-sv.svg')).default
+    ? (await import('@/assets/gu_vert_sv_inv.svg')).default
+    : (await import('@/assets/gu_vert_sv.svg')).default
   logoGUEn.value = isDarkMode
-    ? (await import('@/assets/gu-horiz-en-inv.svg')).default
-    : (await import('@/assets/gu-horiz-en.svg')).default
+    ? (await import('@/assets/gu_vert_en_inv.svg')).default
+    : (await import('@/assets/gu_vert_en.svg')).default
 }
 
 onMounted(() => {
@@ -81,12 +81,12 @@ onMounted(() => {
       <div class="gu-box">
         <div v-if="$i18n.locale == 'sv'">
           <a href="https://gu.se/" target="_new">
-            <img :src="logoGU" alt="Göteborgs universitet" width="200px" />
+            <img :src="logoGU" alt="Göteborgs universitet" width="124px" />
           </a>
         </div>
         <div v-else>
           <a href="https://gu.se/en" target="_new">
-            <img :src="logoGUEn" alt="University of Gothenburg" width="200px" />
+            <img :src="logoGUEn" alt="University of Gothenburg" width="124px" />
           </a>
         </div>
       </div>
@@ -96,7 +96,6 @@ onMounted(() => {
 
 <style scoped>
 .footer-area {
-  color: white;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -106,6 +105,7 @@ onMounted(() => {
   padding-left: 2rem;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 1rem;
   background-color: var(--color-bg);
   box-sizing: border-box;
   width: 100%;
@@ -168,5 +168,16 @@ onMounted(() => {
 
 .gu-box img {
   box-sizing: border-box;
+}
+
+@media (max-width: 1000px) {
+  .footer-area {
+    flex-direction: column;
+    align-items: center;
+  }
+  .middle-area,
+  .right-area {
+    align-items: center;
+  }
 }
 </style>

@@ -64,9 +64,8 @@ onMounted(() => {
 .header-area {
   display: flex;
   flex-direction: row;
-  flex: 1;
-  flex-wrap: wrap;
   justify-content: space-between;
+  flex-wrap: wrap;
   align-items: end;
   padding-top: 0.5rem;
   padding-bottom: 0rem;
