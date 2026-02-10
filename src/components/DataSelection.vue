@@ -9,6 +9,7 @@ import {
 import { secondsToDate, formatNumber } from '@/utils/utils'
 import type { ResourceLocalized } from '@/types/datasetConfig'
 import { th } from '@/utils/utils'
+//import { testForLogin } from '@/api/authService'
 
 const lexicalStorage = lexicalStore()
 
@@ -23,10 +24,12 @@ const selectedTags = computed({
   set: (value) => lexicalStorage.setSelectedTag(value),
 })
   */
+/*
 const selectedFields = computed({
   get: () => lexicalStorage.selectedFields,
   set: (value) => lexicalStorage.setSelectedFields(value),
 })
+*/
 const selectedCompileParams = computed({
   get: () => lexicalStorage.selectedCompileFields,
   set: (value) => lexicalStorage.setSelectedCompileFields(value),
@@ -136,7 +139,7 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -329,34 +332,14 @@ watch(
     //console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
     if (newDatasets.value.length === 0) {
       fields.value = {}
-      selectedFields.value = {}
+      //selectedFields.value = {}
+      lexicalStorage.setSelectedFieldsClear()
       selectedColumns.value = []
       selectedCompileParams.value = []
       lexicalStorage.setIsSearch(true, true)
     }
   },
 )
-
-/*
-watch(
-  () => selectedTags.value,
-  (newTags) => {
-    const currentConfig = lexicalStorage.currentConfig
-    // select datasets that have one of the tags in newTags
-    selectedDatasets.value = []
-    for (const tag of newTags) {
-      for (const elt of currentConfig.resources) {
-        if (elt.tags !== undefined) {
-          if (elt.tags.includes(tag)) {
-            if (!selectedDatasets.value.includes(elt.resourceId)) {
-              selectedDatasets.value.push(elt.resourceId)
-            }
-          }
-        }
-      }
-    }
-  },
-*/
 </script>
 
 <template>
@@ -509,7 +492,7 @@ watch(
                     </div>
                     <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
                     <div class="">
-                      <div v-for="item in datasetInfo.fields" :key="item">
+                      <div v-for="item in datasetInfo.fields" :key="item.name">
                         {{ lexicalStorage.localizeField(item.name) }}
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, reactive } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
-import { isAuthenticated, testForLogin, logout } from '@/api/authService'
+import { testForLogin } from '@/api/authService'
 
 import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
@@ -13,7 +13,7 @@ import AboutView from '@/components/AboutView.vue'
 //import { getLexicalDatasets } from '@/api/apiService'
 import { th, getDate } from '@/utils/utils'
 import TabRefView from '@/components/TabRefView.vue'
-import { useDark } from '@vueuse/core'
+//import { useDark } from '@vueuse/core'
 
 const lexicalStorage = lexicalStore()
 

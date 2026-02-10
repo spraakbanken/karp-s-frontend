@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import { jwtDecode } from 'jwt-decode'
+import { axiosInstance } from '@/api/apiService'
 
 /**
  * API base URL for authentication.
@@ -26,7 +27,8 @@ interface JwtPayload {
  */
 const setJwtToken = (jwt: string): void => {
   localStorage.setItem('jwt', jwt)
-  axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
+  //axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
 }
 
 /**
@@ -52,13 +54,13 @@ const isJwtExpired = (jwt: string): boolean => {
  */
 const checkJwtToken = (): void => {
   const jwt = localStorage.getItem('jwt')
-  //console.log('JWT:', jwt)
   if (jwt && !isJwtExpired(jwt)) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
+    //axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
     isAuthenticated.value = true
   } else {
     localStorage.removeItem('jwt')
-    delete axios.defaults.headers.common['Authorization']
+    delete axiosInstance.defaults.headers.common['Authorization']
     isAuthenticated.value = false
   }
 }

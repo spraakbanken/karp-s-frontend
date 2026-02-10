@@ -1,13 +1,13 @@
 import axios, { AxiosError } from 'axios'
 //import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
-import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
+//import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
 import { BEErrorCode, BEErrorMessage } from '@/utils/constants'
 //import type { forEach } from 'es-toolkit/compat'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
@@ -81,6 +81,9 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     const response = await axiosInstance.get(`/search`, {
       params: params,
       signal: signal,
+      /*      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt')}`, // Use Bearer token authentication
+      },*/
     })
     lexicalStorage.resetIsLoading()
     lexicalStorage.abortController = null
