@@ -2,6 +2,8 @@
   "welcome": "Welcome!",
   "titlebar.version": "Development version",
   "menu.home": "Home",
+  "menu.login": "Log in",
+  "menu.logout": "Log out",
   "menu.about": "About",
   "menu.editmode": "Editing mode",
   "menu.sv": "Swedish",

@@ -16,6 +16,7 @@ import { formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
 import StatisticsRowCompact from './StatisticsRowCompact.vue'
 import StatisticsPagination from './StatisticsPagination.vue'
+import { checkJwtToken } from '@/api/authService'
 
 const { t } = useI18n()
 
@@ -192,6 +193,10 @@ const fetchData = async () => {
   if (lexicalStorage.abortController !== null) {
     //lexicalStorage.abortController.abort()
   }
+
+  // JWT token valid?
+  checkJwtToken()
+
   statisticsResult.value = []
   statisticsTotals.value = []
   //const newFields = lexicalStorage.selectedFields

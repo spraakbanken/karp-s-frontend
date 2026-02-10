@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 //import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { isAuthenticated, logout } from '@/api/authService'
 
 import { lexicalStore } from '@/stores/store'
 
@@ -53,6 +54,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+const loginLogout = async () => {
+  if (!isAuthenticated.value) {
+    window.location.href = `https://sp.spraakbanken.gu.se/auth/login?redirect=${window.location}`
+  } else {
+    logout()
+  }
+}
 </script>
 
 <template>
@@ -61,11 +70,17 @@ onBeforeUnmount(() => {
     <RouterLink to="/">{{ $t('menu.home') }}</RouterLink>
     <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
     -->
-    <span class="edit-mode">
+    <span class="menu-item">
       <a href="https://spraakbanken.gu.se/karp/">
         <span class="material-icons">mode_edit</span>{{ $t('menu.editmode') }}
       </a>
     </span>
+    <span class="menu-item">
+      <span v-on:click="loginLogout" style="cursor: pointer">
+        {{ isAuthenticated ? $t('menu.logout') : $t('menu.login') }}
+      </span>
+    </span>
+
     <button id="theme-toggle" class="nav-button button-mode">
       <span class="material-icons" v-if="themeCurrent === 'light'">light_mode</span>
       <span class="material-icons" v-else>dark_mode</span>
@@ -145,7 +160,6 @@ nav a.router-link-exact-active:hover {
 
 nav a {
   display: inline-block;
-  padding: 0 1rem;
   /* border-left: 1px solid var(--color-border); */
 }
 
@@ -157,8 +171,9 @@ nav button.button-mode {
   margin-top: 2px;
 }
 
-nav .edit-mode {
+nav .menu-item {
   white-space: nowrap;
+  padding: 0 1rem 0 0;
 }
 /* language selection dropdown */
 

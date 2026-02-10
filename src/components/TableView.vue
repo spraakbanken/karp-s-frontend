@@ -5,6 +5,8 @@ import { useI18n } from 'vue-i18n'
 
 import { groupBy } from 'es-toolkit'
 
+import { checkJwtToken } from '@/api/authService'
+
 import {
   ROW_SHOW_COMPACT_DEFAULT,
   SORT_ORDER_ASCENDING,
@@ -142,6 +144,10 @@ const fetchData = async () => {
   if (lexicalStorage.abortController !== null) {
     lexicalStorage.abortController.abort()
   }
+
+  // JWT token valid?
+  checkJwtToken()
+
   // convert checkboxes to search "position"
 
   for (let sf = 0; sf < lexicalStorage.selectedFieldsCount; sf++) {

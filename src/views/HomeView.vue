@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, reactive } from 'vue'
 import { fetchNews, type NewsItem } from '@/api/news.service'
+import { isAuthenticated, testForLogin, logout } from '@/api/authService'
 
 import { lexicalStore } from '../stores/store'
 import DataSearch from '@/components/DataSearch.vue'
@@ -23,6 +24,7 @@ const items = reactive<NewsItem[]>([])
 const limit_tabref = (t: string) => {
   return t.length > 15 ? t.substring(0, 15) + '...' : t
 }
+
 onMounted(async () => {
   try {
     const items_ = await fetchNews(true)
@@ -30,6 +32,8 @@ onMounted(async () => {
   } catch (error) {
     console.error('Could not fetch and parse news', error)
   }
+
+  await testForLogin()
 })
 
 const activeResultTab = ref(lexicalStorage.activeResultTab)

@@ -2,6 +2,8 @@
   "welcome": "Välkommen!",
   "titlebar.version": "Utvecklingsversion",
   "menu.home": "Hem",
+  "menu.login": "Logga in",
+  "menu.logout": "Logga ut",
   "menu.about": "Om",
   "menu.editmode": "Redigeringsläge",
   "menu.sv": "Svenska",

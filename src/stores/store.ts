@@ -210,12 +210,14 @@ export const lexicalStore = defineStore('dataset', {
       this.searchQuery = query
     },
     setSelectedField(sfc: SelectedFieldConfig) {
+      this.setSelectedFieldsClear()
       sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
       this.selectedFields[0] = sfc
       this.selectedFieldsCount = 1
     },
     setSelectedFieldsClear() {
       this.selectedFieldsCount = 0
+      this.selectedFields = []
     },
     setSelectedFieldsAdd(sfc: SelectedFieldConfig) {
       sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value

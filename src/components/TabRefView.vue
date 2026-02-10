@@ -16,6 +16,7 @@ import {
 } from '@/types/datasetConfig'
 import { getTabRefData } from '@/api/apiService'
 import { formatCell } from '@/utils/utils'
+import { checkJwtToken } from '@/api/authService'
 
 const props = defineProps<{
   id: number
@@ -48,6 +49,8 @@ const tableResultGrp = ref<Record<string, { entry: Entry; resourceId: string }[]
 const tableResultGrpSorted = ref(lexicalStorage.tabRefSetup[props.id].tableResultGrpSorted)
 
 const fetchData = async () => {
+  checkJwtToken()
+
   lexicalStorage.tabRefSetup[props.id].isLoading = true
   const data = await getTabRefData(
     props.resourceId,
