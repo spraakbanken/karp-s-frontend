@@ -53,11 +53,13 @@ interface SearchRedux {
   statisticsPageStart: number
   statisticsPageSize: number
   columnVis: Record<string, ColumnVisField[]>
-  isData: boolean
+  isTableData: boolean
+  isStatisticsData: boolean
   isTableSearch: boolean // trigger a search (call server)
   isStatisticsSearch: boolean // trigger a search (call server)
   isStart: boolean // is app in start mode? (do not show anything except dataselection/datasearch boxes)
-  isLoading: number
+  isTableLoading: number
+  isStatisticsLoading: number
 }
 
 // currentParams = list of available fields in selected datasets
@@ -103,11 +105,13 @@ export const lexicalStore = defineStore('dataset', {
     statisticsPageSize: ROWS_PER_PAGE,
     columnVis: {},
     //listLimit: 5,
-    isData: false,
+    isTableData: false,
+    isStatisticsData: false,
     isTableSearch: false,
     isStatisticsSearch: false,
     isStart: true,
-    isLoading: 0,
+    isTableLoading: 0,
+    isStatisticsLoading: 0,
   }),
   actions: {
     setDefault(config: Config) {
@@ -323,7 +327,8 @@ export const lexicalStore = defineStore('dataset', {
         }
         //  console.log('Tot size=', selectedDatasetsSize.value, formatNumber(foo, 2))
 
-        this.isData = false
+        this.setIsTableData(false)
+        this.setIsStatisticsData(false)
       } else {
         this.selectedDatasetsSize = 0
         return []
@@ -452,8 +457,11 @@ export const lexicalStore = defineStore('dataset', {
         }
       }
     },
-    setIsData(x: boolean) {
-      this.isData = x
+    setIsTableData(x: boolean) {
+      this.isTableData = x
+    },
+    setIsStatisticsData(x: boolean) {
+      this.isStatisticsData = x
     },
     setIsSearch(x: boolean, y: boolean) {
       this.isTableSearch = x
@@ -468,14 +476,23 @@ export const lexicalStore = defineStore('dataset', {
     setIsStart(x: boolean) {
       this.isStart = x
     },
-    incIsLoading() {
-      this.isLoading++
+    incIsTableLoading() {
+      this.isTableLoading++
     },
-    decIsLoading() {
-      this.isLoading--
+    decIsTableLoading() {
+      this.isTableLoading--
     },
-    resetIsLoading() {
-      this.isLoading = 0
+    resetIsTableLoading() {
+      this.isTableLoading = 0
+    },
+    incIsStatisticsLoading() {
+      this.isStatisticsLoading++
+    },
+    decIsStatisticsLoading() {
+      this.isStatisticsLoading--
+    },
+    resetIsStatisticsLoading() {
+      this.isStatisticsLoading = 0
     },
     setEmpty() {
       this.selectedDatasets = []

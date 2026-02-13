@@ -27,7 +27,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
   const lexicalStorage = lexicalStore()
 
   try {
-    lexicalStorage.incIsLoading()
+    lexicalStorage.incIsTableLoading()
     const datasets = lexicalStorage.selectedDatasets
     const params: Record<string, string> = {}
 
@@ -85,12 +85,12 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
         Authorization: `Bearer ${localStorage.getItem('jwt')}`, // Use Bearer token authentication
       },*/
     })
-    lexicalStorage.resetIsLoading()
+    lexicalStorage.resetIsTableLoading()
     lexicalStorage.abortController = null
 
     return response.data
   } catch (error) {
-    lexicalStorage.decIsLoading()
+    lexicalStorage.decIsTableLoading()
 
     if (axios.isCancel(error)) {
       // request was cancelled "by user", no error, return empty data
@@ -110,7 +110,7 @@ export const getStatisticsData = async (
   const lexicalStorage = lexicalStore()
 
   try {
-    lexicalStorage.incIsLoading()
+    lexicalStorage.incIsStatisticsLoading()
     const datasets = lexicalStorage.selectedDatasets
     const params: Record<string, string> = {}
 
@@ -168,7 +168,7 @@ export const getStatisticsData = async (
       params: params,
       signal: signal,
     })
-    lexicalStorage.resetIsLoading()
+    lexicalStorage.resetIsStatisticsLoading()
     lexicalStorage.abortController = null
 
     return {
@@ -177,7 +177,7 @@ export const getStatisticsData = async (
       totals: response.data.total,
     }
   } catch (error: unknown) {
-    lexicalStorage.decIsLoading()
+    lexicalStorage.decIsStatisticsLoading()
 
     if (axios.isCancel(error)) {
       // request was cancelled "by user", no error, return empty data

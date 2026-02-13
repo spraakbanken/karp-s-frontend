@@ -162,7 +162,7 @@ const fetchData = async () => {
     }
   }
 
-  lexicalStorage.setIsData(false)
+  lexicalStorage.setIsTableData(false)
   const newDatasets = lexicalStorage.selectedDatasets
   if (newDatasets.length > 0) {
     try {
@@ -172,7 +172,7 @@ const fetchData = async () => {
         tableResult.value = data
         groupData()
       }
-      lexicalStorage.setIsData(tableResult.value.total > 0)
+      lexicalStorage.setIsTableData(tableResult.value.total > 0)
     } catch (error) {
       errorMessage.value = t('error.fetching.data') + ' (' + error + ')'
     }
@@ -230,7 +230,7 @@ const groupData = () => {
 }
 
 watch(
-  () => lexicalStorage.isData,
+  () => lexicalStorage.isTableData,
   (newIsData) => {
     if (!newIsData) {
       tableResult.value = { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 }
@@ -271,7 +271,13 @@ const currentTab = ref(lexicalStorage.activeResultTab)
 watch(
   () => currentTab.value,
   () => {
-    // console.log('WATCH currentTab, tableResult:', tableResult.value.hits)
+    // if switching from statistics, cancel any running statistics queries
+    if (lexicalStorage.isTableSearch) {
+      if (lexicalStorage.abortController !== null) {
+        lexicalStorage.abortController.abort()
+      }
+      lexicalStorage.resetIsTableLoading()
+    }
     groupData()
   },
   { immediate: true },
@@ -281,7 +287,6 @@ watch(
   () => lexicalStorage.isTableSearch,
   () => {
     if (lexicalStorage.isTableSearch) {
-      // console.log('TableView - Watch isSearch!')
       lexicalStorage.setIsTableSearch(false)
       fetchData()
     }
@@ -330,14 +335,16 @@ const picsbarFractionTotalClass = (ds: string) => {
 
 <template>
   <div class="table-wrapper">
-    <p v-if="lexicalStorage.isLoading" class="message-big">
+    <p v-if="lexicalStorage.isTableLoading" class="message-big">
       {{ $t('message.loading') }}
     </p>
     <p v-if="errorMessage != ''" class="message-error">
       {{ errorMessage }}
     </p>
     <p
-      v-if="!lexicalStorage.isData && !lexicalStorage.isStart && !lexicalStorage.isLoading"
+      v-if="
+        !lexicalStorage.isTableData && !lexicalStorage.isStart && !lexicalStorage.isTableLoading
+      "
       class="message-big"
     >
       {{ $t('error.nodata') }}
@@ -349,7 +356,7 @@ const picsbarFractionTotalClass = (ds: string) => {
     </p>
     -->
     <!-- show table -->
-    <div v-if="lexicalStorage.isData">
+    <div v-if="lexicalStorage.isTableData">
       <!-- picsbar -->
       <table class="picsbar">
         <tbody>

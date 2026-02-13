@@ -10,7 +10,7 @@ import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
-import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
+//import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
 import { formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
@@ -202,7 +202,7 @@ const fetchData = async () => {
   //const newFields = lexicalStorage.selectedFields
   const newCompileFields = lexicalStorage.selectedCompileFields
   const newColumns = lexicalStorage.selectedColumns
-  lexicalStorage.setIsData(false)
+  lexicalStorage.setIsStatisticsData(false)
 
   //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (
@@ -233,7 +233,7 @@ const fetchData = async () => {
       //console.log('statisticsResult', statisticsResult.value)
       statisticsResult.value = table
       if (statisticsResult.value.length > 0) {
-        lexicalStorage.setIsData(true)
+        lexicalStorage.setIsStatisticsData(true)
       }
       statisticsTotals.value = totals
       // reset
@@ -254,10 +254,22 @@ watch(
         if (lexicalStorage.abortController !== null) {
           lexicalStorage.abortController.abort()
         }
-        lexicalStorage.resetIsLoading()
-        fetchData()
+        lexicalStorage.resetIsStatisticsLoading()
+        fetchData() // async
         lexicalStorage.setIsStatisticsSearch(false)
       }
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => lexicalStorage.isStatisticsSearch,
+  async () => {
+    if (lexicalStorage.isStatisticsSearch) {
+      await fetchData()
+      lexicalStorage.setIsStatisticsSearch(false)
+      updateOverview() // draw graph (if checked)
     }
   },
   { immediate: true },
@@ -269,7 +281,7 @@ watch(
     //console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
     if (newDatasets.length === 0) {
       statisticsResult.value = []
-      lexicalStorage.setIsData(false)
+      lexicalStorage.setIsStatisticsData(false)
     }
     selectedCompileFields.value = [entryWordField]
     selectedColumns.value = []
@@ -282,19 +294,6 @@ watch(
     isSearchChanged.value = true
   },
   { deep: true },
-)
-
-watch(
-  () => lexicalStorage.isStatisticsSearch,
-  async () => {
-    if (lexicalStorage.isStatisticsSearch) {
-      // console.log('StatisticsView - Watch isSearch!', lexicalStorage.statisticsPageStart )
-      lexicalStorage.setIsStatisticsSearch(false)
-      await fetchData()
-      updateOverview() // draw graph
-    }
-  },
-  { immediate: true },
 )
 
 const sortedData = computed(() => {
@@ -940,11 +939,15 @@ const refClick = (tRow: number, tCol: number) => {
         {{ errorMessage }}
       </p>
       <!-- show loading message -->
-      <p v-if="lexicalStorage.isLoading > 0" class="message-big">
+      <p v-if="lexicalStorage.isStatisticsLoading > 0" class="message-big">
         {{ $t('message.loading') }}
       </p>
       <p
-        v-if="!lexicalStorage.isData && !lexicalStorage.isStart && !lexicalStorage.isLoading"
+        v-if="
+          !lexicalStorage.isStatisticsData &&
+          !lexicalStorage.isStart &&
+          !lexicalStorage.isStatisticsLoading
+        "
         class="message-big"
       >
         {{ $t('error.nodata') }}

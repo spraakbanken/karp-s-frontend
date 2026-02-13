@@ -139,7 +139,7 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -320,6 +320,7 @@ const filterDatasets = computed(() => {
 */
 
 // TODO doesnt trigger, change start of watch
+/*
 watch(
   () => selectedDatasets,
   (newDatasets, oldDatasets) => {
@@ -340,6 +341,7 @@ watch(
     }
   },
 )
+*/
 </script>
 
 <template>
