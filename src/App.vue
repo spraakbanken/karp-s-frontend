@@ -15,10 +15,12 @@ const syncResult = ref<SyncResult>(SyncResult.SYNC_RESULT_NOT_SYNCED)
 
 onMounted(async () => {
   // does user prefer dark mode?
+  /*
   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
   if (mediaQuery.matches) {
     document.documentElement.setAttribute('data-theme', 'dark')
   }
+  */
   // read config
   try {
     const datasets = await getLexicalDatasets()

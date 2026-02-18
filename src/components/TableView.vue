@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { useI18n } from 'vue-i18n'
 
@@ -405,6 +405,7 @@ const picsbarFractionTotalClass = (ds: string) => {
         <ColVisGlobalDropDown />
       </div>
       <TablePagination :tableResultTotal="tableResult.total"></TablePagination>
+
       <!-- tables -->
       <div class="table-container">
         <template v-for="(item, ds, index) in tableResultGrpSorted" :key="index">
@@ -795,6 +796,11 @@ const picsbarFractionTotalClass = (ds: string) => {
   border: 0px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.dataset-label button:hover {
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
 }
 
 .dataset-label .hits {

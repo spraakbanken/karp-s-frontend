@@ -585,7 +585,7 @@ watch(
   top: 100%;
   left: 0rem;
   right: 0rem;
-  background-color: var(--color-background);
+  background-color: var(--color-background-alt2);
   border: 1px solid var(--color-border);
   max-height: 600px;
   overflow-y: visible;
@@ -613,6 +613,10 @@ watch(
 .dropdown-item input {
   margin-right: 0.5rem;
   cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-background-hover);
 }
 
 .dropdown-tags {
@@ -669,6 +673,11 @@ watch(
   border-radius: 4px;
   border: 0;
   font-weight: bold;
+}
+
+.tags-button-action:hover {
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
 }
 
 .dropdown-tags .tags-button-selected {

@@ -115,6 +115,11 @@ onMounted(() => {
   border-radius: 4px;
 }
 
+.dropdown-button:hover {
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
+}
+
 .icon-placement {
   vertical-align: text-bottom;
   font-size: 22px;

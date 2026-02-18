@@ -50,10 +50,10 @@ onMounted(async () => {
           <h2>{{ $t('about.examples.title') }}</h2>
           <ul>
             <li>
-              <a :href="ex1">{{ $t('about.examples.ex1') }}</a>
+              <a :href="ex2">{{ $t('about.examples.ex2') }}</a>
             </li>
             <li>
-              <a :href="ex2">{{ $t('about.examples.ex2') }}</a>
+              <a :href="ex1">{{ $t('about.examples.ex1') }}</a>
             </li>
           </ul>
         </div>

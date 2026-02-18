@@ -566,7 +566,7 @@ input:focus {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: var(--color-background);
+  background-color: var(--color-background-alt2);
   border: 1px solid var(--color-border);
   max-height: 400px;
   overflow-y: auto;
@@ -579,13 +579,18 @@ input:focus {
 }
 
 .dropdown-item {
-  padding: 0.25rem 0.5rem;
+  padding: 0.1rem 0.5rem;
   color: var(--color-text);
 }
 
 .dropdown-item input {
   margin-right: 0.5rem;
 }
+
+.dropdown-item:hover {
+  background-color: var(--color-background-hover);
+}
+
 .dropdown-tags {
   display: flex;
   align-items: center;
@@ -599,10 +604,6 @@ input:focus {
 
 .dropdown-filter {
   padding: 0.5rem 1rem;
-}
-
-.dropdown:hover {
-  background-color: var(--color-background-hover);
 }
 /*
 .input-group {
@@ -706,9 +707,8 @@ input:focus {
 }
 
 .search-button:hover {
-  border: none;
-  background-color: white;
-  color: black;
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
 }
 
 .position {
@@ -745,5 +745,10 @@ input:focus {
   border: 0;
   font-weight: bold;
   cursor: pointer;
+}
+
+.action-button:hover {
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
 }
 </style>

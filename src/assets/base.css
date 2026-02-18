@@ -33,8 +33,10 @@
   --button-active-text-color: #ffffff;
   --button-inactive-bg-color: var(--sb-orange-light);
   --button-inactive-text-color: black;
-  --button-action-bg-color: var(--sb-grey-darker);
+  --button-action-bg-color: var(--sb-orange);
+  --button-action-bg-hover-color: var(--sb-grey-light);
   --button-action-text-color: white;
+  --button-action-text-hover-color: black;
   --button-border: var(--sb-orange);
   --color-search-area: var(--sb-orange-light);
   --color-complement: var(--sb-orange-light);
@@ -69,8 +71,10 @@
   --button-active-text-color: #ffffff;
   --button-inactive-bg-color: var(--sb-grey-medium);
   --button-inactive-text-color: #ffffff;
-  --button-action-bg-color: var(--sb-grey-light);
-  --button-action-text-color: black;
+  --button-action-bg-color: var(--sb-orange);
+  --button-action-bg-hover-color: var(--sb-grey-light);
+  --button-action-text-color: var(--sb-grey-light);
+  --button-action-text-hover-color: black;
   --button-border: var(--sb-orange);
   --color-search-area: var(--sb-grey-dark);
   --color-complement: var(--sb-grey-dark);
