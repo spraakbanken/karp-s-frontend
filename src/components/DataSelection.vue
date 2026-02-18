@@ -176,7 +176,13 @@ const selectTags = (tag: string) => {
   for (const c of currentConfig.resources) {
     //if (!selectedDatasets.value.includes(c.resourceId)) {
     if (hasSelectedTags(c.resourceId)) {
-      selDS.push(c.resourceId)
+      if (c?.limitedAccess) {
+        if (lexicalStorage.grantedDatasets.includes(c.resourceId)) {
+          selDS.push(c.resourceId)
+        }
+      } else {
+        selDS.push(c.resourceId)
+      }
     }
     //}
   }
