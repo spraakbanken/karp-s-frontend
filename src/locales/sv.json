@@ -16,7 +16,7 @@
   "footer.about": "Språkbankens växande samling av forskningsdata kan du se på sidan {0} på vår webbplats. I ett större perspektiv bildar Språkbanken en del av CLARIN ERIC, vars samlade data kan utforskas i {1}.",
   "footer.about.sbdata.title": "Språkbanken Text: Datamängder",
   "about.about.title": "Välkommen till Karps sökläge",
-  "about.about.text": "Karp är Språkbankens lexikonplattform. Här kan du söka i och redigera strukturerade språkliga data, exempelvis ordlistor eller annan tabulär data. <br><br>",
+  "about.about.text": "Karp är Språkbankens lexikonplattform. Här kan du söka i och redigera strukturerade språkliga data, exempelvis ordlistor eller annan tabulär data. <br><br>Om du vill komma igång och söka i <b>SAOL</b> utgå gärna från något av våra sökexempel.",
   "about.about.infotitle": "Information",
   "about.about.info": "För information om hur du refererar till Språkbanken, se <a href='https://spraakbanken.gu.se/om/referera'>referera till oss</a>. För frågor och kommentarer, kontakta <a href='mailto:sb-info{'@'}svenska.gu.se'>sb-info{'@'}svenska.gu.se</a>.",
   "about.examples.title": "Sökexempel",

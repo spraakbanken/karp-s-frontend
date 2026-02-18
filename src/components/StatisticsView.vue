@@ -1315,12 +1315,18 @@ svg g text {
 }
 
 .export-button {
-  margin-top: 0rem;
+  padding: 0.5;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
   cursor: pointer;
-  background-color: var(--color-infocontrol-button-bg);
-  color: var(--color-infocontrol-button-text);
+  border: 0;
   border-radius: 4px;
   font-weight: bold;
+}
+
+.export-button:hover {
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
 }
 
 input[type='checkbox'][disabled] + label {
