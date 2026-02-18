@@ -166,6 +166,7 @@ const updateCompileParams = () => {
 const updateColumns = () => {
   //updateShowHitsCheckbox.value = false
   lexicalStorage.setSelectedColumns(selectedColumns.value)
+  showOverview.value = false
 }
 
 //const updateShowHitsCheckbox = ref(selectedColumns.value.length == 0)
@@ -471,7 +472,7 @@ const exportCSV = () => {
 
 const graph_threshold_min = ref<number>(1)
 const graph_threshold_max = ref<unknown>('')
-const graph_textangled = ref<boolean>(false)
+const graph_textangled = ref<boolean>(true)
 const graph_barwidth = ref<number>(GRAPH_BARWIDTH)
 const graph_dots = ref<boolean>(false)
 const graph_horizontal = ref<boolean>(true)
@@ -850,6 +851,7 @@ const refClick = (tRow: number, tCol: number) => {
       </div>
     </div>
 
+    <!-- settings -->
     <div v-if="statisticsResult.length" class="info-control">
       <div style="margin-right: 0.5rem">
         <!-- show all cells expanded -->
@@ -929,7 +931,7 @@ const refClick = (tRow: number, tCol: number) => {
         {{ $t('graphs.maxnumberofvalues', { number: graph_max_number_of_values }) }}
       </div>
       -->
-      <div id="karps_graph"></div>
+      <div id="karps_graph" class="graph"></div>
     </div>
 
     <!-- show table -->
@@ -959,38 +961,39 @@ const refClick = (tRow: number, tCol: number) => {
 
       <!-- pagination -->
       <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
-
-      <table v-if="statisticsResult.length" class="fancy-table">
-        <thead>
-          <!-- show number of hits -->
-          <tr>
-            <td colspan="100%" class="dataset-label">
-              {{ statisticsResult.length }}
-              {{
-                statisticsResult.length > 1
-                  ? $t('statistics.numberOfHits')
-                  : $t('statistics.numberOfHits.singular')
-              }}
-            </td>
-          </tr>
-          <!-- show header row -->
-          <tr>
-            <!-- empty cell for expand_more/less -->
-            <th v-if="showCompact" class="header-compile"></th>
-            <th
-              v-for="(key, index) in statisticsHeaders"
-              :key="index"
-              :class="{
-                'header-list': lexicalStorage.isList(key.columnField),
-                'header-count': key.type == 'count',
-                'header-total': key.type == 'total',
-                'header-compile': key.type == 'compile',
-              }"
-            >
-              <div class="header-content">
-                <template v-if="key.type == 'compile'">
-                  <span> {{ lexicalStorage.localizeField(key.columnField) }}</span>
-                  <!--
+      <!-- table -->
+      <div class="table-container">
+        <table v-if="statisticsResult.length" class="fancy-table">
+          <thead>
+            <!-- show number of hits -->
+            <tr>
+              <td colspan="100%" class="dataset-label">
+                {{ statisticsResult.length }}
+                {{
+                  statisticsResult.length > 1
+                    ? $t('statistics.numberOfHits')
+                    : $t('statistics.numberOfHits.singular')
+                }}
+              </td>
+            </tr>
+            <!-- show header row -->
+            <tr>
+              <!-- empty cell for expand_more/less -->
+              <th v-if="showCompact" class="header-compile"></th>
+              <th
+                v-for="(key, index) in statisticsHeaders"
+                :key="index"
+                :class="{
+                  'header-list': lexicalStorage.isList(key.columnField),
+                  'header-count': key.type == 'count',
+                  'header-total': key.type == 'total',
+                  'header-compile': key.type == 'compile',
+                }"
+              >
+                <div class="header-content">
+                  <template v-if="key.type == 'compile'">
+                    <span> {{ lexicalStorage.localizeField(key.columnField) }}</span>
+                    <!--
                   <span>
                     {{
                       lexicalStorage.isList(key.columnField)
@@ -998,28 +1001,28 @@ const refClick = (tRow: number, tCol: number) => {
                         : ''
                     }}
                   </span>-->
-                </template>
-                <template v-if="key.type == 'value'">
-                  <div class="header-value-col">
-                    <div class="header-value-row">
-                      <span>
-                        {{ lexicalStorage.localizeField(key.columnField) }}
-                        <!--{{
+                  </template>
+                  <template v-if="key.type == 'value'">
+                    <div class="header-value-col">
+                      <div class="header-value-row">
+                        <span>
+                          {{ lexicalStorage.localizeField(key.columnField) }}
+                          <!--{{
                           lexicalStorage.isList(key.columnField)
                             ? '(' + t('table.header.list') + ')'
                             : ''
                       }}-->
-                      </span>
+                        </span>
+                      </div>
+                      <div>
+                        <span class="resource">
+                          {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <span class="resource">
-                        {{ lexicalStorage.datasetLabels[key.headerValue] }}
-                      </span>
-                    </div>
-                  </div>
-                </template>
-                <template v-if="key.type == 'total' || key.type == 'count'">
-                  <!--
+                  </template>
+                  <template v-if="key.type == 'total' || key.type == 'count'">
+                    <!--
                   <span v-if="columnCount && selectedColumns.length > 0">
                     <template v-if="key.headerField">
                       {{ lexicalStorage.localizeField(key.headerField) }}<br />
@@ -1030,73 +1033,73 @@ const refClick = (tRow: number, tCol: number) => {
                     </template>
                   </span>
                   -->
-                  <span v-if="key.headerField">
-                    <!--
+                    <span v-if="key.headerField">
+                      <!--
                     <span v-if="selectedColumns.length > 0">
                       {{ lexicalStorage.localizeField(key.headerField) }}<br />
                       {{ key.headerValue }}
                     </span>
                     <span v-else>-->
-                    {{ lexicalStorage.datasetLabels[key.headerValue] }}
-                    <!--</span>-->
-                  </span>
-                  <span v-else> {{ t('statistics.total') }} </span>
-                </template>
-                <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
-                  <span class="header-sortable material-icons">
-                    <span
-                      @click="doSort(key.columnField, SORT_ORDER_ASCENDING)"
-                      :class="{
-                        'header-sortable-selected':
-                          lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
-                          lexicalStorage.statisticsSortField == key.columnField,
-                      }"
-                    >
-                      {{ 'keyboard_arrow_down' }}
+                      {{ lexicalStorage.datasetLabels[key.headerValue] }}
+                      <!--</span>-->
                     </span>
-                    <span> </span>
-                    <span
-                      @click="doSort(key.columnField, SORT_ORDER_DESCENDING)"
-                      :class="{
-                        'header-sortable-selected':
-                          lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
-                          lexicalStorage.statisticsSortField == key.columnField,
-                      }"
-                    >
-                      {{ 'keyboard_arrow_up' }}
+                    <span v-else> {{ t('statistics.total') }} </span>
+                  </template>
+                  <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
+                    <span class="header-sortable material-icons">
+                      <span
+                        @click="doSort(key.columnField, SORT_ORDER_ASCENDING)"
+                        :class="{
+                          'header-sortable-selected':
+                            lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
+                            lexicalStorage.statisticsSortField == key.columnField,
+                        }"
+                      >
+                        {{ 'keyboard_arrow_down' }}
+                      </span>
+                      <span> </span>
+                      <span
+                        @click="doSort(key.columnField, SORT_ORDER_DESCENDING)"
+                        :class="{
+                          'header-sortable-selected':
+                            lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
+                            lexicalStorage.statisticsSortField == key.columnField,
+                        }"
+                      >
+                        {{ 'keyboard_arrow_up' }}
+                      </span>
                     </span>
-                  </span>
-                </template>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- show totals -->
-          <tr class="total">
-            <!-- empty cell for expand_more/less -->
-            <td v-if="showCompact"></td>
-            <template v-for="(item, index) in statisticsTotals" :key="index">
-              <td v-if="index == 0" class="total">&Sigma;</td>
-              <td v-else class="total numeric">
-                <span v-html="formatCell(item, '', true)"></span>
-              </td>
+                  </template>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- show totals -->
+            <tr class="total">
+              <!-- empty cell for expand_more/less -->
+              <td v-if="showCompact"></td>
+              <template v-for="(item, index) in statisticsTotals" :key="index">
+                <td v-if="index == 0" class="total">&Sigma;</td>
+                <td v-else class="total numeric">
+                  <span v-html="formatCell(item, '', true)"></span>
+                </td>
+              </template>
+            </tr>
+            <!-- show data -->
+            <template v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
+              <StatisticsRowCompact
+                :item="item"
+                :tableRow="tableRow"
+                :showCompact="showCompact"
+                :updateShowHitsCheckbox="updateShowHitsCheckbox"
+                :paginatedDataRow="paginatedData[tableRow]"
+              >
+              </StatisticsRowCompact>
             </template>
-          </tr>
-          <!-- show data -->
-          <template v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
-            <StatisticsRowCompact
-              :item="item"
-              :tableRow="tableRow"
-              :showCompact="showCompact"
-              :updateShowHitsCheckbox="updateShowHitsCheckbox"
-              :paginatedDataRow="paginatedData[tableRow]"
-            >
-            </StatisticsRowCompact>
-          </template>
-        </tbody>
-      </table>
-
+          </tbody>
+        </table>
+      </div>
       <!-- pagination -->
       <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
       <!--
@@ -1150,7 +1153,7 @@ svg g text {
 }
 
 .statistics {
-  padding: 0.5rem;
+  /*padding: 0.5rem;*/
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -1164,8 +1167,8 @@ svg g text {
 
 .statistics-dropdown {
   position: relative;
-  margin-bottom: 1rem;
-  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
   width: 400px;
   color: var(--color-text);
 }
@@ -1359,6 +1362,18 @@ input[type='checkbox'][disabled] + label {
   font-weight: bold;
   border-radius: 4px;
   border: 0;
+}
+
+/* table */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* graph */
+.graph {
+  overflow-x: auto;
+  width: 100%;
 }
 
 /* misc */

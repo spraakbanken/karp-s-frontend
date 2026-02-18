@@ -2,6 +2,7 @@ import axios from 'axios'
 import { ref } from 'vue'
 import { jwtDecode } from 'jwt-decode'
 import { axiosInstance } from '@/api/apiService'
+import { lexicalStore } from '@/stores/store'
 
 /**
  * API base URL for authentication.
@@ -17,8 +18,38 @@ const user = ref(null)
 /**
  * Interface for the JWT payload structure.
  */
+interface Scope {
+  other: {
+    [key: string]: number // Any additional resources can be represented by string keys
+  }
+  corpora: {
+    [key: string]: number // Any additional corpora can be represented by string keys
+  }
+  lexica: {
+    [key: string]: number // Any additional lexica can be represented by string keys
+  }
+}
+
+interface Levels {
+  READ: number
+  WRITE: number
+  ADMIN: number
+}
+
 interface JwtPayload {
+  iss: string
+  iat: number
   exp: number
+  jti: string
+  idp: string
+  sub: string
+  name: string
+  email: string
+  country: string // Assuming country can be an empty string
+  organization: string // Assuming organization can be an empty string
+  affiliation: string
+  scope: Scope
+  levels: Levels
 }
 
 /**
@@ -26,9 +57,19 @@ interface JwtPayload {
  * @param jwt - The JWT token to be stored and used for authentication.
  */
 const setJwtToken = (jwt: string): void => {
+  const lexicalStorage = lexicalStore()
   localStorage.setItem('jwt', jwt)
   //axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
   axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
+  // update list of restricted datasets the user has been granted access to
+  const jwtd = jwtDecode<JwtPayload>(jwt)
+  const jwt_lexica = jwtd.scope?.lexica
+  if (jwt_lexica !== null) {
+    lexicalStorage.grantedDatasets = Object.entries(jwt_lexica)
+      .filter(([, value]) => value > 0)
+      .map(([key]) => key)
+  }
+  //console.log('Granted: ', lexicalStorage.grantedDatasets)
 }
 
 /**

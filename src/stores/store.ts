@@ -18,6 +18,7 @@ interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
   currentDatasets: string[] //  all datasets (id's)
   currentDatasetsSize: number // total number of entries
+  grantedDatasets: string[] // restricted datasets that the user has been granted access to
   selectedDatasets: string[] // selected datasets (id's)
   selectedDatasetsSize: number // number of entries in selected datasets
   currentTags: string[] // all tags
@@ -69,6 +70,7 @@ export const lexicalStore = defineStore('dataset', {
     currentConfig: { resources: [], tags: {}, fields: {} },
     currentDatasets: [],
     currentDatasetsSize: 0,
+    grantedDatasets: [],
     selectedDatasets: [],
     selectedDatasetsSize: 0,
     currentTags: [],
@@ -203,11 +205,26 @@ export const lexicalStore = defineStore('dataset', {
         }
       }
 
-      // setup default datasets for first run = select all except "Fula ordboken" ("fulaord")
-      this.setSelectedDataset(
-        this.currentDatasets.filter((element) => element !== 'fulaord' && element !== 'flex'),
-      )
-      // and select all tags
+      // setup default datasets for first run:
+      // select all except "Fula ordboken", "Flex" and restricted datasets/resources
+      const startDatasets: string[] = []
+      const unwantedDatasets: string[] = ['fulaord', 'flex']
+      for (const c of this.currentConfig.resources) {
+        // do not include unwanted
+        if (!unwantedDatasets.includes(c.resourceId)) {
+          // do not include restricted
+          if (c.hasOwnProperty('limitedAccess')) {
+            if (!c.limitedAccess) {
+              startDatasets.push(c.resourceId)
+            }
+          } else {
+            startDatasets.push(c.resourceId)
+          }
+        }
+      }
+      this.setSelectedDataset(startDatasets)
+
+      // and select all tags (even if this is not 100% correct)
       this.setSelectedTags(this.currentTags)
     },
     setSearchQuery(query: string) {
@@ -225,12 +242,14 @@ export const lexicalStore = defineStore('dataset', {
     },
     setSelectedFieldsAdd(sfc: SelectedFieldConfig) {
       sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
-      this.selectedFields[this.selectedFieldsCount] = sfc
+      this.selectedFields.push(sfc)
       this.selectedFieldsCount++
     },
+    /*
     setSelectedFieldN(index: number, sfc: SelectedFieldConfig) {
       this.selectedFields[index] = sfc
     },
+    */
     setSelectedFieldsRemove(fid: number) {
       const index = this.selectedFields.findIndex((f) => f.id === fid)
       if (index !== -1) {

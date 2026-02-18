@@ -101,6 +101,7 @@ onMounted(() => {
   position: relative;
   display: inline-block;
 }
+
 .dropdown-button {
   cursor: pointer;
   border: none;
@@ -126,6 +127,7 @@ onMounted(() => {
   color: var(--color-text);
   margin-bottom: 0.5rem;
 }
+
 .dropdown-selectors .tags-button-action {
   cursor: pointer;
   background-color: black;
@@ -134,6 +136,7 @@ onMounted(() => {
   margin-right: 0.5rem;
   cursor: pointer;
 }
+
 .dropdown-menu {
   position: absolute;
   background-color: var(--color-background);
@@ -146,11 +149,15 @@ onMounted(() => {
   font-weight: normal;
   padding: 8px;
 }
+
 .dropdown-item {
+  color: var(--color-text);
 }
+
 .dropdown-item:hover {
   background-color: var(--sb-grey-light);
 }
+
 .dropdown-item input {
   cursor: pointer;
 }

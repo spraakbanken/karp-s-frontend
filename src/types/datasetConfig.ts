@@ -39,6 +39,7 @@ export interface Resource {
   size: string
   tags: string[]
   updated: string
+  limitedAccess: boolean
   [entryWordProperty]: EntryWord
 }
 
@@ -51,6 +52,7 @@ export interface ResourceLocalized {
   size: string
   tags: string[]
   updated: string
+  limitedAccess: boolean
   [entryWordProperty]: string
   entryWordDescription: string
 }

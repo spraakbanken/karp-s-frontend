@@ -2,7 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import {
-  type SelectedFieldConfig,
+  //type SelectedFieldConfig,
   entryWordProperty,
   entryWordDescriptionProperty,
 } from '@/types/datasetConfig'
@@ -30,6 +30,7 @@ const selectedFields = computed({
   set: (value) => lexicalStorage.setSelectedFields(value),
 })
 */
+/*
 const selectedCompileParams = computed({
   get: () => lexicalStorage.selectedCompileFields,
   set: (value) => lexicalStorage.setSelectedCompileFields(value),
@@ -38,6 +39,7 @@ const selectedColumns = computed({
   get: () => lexicalStorage.selectedColumns,
   set: (value) => lexicalStorage.setSelectedColumns(value),
 })
+*/
 
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
@@ -55,6 +57,7 @@ const datasetInfo = ref(<ResourceLocalized>{
   size: '',
   tags: [],
   updated: '',
+  limitedAccess: false,
   [entryWordProperty]: '',
   [entryWordDescriptionProperty]: '',
 })
@@ -92,6 +95,7 @@ const datasetInfoFill = (dataset: string) => {
       }
       datasetInfo.value['size'] = elt.size
       datasetInfo.value['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
+      datasetInfo.value['limitedAccess'] = elt.limitedAccess
       datasetInfo.value['link'] = elt.link
       datasetInfo.value[entryWordProperty] = elt[entryWordProperty].field
       datasetInfo.value['fields'] = elt.fields
@@ -118,7 +122,7 @@ const isDropdownColumns = ref(false)
 const isDropdownCompileParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
-const fields = ref<Record<string, SelectedFieldConfig>>({})
+//const fields = ref<Record<string, SelectedFieldConfig>>({})
 
 const toggleDropdown = () => {
   if (!isDropdownOpen.value) {
@@ -171,7 +175,7 @@ const selectTags = (tag: string) => {
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
     //if (!selectedDatasets.value.includes(c.resourceId)) {
-    if (hasTags(c.resourceId)) {
+    if (hasSelectedTags(c.resourceId)) {
       selDS.push(c.resourceId)
     }
     //}
@@ -194,7 +198,7 @@ const unselectTags = () => {
   doFilterDatasets()
 }
 
-const hasTags = (rid: string): boolean => {
+const hasSelectedTags = (rid: string): boolean => {
   let includeRes = false
   for (const c of lexicalStorage.currentConfig.resources) {
     if (c.resourceId == rid) {
@@ -276,7 +280,7 @@ const doFilterDatasets = () => {
   filteredDatasets.value = arr
 }
 
-watch(searchDatasets, (newFilter) => {
+watch(searchDatasets, () => {
   doFilterDatasets()
 })
 
@@ -474,6 +478,20 @@ watch(
                   />
                   {{ lexicalStorage.datasetLabels[dataset] }}
                 </label>
+                <span
+                  v-if="
+                    lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
+                      ?.limitedAccess
+                  "
+                  ><span
+                    v-if="lexicalStorage.grantedDatasets.includes(dataset)"
+                    class="datasets-icon-status material-icons"
+                  >
+                    lock_open
+                  </span>
+                  <span v-else class="datasets-icon-status material-icons"> lock </span>
+                </span>
+
                 <div v-if="dataset !== '' && previousDataset === dataset">
                   <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
                     <div class="datasets-info-label">{{ datasetInfo.label }}</div>
@@ -483,6 +501,14 @@ watch(
                     <div class="">{{ datasetInfo.updated }}</div>
                     <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
                     <div class="">{{ datasetInfo.size }}</div>
+                    <div class="datasets-info-label">{{ $t('dataset.limitedAccess') }}</div>
+                    <div class="">
+                      {{
+                        datasetInfo.limitedAccess
+                          ? $t('dataset.limitedAccess.true')
+                          : $t('dataset.limitedAccess.false')
+                      }}
+                    </div>
                     <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
                     <div class="">
                       <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
@@ -717,6 +743,12 @@ watch(
   */
   vertical-align: bottom;
   cursor: pointer;
+}
+
+.datasets-icon-status {
+  margin-left: 0.5rem;
+  font-size: 22px;
+  vertical-align: text-bottom;
 }
 
 .datasets-info {

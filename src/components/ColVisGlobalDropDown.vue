@@ -167,8 +167,8 @@ onMounted(() => {
   border: none;
   margin: 0 0rem 0rem 1rem;
   padding: 0.5;
-  background-color: var(--color-infocontrol-button-bg);
-  color: var(--color-infocontrol-button-text);
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
   border-radius: 4px;
   border: 0;
   font-weight: bold;
@@ -186,6 +186,7 @@ onMounted(() => {
   color: var(--color-text);
   margin-bottom: 0.5rem;
 }
+
 .dropdown-selectors .tags-button-action {
   cursor: pointer;
   background-color: black;
@@ -194,6 +195,7 @@ onMounted(() => {
   margin-right: 0.5rem;
   cursor: pointer;
 }
+
 .dropdown-menu {
   position: absolute;
   background-color: var(--color-background);
@@ -208,14 +210,17 @@ onMounted(() => {
 }
 
 .dropdown-item {
+  color: var(--color-text);
 }
 
 .dropdown-item:hover {
   background-color: var(--sb-grey-light);
 }
+
 .dropdown-item input {
   cursor: pointer;
 }
+
 .item-common {
   font-weight: bold;
 }

@@ -21,6 +21,9 @@ export const SORT_ORDER_DESCENDING: string = 'desc'
 export enum BEErrorCode {
   NONE = 0,
   TOO_MANY_COLUMNS = 1,
+  NO_ACCESS = 2,
+  BAD_JWT = 3,
+  BAD_API_KEY = 4,
 }
 
 export const BEErrorMessage = (key: BEErrorCode): string => {
@@ -31,6 +34,15 @@ export const BEErrorMessage = (key: BEErrorCode): string => {
       break
     case BEErrorCode.TOO_MANY_COLUMNS:
       retval = i18n.global.t('error.code.1')
+      break
+    case BEErrorCode.NO_ACCESS:
+      retval = i18n.global.t('error.code.2')
+      break
+    case BEErrorCode.BAD_JWT:
+      retval = i18n.global.t('error.code.3')
+      break
+    case BEErrorCode.BAD_API_KEY:
+      retval = i18n.global.t('error.code.4')
       break
   }
   return retval

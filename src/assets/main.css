@@ -1,5 +1,9 @@
 @import './base.css';
-
+/*
+* {
+  outline: 1px solid #f00 !important;
+}
+*/
 #app {
   width: 100%;
   max-width: 100%;

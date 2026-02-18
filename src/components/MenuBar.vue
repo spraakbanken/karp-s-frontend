@@ -72,7 +72,7 @@ const loginLogout = async () => {
     -->
     <span class="menu-item">
       <a href="https://spraakbanken.gu.se/karp/">
-        <span class="material-icons">mode_edit</span>{{ $t('menu.editmode') }}
+        {{ $t('menu.editmode') }}
       </a>
     </span>
     <span class="menu-item">

@@ -28,11 +28,18 @@ onMounted(async () => {
 <template>
   <div class="about">
     <div class="row">
+      <!-- About -->
+      <div>
+        <h2>{{ $t('about.about.title') }}</h2>
+        <p v-html="$t('about.about.text')"></p>
+      </div>
+    </div>
+    <div class="row">
       <div class="col">
         <!-- About -->
         <div>
-          <h2>{{ $t('about.about.title') }}</h2>
-          <p v-html="$t('about.about.text')"></p>
+          <h2>{{ $t('about.about.infotitle') }}</h2>
+          <p v-html="$t('about.about.info')"></p>
           <p><b>Front-end:</b> {{ packageJson.version }}</p>
           <p><b>Back-end:</b> {{ apiUrl }}</p>
         </div>
@@ -79,8 +86,15 @@ onMounted(async () => {
 <style scoped>
 .about {
   margin: auto;
+  margin-bottom: 1rem;
   padding: 2rem;
   width: 800px;
+  border-radius: 0.5rem;
+  background-color: var(--color-background-alt2);
+  @media (width < 800px) {
+    width: 100%;
+    flex-direction: column;
+  }
 }
 
 .row {
@@ -88,7 +102,6 @@ onMounted(async () => {
   flex-wrap: wrap;
   width: 100%;
   @media (width < 800px) {
-    width: 480px;
     flex-direction: column;
   }
 }
