@@ -71,14 +71,18 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       statisticsPageStart: lexicalStorage.statisticsPageStart,
       statisticsPageSize: lexicalStorage.statisticsPageSize,
     }
+    console.log('Adv, newqs=', newQuery)
 
     const filteredQuery = Object.fromEntries(
       Object.entries(newQuery).filter(
         ([key, value]) => value !== '' && value !== null && value !== undefined,
       ),
     )
+    console.log('Adv, filtqs=', filteredQuery)
 
     if (JSON.stringify(currentQuery) !== JSON.stringify(filteredQuery)) {
+      console.log('Adv, push')
+
       router.push({ query: filteredQuery })
     }
   }
@@ -86,7 +90,11 @@ export function syncStoreWithRouter(router: Router): SyncResult {
   watch(
     () => ({
       resources: lexicalStorage.selectedDatasets,
-      q: [lexicalStorage.selectedFields, lexicalStorage.searchExtendedOp],
+      q: [
+        lexicalStorage.selectedFields,
+        lexicalStorage.searchExtendedOp,
+        lexicalStorage.searchQuery,
+      ],
       compile: lexicalStorage.selectedCompileFields,
       columns: lexicalStorage.selectedColumns,
       tab: lexicalStorage.activeResultTab,

@@ -44,10 +44,17 @@ const clickResourceInfo = (url: string) => {
 
 .latest-row button {
   margin-right: 0.5rem;
-  background-color: var(--color-infocontrol-button-bg);
-  color: var(--color-infocontrol-button-text);
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
   border-radius: 4px;
   border: 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.latest-row button:hover {
+  background-color: var(--button-action-bg-hover-color);
+  color: var(--button-action-text-hover-color);
 }
 
 .latest-label {
