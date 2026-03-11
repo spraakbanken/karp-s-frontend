@@ -15,7 +15,7 @@ import {
   entryWordField,
 } from '@/types/datasetConfig'
 import { getTabRefData } from '@/api/apiService'
-import { formatCell } from '@/utils/utils'
+import { formatCell, isImage } from '@/utils/utils'
 import { checkJwtToken } from '@/api/authService'
 
 const props = defineProps<{
@@ -230,6 +230,17 @@ onMounted(async () => {
             <tr>
               <td v-for="(value2, key) in cItem.entry" :key="key">
                 <span v-html="formatCell(value2.value)"></span>
+                &nbsp;
+                <span v-if="isImage(value2.value)">
+                  <a
+                    :href="'/karplabb/img?img=' + value2.value"
+                    class="material-icons action-link"
+                    target="_blank"
+                    :title="t('table.imgbrowse')"
+                  >
+                    open_in_browser
+                  </a>
+                </span>
               </td>
             </tr>
           </template>
@@ -334,5 +345,11 @@ onMounted(async () => {
   color: var(--sb-orange);
   vertical-align: top;
   font-size: 22px;
+}
+
+.action-link {
+  vertical-align: top;
+  font-size: 22px;
+  text-decoration: none;
 }
 </style>

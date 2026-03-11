@@ -106,9 +106,9 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       statisticsPageSize: lexicalStorage.statisticsPageSize,
     }),
     () => {
-      if (router.currentRoute.value.path !== '/img') {
-        updateRouterQuery()
-      }
+      //if (router.currentRoute.value.path !== '/img') {
+      updateRouterQuery()
+      //}
     },
     { deep: true },
   )

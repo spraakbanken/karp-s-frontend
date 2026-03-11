@@ -1,94 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { lexicalStore } from '@/stores/store'
-
 import { RouterView } from 'vue-router'
-import router from '@/router'
-
-import TitleBar from './components/TitleBar.vue'
-import FooterView from './components/FooterView.vue'
-import { getLexicalDatasets } from '@/api/apiService'
-import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
-
-const lexicalStorage = lexicalStore()
-const syncResult = ref<SyncResult>(SyncResult.SYNC_RESULT_NOT_SYNCED)
-const imgView = ref(false)
-
-onMounted(async () => {
-  // does user prefer dark mode?
-  /*
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  if (mediaQuery.matches) {
-    document.documentElement.setAttribute('data-theme', 'dark')
-  }
-  */
-  // read config
-  try {
-    const datasets = await getLexicalDatasets()
-    lexicalStorage.setDefault(datasets)
-    syncResult.value = syncStoreWithRouter(router)
-
-    // check if we are viewing images
-    if (router.currentRoute.value.path === '/img') {
-      imgView.value = true
-    }
-
-    if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
-      lexicalStorage.setIsStart(false)
-      //TODO lexicalStorage.setIsSearch(true)
-    } else if (syncResult.value === SyncResult.SYNC_RESULT_DATASET_UNKNOWN) {
-      lexicalStorage.setDefault(datasets)
-    }
-  } catch (error) {
-    console.error(error)
-  }
-})
 </script>
 
 <template>
-  <template v-if="!imgView">
-    <div class="wrapper">
-      <header>
-        <TitleBar />
-      </header>
-      <div
-        v-if="syncResult === SyncResult.SYNC_RESULT_DATASET_UNKNOWN && lexicalStorage.isStart"
-        class="message-error"
-      >
-        {{ $t('url.dataset.unknown') }}
-      </div>
-      <div class="main">
-        <RouterView />
-      </div>
-      <footer class="footer">
-        <FooterView />
-      </footer>
-    </div>
-  </template>
-  <template v-else>
-    <div class="main">
-      <RouterView />
-    </div>
-  </template>
+  <RouterView />
 </template>
 
-<style scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-  /*width: 100vw;*/
-}
-
-footer {
-  height: 150px;
-}
-
-.main {
-  flex: 1;
-}
-</style>
+<style scoped></style>

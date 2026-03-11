@@ -12,7 +12,7 @@ const router = createRouter({
     },
     {
       path: '/img',
-      name: 'Img',
+      name: 'img',
       component: ImgView,
     },
     /*
