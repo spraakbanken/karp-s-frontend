@@ -118,12 +118,24 @@ export const formatCell = (
         }
       }
     } else if (typeof x === 'string' && x.startsWith('https://')) {
-      cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
+      cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '</a>'
     } else {
       cell = String(x)
     }
   }
   return cell
+}
+
+export const isImage = (x: unknown): boolean => {
+  let retval = false
+  if (x != null) {
+    if (typeof x === 'string') {
+      if (x.slice(-4) === '.png') {
+        retval = true
+      }
+    }
+  }
+  return retval
 }
 
 /*

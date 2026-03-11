@@ -112,6 +112,7 @@
   "table.columnVis.select.none": "Ingen",
   "table.columnVis.selected.of": "av",
   "table.columnVis.selected.selected": "valda",
+  "table.imgbrowse": "Bläddra bilder",
   "statistics.exportCSV": "Exportera CSV",
   "statistics.showOverview": "Visa översikt",
   "statistics.showColumnCount": "Visa antal för fält",

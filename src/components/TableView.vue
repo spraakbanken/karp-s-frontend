@@ -20,7 +20,7 @@ import {
   entryWordField,
 } from '@/types/datasetConfig'
 import { getTableData } from '@/api/apiService'
-import { formatCell } from '@/utils/utils'
+import { formatCell, isImage } from '@/utils/utils'
 
 import TableRowCompact from '@/components/TableRowCompact.vue'
 import ColVisDropDown from './ColVisDropDown.vue'
@@ -331,6 +331,14 @@ const picsbarFractionTotalClass = (ds: string) => {
     'picsbar-tooltiptext': fraction >= 0.25 && fraction <= 0.75,
   }
 }
+
+/*
+const showImg = (img: string) => {
+  console.log('SHowImg:', img, window.location.pathname)
+
+  window.location.pathname += 'img?img=' + img
+}
+*/
 </script>
 
 <template>
@@ -389,7 +397,9 @@ const picsbarFractionTotalClass = (ds: string) => {
           <tr>
             <td :style="{ width: 100 * (currentPageRowStart / tableResult.total) + '%' }"></td>
             <td
-              :style="{ width: Math.max(0.25, 100 * (currentPageSize / tableResult.total)) + '%' }"
+              :style="{
+                width: Math.max(0.25, 100 * (currentPageSize / tableResult.total)) + '%',
+              }"
               style="background-color: var(--sb-orange)"
             ></td>
             <td></td>
@@ -521,7 +531,19 @@ const picsbarFractionTotalClass = (ds: string) => {
                               ?.vis
                           "
                         >
-                          <span v-html="formatCell(value2.value)"></span>
+                          <span style="white-space: nowrap">
+                            <span v-html="formatCell(value2.value)"></span>&nbsp;
+                            <span v-if="isImage(value2.value)">
+                              <a
+                                :href="'/karplabb/img?img=' + value2.value"
+                                class="material-icons action-link"
+                                target="_blank"
+                                :title="t('table.imgbrowse')"
+                              >
+                                open_in_browser
+                              </a>
+                            </span>
+                          </span>
                         </td>
                       </template>
                     </tr>
@@ -811,6 +833,12 @@ const picsbarFractionTotalClass = (ds: string) => {
   color: var(--sb-orange);
   vertical-align: top;
   font-size: 22px;
+}
+
+.action-link {
+  vertical-align: top;
+  font-size: 22px;
+  text-decoration: none;
 }
 
 .fancy-table {

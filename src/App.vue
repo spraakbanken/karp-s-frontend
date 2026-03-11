@@ -12,6 +12,7 @@ import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
 
 const lexicalStorage = lexicalStore()
 const syncResult = ref<SyncResult>(SyncResult.SYNC_RESULT_NOT_SYNCED)
+const imgView = ref(false)
 
 onMounted(async () => {
   // does user prefer dark mode?
@@ -27,6 +28,11 @@ onMounted(async () => {
     lexicalStorage.setDefault(datasets)
     syncResult.value = syncStoreWithRouter(router)
 
+    // check if we are viewing images
+    if (router.currentRoute.value.path === '/img') {
+      imgView.value = true
+    }
+
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
       //TODO lexicalStorage.setIsSearch(true)
@@ -40,23 +46,30 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="wrapper">
-    <header>
-      <TitleBar />
-    </header>
-    <div
-      v-if="syncResult === SyncResult.SYNC_RESULT_DATASET_UNKNOWN && lexicalStorage.isStart"
-      class="message-error"
-    >
-      {{ $t('url.dataset.unknown') }}
+  <template v-if="!imgView">
+    <div class="wrapper">
+      <header>
+        <TitleBar />
+      </header>
+      <div
+        v-if="syncResult === SyncResult.SYNC_RESULT_DATASET_UNKNOWN && lexicalStorage.isStart"
+        class="message-error"
+      >
+        {{ $t('url.dataset.unknown') }}
+      </div>
+      <div class="main">
+        <RouterView />
+      </div>
+      <footer class="footer">
+        <FooterView />
+      </footer>
     </div>
+  </template>
+  <template v-else>
     <div class="main">
       <RouterView />
     </div>
-    <footer class="footer">
-      <FooterView />
-    </footer>
-  </div>
+  </template>
 </template>
 
 <style scoped>

@@ -2,8 +2,11 @@
 import { ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
-import { formatCell } from '@/utils/utils'
+import { formatCell, isImage } from '@/utils/utils'
 import { isNumber } from 'es-toolkit/compat'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   /** Maximum height (px). */
@@ -41,7 +44,19 @@ const [expanded, toggleExpanded] = useToggle()
       <td v-else-if="key === 0 && showCompact"></td>
       <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
         <div :class="{ 'mhr-div': !expanded && thflag, numeric: isNumber(value2.value) }">
-          <span v-html="formatCell(value2.value)"></span>
+          <span style="white-space: nowrap">
+            <span v-html="formatCell(value2.value)"> </span>
+            <span v-if="isImage(value2.value)">
+              <a
+                :href="'/karplabb/img?img=' + value2.value"
+                class="material-icons action-link"
+                target="_blank"
+                :title="t('table.imgbrowse')"
+              >
+                open_in_browser
+              </a>
+            </span>
+          </span>
         </div>
       </td>
     </template>
@@ -95,5 +110,11 @@ p:not(:last-of-type) {
 
 .numeric {
   text-align: right;
+}
+
+.action-link {
+  vertical-align: top;
+  font-size: 22px;
+  text-decoration: none;
 }
 </style>

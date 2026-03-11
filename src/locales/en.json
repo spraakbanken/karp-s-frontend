@@ -112,6 +112,7 @@
   "table.columnVis.select.none": "None",
   "table.columnVis.selected.of": "of",
   "table.columnVis.selected.selected": "selected",
+  "table.imgbrowse": "Browse images",
   "statistics.exportCSV": "Export CSV",
   "statistics.showOverview": "Show overview",
   "statistics.showColumnCount": "Show count for fields",
