@@ -2,6 +2,7 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField } from '@/types/datasetConfig'
+import { TAB_RESULT_REF, TAB_RESULT_TABLE } from '@/utils/constants'
 
 const lexicalStorage = lexicalStore()
 
@@ -169,6 +170,9 @@ const updateData = () => {
   lexicalStorage.setIsStart(false)
   lexicalStorage.tablePageRowStart = 0
   lexicalStorage.statisticsPageStart = 1
+  if (lexicalStorage.activeResultTab.slice(0, 3) === TAB_RESULT_REF) {
+    lexicalStorage.setActiveResultTab(TAB_RESULT_TABLE)
+  }
   //}
 }
 

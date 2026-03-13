@@ -18,6 +18,7 @@ import TabRefView from '@/components/TabRefView.vue'
 import { getLexicalDatasets } from '@/api/apiService'
 import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
 import router from '@/router'
+import { TAB_RESULT_REF, TAB_RESULT_STATISTICS, TAB_RESULT_TABLE } from '@/utils/constants'
 
 const lexicalStorage = lexicalStore()
 
@@ -129,20 +130,20 @@ const tabRefClose = (id: number) => {
         <template v-if="!lexicalStorage.isStart">
           <div class="tabs">
             <button
-              :class="{ active: activeResultTab === 'table' }"
-              @click="setActiveResultTab('table')"
+              :class="{ active: activeResultTab === TAB_RESULT_TABLE }"
+              @click="setActiveResultTab(TAB_RESULT_TABLE)"
             >
               {{ $t('tab.tables') }}
             </button>
             <button
-              :class="{ active: activeResultTab === 'statistics' }"
-              @click="setActiveResultTab('statistics')"
+              :class="{ active: activeResultTab === TAB_RESULT_STATISTICS }"
+              @click="setActiveResultTab(TAB_RESULT_STATISTICS)"
             >
               {{ $t('tab.statistics') }}
             </button>
             <template v-for="(tabRef, key) in tabRefSetup" :key="key">
-              <button :class="{ active: activeResultTab === 'ref' + key }">
-                <span @click="setActiveResultTab('ref' + key)">
+              <button :class="{ active: activeResultTab === TAB_RESULT_REF + key }">
+                <span @click="setActiveResultTab(TAB_RESULT_REF + key)">
                   <span class="material-icons icon-placement">arrow_forward</span
                   >{{ limit_tabref(tabRef.columnValue) }}</span
                 >
@@ -158,11 +159,11 @@ const tabRefClose = (id: number) => {
         </template>
 
         <div>
-          <TableView v-if="activeResultTab === 'table' && !lexicalStorage.isStart" />
-          <StatisticsView v-if="activeResultTab === 'statistics'" />
+          <TableView v-if="activeResultTab === TAB_RESULT_TABLE && !lexicalStorage.isStart" />
+          <StatisticsView v-if="activeResultTab === TAB_RESULT_STATISTICS" />
           <div v-for="(tabRef, key) in tabRefSetup" :key="key">
             <TabRefView
-              v-if="activeResultTab === 'ref' + key"
+              v-if="activeResultTab === TAB_RESULT_REF + key"
               :id="Number(key)"
               :resourceId="tabRef.resourceId"
               :columnField="tabRef.columnField"

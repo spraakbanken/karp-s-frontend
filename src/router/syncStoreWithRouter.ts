@@ -2,6 +2,7 @@ import { watch } from 'vue'
 import type { Router } from 'vue-router'
 import { lexicalStore } from '@/stores/store'
 import type { SelectedFieldConfig } from '@/types/datasetConfig'
+import { TAB_RESULT_STATISTICS, TAB_RESULT_TABLE } from '@/utils/constants'
 
 export enum SyncResult {
   SYNC_RESULT_NOT_SYNCED = 0,
@@ -61,9 +62,9 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       q: queryString,
       compile: lexicalStorage.selectedCompileFields.join(','),
       columns: lexicalStorage.selectedColumns.join(','),
-      tab: ['table', 'statistics'].includes(lexicalStorage.activeResultTab)
+      tab: [TAB_RESULT_TABLE, TAB_RESULT_STATISTICS].includes(lexicalStorage.activeResultTab)
         ? lexicalStorage.activeResultTab
-        : 'statistics',
+        : TAB_RESULT_STATISTICS,
       searchtab: lexicalStorage.activeSearchTab,
       sort: lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder,
       tablePageRowStart: lexicalStorage.tablePageRowStart,

@@ -12,7 +12,12 @@ import {
   entryWordField,
   type ColumnVisField,
 } from '@/types/datasetConfig.ts'
-import { ROWS_PER_PAGE, SORT_ORDER_ASCENDING, TABREFCOUNT_MAX } from '@/utils/constants'
+import {
+  ROWS_PER_PAGE,
+  SORT_ORDER_ASCENDING,
+  TAB_RESULT_TABLE,
+  TABREFCOUNT_MAX,
+} from '@/utils/constants'
 
 interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
@@ -92,7 +97,7 @@ export const lexicalStore = defineStore('dataset', {
     tabRefSetup: {},
     tabRefSetupCounter: 2,
     activeSearchTab: 'simple',
-    activeResultTab: 'table',
+    activeResultTab: TAB_RESULT_TABLE,
     activeLocale: 'sv',
     tableSortField: '',
     tableSortOrder: SORT_ORDER_ASCENDING,
@@ -516,7 +521,7 @@ export const lexicalStore = defineStore('dataset', {
     setEmpty() {
       this.selectedDatasets = []
       this.setActiveSearchTab('simple')
-      this.setActiveResultTab('table')
+      this.setActiveResultTab(TAB_RESULT_TABLE)
     },
     localizeField(p: string): string {
       const pCamel = p //this.camelify(p)

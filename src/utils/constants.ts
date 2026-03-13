@@ -16,6 +16,11 @@ export const BE_STATISTICS_VALUE_ID: string = 'value' // and for value
 export const SORT_ORDER_ASCENDING: string = 'asc'
 export const SORT_ORDER_DESCENDING: string = 'desc'
 
+// tabs - result
+export const TAB_RESULT_TABLE: string = 'table'
+export const TAB_RESULT_STATISTICS: string = 'statistics'
+export const TAB_RESULT_REF: string = 'ref' // + key
+
 // error messages
 
 export enum BEErrorCode {
