@@ -285,9 +285,14 @@ watch(
             </div>
 
             <div class="dropdown-menu" v-if="isDropdownParams">
-              <div v-for="param in currentFields" :key="param.name" class="dropdown-item">
+              <div
+                v-for="param in currentFields"
+                :key="param.name"
+                class="dropdown-item"
+                @click="selectedFieldAdd(param.name)"
+              >
                 <label>
-                  <button @click="selectedFieldAdd(param.name)" class="action-button">
+                  <button class="action-button">
                     {{ $t('search.button.add') }}
                   </button>
                   <!--<input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />-->

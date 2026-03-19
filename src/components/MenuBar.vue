@@ -196,6 +196,7 @@ nav .menu-item {
   overflow-y: auto;
   width: 160px;
   z-index: 1000;
+  right: 0;
 }
 
 .dropdown-content a {

@@ -403,19 +403,6 @@ watch(
           <!--
         <div class="dropdown-group">{{ $t('dataselector.datasets.title') }}</div>
         -->
-          <!-- filter -->
-          <div class="dropdown-filter">
-            {{ $t('dataselector.datasets.filter') }}:
-            <input type="text" v-model="searchDatasets" />
-            <button
-              @click="unselectTags()"
-              class="tags-button-action"
-              style="margin-left: 0.5rem"
-              :disabled="selectedTags.length == 0 && searchDatasets == ''"
-            >
-              {{ $t('dataselector.tags.reset') }}
-            </button>
-          </div>
           <!--
           <div>
             <input
@@ -448,6 +435,20 @@ watch(
         <!--
         </div>
         -->
+        <!-- filter -->
+        <div class="dropdown-filter">
+          {{ $t('dataselector.datasets.filter') }}:
+          <input type="text" v-model="searchDatasets" />
+          <button
+            @click="unselectTags()"
+            class="tags-button-action"
+            style="margin-left: 0.5rem"
+            :disabled="selectedTags.length == 0 && searchDatasets == ''"
+          >
+            {{ $t('dataselector.tags.reset') }}
+          </button>
+        </div>
+
         <div class="dropdown-selectors">
           <button @click="selectAllFiltered()" class="tags-button-action">
             {{ $t('dataselector.tags.select') }}
@@ -694,6 +695,10 @@ watch(
 .dropdown-group .tags-button-action:disabled {
   background-color: black;
   color: var(--sb-grey-medium);
+}
+
+.dropdown-filter {
+  margin: 0 0.5rem;
 }
 
 .dropdown-filter input {
