@@ -189,6 +189,7 @@ const selectedFieldAdd = (fieldName: string) => {
   }
   lexicalStorage.selectedFieldsCount++
   */
+  console.log('selectedFieldAdd()', fieldName)
   lexicalStorage.setSelectedFieldsAdd({
     id: 0,
     name: fieldName,
@@ -285,14 +286,9 @@ watch(
             </div>
 
             <div class="dropdown-menu" v-if="isDropdownParams">
-              <div
-                v-for="param in currentFields"
-                :key="param.name"
-                class="dropdown-item"
-                @click="selectedFieldAdd(param.name)"
-              >
+              <div v-for="param in currentFields" :key="param.name" class="dropdown-item">
                 <label>
-                  <button class="action-button">
+                  <button class="action-button" @click="selectedFieldAdd(param.name)">
                     {{ $t('search.button.add') }}
                   </button>
                   <!--<input type="checkbox" :value="param.name" v-model="selectedFieldsArray" />-->

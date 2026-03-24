@@ -213,7 +213,7 @@ export const lexicalStore = defineStore('dataset', {
       // setup default datasets for first run:
       // select all except "Fula ordboken", "Flex" and restricted datasets/resources
       const startDatasets: string[] = []
-      const unwantedDatasets: string[] = ['fulaord', 'flex']
+      const unwantedDatasets: string[] = ['fulaord', 'flex', 'kubord2-stats']
       for (const c of this.currentConfig.resources) {
         // do not include unwanted
         if (!unwantedDatasets.includes(c.resourceId)) {
