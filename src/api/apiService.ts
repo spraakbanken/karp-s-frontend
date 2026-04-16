@@ -2,7 +2,13 @@ import axios, { AxiosError } from 'axios'
 //import { processDatasets, processSubDataset } from '@/utils/processDatasets'
 import { lexicalStore } from '@/stores/store'
 //import { type SelectedFieldConfig, entryWordField } from '@/types/datasetConfig'
-import { BEErrorCode, BEErrorMessage } from '@/utils/constants'
+import {
+  BEErrorCode,
+  BEErrorMessage,
+  TAB_SEARCH_ADVANCED,
+  TAB_SEARCH_EXTENDED,
+  TAB_SEARCH_SIMPLE,
+} from '@/utils/constants'
 //import type { forEach } from 'es-toolkit/compat'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
@@ -23,6 +29,51 @@ export const getLexicalDatasets = async () => {
   }
 }
 
+const createQuery = () => {
+  const lexicalStorage = lexicalStore()
+  let mainQuery = ''
+
+  if (
+    lexicalStorage.activeSearchTab == TAB_SEARCH_SIMPLE ||
+    lexicalStorage.activeSearchTab == TAB_SEARCH_EXTENDED
+  ) {
+    let mainQueryCount = 0
+    for (const mainItem of lexicalStorage.selectedFieldsMain) {
+      let subQuery = ''
+      let subQueryCount = 0
+      for (const subItem of mainItem.selectedFieldsSub) {
+        if (subItem.isNot) {
+          const q =
+            'not(' +
+            subItem.position +
+            '|' +
+            subItem.name +
+            '|' +
+            subItem.value.replace(/"/g, '\\"') +
+            ')'
+          subQuery = subQuery === '' ? q : subQuery + '||' + q
+        } else {
+          const q = subItem.position + '|' + subItem.name + '|' + subItem.value.replace(/"/g, '\\"')
+          subQuery = subQuery === '' ? q : subQuery + '||' + q
+        }
+        subQueryCount++
+      }
+      if (subQueryCount > 1) {
+        subQuery = 'or(' + subQuery + ')'
+      }
+      mainQuery = mainQuery === '' ? subQuery : mainQuery + '||' + subQuery
+      mainQueryCount++
+    }
+    if (mainQueryCount > 1) {
+      mainQuery = 'and(' + mainQuery + ')'
+    }
+  } else if (lexicalStorage.activeSearchTab == TAB_SEARCH_ADVANCED) {
+    mainQuery = lexicalStorage.searchQuery
+  }
+  console.log('CreateQuery:', mainQuery)
+  return mainQuery
+}
+
 export const getTableData = async (pageStart: number, pageSize: number) => {
   const lexicalStorage = lexicalStore()
 
@@ -36,39 +87,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     params['resources'] = resources
 
     // query/field parameters
-    if (
-      lexicalStorage.activeSearchTab == 'simple' ||
-      lexicalStorage.activeSearchTab == 'extended'
-    ) {
-      /*
-      const queryParam = Object.entries(lexicalStorage.selectedFields)
-        .map(([key, value]) => `${value.position}|${key}|"${value.value.replace(/"/g, '\\"')}"`)
-        .join('||')
-        */
-      let queryParam = ''
-      for (let i = 0; i < lexicalStorage.selectedFieldsCount; i++) {
-        const sf = lexicalStorage.selectedFields[i]
-        const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
-        queryParam = queryParam === '' ? q : queryParam + '||' + q
-      }
-      if (queryParam) {
-        if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
-          if (lexicalStorage.selectedFieldsCount == 1) {
-            params['q'] = queryParam
-          } else {
-            // more than one field, ie Extended search
-            if (lexicalStorage.searchExtendedOp) {
-              params['q'] = 'and(' + queryParam + ')'
-            } else {
-              params['q'] = 'or(' + queryParam + ')'
-            }
-          }
-        }
-      }
-    } else if (lexicalStorage.activeSearchTab == 'advanced') {
-      params['q'] = lexicalStorage.searchQuery
-    }
-
+    params['q'] = createQuery()
     params['sort'] = lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder
     params['size'] = pageSize.toString()
     params['from'] = pageStart.toString()
@@ -119,33 +138,7 @@ export const getStatisticsData = async (
     params['resources'] = resources
 
     // query/field parameters
-    if (
-      lexicalStorage.activeSearchTab == 'simple' ||
-      lexicalStorage.activeSearchTab == 'extended'
-    ) {
-      let queryParam = ''
-      for (let i = 0; i < lexicalStorage.selectedFieldsCount; i++) {
-        const sf = lexicalStorage.selectedFields[i]
-        const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
-        queryParam = queryParam === '' ? q : queryParam + '||' + q
-      }
-      if (queryParam) {
-        if (!queryParam.endsWith('|') && !queryParam.endsWith('|""')) {
-          if (lexicalStorage.selectedFieldsCount == 1) {
-            params['q'] = queryParam
-          } else {
-            // more than one field, ie Extended search
-            if (lexicalStorage.searchExtendedOp) {
-              params['q'] = 'and(' + queryParam + ')'
-            } else {
-              params['q'] = 'or(' + queryParam + ')'
-            }
-          }
-        }
-      }
-    } else if (lexicalStorage.activeSearchTab == 'advanced') {
-      params['q'] = lexicalStorage.searchQuery
-    }
+    params['q'] = createQuery()
 
     // compile on
     if (compileParams.length > 0) {

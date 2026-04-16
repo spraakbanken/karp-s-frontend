@@ -11,13 +11,17 @@ import {
   type TabRefSetup,
   entryWordField,
   type ColumnVisField,
+  type SelectedFieldsMain,
 } from '@/types/datasetConfig.ts'
 import {
   ROWS_PER_PAGE,
   SORT_ORDER_ASCENDING,
   TAB_RESULT_TABLE,
+  TAB_SEARCH_EXTENDED,
+  TAB_SEARCH_SIMPLE,
   TABREFCOUNT_MAX,
 } from '@/utils/constants'
+import { randomId } from '@/utils/utils'
 
 interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
@@ -32,8 +36,8 @@ interface SearchRedux {
   fieldsInDatasets: Record<string, FieldConfig[]> // all fields in datasets; object with key: resurceId, value: FieldConfig-array
   currentFields: FieldConfig[] // available fields in selected datasets (union)
   currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
-  selectedFields: SelectedFieldConfig[] // fields we are searching in
-  selectedFieldsCount: number
+  selectedFieldsMain: SelectedFieldsMain[] // fields we are searching in
+  //selectedFieldsCount: number
   selectedCompileFields: string[] // statistics, fields we compile on
   selectedColumns: string[] // statistics, field we show totals on
   searchQuery: string
@@ -84,8 +88,8 @@ export const lexicalStore = defineStore('dataset', {
     fieldsInDatasets: {},
     currentFields: [],
     currentCommonFields: [],
-    selectedFields: [],
-    selectedFieldsCount: 0,
+    selectedFieldsMain: [{ id: randomId(), selectedFieldsSub: [], operator: 'and' }],
+    //selectedFieldsCount: 0,
     selectedCompileFields: [],
     selectedColumns: [],
     searchQuery: '',
@@ -96,7 +100,7 @@ export const lexicalStore = defineStore('dataset', {
     statisticsTotals: [],
     tabRefSetup: {},
     tabRefSetupCounter: 2,
-    activeSearchTab: 'simple',
+    activeSearchTab: TAB_SEARCH_SIMPLE,
     activeResultTab: TAB_RESULT_TABLE,
     activeLocale: 'sv',
     tableSortField: '',
@@ -235,26 +239,147 @@ export const lexicalStore = defineStore('dataset', {
     setSearchQuery(query: string) {
       this.searchQuery = query
     },
-    setSelectedField(sfc: SelectedFieldConfig) {
-      this.setSelectedFieldsClear()
-      sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
-      this.selectedFields[0] = sfc
-      this.selectedFieldsCount = 1
+    /*
+    setSelectedFieldMain(sfc: SelectedFieldConfig) {
+      this.clearSelectedFieldMain()
+      this.addSelectedFieldMain(sfc)
     },
-    setSelectedFieldsClear() {
-      this.selectedFieldsCount = 0
-      this.selectedFields = []
+*/
+    resetSelectedFieldsMain(sfc: SelectedFieldConfig) {
+      // minimum one field
+      this.selectedFieldsMain = [
+        {
+          id: randomId(),
+          selectedFieldsSub: [sfc],
+          operator: 'AND',
+        },
+      ]
     },
-    setSelectedFieldsAdd(sfc: SelectedFieldConfig) {
-      sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
-      this.selectedFields.push(sfc)
-      this.selectedFieldsCount++
+    getSelectedFieldsMainCount() {
+      return this.selectedFieldsMain.length
+    },
+    getSelectedFieldsTotalCount(): number {
+      let total = 0
+      for (const mainItem of this.selectedFieldsMain) {
+        total += mainItem.selectedFieldsSub.length
+      }
+      return total
+    },
+    getSelectedFieldsSubCount(mainId: number) {
+      const mainIndex = this.selectedFieldsMain.findIndex((f) => f.id === mainId)
+      if (mainIndex >= 0) {
+        return this.selectedFieldsMain[mainIndex].selectedFieldsSub.length
+      } else {
+        return 0
+      }
+    },
+    addSelectedFieldsMain() {
+      const sfc: SelectedFieldConfig = {
+        id: randomId(),
+        name: entryWordField,
+        value: '',
+        position: 'equals',
+        positionInitial: false,
+        positionMedial: false,
+        positionFinal: false,
+        isNot: false,
+      }
+
+      this.selectedFieldsMain.push({
+        id: randomId(),
+        selectedFieldsSub: [sfc],
+        operator: 'AND',
+      })
+    },
+    addSelectedFieldsSub(mainId: number) {
+      const mainIndex = this.selectedFieldsMain.findIndex((f) => f.id === mainId)
+      if (mainIndex >= 0) {
+        const sfc: SelectedFieldConfig = {
+          id: randomId(),
+          name: entryWordField,
+          value: '',
+          position: 'equals',
+          positionInitial: false,
+          positionMedial: false,
+          positionFinal: false,
+          isNot: false,
+        }
+
+        this.selectedFieldsMain[mainIndex].selectedFieldsSub.push(sfc)
+      }
+    },
+    delSelectedField(mainId: number, subId: number) {
+      const mainIndex = this.selectedFieldsMain.findIndex((f) => f.id === mainId)
+      if (mainIndex >= 0) {
+        const subIndex = this.selectedFieldsMain[mainIndex].selectedFieldsSub.findIndex(
+          (f) => f.id === subId,
+        )
+        if (subIndex >= 0) {
+          this.selectedFieldsMain[mainIndex].selectedFieldsSub.splice(subIndex, 1)
+          if (this.selectedFieldsMain[mainIndex].selectedFieldsSub.length === 0) {
+            this.selectedFieldsMain.splice(mainIndex, 1)
+          }
+        }
+      }
+    },
+    getQuery() {
+      const lexicalStorage = lexicalStore()
+      let mainQuery = ''
+
+      if (
+        lexicalStorage.activeSearchTab == TAB_SEARCH_SIMPLE ||
+        lexicalStorage.activeSearchTab == TAB_SEARCH_EXTENDED
+      ) {
+        let mainQueryCount = 0
+        for (const mainItem of lexicalStorage.selectedFieldsMain) {
+          let subQuery = ''
+          let subQueryCount = 0
+          for (const subItem of mainItem.selectedFieldsSub) {
+            if (subItem.isNot) {
+              const q =
+                'not(' +
+                subItem.position +
+                '|' +
+                subItem.name +
+                '|' +
+                subItem.value.replace(/"/g, '\\"') +
+                ')'
+              subQuery = subQuery === '' ? q : subQuery + '||' + q
+            } else {
+              const q =
+                subItem.position + '|' + subItem.name + '|' + subItem.value.replace(/"/g, '\\"')
+              subQuery = subQuery === '' ? q : subQuery + '||' + q
+            }
+            subQueryCount++
+          }
+          if (subQueryCount > 1) {
+            subQuery = 'or(' + subQuery + ')'
+          }
+          mainQuery = mainQuery === '' ? subQuery : mainQuery + '||' + subQuery
+          mainQueryCount++
+        }
+        if (mainQueryCount > 1) {
+          mainQuery = 'and(' + mainQuery + ')'
+        }
+      } else if (lexicalStorage.activeSearchTab == 'advanced') {
+        mainQuery = lexicalStorage.searchQuery
+      }
+      return mainQuery
     },
     /*
+    setSelectedFieldsPosInitial(mainIndex: number, subIndex: number, value: boolean) {
+      this.selectedFieldsMain[mainIndex].selectedFieldsSub[subIndex].positionInitial = value
+    },
+    */
+    /*
+    addSelectedFieldMain(sfc: SelectedFieldConfig) {
+      sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
+      const sfcArr: SelectedFieldConfig[] = [{ ...sfc }]
+      //this.selectedFieldsCount++
+    },
     setSelectedFieldN(index: number, sfc: SelectedFieldConfig) {
       this.selectedFields[index] = sfc
     },
-    */
     setSelectedFieldsRemove(fid: number) {
       const index = this.selectedFields.findIndex((f) => f.id === fid)
       if (index !== -1) {
@@ -265,6 +390,7 @@ export const lexicalStore = defineStore('dataset', {
     setSelectedFieldsCount(n: number) {
       this.selectedFieldsCount = n
     },
+    */
     setSearchExtendedOp(x: boolean) {
       this.searchExtendedOp = x
     },
@@ -314,30 +440,33 @@ export const lexicalStore = defineStore('dataset', {
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields
         // remove them from selectedFields
-        const newSelectedFields: SelectedFieldConfig[] = []
-        //for (const [k, v] of Object.entries(this.selectedFields)) {
-        for (let i = 0; i < this.selectedFieldsCount; i++) {
-          let bFound = false
-          //console.log('k, v', k, v)
-          if (this.currentFields.find((f) => f.name === this.selectedFields[i].name)) {
-            bFound = true
+
+        // traverse selectedFields, main and sub
+        // do it in reverse so we can delete items
+        if (this.selectedFieldsMain.length > 0) {
+          for (let m = this.selectedFieldsMain.length - 1; m >= 0; m--) {
+            console.log('m:', m, this.selectedFieldsMain[m])
+            if (this.selectedFieldsMain[m].selectedFieldsSub) {
+              for (let s = this.selectedFieldsMain[m].selectedFieldsSub.length - 1; s >= 0; s--) {
+                if (
+                  !this.currentFields.find(
+                    (f) => f.name === this.selectedFieldsMain[m].selectedFieldsSub[s].name,
+                  )
+                ) {
+                  this.selectedFieldsMain[m].selectedFieldsSub.splice(s, 1)
+                }
+              }
+            }
           }
-          if (bFound) {
-            newSelectedFields.push(...this.selectedFields.slice(i, 1))
+          // now delete all empty in main
+          for (let m = this.selectedFieldsMain.length - 1; m >= 0; m--) {
+            if (this.selectedFieldsMain[m].selectedFieldsSub.length === 0) {
+              this.selectedFieldsMain.splice(m, 1)
+            }
           }
         }
-        this.selectedFields = newSelectedFields
-        this.selectedFieldsCount = this.selectedFields.length
-        // and set "ingångsord" to default, also for statistics
-        // but if selectedFields exists in all selected datasets don't do this
-        let isEmpty = true
-        for (let i = 0; i < this.selectedFieldsCount; i++) {
-          //console.log('k, v', k, v)
-          if (this.selectedFields[i].value !== '') {
-            isEmpty = false
-          }
-        }
-        if (isEmpty) {
+        // if we don't have any fields left
+        if (this.selectedFieldsMain.length === 0) {
           this.setStartField()
         }
 
@@ -458,16 +587,17 @@ export const lexicalStore = defineStore('dataset', {
     setStartField(val: string = '') {
       // set "ingångsord" to default, also for statistics
       //console.log('setStartField()')
-      const fields: SelectedFieldConfig = {
-        id: 0,
+      const sfc: SelectedFieldConfig = {
+        id: randomId(),
         name: entryWordField,
         value: val,
         position: 'equals',
         positionInitial: false,
         positionMedial: false,
         positionFinal: false,
+        isNot: false,
       }
-      this.setSelectedField(fields)
+      this.resetSelectedFieldsMain(sfc)
       this.setSelectedCompileFields([entryWordField])
     },
     setSort(sf: string) {
@@ -520,7 +650,7 @@ export const lexicalStore = defineStore('dataset', {
     },
     setEmpty() {
       this.selectedDatasets = []
-      this.setActiveSearchTab('simple')
+      this.setActiveSearchTab(TAB_SEARCH_SIMPLE)
       this.setActiveResultTab(TAB_RESULT_TABLE)
     },
     localizeField(p: string): string {

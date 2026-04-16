@@ -271,6 +271,11 @@ export function setKeys<T>(obj: Record<string, T>, keys: string[], defaultValue:
 /** Create a random string of around 11 chars in the [0-9a-z] range. */
 export const randomString = () => Math.random().toString(36).slice(2)
 
+/* create a random id for arrays */
+export const randomId = (): number => {
+  return Date.now() + Math.floor(Math.random() * 1000)
+}
+
 /** Execute callback, catch and return any exception, otherwise return undefined. */
 // TODO Use attempt and isError from es-toolkit instead
 export const getException = (f: () => void): unknown | undefined => {

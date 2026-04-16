@@ -78,6 +78,13 @@ export type SelectedFieldConfig = {
   positionInitial: boolean
   positionMedial: boolean
   positionFinal: boolean
+  isNot: boolean
+}
+
+export type SelectedFieldsMain = {
+  id: number
+  selectedFieldsSub: SelectedFieldConfig[]
+  operator: string
 }
 
 export interface Config {

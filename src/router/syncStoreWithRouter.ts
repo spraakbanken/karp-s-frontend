@@ -1,7 +1,7 @@
 import { watch } from 'vue'
 import type { Router } from 'vue-router'
 import { lexicalStore } from '@/stores/store'
-import type { SelectedFieldConfig } from '@/types/datasetConfig'
+import type { SelectedFieldConfig, SelectedFieldsMain } from '@/types/datasetConfig'
 import { TAB_RESULT_STATISTICS, TAB_RESULT_TABLE } from '@/utils/constants'
 
 export enum SyncResult {
@@ -9,6 +9,97 @@ export enum SyncResult {
   SYNC_RESULT_SYNCED = 1,
   SYNC_RESULT_DATASET_UNKNOWN = 2,
 }
+
+// parsing code written by Copilot 20260415
+
+let mainId = 1
+let subId = 1
+
+function parseClause(raw: string, isNot: boolean): SelectedFieldConfig {
+  const cleaned = raw.endsWith('|') ? raw.slice(0, -1) : raw
+  const [position, name, value] = cleaned.split('|')
+
+  return {
+    id: subId++,
+    name,
+    value,
+    position,
+    positionInitial: position == 'startswith',
+    positionMedial: position == 'contains',
+    positionFinal: position == 'endswith',
+    isNot,
+  }
+}
+
+function parseGroup(input: string): SelectedFieldsMain {
+  let operator = 'or'
+  let isNot = false
+  let inner = input
+
+  if (input.startsWith('not(')) {
+    operator = 'not'
+    isNot = true
+    inner = input.slice(4, -1)
+  } else if (input.startsWith('or(')) {
+    inner = input.slice(3, -1)
+  }
+
+  const clauses = inner.split('||')
+
+  return {
+    id: mainId++,
+    operator,
+    selectedFieldsSub: clauses.map((c) => parseClause(c, isNot)),
+  }
+}
+
+function isSingleClause(q: string): boolean {
+  return !/^(and|or|not)\(/.test(q)
+}
+
+function splitTopLevel(input: string): string[] {
+  const result: string[] = []
+  let depth = 0
+  let start = 0
+
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] === '(') depth++
+    if (input[i] === ')') depth--
+
+    if (input.slice(i, i + 2) === '||' && depth === 0) {
+      result.push(input.slice(start, i))
+      start = i + 2
+    }
+  }
+
+  result.push(input.slice(start))
+  return result
+}
+
+export function parseQuery(q: string): SelectedFieldsMain[] {
+  // ✅ Case 1: single clause
+  if (isSingleClause(q)) {
+    return [
+      {
+        id: mainId++,
+        operator: 'or',
+        selectedFieldsSub: [parseClause(q, false)],
+      },
+    ]
+  }
+
+  // ✅ Case 2: wrapped expression
+  if (q.startsWith('and(')) {
+    const inner = q.slice(4, -1)
+    const groups = splitTopLevel(inner)
+    return groups.map(parseGroup)
+  }
+
+  // ✅ Case 3: single or(...) / not(...)
+  return [parseGroup(q)]
+}
+
+// end of parsing code
 
 export function syncStoreWithRouter(router: Router): SyncResult {
   const lexicalStorage = lexicalStore()
@@ -21,40 +112,12 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       queryString = lexicalStorage.searchQuery
     } else if (
       lexicalStorage.activeSearchTab == 'extended' &&
-      lexicalStorage.selectedFieldsCount > 1
+      lexicalStorage.getSelectedFieldsTotalCount() > 1
     ) {
-      if (lexicalStorage.searchExtendedOp) {
-        queryString = 'and'
-      } else {
-        queryString = 'or'
-      }
-      /*
-      queryString +=
-        '(' +
-        Object.entries(lexicalStorage.searchField)
-          .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-          .join('||') +
-        ')'
-      */
-      let queryParam = ''
-      for (let i = 0; i < lexicalStorage.selectedFieldsCount; i++) {
-        const sf = lexicalStorage.selectedFields[i]
-        const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
-        queryParam = queryParam === '' ? q : queryParam + '||' + q
-      }
-      queryString += '(' + queryParam + ')'
-    } else if (lexicalStorage.selectedFieldsCount >= 1) {
+      queryString = lexicalStorage.getQuery()
+    } else if (lexicalStorage.getSelectedFieldsTotalCount() >= 1) {
       // simple search
-      // TODO not necessary as simple search only has one field
-      /*
-      queryString = Object.entries(lexicalStorage.searchField)
-        .map(([key, value]) => `${value.position}|${key}|${value.value}`)
-        .join(',')
-      */
-      const i = 0
-      const sf = lexicalStorage.selectedFields[i]
-      const q = sf.position + '|' + sf.name + '|' + sf.value.replace(/"/g, '\\"')
-      queryString += queryString === '' ? q : queryString + '||' + q
+      queryString = lexicalStorage.getQuery()
     }
     const newQuery = {
       ...currentQuery,
@@ -91,7 +154,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
     () => ({
       resources: lexicalStorage.selectedDatasets,
       q: [
-        lexicalStorage.selectedFields,
+        lexicalStorage.selectedFieldsMain,
         lexicalStorage.searchExtendedOp,
         lexicalStorage.searchQuery,
       ],
@@ -138,46 +201,8 @@ export function syncStoreWithRouter(router: Router): SyncResult {
           lexicalStorage.setSearchQuery(query.get('q')!)
         } else {
           const queryString = query.get('q')!
-          if (queryString.startsWith('and') || queryString.startsWith('or')) {
-            // eg and(op1, op2, ...), or(op1, op2, ...)
-            const regex = /\(([^)]+)\)/
-            const match = queryString.match(regex)
-            if (match) {
-              const activeFields = match[1].split('||').map((value) => value.trim())
-              lexicalStorage.setSelectedFieldsClear()
-              for (const field of activeFields) {
-                const [position, key, value] = field.split('|')
-                lexicalStorage.setSelectedFieldsAdd({
-                  id: 0,
-                  name: key,
-                  value: value,
-                  position: position,
-                  positionInitial: position == 'startswith',
-                  positionMedial: position == 'contains',
-                  positionFinal: position == 'endswith',
-                })
-              }
-              lexicalStorage.setSearchExtendedOp(queryString.startsWith('and'))
-              //lexicalStorage.setSearchField(searchField)
-            }
-          } else {
-            // TODO no split should be necessary as this is simple search = only one field
-            const activeFields = query.get('q')!.split(',')
-            lexicalStorage.setSelectedFieldsClear()
-            for (const field of activeFields) {
-              const [position, key, value] = field.split('|')
-              lexicalStorage.setSelectedFieldsAdd({
-                id: 0,
-                name: key,
-                value: value,
-                position: position,
-                positionInitial: position == 'startswith',
-                positionMedial: position == 'contains',
-                positionFinal: position == 'endswith',
-              })
-            }
-            //lexicalStorage.setSearchField(searchField)
-          }
+          // console.log('initializeStoreFromQuery:', parseQuery(queryString))
+          lexicalStorage.selectedFieldsMain = parseQuery(queryString)
         }
       }
       if (query.has('compile')) {

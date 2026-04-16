@@ -18,7 +18,12 @@ import TabRefView from '@/components/TabRefView.vue'
 import { getLexicalDatasets } from '@/api/apiService'
 import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
 import router from '@/router'
-import { TAB_RESULT_REF, TAB_RESULT_STATISTICS, TAB_RESULT_TABLE } from '@/utils/constants'
+import {
+  TAB_RESULT_REF,
+  TAB_RESULT_STATISTICS,
+  TAB_RESULT_TABLE,
+  TAB_SEARCH_SIMPLE,
+} from '@/utils/constants'
 
 const lexicalStorage = lexicalStore()
 
@@ -67,6 +72,8 @@ onMounted(async () => {
     console.error('Could not fetch and parse news', error)
   }
 
+  //lexicalStorage.setActiveSearchTab(TAB_SEARCH_SIMPLE)
+
   // is user logged in?
   await testForLogin()
 })
@@ -87,7 +94,7 @@ watch(
 
 const tabRefClose = (id: number) => {
   lexicalStorage.delTabRef(id)
-  setActiveResultTab('statistics')
+  setActiveResultTab(TAB_RESULT_STATISTICS)
 }
 </script>
 
