@@ -383,7 +383,7 @@ watch(
               <button
                 @click="selectTags(tag)"
                 :class="{ 'tags-button-selected': selectedTags.indexOf(tag) !== -1 }"
-                class="tags-button datasets-tooltip"
+                class="tags-button-action datasets-tooltip"
               >
                 {{ th(lexicalStorage.currentConfig.tags[tag].label) }}&nbsp; ({{
                   formatNumber(lexicalStorage.tagEntriesCount[tag], 2)
@@ -429,9 +429,6 @@ watch(
             {{ $t('dataselector.datasets.selectedfirst') }}
           </div>
           -->
-        <div v-if="listExcludedDatasets" class="datasets-excluded">
-          {{ $t('dataselector.datasets.excluded') }}
-        </div>
         <!--
         </div>
         -->
@@ -447,6 +444,9 @@ watch(
           >
             {{ $t('dataselector.tags.reset') }}
           </button>
+        </div>
+        <div v-if="listExcludedDatasets" class="datasets-excluded">
+          {{ $t('dataselector.datasets.excluded') }}
         </div>
 
         <div class="dropdown-selectors">
@@ -565,6 +565,7 @@ watch(
   background-color: var(--color-background-alt);
   color: var(--color-text);
   padding-left: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .dropdown-disabled {
@@ -639,25 +640,29 @@ watch(
   flex-wrap: wrap;
   align-items: center;
   padding: 0rem 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: var(--color-text);
 }
 
+/*
 .dropdown-selectors .tags-button-action {
   margin-right: 0.5rem;
   margin-top: 0.5rem;
   background-color: var(--button-action-bg-color);
-  color: var(--button-action-text-color);
+  border: 1px solid var(--sb-orange);
+  color: black;
   border-radius: 4px;
-  border: 0;
   font-weight: bold;
   cursor: pointer;
 }
+*/
 
+/*
 .dropdown-selectors .tags-button-action:disabled {
   background-color: black;
   color: var(--sb-grey-medium);
 }
+*/
 
 .dropdown-tags input {
   margin-right: 0.5rem;
@@ -668,17 +673,16 @@ watch(
   margin-bottom: 0.5rem;
   cursor: pointer;
   border-radius: 4px;
-  border: 0;
   font-weight: bold;
 }
 
 .tags-button-action {
-  margin: 0 0.5rem 0.5rem 0rem;
+  margin: 0 0.5rem 0.25rem 0rem;
   padding: 0.5;
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   border-radius: 4px;
-  border: 0;
+  border: 1px solid var(--sb-orange);
   font-weight: bold;
 }
 
@@ -687,18 +691,18 @@ watch(
   color: var(--button-action-text-hover-color);
 }
 
-.dropdown-tags .tags-button-selected {
-  background-color: var(--sb-orange);
-  color: white;
-}
-
-.dropdown-group .tags-button-action:disabled {
+.tags-button-action:disabled {
   background-color: black;
   color: var(--sb-grey-medium);
 }
 
+.tags-button-selected {
+  background-color: var(--sb-orange);
+  color: white;
+}
+
 .dropdown-filter {
-  margin: 0 0.5rem;
+  margin: 0 0.5rem 0.25rem 0.5rem;
 }
 
 .dropdown-filter input {
@@ -722,7 +726,7 @@ watch(
 }
 
 .datasets-excluded {
-  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
   margin-left: 0.5rem;
   font-style: italic;
 }

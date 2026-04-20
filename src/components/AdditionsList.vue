@@ -47,7 +47,7 @@ const clickResourceInfo = (url: string) => {
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   border-radius: 4px;
-  border: 0;
+  border: 1px solid var(--sb-orange);
   cursor: pointer;
   font-weight: bold;
 }

@@ -20,7 +20,7 @@ export const axiosInstance = axios.create({
   },
 })
 
-export const getLexicalDatasets = async () => {
+export const getLexicalConfig = async () => {
   try {
     const response = await axiosInstance.get('/config')
     return response.data

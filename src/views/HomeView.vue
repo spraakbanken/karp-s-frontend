@@ -15,7 +15,7 @@ import { th, getDate } from '@/utils/utils'
 import TabRefView from '@/components/TabRefView.vue'
 //import { useDark } from '@vueuse/core'
 
-import { getLexicalDatasets } from '@/api/apiService'
+import { getLexicalConfig } from '@/api/apiService'
 import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
 import router from '@/router'
 import {
@@ -50,15 +50,15 @@ onMounted(async () => {
 
   // read config
   try {
-    const datasets = await getLexicalDatasets()
-    lexicalStorage.setDefault(datasets)
+    const config = await getLexicalConfig()
+    lexicalStorage.setDefault(config)
     syncResult.value = syncStoreWithRouter(router)
 
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
       //TODO lexicalStorage.setIsSearch(true)
     } else if (syncResult.value === SyncResult.SYNC_RESULT_DATASET_UNKNOWN) {
-      lexicalStorage.setDefault(datasets)
+      //lexicalStorage.setDefault(config)
     }
   } catch (error) {
     console.error(error)
