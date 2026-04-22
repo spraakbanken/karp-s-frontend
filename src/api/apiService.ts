@@ -42,21 +42,27 @@ const createQuery = () => {
       let subQuery = ''
       let subQueryCount = 0
       for (const subItem of mainItem.selectedFieldsSub) {
-        if (subItem.isNot) {
-          const q =
-            'not(' +
-            subItem.position +
-            '|' +
-            subItem.name +
-            '|' +
-            subItem.value.replace(/"/g, '\\"') +
-            ')'
-          subQuery = subQuery === '' ? q : subQuery + '||' + q
+        // ignore empty string
+        if (subItem.value !== '') {
+          if (subItem.isNot) {
+            const q =
+              'not(' +
+              subItem.position +
+              '|' +
+              subItem.name +
+              '|' +
+              subItem.value.replace(/"/g, '\\"') +
+              ')'
+            subQuery = subQuery === '' ? q : subQuery + '||' + q
+          } else {
+            const q =
+              subItem.position + '|' + subItem.name + '|' + subItem.value.replace(/"/g, '\\"')
+            subQuery = subQuery === '' ? q : subQuery + '||' + q
+          }
+          subQueryCount++
         } else {
-          const q = subItem.position + '|' + subItem.name + '|' + subItem.value.replace(/"/g, '\\"')
-          subQuery = subQuery === '' ? q : subQuery + '||' + q
+          subQuery = ''
         }
-        subQueryCount++
       }
       if (subQueryCount > 1) {
         subQuery = 'or(' + subQuery + ')'

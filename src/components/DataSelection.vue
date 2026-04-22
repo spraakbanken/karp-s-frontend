@@ -58,6 +58,7 @@ const datasetInfo = ref(<ResourceLocalized>{
   tags: [],
   updated: '',
   limitedAccess: false,
+  protectedMetadata: false,
   [entryWordProperty]: '',
   [entryWordDescriptionProperty]: '',
 })
@@ -96,6 +97,7 @@ const datasetInfoFill = (dataset: string) => {
       datasetInfo.value['size'] = elt.size
       datasetInfo.value['updated'] = elt.updated ? secondsToDate(elt.updated) : ''
       datasetInfo.value['limitedAccess'] = elt.limitedAccess
+      datasetInfo.value['protectedMetadata'] = elt.protectedMetadata
       datasetInfo.value['link'] = elt.link
       datasetInfo.value[entryWordProperty] = elt[entryWordProperty].field
       datasetInfo.value['fields'] = elt.fields
@@ -108,6 +110,8 @@ const datasetInfoFill = (dataset: string) => {
     datasetInfo.value['description'] = ''
     datasetInfo.value['size'] = ''
     datasetInfo.value['updated'] = ''
+    datasetInfo.value['limitedAccess'] = false
+    datasetInfo.value['protectedMetadata'] = false
     datasetInfo.value['link'] = ''
     datasetInfo.value[entryWordProperty] = ''
     datasetInfo.value['fields'] = []
@@ -490,13 +494,23 @@ watch(
                     lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
                       ?.limitedAccess
                   "
+                  :title="$t('datasets.icon.limitedaccess')"
                   ><span
                     v-if="lexicalStorage.grantedDatasets.includes(dataset)"
                     class="datasets-icon-status material-icons"
                   >
                     lock_open
                   </span>
-                  <span v-else class="datasets-icon-status material-icons"> lock </span>
+                  <span v-else class="datasets-icon-status material-icons">lock</span>
+                </span>
+                <span
+                  v-if="
+                    lexicalStorage.currentConfig.resources.find((x) => x.resourceId === dataset)
+                      ?.protectedMetadata
+                  "
+                  :title="$t('datasets.icon.protectedmetadata')"
+                >
+                  <span class="datasets-icon-status material-icons">lock_person</span>
                 </span>
 
                 <div v-if="dataset !== '' && previousDataset === dataset">
@@ -514,6 +528,14 @@ watch(
                         datasetInfo.limitedAccess
                           ? $t('dataset.limitedAccess.true')
                           : $t('dataset.limitedAccess.false')
+                      }}
+                    </div>
+                    <div class="datasets-info-label">{{ $t('dataset.protectedMetadata') }}</div>
+                    <div class="">
+                      {{
+                        datasetInfo.protectedMetadata
+                          ? $t('dataset.protectedMetadata.true')
+                          : $t('dataset.protectedMetadata.false')
                       }}
                     </div>
                     <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
@@ -770,9 +792,10 @@ watch(
 }
 
 .datasets-icon-status {
-  margin-left: 0.5rem;
+  margin-left: 0.1rem;
   font-size: 22px;
   vertical-align: text-bottom;
+  cursor: pointer;
 }
 
 .datasets-info {

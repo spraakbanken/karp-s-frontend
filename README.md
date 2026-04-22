@@ -12,7 +12,7 @@ Sharepoint > Språkbanken > Documents > Plattformar > karp-s > development.docx
 
 For SB-Auth to allow authentication requests, the frontend must be served under spraakbanken.gu.se (, and HTTPS must be enabled).
 
-- Point the hostname minkdev.spraakbanken.gu.se to localhost. On a Linux system, you can do this by editing /etc/hosts: `127.0.0.1	localhost	karplabb.spraakbanken.gu.se`
+- Point the hostname karplabb.spraakbanken.gu.se to localhost. On a Linux system, you can do this by editing /etc/hosts: `127.0.0.1	localhost	karplabb.spraakbanken.gu.se`
 - Create certificate files with `mkcert`: `mkcert "*.spraakbanken.gu.se"`
   - and refer to them in `.env.localdev`:
   ```
@@ -26,7 +26,9 @@ For SB-Auth to allow authentication requests, the frontend must be served under 
     allowedHosts: ['karplabb.spraakbanken.gu.se'],
   },
   ```
-- Optionally, configure `server.https` (eg like in mink-frontend) and visit the app using `https://...`
+- Optionally, configure `server https` and visit the app using `https://...`
+
+- access locally: `http://karplabb.spraakbanken.gu.se:5173/karplabb/`
 
 ## Tools/framework
 

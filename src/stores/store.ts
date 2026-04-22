@@ -366,45 +366,13 @@ export const lexicalStore = defineStore('dataset', {
       }
       return mainQuery
     },
-    /*
-    setSelectedFieldsPosInitial(mainIndex: number, subIndex: number, value: boolean) {
-      this.selectedFieldsMain[mainIndex].selectedFieldsSub[subIndex].positionInitial = value
-    },
-    */
-    /*
-    addSelectedFieldMain(sfc: SelectedFieldConfig) {
-      sfc.id = Date.now() + Math.floor(Math.random() * 1000) // unique value
-      const sfcArr: SelectedFieldConfig[] = [{ ...sfc }]
-      //this.selectedFieldsCount++
-    },
-    setSelectedFieldN(index: number, sfc: SelectedFieldConfig) {
-      this.selectedFields[index] = sfc
-    },
-    setSelectedFieldsRemove(fid: number) {
-      const index = this.selectedFields.findIndex((f) => f.id === fid)
-      if (index !== -1) {
-        this.selectedFieldsCount--
-        this.selectedFields.splice(index, 1)
-      }
-    },
-    setSelectedFieldsCount(n: number) {
-      this.selectedFieldsCount = n
-    },
-    */
     setSearchExtendedOp(x: boolean) {
       this.searchExtendedOp = x
     },
-    /*
-    setSelectedParams(params: string[]) {
-      // Not used
-      this.selectedParams = params
-    },*/
     setSelectedColumns(columns: string[]) {
-      // console.log('selectedColumns', columns)
       this.selectedColumns = columns
     },
     setSelectedCompileFields(fields: string[]) {
-      // console.log('selectedCompileParams', params)
       this.selectedCompileFields = fields
     },
     setSelectedTags(t: string[]) {
@@ -445,7 +413,6 @@ export const lexicalStore = defineStore('dataset', {
         // do it in reverse so we can delete items
         if (this.selectedFieldsMain.length > 0) {
           for (let m = this.selectedFieldsMain.length - 1; m >= 0; m--) {
-            console.log('m:', m, this.selectedFieldsMain[m])
             if (this.selectedFieldsMain[m].selectedFieldsSub) {
               for (let s = this.selectedFieldsMain[m].selectedFieldsSub.length - 1; s >= 0; s--) {
                 if (
@@ -478,8 +445,6 @@ export const lexicalStore = defineStore('dataset', {
             this.selectedDatasetsSize += Number(elt.size)
           }
         }
-        //  console.log('Tot size=', selectedDatasetsSize.value, formatNumber(foo, 2))
-
         this.setIsTableData(false)
         this.setIsStatisticsData(false)
       } else {
@@ -514,12 +479,6 @@ export const lexicalStore = defineStore('dataset', {
         }
       }
     },
-    /*
-    setSelectedTag(tags: string[]) {
-      this.selectedTags = tags
-      this.setSelectedDataset(this.selectedDatasets)
-    },
-    */
     setUnionAndIntersectionFields(keys: string[]) {
       // get union of fields in all selected datasets
       const fieldUnion: FieldConfig[] = []
@@ -683,17 +642,6 @@ export const lexicalStore = defineStore('dataset', {
     },
     areDatasetsInConfig(keys: string[]): boolean {
       return keys.every((k) => this.currentDatasets.includes(k))
-      /*
-      let allIncluded: boolean = true
-      for (const k of keys) {
-        if (!this.currentDatasets.includes(k)) {
-          //console.log('areDatasetsInConfig:', k, this.currentDatasets)
-          allIncluded = false
-          break
-        }
-      }
-      return allIncluded
-      */
     },
     addTabRef(aResourceId: string[], aColumnField: string, aColumnValue: string) {
       if (this.tabRefSetupCounter < TABREFCOUNT_MAX) {

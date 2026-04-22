@@ -464,10 +464,9 @@ watch(
                         v-for="param in currentFields"
                         :key="mainExpression.id + subExpression.id + param.name"
                         class="dropdown-item"
+                        @click="selectedFieldAdd(param.name, mainExpression.id, subExpression.id)"
                       >
-                        <label
-                          @click="selectedFieldAdd(param.name, mainExpression.id, subExpression.id)"
-                        >
+                        <label>
                           <!--
                           <button
                             class="action-button"

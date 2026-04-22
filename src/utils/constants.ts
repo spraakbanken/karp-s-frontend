@@ -17,7 +17,7 @@ export const SORT_ORDER_ASCENDING: string = 'asc'
 export const SORT_ORDER_DESCENDING: string = 'desc'
 
 // tabs - result
-export const TAB_SEARCH_SIMPLE: string = 'stimple'
+export const TAB_SEARCH_SIMPLE: string = 'simple'
 export const TAB_SEARCH_EXTENDED: string = 'extended'
 export const TAB_SEARCH_ADVANCED: string = 'advanced'
 export const TAB_RESULT_TABLE: string = 'table'

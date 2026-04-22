@@ -40,6 +40,7 @@ export interface Resource {
   tags: string[]
   updated: string
   limitedAccess: boolean
+  protectedMetadata: boolean
   [entryWordProperty]: EntryWord
 }
 
@@ -53,6 +54,7 @@ export interface ResourceLocalized {
   tags: string[]
   updated: string
   limitedAccess: boolean
+  protectedMetadata: boolean
   [entryWordProperty]: string
   entryWordDescription: string
 }

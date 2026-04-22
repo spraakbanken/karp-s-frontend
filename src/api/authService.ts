@@ -10,7 +10,7 @@ import { lexicalStore } from '@/stores/store'
 export const apiAuth = import.meta.env.VITE_API_AUTH as string
 
 /**
- * Reactive state to track authentication status ans store user information.
+ * Reactive state to track authentication status and store user information.
  */
 const isAuthenticated = ref(false)
 const user = ref(null)
@@ -57,7 +57,10 @@ interface JwtPayload {
  * @param jwt - The JWT token to be stored and used for authentication.
  */
 const setJwtToken = (jwt: string): void => {
+  console.log('setJwtToken() - start ')
+
   const lexicalStorage = lexicalStore()
+
   localStorage.setItem('jwt', jwt)
   //axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
   axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
@@ -69,7 +72,8 @@ const setJwtToken = (jwt: string): void => {
       .filter(([, value]) => value > 0)
       .map(([key]) => key)
   }
-  //console.log('Granted: ', lexicalStorage.grantedDatasets)
+  console.log('Granted: ', lexicalStorage.grantedDatasets)
+  console.log('setJwtToken() - end ')
 }
 
 /**
@@ -78,12 +82,16 @@ const setJwtToken = (jwt: string): void => {
  * @returns `true` if the token is expired, `false` otherwise.
  */
 const isJwtExpired = (jwt: string): boolean => {
+  console.log('isJwtExpired() - start ')
+
   try {
     const decoded = jwtDecode<JwtPayload>(jwt)
     const now = Date.now() / 1000 // Current time in seconds
+    console.log('isJwtExpired() - end1')
     return decoded.exp < now
   } catch (error) {
     console.error('Error decoding JWT:', error)
+    console.log('isJwtExpired() - end2')
     return true
   }
 }
@@ -94,6 +102,8 @@ const isJwtExpired = (jwt: string): boolean => {
  * If invalid, removes the token and clears the authentication state.
  */
 const checkJwtToken = (): void => {
+  console.log('checkJwtToken() - start ')
+
   const jwt = localStorage.getItem('jwt')
   if (jwt && !isJwtExpired(jwt)) {
     //axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`
@@ -104,6 +114,7 @@ const checkJwtToken = (): void => {
     delete axiosInstance.defaults.headers.common['Authorization']
     isAuthenticated.value = false
   }
+  console.log('checkJwtToken() - end ', isAuthenticated.value)
 }
 
 /**
@@ -112,8 +123,11 @@ const checkJwtToken = (): void => {
  * @returns A promise that resolves to `true` if authenticated, `false` otherwise.
  */
 const testForLogin = async () => {
+  console.log('testForLogin() - start ')
   try {
     // https://sp.spraakbanken.gu.se/auth/jwt
+
+    // TODO test
     const response = await axios.get(`${apiAuth}/jwt`, {
       responseType: 'text',
       withCredentials: true,
@@ -138,6 +152,7 @@ const testForLogin = async () => {
       // throw error
     }
   }
+  console.log('testForLogin() - end')
 }
 
 /**

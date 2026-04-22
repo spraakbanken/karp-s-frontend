@@ -48,6 +48,9 @@ onMounted(async () => {
   }
   */
 
+  // is user logged in?
+  await testForLogin()
+
   // read config
   try {
     const config = await getLexicalConfig()
@@ -71,11 +74,6 @@ onMounted(async () => {
   } catch (error) {
     console.error('Could not fetch and parse news', error)
   }
-
-  //lexicalStorage.setActiveSearchTab(TAB_SEARCH_SIMPLE)
-
-  // is user logged in?
-  await testForLogin()
 })
 
 const activeResultTab = ref(lexicalStorage.activeResultTab)
