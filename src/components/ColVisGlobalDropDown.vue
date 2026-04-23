@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import { useI18n } from 'vue-i18n'
 import { entryWordField, type ColumnVisField } from '@/types/datasetConfig'
 
 const lexicalStorage = lexicalStore()
@@ -81,9 +80,9 @@ const updateGlobalVis = () => {
   lexicalStorage.currentFields.forEach((item) => {
     let label: string = item.name // fallback
     if (lexicalStorage.activeLocale == 'sv') {
-      label = item.label.swe ? item.label.swe : item.label
+      label = typeof item.label === 'object' && item.label !== null ? item.label.swe : item.label
     } else {
-      label = item.label.eng ? item.label.eng : item.label
+      label = typeof item.label === 'object' && item.label !== null ? item.label.eng : item.label
     }
     // visible - primary
     let fieldVis: boolean = false

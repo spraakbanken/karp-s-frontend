@@ -200,7 +200,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
 
     const filteredQuery = Object.fromEntries(
       Object.entries(newQuery).filter(
-        ([key, value]) => value !== '' && value !== null && value !== undefined,
+        ([, value]) => value !== '' && value !== null && value !== undefined,
       ),
     )
     //console.log('Adv, filtqs=', filteredQuery)

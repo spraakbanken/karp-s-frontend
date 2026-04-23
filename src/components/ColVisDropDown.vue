@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   resourceId: string

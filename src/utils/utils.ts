@@ -88,7 +88,6 @@ export const formatCell = (
       }
     } else if (typeof x === 'object' && x !== null) {
       // value(s)
-      //let x = y.valueOf
       if (BE_STATISTICS_VALUES_ID in x) {
         //console.log('IN', x)
         x.values.forEach((v) => {
@@ -101,7 +100,6 @@ export const formatCell = (
             if (BE_STATISTICS_COUNT_ID in v) {
               vcount = v[BE_STATISTICS_COUNT_ID]
             }
-            //console.log(showCount)
             cell = cell + (cell ? ', ' : '') + vvalue + (showCount ? ': ' + String(vcount) : '')
           }
         })

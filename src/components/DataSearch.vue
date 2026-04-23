@@ -69,7 +69,7 @@ const dropdownRefs = ref<HTMLElement[]>([])
 
 const handleClickOutside = (event: MouseEvent) => {
   let inside = false
-  dropdownRefs.value.forEach((dropdownEl, index) => {
+  dropdownRefs.value.forEach((dropdownEl) => {
     if (dropdownEl && dropdownEl.contains(event.target as Node)) {
       inside = true
     }

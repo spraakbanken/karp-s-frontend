@@ -8,10 +8,6 @@ import { groupBy } from 'es-toolkit'
 import { checkJwtToken } from '@/api/authService'
 
 import {
-  POSITION_CONTAINS,
-  POSITION_ENDSWITH,
-  POSITION_EQUALS,
-  POSITION_STARTSWITH,
   ROW_SHOW_COMPACT_DEFAULT,
   SORT_ORDER_ASCENDING,
   SORT_ORDER_DESCENDING,

@@ -5,13 +5,6 @@ const logoSB = ref('')
 const logoGU = ref('')
 const logoGUEn = ref('')
 
-function resetApp() {
-  // console.log('Pathname ', window.location.pathname)
-  // window.location.href = window.location.pathname
-  window.location.href = '/karplabb/'
-  //router.push('/')
-}
-
 const updateTheme = async () => {
   const theme = document.documentElement.getAttribute('data-theme')
   const isDarkMode = theme === 'dark'

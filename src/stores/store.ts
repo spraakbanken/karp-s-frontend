@@ -629,9 +629,9 @@ export const lexicalStore = defineStore('dataset', {
       for (const c of this.currentFields) {
         if (c.name === pCamel) {
           if (this.activeLocale == 'sv') {
-            label = c.label.swe ? c.label.swe : (c.label as unknown as string)
+            label = typeof c.label === 'object' && c.label !== null ? c.label.swe : c.label
           } else {
-            label = c.label.eng ? c.label.eng : (c.label as unknown as string)
+            label = typeof c.label === 'object' && c.label !== null ? c.label.eng : c.label
           }
           break
         }
