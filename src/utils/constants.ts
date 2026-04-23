@@ -1,5 +1,7 @@
 import { i18n } from '@/i18n.ts'
 
+import { entryWordField } from '@/types/datasetConfig.ts'
+
 // UI
 export const ROW_MAX_HEIGHT: number = 33 // if shortening columns, how high should they be
 export const ROW_SHOW_COMPACT_DEFAULT: boolean = true // default for shortening columns or expand them
@@ -12,6 +14,13 @@ export const BE_STATISTICS_VALUES_ID: string = 'values' // and for value
 export const BE_STATISTICS_COUNT_ID: string = 'count' // what BE sends in statistics data for count value in object
 export const BE_STATISTICS_VALUE_ID: string = 'value' // and for value
 
+// position (search)
+export const POSITION_STARTSWITH: string = 'startswith'
+export const POSITION_ENDSWITH: string = 'endswith'
+export const POSITION_CONTAINS: string = 'contains'
+export const POSITION_EQUALS: string = 'equals'
+export const POSITION_REGEX: string = 'regex'
+
 // sortering
 export const SORT_ORDER_ASCENDING: string = 'asc'
 export const SORT_ORDER_DESCENDING: string = 'desc'
@@ -23,6 +32,19 @@ export const TAB_SEARCH_ADVANCED: string = 'advanced'
 export const TAB_RESULT_TABLE: string = 'table'
 export const TAB_RESULT_STATISTICS: string = 'statistics'
 export const TAB_RESULT_REF: string = 'ref' // + key
+
+// defaults
+export const DEFAULT_SORT_FIELD: string = entryWordField
+export const DEFAULT_SORT_ORDER: string = SORT_ORDER_ASCENDING
+export const DEFAULT_TAB_SEARCH: string = TAB_SEARCH_SIMPLE
+export const DEFAULT_TAB_RESULT: string = TAB_RESULT_TABLE
+export const DEFAULT_ROWS_PER_PAGE: number = ROWS_PER_PAGE
+export const DEFAULT_TABLE_PAGE_ROW_START: number = 0
+export const DEFAULT_TABLE_PAGE_SIZE: number = ROWS_PER_PAGE
+export const DEFAULT_STATISTICS_PAGE_START: number = 1
+export const DEFAULT_STATISTICS_PAGE_SIZE: number = ROWS_PER_PAGE
+export const DEFAULT_STATISTICS_COMPILE: string[] = [entryWordField]
+export const DEFAULT_STATISTICS_COLUMNS: string[] = []
 
 // error messages
 

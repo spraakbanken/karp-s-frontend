@@ -14,6 +14,17 @@ import {
   type SelectedFieldsMain,
 } from '@/types/datasetConfig.ts'
 import {
+  DEFAULT_SORT_FIELD,
+  DEFAULT_SORT_ORDER,
+  DEFAULT_STATISTICS_COLUMNS,
+  DEFAULT_STATISTICS_COMPILE,
+  DEFAULT_STATISTICS_PAGE_SIZE,
+  DEFAULT_STATISTICS_PAGE_START,
+  DEFAULT_TAB_RESULT,
+  DEFAULT_TAB_SEARCH,
+  DEFAULT_TABLE_PAGE_ROW_START,
+  DEFAULT_TABLE_PAGE_SIZE,
+  POSITION_EQUALS,
   ROWS_PER_PAGE,
   SORT_ORDER_ASCENDING,
   TAB_RESULT_TABLE,
@@ -90,8 +101,8 @@ export const lexicalStore = defineStore('dataset', {
     currentCommonFields: [],
     selectedFieldsMain: [{ id: randomId(), selectedFieldsSub: [], operator: 'and' }],
     //selectedFieldsCount: 0,
-    selectedCompileFields: [],
-    selectedColumns: [],
+    selectedCompileFields: DEFAULT_STATISTICS_COMPILE,
+    selectedColumns: DEFAULT_STATISTICS_COLUMNS,
     searchQuery: '',
     searchExtendedOp: true,
     tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
@@ -100,20 +111,20 @@ export const lexicalStore = defineStore('dataset', {
     statisticsTotals: [],
     tabRefSetup: {},
     tabRefSetupCounter: 2,
-    activeSearchTab: TAB_SEARCH_SIMPLE,
-    activeResultTab: TAB_RESULT_TABLE,
+    activeSearchTab: DEFAULT_TAB_SEARCH,
+    activeResultTab: DEFAULT_TAB_RESULT,
     activeLocale: 'sv',
-    tableSortField: '',
-    tableSortOrder: SORT_ORDER_ASCENDING,
+    tableSortField: DEFAULT_SORT_FIELD,
+    tableSortOrder: DEFAULT_SORT_ORDER,
     statisticsSortField: '',
     statisticsSortOrder: SORT_ORDER_ASCENDING,
     datasetLabels: {},
     datasetDates: [],
     abortController: null,
-    tablePageRowStart: 0,
-    tablePageSize: ROWS_PER_PAGE,
-    statisticsPageStart: 1,
-    statisticsPageSize: ROWS_PER_PAGE,
+    tablePageRowStart: DEFAULT_TABLE_PAGE_ROW_START,
+    tablePageSize: DEFAULT_TABLE_PAGE_SIZE,
+    statisticsPageStart: DEFAULT_STATISTICS_PAGE_START,
+    statisticsPageSize: DEFAULT_STATISTICS_PAGE_SIZE,
     columnVis: {},
     //listLimit: 5,
     isTableData: false,
@@ -278,7 +289,7 @@ export const lexicalStore = defineStore('dataset', {
         id: randomId(),
         name: entryWordField,
         value: '',
-        position: 'equals',
+        position: POSITION_EQUALS,
         positionInitial: false,
         positionMedial: false,
         positionFinal: false,
@@ -298,7 +309,7 @@ export const lexicalStore = defineStore('dataset', {
           id: randomId(),
           name: entryWordField,
           value: '',
-          position: 'equals',
+          position: POSITION_EQUALS,
           positionInitial: false,
           positionMedial: false,
           positionFinal: false,
@@ -455,8 +466,8 @@ export const lexicalStore = defineStore('dataset', {
       this.tableSortOrder = SORT_ORDER_ASCENDING
       this.statisticsSortField = entryWordField
       this.tableSortOrder = SORT_ORDER_ASCENDING
-      this.setSelectedCompileFields([entryWordField])
-      this.setSelectedColumns([])
+      this.setSelectedCompileFields(DEFAULT_STATISTICS_COMPILE)
+      this.setSelectedColumns(DEFAULT_STATISTICS_COLUMNS)
 
       // sync selectedTags with selectedDatasets
       // ie make sure only tags that have all their datasets selected
@@ -550,14 +561,14 @@ export const lexicalStore = defineStore('dataset', {
         id: randomId(),
         name: entryWordField,
         value: val,
-        position: 'equals',
+        position: POSITION_EQUALS,
         positionInitial: false,
         positionMedial: false,
         positionFinal: false,
         isNot: false,
       }
       this.resetSelectedFieldsMain(sfc)
-      this.setSelectedCompileFields([entryWordField])
+      this.setSelectedCompileFields(DEFAULT_STATISTICS_COMPILE)
     },
     setSort(sf: string) {
       if (sf) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { useI18n } from 'vue-i18n'
 
@@ -8,6 +8,10 @@ import { groupBy } from 'es-toolkit'
 import { checkJwtToken } from '@/api/authService'
 
 import {
+  POSITION_CONTAINS,
+  POSITION_ENDSWITH,
+  POSITION_EQUALS,
+  POSITION_STARTSWITH,
   ROW_SHOW_COMPACT_DEFAULT,
   SORT_ORDER_ASCENDING,
   SORT_ORDER_DESCENDING,
@@ -93,22 +97,7 @@ watch(
 
 watch(
   () => currentPageSize.value,
-  (newItemsPerPage, oldItemsPerPage) => {
-    //lexicalStorage.pageSize = itemsPerPage.value
-    //console.log('WATCH itemsPerPage.value', currentPageSize.value)
-    //currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
-    //tableResult.total
-    /*
-    console.log(
-      'NEW pagestart',
-      currentPageRowStart.value,
-      //Math.ceil(currentPageStart.value * (lexicalStorage.pageSize / currentPageSize.value)),
-      Math.ceil(currentPageRowStart.value * (oldItemsPerPage / newItemsPerPage)),
-    )
-    */
-    //currentPageStart.value = Math.ceil(currentPageStart.value * (oldItemsPerPage / newItemsPerPage))
-
-    //lexicalStorage.tablePageRowStart = currentPageRowStart.value
+  () => {
     lexicalStorage.tablePageSize = currentPageSize.value
     fetchData()
   },
@@ -120,21 +109,7 @@ const doSort = (field: string, sortOrder: string) => {
   sortField.value = field
   lexicalStorage.tableSortField = field
   lexicalStorage.tableSortOrder = sortOrder
-  /*
-  sortField.value = s
-  if (sortField.value == lexicalStorage.sortField) {
-    if (lexicalStorage.sortOrder == 'asc') {
-      lexicalStorage.sortOrder = 'desc'
-    } else {
-      lexicalStorage.sortOrder = 'asc'
-    }
-  } else {
-    lexicalStorage.sortOrder = 'asc'
-  }
-  */
   fetchData()
-
-  //console.log('doSort()', sortField.value)
 }
 
 const errorMessage = ref('')
@@ -148,19 +123,21 @@ const fetchData = async () => {
   // JWT token valid?
   checkJwtToken()
 
+  /*
   // convert checkboxes to search "position"
 
   for (let sf = 0; sf < lexicalStorage.selectedFieldsCount; sf++) {
     if (lexicalStorage.selectedFields[sf].positionMedial) {
-      lexicalStorage.selectedFields[sf].position = 'contains'
+      lexicalStorage.selectedFields[sf].position = POSITION_CONTAINS
     } else if (lexicalStorage.selectedFields[sf].positionInitial) {
-      lexicalStorage.selectedFields[sf].position = 'startswith'
+      lexicalStorage.selectedFields[sf].position = POSITION_STARTSWITH
     } else if (lexicalStorage.selectedFields[sf].positionFinal) {
-      lexicalStorage.selectedFields[sf].position = 'endswith'
+      lexicalStorage.selectedFields[sf].position = POSITION_ENDSWITH
     } else {
-      lexicalStorage.selectedFields[sf].position = 'equals'
+      lexicalStorage.selectedFields[sf].position = POSITION_EQUALS
     }
   }
+  */
 
   lexicalStorage.setIsTableData(false)
   const newDatasets = lexicalStorage.selectedDatasets

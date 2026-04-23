@@ -139,22 +139,9 @@ const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 const doSort = (field: string, order: string) => {
   lexicalStorage.statisticsSortField = field
   lexicalStorage.statisticsSortOrder = order
-  /*
-  if (sortField.value == lexicalStorage.sortField) {
-    if (lexicalStorage.sortOrder == SORT_ORDER_ASCENDING) {
-      lexicalStorage.sortOrder = SORT_ORDER_DESCENDING
-    } else {
-      lexicalStorage.sortOrder = SORT_ORDER_ASCENDING
-    }
-  } else {
-    lexicalStorage.sortOrder = SORT_ORDER_ASCENDING
-  }
-  */
-
   // TODO: not really necessary as we sort in FE
   //fetchData()
   lexicalStorage.statisticsPageStart = 1
-  //console.log('doSort()', lexicalStorage.statisticsSortField)
 }
 
 // update state from URL

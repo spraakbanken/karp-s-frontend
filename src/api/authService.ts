@@ -127,7 +127,6 @@ const testForLogin = async () => {
   try {
     // https://sp.spraakbanken.gu.se/auth/jwt
 
-    // TODO test
     const response = await axios.get(`${apiAuth}/jwt`, {
       responseType: 'text',
       withCredentials: true,
@@ -141,18 +140,20 @@ const testForLogin = async () => {
       delete axios.defaults.headers.common['Authorization']
       isAuthenticated.value = false
     }
+    console.log('testForLogin() - end', isAuthenticated.value)
 
     return isAuthenticated.value
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 403) {
       isAuthenticated.value = false
+      console.log('testForLogin() - end ERROR', isAuthenticated.value)
+
       return false
     } else {
       // console.error('Login error:', error)
       // throw error
     }
   }
-  console.log('testForLogin() - end')
 }
 
 /**

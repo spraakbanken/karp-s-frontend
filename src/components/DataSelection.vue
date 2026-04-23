@@ -126,8 +126,6 @@ const isDropdownColumns = ref(false)
 const isDropdownCompileParams = ref(false)
 const dropdownContainer = ref<HTMLElement | null>(null)
 
-//const fields = ref<Record<string, SelectedFieldConfig>>({})
-
 const toggleDropdown = () => {
   if (!isDropdownOpen.value) {
     doFilterDatasets()
@@ -156,13 +154,7 @@ onBeforeUnmount(() => {
 })
 
 const selectDataset = () => {
-  //console.log('selectDataset:', selectedDatasets.value.length)
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
-  /* save filtering/sorting until next time we open dropdown
-  if (listSortSelectedFirst.value) {
-    doFilterDatasets()
-  }
-  */
 }
 
 // INFO: doesn't trigger the watch (because selectedDatasets is "computed")
@@ -178,7 +170,6 @@ const selectTags = (tag: string) => {
   const selDS: string[] = []
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
-    //if (!selectedDatasets.value.includes(c.resourceId)) {
     if (hasSelectedTags(c.resourceId)) {
       if (c?.limitedAccess) {
         if (lexicalStorage.grantedDatasets.includes(c.resourceId)) {
@@ -188,11 +179,8 @@ const selectTags = (tag: string) => {
         selDS.push(c.resourceId)
       }
     }
-    //}
   }
   selectedDatasets.value = selDS
-
-  //doFilterDatasets()
 }
 
 const unselectAll = () => {
@@ -201,9 +189,7 @@ const unselectAll = () => {
 }
 
 const unselectTags = () => {
-  //if (selectedDatasets.value.length > 0) {
   selectedTags.value = []
-  //}
   searchDatasets.value = ''
   doFilterDatasets()
 }
@@ -298,40 +284,6 @@ watch(searchDatasets, () => {
 const selectAllFiltered = () => {
   lexicalStorage.setSelectedDataset(filteredDatasets.value)
 }
-
-/*
-const filterDatasets = computed(() => {
-  let label: string = ''
-  let arr: string[] = []
-  const currentConfig = lexicalStorage.currentConfig
-  for (const c of currentConfig.resources) {
-    if (lexicalStorage.activeLocale == 'sv') {
-      label = c.label.swe ? c.label.swe : (c.label as unknown as string)
-    } else {
-      label = c.label.eng ? c.label.eng : (c.label as unknown as string)
-    }
-    if (
-      (!searchDatasets.value ||
-        label.toLowerCase().indexOf(searchDatasets.value.toLowerCase()) !== -1) &&
-      true
-    ) {
-      arr.push(c.resourceId)
-    }
-  }
-
-  arr = arr.sort(function (a, b) {
-    return lexicalStorage.datasetLabels[a].localeCompare(
-      lexicalStorage.datasetLabels[b],
-      lexicalStorage.activeLocale,
-      { numeric: true },
-    )
-  })
-
-  //console.log('COMPUTED filterDatasets:', searchDatasets.value, currentDatasets.value, arr)
-
-  return arr
-})
-*/
 
 // TODO doesnt trigger, change start of watch
 /*

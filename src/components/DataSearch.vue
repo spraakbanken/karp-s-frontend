@@ -3,6 +3,11 @@ import { ref, onMounted, onBeforeUnmount, computed, watch, onUnmounted } from 'v
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, type SelectedFieldConfig } from '@/types/datasetConfig'
 import {
+  POSITION_CONTAINS,
+  POSITION_ENDSWITH,
+  POSITION_EQUALS,
+  POSITION_REGEX,
+  POSITION_STARTSWITH,
   TAB_RESULT_REF,
   TAB_RESULT_TABLE,
   TAB_SEARCH_ADVANCED,
@@ -20,7 +25,7 @@ const setActiveSearchTab = (tab: string) => {
       id: randomId(),
       name: entryWordField,
       value: val,
-      position: 'equals',
+      position: POSITION_EQUALS,
       positionInitial: false,
       positionMedial: false,
       positionFinal: false,
@@ -93,7 +98,13 @@ const selectedFields = computed({
 })
 */
 
-const searchFieldPosition = ['startswith', 'endswith', 'contains', 'equals', 'regex']
+const searchFieldPosition = [
+  POSITION_STARTSWITH,
+  POSITION_ENDSWITH,
+  POSITION_CONTAINS,
+  POSITION_EQUALS,
+  POSITION_REGEX,
+]
 
 const searchFieldPositionText = [
   'dataselector.parameter.position.startswith',
@@ -238,8 +249,6 @@ const handlePos = (mainId: number, subId: number, pos: number) => {
         }
       }
       // now translate this to .position
-      //console.log('P: ', searchField.value[f])
-      //console.log('P2', JSON.parse(JSON.stringify(searchField.value[f])))
 
       // we need a tick so all searchField.value[f].position* values get truly set
       setTimeout(() => {
@@ -252,8 +261,6 @@ const handlePos = (mainId: number, subId: number, pos: number) => {
 
 // click search button
 const updateData = () => {
-  //if (currentFields.value.length > 0) {
-  //lexicalStorage.setSelectedFields(searchField.value)
   lexicalStorage.setIsSearch(true, true)
   lexicalStorage.setIsStart(false)
   lexicalStorage.tablePageRowStart = 0
@@ -261,7 +268,6 @@ const updateData = () => {
   if (lexicalStorage.activeResultTab.slice(0, 3) === TAB_RESULT_REF) {
     lexicalStorage.setActiveResultTab(TAB_RESULT_TABLE)
   }
-  //}
 }
 
 const selectedFieldsAddSub = (mainId: number) => {
