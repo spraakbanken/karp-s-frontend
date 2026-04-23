@@ -20,7 +20,7 @@ const ex2 = encodeURI(
 //  'https://spraakbanken.gu.se/karp-s/?resources=saol9,saol1,saol10,saol11,saol12,saol13,saol14,saol6,saol7,saol8,so2009&tab=graph&q=startswith|normaliserat_ord|blom&compile=normaliserat_ord',
 
 const ex3 = encodeURI(
-  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,so2009-ord,saol6-faksimil&tab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|VERB))&compile=entry_word&searchtab=extended&sort=entry_word|asc&tablePageRowStart=0&tablePageSize=100&statisticsPageStart=1&statisticsPageSize=100',
+  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,so2009-ord,saol6-faksimil&tab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|NOUN))&searchtab=extended',
 )
 // http://localhost:5173/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,so2009-ord,saol6-faksimil&tab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|VERB))&compile=entry_word&searchtab=extended&sort=entry_word|asc&tablePageRowStart=0&tablePageSize=100&statisticsPageStart=1&statisticsPageSize=100
 

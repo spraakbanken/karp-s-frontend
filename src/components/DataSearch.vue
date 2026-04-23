@@ -271,60 +271,11 @@ const updateData = () => {
 }
 
 const selectedFieldsAddSub = (mainId: number) => {
-  /*
-  lexicalStorage.selectedFields[lexicalStorage.selectedFieldsCount] = {
-    id: Date.now() + Math.floor(Math.random() * 1000),
-    name: fieldName,
-    value: '',
-    position: 'equals',
-    positionInitial: false,
-    positionMedial: false,
-    positionFinal: false,
-  }
-  lexicalStorage.selectedFieldsCount++
-  */
-  //console.log('selectedFieldAddSub()', mainId)
   lexicalStorage.addSelectedFieldsSub(mainId)
-
-  /*
-  lexicalStorage.setSelectedFieldsAdd({
-    id: 0,
-    name: fieldName,
-    value: '',
-    position: 'equals',
-    positionInitial: false,
-    positionMedial: false,
-    positionFinal: false,
-  })
-  */
 }
 
 const selectedFieldsAddMain = () => {
-  /*
-  lexicalStorage.selectedFields[lexicalStorage.selectedFieldsCount] = {
-    id: Date.now() + Math.floor(Math.random() * 1000),
-    name: fieldName,
-    value: '',
-    position: 'equals',
-    positionInitial: false,
-    positionMedial: false,
-    positionFinal: false,
-  }
-  lexicalStorage.selectedFieldsCount++
-  */
-  //console.log('selectedFieldsAddMain()')
   lexicalStorage.addSelectedFieldsMain()
-  /*
-  lexicalStorage.setSelectedFieldsAdd({
-    id: 0,
-    name: fieldName,
-    value: '',
-    position: 'equals',
-    positionInitial: false,
-    positionMedial: false,
-    positionFinal: false,
-  })
-  */
 }
 
 const selectedFieldAdd = (fieldName: string, mainId: number, subId: number) => {

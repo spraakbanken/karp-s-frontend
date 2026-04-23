@@ -22,7 +22,7 @@
   "about.examples.title": "Search examples",
   "about.examples.ex1": "All words in 'Svenska Akademiens ordböcker' that begins with 'blom'",
   "about.examples.ex2": "Statistics for words in 'Svenska Akademiens ordböcker' that begins with 'blom'",
-  "about.examples.ex3": "All words in 'Svenska Akademiens ordböcker' that begins with either 'pest' or 'kolera' and are not verbs",
+  "about.examples.ex3": "All words in 'Svenska Akademiens ordböcker' that begins with either 'pest' or 'kolera' and are not nouns",
   "about.additions.title": "Latest additions",
   "about.additions.text": "Latest additions:",
   "about.news.title": "News",
