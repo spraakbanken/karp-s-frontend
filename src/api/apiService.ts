@@ -76,7 +76,9 @@ const createQuery = () => {
   } else if (lexicalStorage.activeSearchTab == TAB_SEARCH_ADVANCED) {
     mainQuery = lexicalStorage.searchQuery
   }
-  console.log('CreateQuery:', mainQuery)
+
+  //console.log('CreateQuery:', mainQuery)
+
   return mainQuery
 }
 

@@ -288,6 +288,16 @@ export const getException = (f: () => void): unknown | undefined => {
 /** Returns the last part after the period ("."), or empty string if there is none */
 export const getFilenameExtension = (filename: string) => filename.split('.').slice(1).pop() || ''
 
+// check if a file exists
+export const fileExists = async (url: string) => {
+  try {
+    const response = await fetch(url, { method: 'HEAD' })
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
 /** If an array, return first element. Otherwise return the whole argument. */
 export const unarray = <T>(x: T[] | T): T => (Array.isArray(x) ? x[0] : x)
 

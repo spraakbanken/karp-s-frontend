@@ -7,6 +7,7 @@ import { isNumber } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+const baseUrl = import.meta.env.BASE_URL
 
 const props = defineProps<{
   /** Maximum height (px). */
@@ -48,7 +49,7 @@ const [expanded, toggleExpanded] = useToggle()
             <span v-html="formatCell(value2.value)"> </span>
             <span v-if="isImage(value2.value)">
               <a
-                :href="'/karplabb/img?img=' + value2.value"
+                :href="baseUrl + 'img?img=' + value2.value"
                 class="material-icons action-link"
                 target="_blank"
                 :title="t('table.imgbrowse')"

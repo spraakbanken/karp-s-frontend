@@ -397,7 +397,7 @@ const showImg = (img: string) => {
               <!-- show dataset name -->
               <tr>
                 <td colspan="100%" class="dataset-label">
-                  <span class="material-icons icon-placement">square</span>
+                  <!--<span class="material-icons icon-placement">square</span>-->
                   {{ lexicalStorage.datasetLabels[ds] }}
                   <button class="button" @click="clickResourceInfo(ds)">Info</button>
                   <span class="hits">
@@ -432,9 +432,9 @@ const showImg = (img: string) => {
                       :key="key"
                       :class="{
                         'header-list': lexicalStorage.isList(value.name),
-                        'header-compile': value.name == entryWordField,
                       }"
                     >
+                      <!--'header-compile': value.name == entryWordField, -->
                       <div class="header-content">
                         <span
                           :class="{
@@ -788,7 +788,7 @@ const showImg = (img: string) => {
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   border-radius: 4px;
-  border: 0px;
+  border: 1px solid var(--sb-orange);
   cursor: pointer;
   font-weight: bold;
 }

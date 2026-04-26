@@ -52,52 +52,63 @@ const lastPage = () => {
 
 const itemsPerPage = () => {
   //fetchData()
+  localStorage.setItem('defaultTablePageSize', String(currentPageSize.value))
 }
 </script>
 
 <template>
   <div class="pagination">
-    <span>
-      {{ $t('table.footer.page') }}: {{ Math.ceil(currentPageRowStart / currentPageSize) + 1 }}
-      {{ $t('table.of') }}
-      {{ totalPages + Math.ceil((currentPageRowStart % currentPageSize) / currentPageSize) }}
+    <span class="subsection">
+      <span>
+        {{ $t('table.footer.page') }}: {{ Math.ceil(currentPageRowStart / currentPageSize) + 1 }}
+        {{ $t('table.of') }}
+        {{ totalPages + Math.ceil((currentPageRowStart % currentPageSize) / currentPageSize) }}
+      </span>
     </span>
-    <button @click="firstPage" :disabled="currentPageRowStart === 0">
-      <span class="material-icons">first_page</span>
-    </button>
-    <button @click="prevPage" :disabled="currentPageRowStart === 0">
-      <span class="material-icons">chevron_left</span>
-    </button>
-    <button
-      @click="nextPage"
-      :disabled="currentPageRowStart + currentPageSize >= props.tableResultTotal - 1"
-    >
-      <span class="material-icons">chevron_right</span>
-    </button>
-    <button
-      @click="lastPage"
-      :disabled="currentPageRowStart + currentPageSize >= props.tableResultTotal - 1"
-    >
-      <span class="material-icons">last_page</span>
-    </button>
-
-    <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }} </label>:
-    <select @click="itemsPerPage" id="itemsPerPage" v-model="currentPageSize">
-      <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
-        {{ option }}
-      </option>
-    </select>
-    {{ $t('table.footer.hit') }}: {{ currentPageRowStart + 1 }}-{{
-      currentPageRowStart + currentPageSize > props.tableResultTotal
-        ? props.tableResultTotal
-        : currentPageRowStart + currentPageSize
-    }}
-    {{ $t('table.of') }} {{ props.tableResultTotal }}
+    <span class="subsection">
+      <button @click="firstPage" :disabled="currentPageRowStart === 0">
+        <span class="material-icons">first_page</span>
+      </button>
+      <button @click="prevPage" :disabled="currentPageRowStart === 0">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <button
+        @click="nextPage"
+        :disabled="currentPageRowStart + currentPageSize >= props.tableResultTotal - 1"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+      <button
+        @click="lastPage"
+        :disabled="currentPageRowStart + currentPageSize >= props.tableResultTotal - 1"
+      >
+        <span class="material-icons">last_page</span>
+      </button>
+    </span>
+    <span class="subsection">
+      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }} </label>:
+      <select @click="itemsPerPage" id="itemsPerPage" v-model="currentPageSize">
+        <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </span>
+    <span class="subsection">
+      {{ $t('table.footer.hit') }}: {{ currentPageRowStart + 1 }}-{{
+        currentPageRowStart + currentPageSize > props.tableResultTotal
+          ? props.tableResultTotal
+          : currentPageRowStart + currentPageSize
+      }}
+      {{ $t('table.of') }} {{ props.tableResultTotal }}
+    </span>
   </div>
 </template>
 <style src="@/assets/table.css" scoped></style>
 
 <style scoped>
 .pagination {
+}
+.subsection {
+  margin-right: 0.5rem;
 }
 </style>

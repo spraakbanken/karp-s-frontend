@@ -1123,6 +1123,9 @@ const refClick = (tRow: number, tCol: number) => {
       -->
     </div>
   </div>
+
+  <!-- snackbar, popup message that we have created a new tab for a ref table-->
+  <div id="snackbar">{{ t('statistics.reftable.added') }}</div>
 </template>
 
 <style src="@/assets/table.css" scoped></style>
@@ -1302,13 +1305,14 @@ svg g text {
 }
 
 .export-button {
-  padding: 0.5;
+  cursor: pointer;
+  margin: 0;
+  padding: 1 0.25rem 1 0.25rem;
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
-  cursor: pointer;
-  border: 0;
-  border-radius: 4px;
   font-weight: bold;
+  border: 1px solid var(--sb-orange);
+  border-radius: 4px;
 }
 
 .export-button:hover {
@@ -1372,6 +1376,33 @@ input[type='checkbox'][disabled] + label {
 /* misc */
 .material-icons {
   font-size: 20px;
+}
+
+/* snackbar */
+/* snackbar, popup message that we have created a new tab for a ref table */
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: var(--sb-grey-dark);
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 30px;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation:
+    fadein 0.5s,
+    fadeout 0.5s 2.5s;
+  animation:
+    fadein 0.5s,
+    fadeout 0.5s 2.5s;
 }
 </style>
 

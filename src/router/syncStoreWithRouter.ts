@@ -95,7 +95,7 @@ function splitTopLevel(input: string): string[] {
 }
 
 export function parseQuery(q: string): SelectedFieldsMain[] {
-  // ✅ Case 1: single clause
+  // Case 1: single clause
   if (isSingleClause(q)) {
     return [
       {
@@ -106,14 +106,14 @@ export function parseQuery(q: string): SelectedFieldsMain[] {
     ]
   }
 
-  // ✅ Case 2: wrapped expression
+  // Case 2: wrapped expression
   if (q.startsWith('and(')) {
     const inner = q.slice(4, -1)
     const groups = splitTopLevel(inner)
     return groups.map(parseGroup)
   }
 
-  // ✅ Case 3: single or(...) / not(...)
+  // Case 3: single or(...) / not(...)
   return [parseGroup(q)]
 }
 
@@ -123,8 +123,8 @@ export function syncStoreWithRouter(router: Router): SyncResult {
   const lexicalStorage = lexicalStore()
 
   const updateRouterQuery = () => {
-    //console.log('updateRouterQuery, lexicalStorage.pageStart:', lexicalStorage.pageStart)
     const currentQuery = router.currentRoute.value.query
+
     let queryString = ''
     if (lexicalStorage.activeSearchTab == 'advanced') {
       queryString = lexicalStorage.searchQuery
@@ -138,7 +138,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       queryString = lexicalStorage.getQuery()
     }
     const newQuery: Record<string, string | number> = {
-      ...currentQuery,
+      /*...currentQuery, */
       resources: lexicalStorage.selectedDatasets.join(','),
     }
     // query string (search field)
@@ -154,11 +154,14 @@ export function syncStoreWithRouter(router: Router): SyncResult {
     }
     // result tab
     if (lexicalStorage.activeResultTab !== DEFAULT_TAB_RESULT) {
+      /*
       newQuery.tab = [TAB_RESULT_TABLE, TAB_RESULT_STATISTICS].includes(
         lexicalStorage.activeResultTab,
       )
         ? lexicalStorage.activeResultTab
         : TAB_RESULT_STATISTICS
+      */
+      newQuery.resultTab = lexicalStorage.activeResultTab
     }
     // sort
     if (
@@ -196,21 +199,18 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       newQuery.statisticsPageSize = lexicalStorage.statisticsPageSize
     }
 
-    //console.log('Adv, newqs=', newQuery)
-
     const filteredQuery = Object.fromEntries(
       Object.entries(newQuery).filter(
         ([, value]) => value !== '' && value !== null && value !== undefined,
       ),
     )
-    //console.log('Adv, filtqs=', filteredQuery)
+
+    //console.log('UpdRouterQuery, curr, new, filt:', currentQuery, newQuery, filteredQuery)
 
     if (JSON.stringify(currentQuery) !== JSON.stringify(filteredQuery)) {
       router.push({ query: filteredQuery })
     }
   }
-
-  //console.log('Setup watch!')
 
   watch(
     () => ({
@@ -232,7 +232,6 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       statisticsPageSize: lexicalStorage.statisticsPageSize,
     }),
     () => {
-      //console.log('WATCH FIRED updateRouterQuery')
       updateRouterQuery()
     },
     { deep: true },
@@ -240,7 +239,9 @@ export function syncStoreWithRouter(router: Router): SyncResult {
 
   const initializeStoreFromQuery = (): SyncResult => {
     const query = new URLSearchParams(window.location.search)
+
     //console.log('initializeStoreFromQuery: query=', query)
+
     let syncResult: SyncResult = SyncResult.SYNC_RESULT_NOT_SYNCED
 
     if (query.has('resources')) {
@@ -266,7 +267,6 @@ export function syncStoreWithRouter(router: Router): SyncResult {
           lexicalStorage.setSearchQuery(query.get('q')!)
         } else {
           const queryString = query.get('q')!
-          //console.log('initializeStoreFromQuery:', parseQuery(queryString))
           lexicalStorage.selectedFieldsMain = parseQuery(queryString)
         }
       }
@@ -291,8 +291,8 @@ export function syncStoreWithRouter(router: Router): SyncResult {
         lexicalStorage.setSelectedColumns(DEFAULT_STATISTICS_COLUMNS)
       }
       // result tab
-      if (query.has('tab')) {
-        lexicalStorage.setActiveResultTab(query.get('tab')!)
+      if (query.has('resultTab')) {
+        lexicalStorage.setActiveResultTab(query.get('resultTab')!)
       } else {
         lexicalStorage.setActiveResultTab(DEFAULT_TAB_RESULT)
       }
@@ -306,7 +306,13 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       if (query.has('tablePageSize')) {
         lexicalStorage.tablePageSize = Number(query.get('tablePageSize'))
       } else {
-        lexicalStorage.tablePageSize = DEFAULT_TABLE_PAGE_SIZE
+        const defaultTablePageSize: number = Number(localStorage.getItem('defaultTablePageSize'))
+        if (defaultTablePageSize === null) {
+          lexicalStorage.tablePageSize = DEFAULT_TABLE_PAGE_SIZE
+          localStorage.setItem('defaultTablePageSize', String(DEFAULT_TABLE_PAGE_SIZE))
+        } else {
+          lexicalStorage.tablePageSize = defaultTablePageSize
+        }
       }
       // statistics page start
       if (query.has('statisticsPageStart')) {
@@ -318,8 +324,14 @@ export function syncStoreWithRouter(router: Router): SyncResult {
       if (query.has('statisticsPageSize')) {
         lexicalStorage.statisticsPageSize = Number(query.get('statisticsPageSize'))
       } else {
-        {
+        const defaultStatisticsPageSize: number = Number(
+          localStorage.getItem('defaultStatisticsPageSize'),
+        )
+        if (defaultStatisticsPageSize === null) {
           lexicalStorage.statisticsPageSize = DEFAULT_STATISTICS_PAGE_SIZE
+          localStorage.setItem('defaultStatisticsPageSize', String(DEFAULT_STATISTICS_PAGE_SIZE))
+        } else {
+          lexicalStorage.statisticsPageSize = defaultStatisticsPageSize
         }
       }
 
@@ -330,8 +342,6 @@ export function syncStoreWithRouter(router: Router): SyncResult {
 
     return syncResult
   }
-
-  //console.log('sync!')
 
   const syncResult = initializeStoreFromQuery()
   window.addEventListener('popstate', initializeStoreFromQuery)

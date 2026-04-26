@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import router from '@/router'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const imgBrowserURL = ref('')
+
+const pageNumber = ref<number | null>(null)
 
 onMounted(() => {
   const query = new URLSearchParams(window.location.search)
@@ -10,25 +15,60 @@ onMounted(() => {
   //console.log('ImgView q:', query)
 })
 
-const nextImg = async () => {
-  const next = imgBrowserURL.value.replace(/(\D+)(\d+)(\.png)$/, (match, prefix, num, suffix) => {
-    const newNum = String(Number(num) + 1).padStart(num.length, '0')
-    return prefix + newNum + suffix
+function replacePageNumber(filename: string, newPageNumber: number) {
+  return filename.replace(/_(\d+)\./, (_, digits) => {
+    const padded = String(newPageNumber).padStart(digits.length, '0')
+    return `_${padded}.`
   })
+}
+
+const handleClick = async () => {
+  if (pageNumber.value !== null) {
+    // Use the numeric value here
+    console.log(
+      'Input value:',
+      pageNumber.value,
+      ', result:',
+      replacePageNumber(imgBrowserURL.value, pageNumber.value),
+    )
+    const next = replacePageNumber(imgBrowserURL.value, pageNumber.value)
+    if (await checkImageExists(next)) {
+      imgBrowserURL.value = next
+      router.push({ query: { img: imgBrowserURL.value } })
+    }
+  }
+}
+
+const nextImg = async () => {
+  let newNum = ''
+  const next = imgBrowserURL.value.replace(
+    /(\D+)(\d+)(\.(png|jpg))$/,
+    (match, prefix, num, suffix) => {
+      //  const next = imgBrowserURL.value.replace(/(\D+)(\d+)(\.png)$/, (match, prefix, num, suffix) => {
+      newNum = String(Number(num) + 1).padStart(num.length, '0')
+      return prefix + newNum + suffix
+    },
+  )
 
   if (await checkImageExists(next)) {
+    pageNumber.value = Number(newNum)
     imgBrowserURL.value = next
     router.push({ query: { img: imgBrowserURL.value } })
   }
 }
 
 const prevImg = async () => {
-  const prev = imgBrowserURL.value.replace(/(\D+)(\d+)(\.png)$/, (match, prefix, num, suffix) => {
-    const newNum = String(Number(num) - 1).padStart(num.length, '0')
-    return prefix + newNum + suffix
-  })
+  let newNum = ''
+  const prev = imgBrowserURL.value.replace(
+    /(\D+)(\d+)(\.(png|jpg))$/,
+    (match, prefix, num, suffix) => {
+      newNum = String(Number(num) - 1).padStart(num.length, '0')
+      return prefix + newNum + suffix
+    },
+  )
 
   if (await checkImageExists(prev)) {
+    pageNumber.value = Number(newNum)
     imgBrowserURL.value = prev
     router.push({ query: { img: imgBrowserURL.value } })
   }
@@ -46,20 +86,32 @@ const checkImageExists = (url: string): Promise<boolean> => {
 
 <template>
   <div class="imgbrowser-wrapper">
-    <div class="imgbrowser-content">
-      <div class="imgbrowser-header">
-        <div class="imgbrowser-filename">
-          {{ imgBrowserURL.split('/').pop() }}
-        </div>
-        <div>
-          <button class="imgbrowser-btn material-icons" @click="prevImg">navigate_before</button>
-          &nbsp;
-          <button class="imgbrowser-btn material-icons" @click="nextImg">navigate_next</button>
-        </div>
+    <div class="imgbrowser-header">
+      <div class="imgbrowser-filename">
+        {{ imgBrowserURL.split('/').pop() }}
       </div>
-      <div class="imgbrowser-image">
-        <img :src="imgBrowserURL" :alt="imgBrowserURL" />
+      <div class="imgbrowser-page">
+        <button class="imgbrowser-btn material-icons" @click="prevImg">navigate_before</button>
+        &nbsp;
+        <button class="imgbrowser-btn material-icons" @click="nextImg">navigate_next</button>
+        <span class="imgbrowser-pagenumber">
+          <input
+            type="number"
+            v-model.number="pageNumber"
+            :placeholder="t('table.imgbrowse.placeholder')"
+            @keyup.enter="handleClick"
+          />
+          <button @click="handleClick">{{ t('table.imgbrowse.submit') }}</button>
+        </span>
       </div>
+    </div>
+    <div class="imgbrowser-image">
+      <img :src="imgBrowserURL" :alt="imgBrowserURL" />
+    </div>
+    <div class="imgbrowser-footer">
+      <a href="https://sprakbanken.se/" target="_new">
+        <img src="@/assets/sprakbanken_text_light_theme.svg" alt="Språkbanken Text" />
+      </a>
     </div>
   </div>
 </template>
@@ -67,24 +119,18 @@ const checkImageExists = (url: string): Promise<boolean> => {
 <style scoped>
 .imgbrowser-wrapper {
   width: 100%;
+  background-color: var(--sb-grey-light);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #666;
-}
-
-.imgbrowser-content {
-  background-color: #eee;
-  border: 1px solid black;
+  flex-direction: column;
 }
 
 .imgbrowser-header {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 0.5rem;
-  background-color: #eee;
 }
 
 .imgbrowser-filename {
@@ -94,18 +140,46 @@ const checkImageExists = (url: string): Promise<boolean> => {
   margin-bottom: 0.5rem;
 }
 
-.imgbrowser-image {
+.imgbrowser-page {
   display: flex;
-  justify-content: center;
   align-items: center;
 }
 
-.imgbrowser-btn {
-  background: none;
-  border-radius: 0.5rem;
-  border: 1px solid black;
-  font-size: 28px;
+.imgbrowser-pagenumber input {
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.imgbrowser-btn,
+.imgbrowser-pagenumber button {
   cursor: pointer;
-  color: #666;
+  padding: 1 0.25rem 1 0.25rem;
+  background-color: var(--button-action-bg-color);
+  color: var(--button-action-text-color);
+  border-radius: 4px;
+  border: 1px solid var(--sb-orange);
+  font-weight: bold;
+}
+
+.imgbrowser-image {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .imgbrowser-image {
+    justify-content: center; /* Center on larger screens */
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.imgbrowser-footer {
+  align-self: center;
+  padding: 1rem;
 }
 </style>

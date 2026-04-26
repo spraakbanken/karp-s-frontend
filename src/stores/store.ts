@@ -394,6 +394,7 @@ export const lexicalStore = defineStore('dataset', {
       this.activeSearchTab = tab
     },
     setActiveResultTab(tab: string) {
+      console.log('setActiveResultTab()', tab)
       this.activeResultTab = tab
     },
     setSelectedDataset(keys: string[]) {

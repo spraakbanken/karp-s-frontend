@@ -18,7 +18,19 @@ const props = defineProps<{
 
 const lexicalStorage = lexicalStore()
 
+/* Show "popup" message that we have added a ref table */
+function showSnackbar() {
+  const x = document.getElementById('snackbar')
+  if (x !== null) {
+    x.className = 'show'
+    setTimeout(function () {
+      x.className = x.className.replace('show', '')
+    }, 3000)
+  }
+}
+
 const refClick = (tRow: number, tCol: number) => {
+  showSnackbar()
   if (tCol < lexicalStorage.selectedCompileFields.length) {
     const xValue = props.paginatedDataRow[tCol]
     const xField = lexicalStorage.statisticsHeaders[tCol].columnField

@@ -103,14 +103,12 @@ onMounted(() => {
 
 .dropdown-button {
   cursor: pointer;
-  border: none;
-  /* border-radius: 5px; */
   margin: 0;
-  padding: 0.5;
+  padding: 1 0.25rem 1 0.25rem;
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   font-weight: bold;
-  border: 0;
+  border: 1px solid var(--sb-orange);
   border-radius: 4px;
 }
 

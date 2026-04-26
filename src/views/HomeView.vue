@@ -56,12 +56,24 @@ onMounted(async () => {
     const config = await getLexicalConfig()
     lexicalStorage.setDefault(config)
     syncResult.value = syncStoreWithRouter(router)
-
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
       //TODO lexicalStorage.setIsSearch(true)
     } else if (syncResult.value === SyncResult.SYNC_RESULT_DATASET_UNKNOWN) {
       //lexicalStorage.setDefault(config)
+    } else {
+      // have we a saved default table page size?
+      const defaultTablePageSize: number = Number(localStorage.getItem('defaultTablePageSize'))
+      if (defaultTablePageSize !== null) {
+        lexicalStorage.tablePageSize = defaultTablePageSize
+      }
+      // have we a saved default statistics page size?
+      const defaultStatisticsPageSize: number = Number(
+        localStorage.getItem('defaultStatisticsPageSize'),
+      )
+      if (defaultStatisticsPageSize !== null) {
+        lexicalStorage.statisticsPageSize = defaultStatisticsPageSize
+      }
     }
   } catch (error) {
     console.error(error)

@@ -51,37 +51,51 @@ const itemsPerPage = () => {
   )
   lexicalStorage.statisticsPageStart = currentPageStart.value
   lexicalStorage.statisticsPageSize = currentPageSize.value
+  localStorage.setItem('defaultStatisticsPageSize', String(currentPageSize.value))
 }
 </script>
 
 <template>
   <div class="pagination">
-    <span>
-      {{ $t('table.footer.page') }}: {{ currentPageStart }}
-      {{ $t('table.of') }}
-      {{ totalPages }}
+    <span class="subsection">
+      <span>
+        {{ $t('table.footer.page') }}: {{ currentPageStart }}
+        {{ $t('table.of') }}
+        {{ totalPages }}
+      </span>
     </span>
-    <button @click="firstPage" :disabled="currentPageStart === 1">
-      <span class="material-icons">first_page</span>
-    </button>
-    <button @click="prevPage" :disabled="currentPageStart === 1">
-      <span class="material-icons">chevron_left</span>
-    </button>
-    <button @click="nextPage" :disabled="currentPageStart === totalPages">
-      <span class="material-icons">chevron_right</span>
-    </button>
-    <button @click="lastPage" :disabled="currentPageStart === totalPages">
-      <span class="material-icons">last_page</span>
-    </button>
 
-    <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }} </label>:
-    <select @click="itemsPerPage" id="itemsPerPage" v-model="currentPageSize">
-      <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
-        {{ option }}
-      </option>
-    </select>
+    <span class="subsection">
+      <button @click="firstPage" :disabled="currentPageStart === 1">
+        <span class="material-icons">first_page</span>
+      </button>
+      <button @click="prevPage" :disabled="currentPageStart === 1">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <button @click="nextPage" :disabled="currentPageStart === totalPages">
+        <span class="material-icons">chevron_right</span>
+      </button>
+      <button @click="lastPage" :disabled="currentPageStart === totalPages">
+        <span class="material-icons">last_page</span>
+      </button>
+    </span>
+
+    <span class="subsection">
+      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }} </label>:
+      <select @click="itemsPerPage" id="itemsPerPage" v-model="currentPageSize">
+        <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+    </span>
   </div>
 </template>
 <style src="@/assets/table.css" scoped></style>
 
-<style scoped></style>
+<style scoped>
+.pagination {
+}
+.subsection {
+  margin-right: 0.5rem;
+}
+</style>
