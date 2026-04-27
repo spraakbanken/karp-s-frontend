@@ -307,7 +307,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
         lexicalStorage.tablePageSize = Number(query.get('tablePageSize'))
       } else {
         const defaultTablePageSize: number = Number(localStorage.getItem('defaultTablePageSize'))
-        if (defaultTablePageSize === null) {
+        if (defaultTablePageSize === null || defaultTablePageSize === 0) {
           lexicalStorage.tablePageSize = DEFAULT_TABLE_PAGE_SIZE
           localStorage.setItem('defaultTablePageSize', String(DEFAULT_TABLE_PAGE_SIZE))
         } else {
@@ -327,7 +327,7 @@ export function syncStoreWithRouter(router: Router): SyncResult {
         const defaultStatisticsPageSize: number = Number(
           localStorage.getItem('defaultStatisticsPageSize'),
         )
-        if (defaultStatisticsPageSize === null) {
+        if (defaultStatisticsPageSize === null || defaultStatisticsPageSize === 0) {
           lexicalStorage.statisticsPageSize = DEFAULT_STATISTICS_PAGE_SIZE
           localStorage.setItem('defaultStatisticsPageSize', String(DEFAULT_STATISTICS_PAGE_SIZE))
         } else {

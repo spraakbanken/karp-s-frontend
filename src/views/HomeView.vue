@@ -19,6 +19,8 @@ import { getLexicalConfig } from '@/api/apiService'
 import { syncStoreWithRouter, SyncResult } from '@/router/syncStoreWithRouter'
 import router from '@/router'
 import {
+  DEFAULT_STATISTICS_PAGE_SIZE,
+  DEFAULT_TABLE_PAGE_SIZE,
   TAB_RESULT_REF,
   TAB_RESULT_STATISTICS,
   TAB_RESULT_TABLE,
@@ -55,6 +57,18 @@ onMounted(async () => {
   try {
     const config = await getLexicalConfig()
     lexicalStorage.setDefault(config)
+    // check localstore defaults
+    const defaultTablePageSize: number = Number(localStorage.getItem('defaultTablePageSize'))
+    if (defaultTablePageSize === null || defaultTablePageSize === 0) {
+      localStorage.setItem('defaultTablePageSize', String(DEFAULT_TABLE_PAGE_SIZE))
+    }
+    const defaultStatisticsPageSize: number = Number(
+      localStorage.getItem('defaultStatisticsPageSize'),
+    )
+    if (defaultStatisticsPageSize === null || defaultStatisticsPageSize === 0) {
+      localStorage.setItem('defaultStatisticsPageSize', String(DEFAULT_STATISTICS_PAGE_SIZE))
+    }
+    // sync URL
     syncResult.value = syncStoreWithRouter(router)
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
