@@ -125,7 +125,6 @@ const checkImageExists = (url: string): Promise<boolean> => {
 }
 
 .imgbrowser-header {
-  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
