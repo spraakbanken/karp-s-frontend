@@ -56,6 +56,7 @@ onMounted(async () => {
   // read config
   try {
     const config = await getLexicalConfig()
+
     lexicalStorage.setDefault(config)
     // check localstore defaults
     const defaultTablePageSize: number = Number(localStorage.getItem('defaultTablePageSize'))

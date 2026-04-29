@@ -24,14 +24,6 @@ const clickResourceInfo = (url: string) => {
       <button class="button" @click="clickResourceSearch(value.resourceId)">
         {{ $t('additions.button.search') }}
       </button>
-      <!--
-      <a :href="value.resourceUrl" target="_blank">
-        <img src="@/assets/sb_symbol_info.svg" class="datasets-icon" />
-      </a>
-      <a :href="'/karplabb/?resources=' + value.resourceId"
-        >
-      </a>
-      -->
       <span class="latest-label">{{ value.label }}</span>
       <span class="latest-date">{{ secondsToDate(value.updated) }}</span>
     </div>

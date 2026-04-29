@@ -107,6 +107,7 @@
   "search.separator.and": "och",
   "search.advanced.label": "Sök med frågespråk:",
   "search.advanced.placeholder": "<frågespråk>",
+  "search.input.list": "<lista med värden, sök eller använd piltangenterna>",
   "table.total.pre": "Totalt",
   "table.total.hits": "träffar",
   "table.total.hit": "träff",

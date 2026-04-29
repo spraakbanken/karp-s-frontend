@@ -7,7 +7,9 @@ export interface FieldConfig {
   name: string
   type: string
   collection: boolean
-  label: Label | string // TODO
+  label: Label | string
+  categories: string[]
+  categoryLabel: Record<string, { swe: string; eng: string }>
 }
 
 export interface Label {
@@ -68,9 +70,11 @@ export interface Tag {
   [key: string]: TagLabel
 }
 
+/*
 export interface FieldConfigArray {
   [key: string]: FieldConfig
 }
+*/
 
 export type SelectedFieldConfig = {
   id: number
@@ -92,7 +96,7 @@ export type SelectedFieldsMain = {
 export interface Config {
   resources: Resource[]
   tags: Tag
-  fields: FieldConfigArray
+  fields: Record<string, FieldConfig>
 }
 
 export interface DatasetDates {

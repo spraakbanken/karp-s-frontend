@@ -300,7 +300,7 @@ const sortedData = computed(() => {
       if (aValue === bValue) return 0
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return aValue.localeCompare(bValue) * order
+        return aValue.localeCompare(bValue, 'sv-SE') * order
       }
 
       return (aValue as unknown as number) > (bValue as unknown as number) ? order : -order

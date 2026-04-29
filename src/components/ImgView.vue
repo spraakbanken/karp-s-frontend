@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
+import sprakbankenLogo from '@/assets/sprakbanken_text_light_theme.svg'
 
 const { t } = useI18n()
 
@@ -110,7 +111,7 @@ const checkImageExists = (url: string): Promise<boolean> => {
     </div>
     <div class="imgbrowser-footer">
       <a href="https://sprakbanken.se/" target="_new">
-        <img src="@/assets/sprakbanken_text_light_theme.svg" alt="Språkbanken Text" />
+        <img :src="sprakbankenLogo" alt="Språkbanken Text" />
       </a>
     </div>
   </div>

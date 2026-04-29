@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import logoSBLight from '@/assets/sprakbanken_text_light_theme.svg'
+import logoSBDark from '@/assets/sprakbanken_text_light_theme.svg'
+import logoGUSvLight from '@/assets/gu_vert_sv.svg'
+import logoGUSvDark from '@/assets/gu_vert_sv_inv.svg'
+import logoGUEnLight from '@/assets/gu_vert_en.svg'
+import logoGUEnDark from '@/assets/gu_vert_en_inv.svg'
 
 const logoSB = ref('')
-const logoGU = ref('')
+const logoGUSv = ref('')
 const logoGUEn = ref('')
 
 const updateTheme = async () => {
   const theme = document.documentElement.getAttribute('data-theme')
   const isDarkMode = theme === 'dark'
-  logoSB.value = isDarkMode
-    ? (await import('@/assets/sprakbanken_text_dark_theme.svg')).default
-    : (await import('@/assets/sprakbanken_text_light_theme.svg')).default
-  logoGU.value = isDarkMode
-    ? (await import('@/assets/gu_vert_sv_inv.svg')).default
-    : (await import('@/assets/gu_vert_sv.svg')).default
-  logoGUEn.value = isDarkMode
-    ? (await import('@/assets/gu_vert_en_inv.svg')).default
-    : (await import('@/assets/gu_vert_en.svg')).default
+  logoSB.value = isDarkMode ? logoSBLight : logoSBDark
+  logoGUSv.value = isDarkMode ? logoGUSvDark : logoGUSvLight
+  logoGUEn.value = isDarkMode ? logoGUEnDark : logoGUEnLight
 }
 
 onMounted(() => {
@@ -74,7 +74,7 @@ onMounted(() => {
       <div class="gu-box">
         <div v-if="$i18n.locale == 'sv'">
           <a href="https://gu.se/" target="_new">
-            <img :src="logoGU" alt="Göteborgs universitet" width="124px" />
+            <img :src="logoGUSv" alt="Göteborgs universitet" width="124px" />
           </a>
         </div>
         <div v-else>

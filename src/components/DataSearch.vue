@@ -290,6 +290,13 @@ const selectedFieldAdd = (fieldName: string, mainId: number, subId: number) => {
   }
 }
 
+const fieldHasCategories = (f: string): boolean => {
+  if (lexicalStorage.currentConfig.fields[f]) {
+    return 'categories' in lexicalStorage.currentConfig.fields[f]
+  }
+  return false
+}
+
 watch(
   () => currentFields.value,
   (newFields) => {
@@ -463,13 +470,13 @@ watch(
                     X<!--{{ $t('search.button.remove') }}-->
                   </button>
                 </div>
-                <i>{{
+                <span class="search-input-message">{{
                   lexicalStorage.currentCommonFields.find(
                     (item) => item.name === subExpression.name,
                   )
                     ? ''
                     : '(' + $t('search.field.notcommon') + ')'
-                }}</i>
+                }}</span>
 
                 <div class="input-group">
                   <!-- input group, one per selected field -->
@@ -479,22 +486,36 @@ watch(
                       {{ $t('search.field.isnot') }}
                     </label>
                   </div>
-                  <div>
+                  <div class="search-input-wrapper">
                     <input
                       v-focus
                       autofocus
                       tabindex="0"
                       @keyup.enter="updateData"
                       class="search-input"
+                      :list="'categories-list' + subExpression.name"
                       type="text"
                       :id="String(subExpression.id)"
                       v-model="subExpression.value"
                       :placeholder="
-                        lexicalStorage.activeSearchTab == TAB_SEARCH_EXTENDED
-                          ? $t('dataselector.parameters.placeholder')
-                          : $t('dataselector.simplesearch.placeholder')
+                        fieldHasCategories(subExpression.name)
+                          ? $t('search.input.list')
+                          : lexicalStorage.activeSearchTab == TAB_SEARCH_EXTENDED
+                            ? $t('dataselector.parameters.placeholder')
+                            : $t('dataselector.simplesearch.placeholder')
                       "
                     />
+                    <template v-if="fieldHasCategories(subExpression.name)">
+                      <!-- <span class="search-input-message">{{ $t('search.input.list') }}</span>-->
+                      <datalist :id="'categories-list' + subExpression.name">
+                        <option
+                          v-for="x in lexicalStorage.currentConfig.fields[subExpression.name]
+                            .categories"
+                          :key="x"
+                          :value="x"
+                        ></option>
+                      </datalist>
+                    </template>
                   </div>
                   <div class="position">
                     <div class="group">
@@ -847,13 +868,15 @@ input:focus {
   background-color: white;
 }
 
-/*.input-group .search-input { */
-.search-input {
-  /* flex: 1;*/
+.search-input-wrapper {
+  display: flex;
+  flex-direction: column;
   margin-right: 0.5rem;
   margin-left: 0.5rem;
+}
+
+.search-input {
   padding: 0.5rem;
-  /* border: 2px solid var(--sb-orange); */
   border: none;
   border-radius: 4px;
   width: 300px;
@@ -862,6 +885,13 @@ input:focus {
   }
   color: var(--color-text);
   background-color: var(--color-background);
+  /*
+    display: table-cell;
+  vertical-align: middle;
+  padding: 2px;
+  cursor: pointer;
+  accent-color: var(--sb-orange);
+  */
 }
 
 .search-input:focus {
@@ -873,6 +903,11 @@ input:focus {
 .search-label {
   white-space: nowrap;
   display: inline-block;
+}
+
+.search-input-message {
+  font-style: italic;
+  font-size: 0.75rem;
 }
 
 /*
@@ -948,7 +983,6 @@ input:focus {
   box-sizing: border-box;
 }
 
-.input-group input,
 .position input {
   display: table-cell;
   vertical-align: middle;

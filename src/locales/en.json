@@ -107,6 +107,7 @@
   "search.separator.and": "and",
   "search.advanced.label": "Search using query language:",
   "search.advanced.placeholder": "<query language>",
+  "search.input.list": "<list of values, search or use arrow keys>",
   "table.total.pre": "Total",
   "table.total.hits": "hits",
   "table.total.hit": "hit",
