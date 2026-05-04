@@ -25,6 +25,7 @@ const lexicalStorage = lexicalStore()
 //const statisticsHeaders = ref<CountHeadersColumn[]>([])
 //const statisticsResult = ref<Dataset[]>([])
 //const statisticsTotals = ref<number[]>([])
+const statisticsSortIndex = ref<number>(0)
 
 const statisticsHeaders = computed({
   get: () => lexicalStorage.statisticsHeaders,
@@ -136,9 +137,11 @@ const currentCommonFields = computed(() => lexicalStorage.currentCommonFields)
 
 // sort column selection
 
-const doSort = (field: string, order: string) => {
+const doSort = (index: number, field: string, order: string) => {
+  statisticsSortIndex.value = index
   lexicalStorage.statisticsSortField = field
   lexicalStorage.statisticsSortOrder = order
+  // console.log('doSort()', field, order)
   // TODO: not really necessary as we sort in FE
   //fetchData()
   lexicalStorage.statisticsPageStart = 1
@@ -285,18 +288,18 @@ watch(
 )
 
 const sortedData = computed(() => {
-  //console.log('sortedData compute: ', lexicalStorage.statisticsSortField)
+  // console.log('sortedData compute: ', lexicalStorage.statisticsSortField)
   const order = lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING ? 1 : -1
   if (!lexicalStorage.statisticsSortField) {
     return statisticsResult.value
   } else {
+    // find statisticsSortField in statisticsHeader, array of objects (type, columnField ===)
     return [...statisticsResult.value].sort((a, b) => {
       //const aValue = a[sortKey.value]
       //const bValue = b[sortKey.value]
       // data is of format a[0] = "name", a[1] = number
-      const aValue = a[0]
-      const bValue = b[0]
-      //console.log('Sort', aValue, bValue, a, b)
+      const aValue = a[statisticsSortIndex.value]
+      const bValue = b[statisticsSortIndex.value]
       if (aValue === bValue) return 0
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -948,6 +951,7 @@ const refClick = (tRow: number, tCol: number) => {
 
       <!-- pagination -->
       <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
+
       <!-- table -->
       <div class="table-container">
         <table v-if="statisticsResult.length" class="fancy-table">
@@ -1035,7 +1039,7 @@ const refClick = (tRow: number, tCol: number) => {
                   <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
                     <span class="header-sortable material-icons">
                       <span
-                        @click="doSort(key.columnField, SORT_ORDER_ASCENDING)"
+                        @click="doSort(index, key.columnField, SORT_ORDER_ASCENDING)"
                         :class="{
                           'header-sortable-selected':
                             lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
@@ -1046,7 +1050,7 @@ const refClick = (tRow: number, tCol: number) => {
                       </span>
                       <span> </span>
                       <span
-                        @click="doSort(key.columnField, SORT_ORDER_DESCENDING)"
+                        @click="doSort(index, key.columnField, SORT_ORDER_DESCENDING)"
                         :class="{
                           'header-sortable-selected':
                             lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
