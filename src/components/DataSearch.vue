@@ -286,6 +286,8 @@ const selectedFieldAdd = (fieldName: string, mainId: number, subId: number) => {
     )
     if (subIndex >= 0) {
       lexicalStorage.selectedFieldsMain[mainIndex].selectedFieldsSub[subIndex].name = fieldName
+      isDDMain.value = -1
+      isDDSub.value = -1
     }
   }
 }
