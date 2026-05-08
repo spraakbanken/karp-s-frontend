@@ -849,6 +849,7 @@ input:focus {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
 
   @media (width < 640px) {
     flex-direction: column;
@@ -881,9 +882,9 @@ input:focus {
   padding: 0.5rem;
   border: none;
   border-radius: 4px;
-  width: 300px;
+  width: 260px;
   @media (width < 640px) {
-    width: 300px;
+    width: 260px;
   }
   color: var(--color-text);
   background-color: var(--color-background);
