@@ -61,12 +61,23 @@ onMounted(() => {
       </template>
     </div>
     <div class="footer-area-middle">
+      <div class="footer-space-below">
+        {{ $t('footer.use') }}
+      </div>
       <div>
         <template v-if="$i18n.locale == 'sv'">
           <a href="https://spraakbanken.gu.se/kontakt">{{ $t('footer.help') }}</a>
         </template>
         <template v-if="$i18n.locale == 'en'">
           <a href="https://spraakbanken.gu.se/en/contact">{{ $t('footer.help') }}</a>
+        </template>
+      </div>
+      <div>
+        <template v-if="$i18n.locale == 'sv'">
+          <a href="https://spraakbanken.gu.se/om/referera">{{ $t('footer.cite') }}</a>
+        </template>
+        <template v-if="$i18n.locale == 'en'">
+          <a href="https://spraakbanken.gu.se/en/about/howtocite">{{ $t('footer.cite') }}</a>
         </template>
       </div>
     </div>
@@ -99,6 +110,7 @@ onMounted(() => {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 1rem;
+  color: var(--color-text);
   background-color: var(--color-bg);
   box-sizing: border-box;
   width: 100%;
@@ -111,7 +123,6 @@ onMounted(() => {
   flex-wrap: wrap;
   flex-direction: column;
   justify-content: flex-start;
-  color: white;
   flex: 1;
   padding: 0rem;
   box-sizing: border-box;
@@ -123,7 +134,7 @@ onMounted(() => {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  color: white;
+  text-align: center;
   flex: 1;
   padding: 0rem;
   box-sizing: border-box;
@@ -132,20 +143,22 @@ onMounted(() => {
 .footer-area-right {
   display: flex;
   justify-content: flex-end;
-  color: white;
   flex: 1;
   padding: 0rem;
   box-sizing: border-box;
 }
 
 .footer-area a {
-  color: var(--color-text);
   text-decoration: underline;
 }
 
 .footer-area .contact {
   color: var(--sb-orange);
   text-align: center;
+}
+
+.footer-space-below {
+  margin-bottom: 0.5rem;
 }
 
 .sb-box {
