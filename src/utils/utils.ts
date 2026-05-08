@@ -77,7 +77,6 @@ export const formatCell = (
 ): string => {
   let cell: string = ''
   //let count: number = 0
-  console.log('formatCell: ', x, typeof x, Array.isArray(x), x !== null)
 
   if (x !== null) {
     if (Array.isArray(x)) {
@@ -88,11 +87,8 @@ export const formatCell = (
         })
       }
     } else if (typeof x === 'object' && x !== null) {
-      console.log('OBJECT, not null', x)
-
       // value(s)
       if (BE_STATISTICS_VALUES_ID in x) {
-        console.log('IN', x)
         x.values.forEach((v) => {
           if (typeof v === 'object') {
             let vvalue: string = ''
@@ -103,7 +99,6 @@ export const formatCell = (
             if (BE_STATISTICS_COUNT_ID in v) {
               vcount = v[BE_STATISTICS_COUNT_ID]
             }
-            console.log('IN2', vvalue)
             vvalue = vvalue !== null ? String(vvalue) : '<i>n/a</i>'
 
             cell = cell + (cell ? ', ' : '') + vvalue + (showCount ? ': ' + String(vcount) : '')
@@ -129,6 +124,7 @@ export const formatCell = (
   } else {
     cell = '-'
   }
+  // console.log('formatCell result: ', cell)
   return cell
 }
 

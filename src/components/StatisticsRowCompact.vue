@@ -79,6 +79,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
       <template
         v-else-if="
           typeof value === 'object' &&
+          value !== null &&
           ((BE_STATISTICS_VALUES_ID in value && value[BE_STATISTICS_VALUES_ID].length === 0) ||
             !(BE_STATISTICS_VALUES_ID in value))
         "
