@@ -521,31 +521,40 @@ watch(
                   </div>
                   <div class="position">
                     <div class="group">
-                      <label for="pos0" class="search-label">
+                      <label
+                        :for="'pos0' + mainExpression.id + subExpression.id"
+                        class="search-label"
+                      >
                         <input
                           @click="handlePos(mainExpression.id, subExpression.id, 0)"
                           type="checkbox"
-                          id="pos0"
+                          :id="'pos0' + mainExpression.id + subExpression.id"
                           value="startswith"
                           v-model="subExpression.positionInitial"
                         />
                         {{ $t(searchFieldPositionText[0]) }}
                       </label>
-                      <label for="pos2" class="search-label">
+                      <label
+                        :for="'pos2' + mainExpression.id + subExpression.id"
+                        class="search-label"
+                      >
                         <input
                           @click="handlePos(mainExpression.id, subExpression.id, 2)"
                           type="checkbox"
-                          id="pos2"
+                          :id="'pos2' + mainExpression.id + subExpression.id"
                           value="contains"
                           v-model="subExpression.positionMedial"
                         />
                         {{ $t(searchFieldPositionText[2]) }}
                       </label>
-                      <label for="pos1" class="search-label">
+                      <label
+                        :for="'pos1' + mainExpression.id + subExpression.id"
+                        class="search-label"
+                      >
                         <input
                           @click="handlePos(mainExpression.id, subExpression.id, 1)"
                           type="checkbox"
-                          id="pos1"
+                          :id="'pos1' + mainExpression.id + subExpression.id"
                           value="endswith"
                           v-model="subExpression.positionFinal"
                         />

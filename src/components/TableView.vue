@@ -504,10 +504,11 @@ const showImg = (img: string) => {
                               ?.vis
                           "
                         >
-                          <span style="white-space: nowrap">
-                            <span v-html="formatCell(value2.value)"></span>&nbsp;
+                          <span>
+                            <!--<span style="white-space: nowrap">-->
+                            <span v-html="formatCell(value2.value)"></span>
                             <span v-if="isImage(value2.value)">
-                              <a
+                              &nbsp;<a
                                 :href="'/karplabb/img?img=' + value2.value"
                                 class="material-icons action-link"
                                 target="_blank"

@@ -45,7 +45,9 @@ const [expanded, toggleExpanded] = useToggle()
       <td v-else-if="key === 0 && showCompact"></td>
       <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
         <div :class="{ 'mhr-div': !expanded && thflag, numeric: isNumber(value2.value) }">
-          <span style="white-space: nowrap">
+          <span>
+            <!--<span style="white-space: nowrap">-->
+
             <span v-html="formatCell(value2.value)"> </span>
             <span v-if="isImage(value2.value)">
               <a
