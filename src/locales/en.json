@@ -25,6 +25,7 @@
   "about.examples.ex1": "All words in 'Svenska Akademiens ordböcker' that begins with 'blom'",
   "about.examples.ex2": "Statistics for words in 'Svenska Akademiens ordböcker' that begins with 'blom'",
   "about.examples.ex3": "All words in 'Svenska Akademiens ordböcker' that begins with either 'pest' or 'kolera' and are not nouns",
+  "about.examples.ex4": "All words in Isof's 'nyordlista' that ends with the word 'ekonomi'",
   "about.additions.title": "Latest additions",
   "about.additions.text": "Latest additions:",
   "about.news.title": "News",

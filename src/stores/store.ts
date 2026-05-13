@@ -33,6 +33,7 @@ import {
   TABREFCOUNT_MAX,
 } from '@/utils/constants'
 import { randomId } from '@/utils/utils'
+import { escapeInnerQuotes } from '@/api/apiService'
 
 interface SearchRedux {
   currentConfig: Config // all resources, tags, fields; set at HomeView > OnMounted()
@@ -353,12 +354,12 @@ export const lexicalStore = defineStore('dataset', {
                 '|' +
                 subItem.name +
                 '|' +
-                subItem.value.replace(/"/g, '\\"') +
+                escapeInnerQuotes(subItem.value) +
                 ')'
               subQuery = subQuery === '' ? q : subQuery + '||' + q
             } else {
               const q =
-                subItem.position + '|' + subItem.name + '|' + subItem.value.replace(/"/g, '\\"')
+                subItem.position + '|' + subItem.name + '|' + escapeInnerQuotes(subItem.value)
               subQuery = subQuery === '' ? q : subQuery + '||' + q
             }
             subQueryCount++
@@ -403,18 +404,25 @@ export const lexicalStore = defineStore('dataset', {
 
       // so now we have all fields that are in all selected datasets, union and intersection
       // and add the "ingångsord"
-      this.currentFields.unshift({
-        name: entryWordField,
-        type: 'text',
-        collection: false,
-        label: { swe: 'ingångsord', eng: 'word' },
-      })
-      this.currentCommonFields.unshift({
-        name: entryWordField,
-        type: 'text',
-        collection: false,
-        label: { swe: 'ingångsord', eng: 'word' },
-      })
+      if (keys.length > 0 && !this.currentFields.some((field) => field.name === entryWordField)) {
+        //console.log('Adding entry word field to currentFields and currentCommonFields')
+        this.currentFields.unshift({
+          name: entryWordField,
+          type: 'text',
+          collection: false,
+          label: { swe: 'ingångsord', eng: 'word' },
+          categories: [],
+          categoryLabel: {},
+        })
+        this.currentCommonFields.unshift({
+          name: entryWordField,
+          type: 'text',
+          collection: false,
+          label: { swe: 'ingångsord', eng: 'word' },
+          categories: [],
+          categoryLabel: {},
+        })
+      }
       if (this.currentFields.length > 0) {
         // if we have fields in selectedFields (from beforehand)
         // that are now not in currentFields

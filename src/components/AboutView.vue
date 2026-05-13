@@ -24,6 +24,8 @@ const ex3 = encodeURI(
 )
 // http://localhost:5173/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,so2009-ord,saol6-faksimil&tab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|VERB))&compile=entry_word&searchtab=extended&sort=entry_word|asc&tablePageRowStart=0&tablePageSize=100&statisticsPageStart=1&statisticsPageSize=100
 
+const ex4 = encodeURI('/karplabb/?resources=isof-nyord&q=endswith|entry_word|"+ekonomi"')
+
 /*
 onMounted(async () => {
   lexicalStorage.setIsStart(false)
@@ -63,6 +65,9 @@ onMounted(async () => {
             </li>
             <li>
               <a :href="ex3">{{ $t('about.examples.ex3') }}</a>
+            </li>
+            <li>
+              <a :href="ex4">{{ $t('about.examples.ex4') }}</a>
             </li>
           </ul>
         </div>

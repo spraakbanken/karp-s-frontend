@@ -194,7 +194,9 @@ const groupData = () => {
       // loop over config, when field is found, add value to new row/array
       for (const key in fieldsFromConfig) {
         //console.log('ORDERS:', key, fieldsFromConfig[key].name, e0[fieldsFromConfig[key].name])
-        e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
+        if (fieldsFromConfig[key].name !== entryWordField) {
+          e1.push({ name: fieldsFromConfig[key].name, value: e0[fieldsFromConfig[key].name] })
+        }
       }
       // add new row/array to sorted result
       tableResultGrpSorted.value[resId].push({ entry: e1, resourceId: resId })

@@ -498,7 +498,7 @@ watch(
                       :list="'categories-list' + subExpression.name"
                       type="text"
                       :id="String(subExpression.id)"
-                      v-model="subExpression.value"
+                      v-model.trim="subExpression.value"
                       :placeholder="
                         fieldHasCategories(subExpression.name)
                           ? $t('search.input.list')

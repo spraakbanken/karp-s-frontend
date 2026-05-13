@@ -29,6 +29,45 @@ export const getLexicalConfig = async () => {
   }
 }
 
+// Escape inner quotes in a string, while preserving outer quotes if they exist
+export const escapeInnerQuotes = (str: string): string => {
+  const startsWithQuote: boolean = str.startsWith('"')
+  const endsWithQuote: boolean = str.endsWith('"')
+
+  if (startsWithQuote || endsWithQuote) {
+    // Has at least one outer quote — extract and escape inner content
+    let inner: string = str
+
+    // Remove outer quotes if they exist
+    if (startsWithQuote && endsWithQuote) {
+      inner = str.slice(1, -1)
+    } else if (startsWithQuote) {
+      inner = str.slice(1)
+    } else {
+      // endsWithQuote only
+      inner = str.slice(0, -1)
+    }
+
+    // Escape inner quotes
+    const escaped: string = inner.replace(/"/g, '\\"')
+
+    // Rebuild with outer quotes preserved
+    let result: string = ''
+    if (startsWithQuote) {
+      result += '"'
+    }
+    result += escaped
+    if (endsWithQuote) {
+      result += '"'
+    }
+
+    return result
+  } else {
+    // No outer quotes — escape all quotes
+    return str.replace(/"/g, '\\"') //.trim()
+  }
+}
+
 const createQuery = () => {
   const lexicalStorage = lexicalStore()
   let mainQuery = ''
@@ -51,12 +90,11 @@ const createQuery = () => {
               '|' +
               subItem.name +
               '|' +
-              subItem.value.replace(/"/g, '\\"') +
+              escapeInnerQuotes(subItem.value) +
               ')'
             subQuery = subQuery === '' ? q : subQuery + '||' + q
           } else {
-            const q =
-              subItem.position + '|' + subItem.name + '|' + subItem.value.replace(/"/g, '\\"')
+            const q = subItem.position + '|' + subItem.name + '|' + escapeInnerQuotes(subItem.value)
             subQuery = subQuery === '' ? q : subQuery + '||' + q
           }
           subQueryCount++
