@@ -540,6 +540,8 @@ export const lexicalStore = defineStore('dataset', {
       this.currentCommonFields = fieldIntersection
     },
     setLocale(locale: string) {
+      document.documentElement.lang = locale
+
       this.activeLocale = locale
       if (this.activeLocale == 'sv') {
         this.datasetLabels = this.currentConfig.resources
