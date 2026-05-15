@@ -90,7 +90,8 @@ onMounted(() => {
         return item.vis ? count + 1 : count
       }, 0)
     }}
-    {{ $t('table.columnVis.selected.of') }} {{ lexicalStorage.columnVis[props.resourceId].length }}
+    {{ $t('table.columnVis.selected.of') }}
+    {{ lexicalStorage.columnVis[props.resourceId].length }}
     {{ $t('table.columnVis.selected.selected') }}
   </div>
 </template>

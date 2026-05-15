@@ -549,6 +549,10 @@ const showImg = (img: string) => {
   width: 100%;
 }
 
+.fancy-table {
+  /* overflow-x: scroll; */
+}
+
 .graph-parameter {
   margin-top: 0.5rem;
   margin-left: 0.5rem;
@@ -815,8 +819,5 @@ const showImg = (img: string) => {
   vertical-align: top;
   font-size: 22px;
   text-decoration: none;
-}
-
-.fancy-table {
 }
 </style>

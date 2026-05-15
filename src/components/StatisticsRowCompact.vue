@@ -66,6 +66,16 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
     <template v-for="(value, tableCol) in item" :key="tableCol">
       <!-- is value just a number? -->
       <template v-if="isNumber(value)">
+        <!--first column -->
+        <td
+          v-if="thflag && tableCol === 0 && showCompact"
+          class="button-span material-icons"
+          @click="toggleExpanded()"
+        >
+          {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
+        </td>
+        <td v-else-if="tableCol === 0 && showCompact"></td>
+        <!-- show data as number-->
         <td
           :class="{
             'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
@@ -84,6 +94,15 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
             !(BE_STATISTICS_VALUES_ID in value))
         "
       >
+        <!--first column -->
+        <td
+          v-if="thflag && tableCol === 0 && showCompact"
+          class="button-span material-icons"
+          @click="toggleExpanded()"
+        >
+          {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
+        </td>
+        <td v-else-if="tableCol === 0 && showCompact"></td>
         <td
           class="numeric"
           :class="{
@@ -96,6 +115,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
       </template>
       <!-- other -->
       <template v-else>
+        <!--first column -->
         <td
           v-if="thflag && tableCol === 0 && showCompact"
           class="button-span material-icons"
@@ -104,6 +124,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
           {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
+        <!--show data -->
         <td ref="tdRefs">
           <div :class="{ 'mhr-div': !expanded && thflag }">
             <span
