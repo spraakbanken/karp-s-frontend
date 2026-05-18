@@ -182,9 +182,11 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
   }
-  .middle-area,
-  .right-area {
+  .footer-area-left,
+  .footer-area-middle,
+  .footer-area-right {
     align-items: center;
+    margin-bottom: 1rem;
   }
 }
 </style>

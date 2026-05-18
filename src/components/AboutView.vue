@@ -10,15 +10,15 @@ const apiUrl = import.meta.env.VITE_API_URL
 //const lexicalStorage = lexicalStore()
 
 const ex1 = encodeURI(
-  '/karplabb/?resources=saol1-faksimil,saol9-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil&resultTab=table&q=startswith|entry_word|blom',
+  '/karplabb/?resources=saol1-faksimil,saol9-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,so2009-ord&resultTab=table&q=startswith|entry_word|blom',
 )
 
 const ex2 = encodeURI(
-  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,saol6-faksimil&resultTab=statistics&q=startswith|entry_word|blom&compile=entry_word&columns=entry_word',
+  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,saol6-faksimil,so2009-ord&resultTab=statistics&q=startswith|entry_word|blom&compile=entry_word&columns=entry_word',
 )
 
 const ex3 = encodeURI(
-  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,saol6-faksimil&resultTab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|NOUN))&searchtab=extended',
+  '/karplabb/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,saol6-faksimil,so2009-ord&resultTab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|NOUN))&searchtab=extended',
 )
 
 const ex4 = encodeURI('/karplabb/?resources=isof-nyord&q=endswith|entry_word|"+ekonomi"')
@@ -51,7 +51,7 @@ onMounted(async () => {
       </div>
       <div class="col">
         <!-- Examples -->
-        <div>
+        <div class="examples">
           <h2>{{ $t('about.examples.title') }}</h2>
           <ul>
             <li>
@@ -127,5 +127,11 @@ onMounted(async () => {
 
 p {
   margin-bottom: 0.5rem;
+}
+
+.examples ul {
+  padding-left: 1rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 </style>

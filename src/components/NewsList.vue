@@ -37,7 +37,7 @@ onMounted(async () => {
 }
 
 .newstitle {
-  color: var(--sb-orange);
+  /* color: var(--sb-orange); */
 }
 
 .newsdate {
