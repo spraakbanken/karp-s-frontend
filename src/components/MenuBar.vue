@@ -82,8 +82,12 @@ const loginLogout = async () => {
     </span>
 
     <button id="theme-toggle" class="nav-button button-mode">
-      <span class="material-icons" v-if="themeCurrent === 'light'">light_mode</span>
-      <span class="material-icons" v-else>dark_mode</span>
+      <span v-if="themeCurrent === 'light'">
+        <font-awesome-icon :icon="['fas', 'sun']" />
+      </span>
+      <span v-else>
+        <font-awesome-icon :icon="['fas', 'moon']" />
+      </span>
     </button>
     <div
       class="dropdown nav-button"
@@ -91,25 +95,21 @@ const loginLogout = async () => {
       :class="{ 'dropdown-open': isDropDownLanguage }"
     >
       <div class="dropdown-toggle" @click="toggleDropdownLanguage">
-        <span class="material-icons">language</span>
-        <span class="material-icons">keyboard_arrow_down</span>
+        <span> <font-awesome-icon :icon="['fas', 'globe']" /> </span>
+        <span> <font-awesome-icon :icon="['fas', 'chevron-down']" /> </span>
         <!--<button class="nav-button">{{ $t('menu.' + locale) }}</button>-->
       </div>
       <div class="dropdown-content" v-if="isDropDownLanguage">
         <a href="#" @click.prevent="ChangeLocale('en')">
-          <span
-            :class="{ hidden: locale === 'sv', visible: locale === 'en' }"
-            class="material-icons"
-            >check</span
-          >
+          <span :class="{ hidden: locale === 'sv', visible: locale === 'en' }">
+            <font-awesome-icon :icon="['fas', 'check']" />
+          </span>
           {{ $t('menu.en') }}
         </a>
         <a href="#" @click.prevent="ChangeLocale('sv')">
-          <span
-            :class="{ hidden: locale === 'en', visible: locale === 'sv' }"
-            class="material-icons"
-            >check</span
-          >
+          <span :class="{ hidden: locale === 'en', visible: locale === 'sv' }">
+            <font-awesome-icon :icon="['fas', 'check']" />
+          </span>
           {{ $t('menu.sv') }}
         </a>
       </div>
@@ -126,7 +126,6 @@ nav {
   vertical-align: top;
   justify-content: right;
   width: 100%;
-  font-size: 15px;
   text-align: right;
   margin-top: 1rem;
 }
@@ -142,7 +141,6 @@ nav a,
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 15px;
 }
 
 nav a.router-link-exact-active,
@@ -165,10 +163,6 @@ nav a {
 
 nav a:first-of-type {
   border: 0;
-}
-
-nav button.button-mode {
-  margin-top: 2px;
 }
 
 nav .menu-item {
@@ -204,10 +198,6 @@ nav .menu-item {
   padding: 12px 16px;
   text-decoration: none;
   display: block;
-}
-
-.material-icons {
-  font-size: 16px;
 }
 
 .hidden {

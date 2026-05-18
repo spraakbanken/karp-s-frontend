@@ -404,24 +404,28 @@ export const lexicalStore = defineStore('dataset', {
 
       // so now we have all fields that are in all selected datasets, union and intersection
       // and add the "ingångsord"
-      if (keys.length > 0 && !this.currentFields.some((field) => field.name === entryWordField)) {
-        //console.log('Adding entry word field to currentFields and currentCommonFields')
-        this.currentFields.unshift({
-          name: entryWordField,
-          type: 'text',
-          collection: false,
-          label: { swe: 'ingångsord', eng: 'word' },
-          categories: [],
-          categoryLabel: {},
-        })
-        this.currentCommonFields.unshift({
-          name: entryWordField,
-          type: 'text',
-          collection: false,
-          label: { swe: 'ingångsord', eng: 'word' },
-          categories: [],
-          categoryLabel: {},
-        })
+      if (keys.length > 0) {
+        if (!this.currentFields.some((field) => field.name === entryWordField)) {
+          //console.log('Adding entry word field to currentFields and currentCommonFields')
+          this.currentFields.unshift({
+            name: entryWordField,
+            type: 'text',
+            collection: false,
+            label: { swe: 'ingångsord', eng: 'word' },
+            categories: [],
+            categoryLabel: {},
+          })
+        }
+        if (!this.currentCommonFields.some((field) => field.name === entryWordField)) {
+          this.currentCommonFields.unshift({
+            name: entryWordField,
+            type: 'text',
+            collection: false,
+            label: { swe: 'ingångsord', eng: 'word' },
+            categories: [],
+            categoryLabel: {},
+          })
+        }
       }
       if (this.currentFields.length > 0) {
         // if we have fields in selectedFields (from beforehand)

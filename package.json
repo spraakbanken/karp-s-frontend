@@ -1,6 +1,6 @@
 {
   "name": "karp-s-frontend",
-  "version": "0.20.11",
+  "version": "0.20.13",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,6 +16,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/vue-fontawesome": "^3.2.0",
     "@phosphor-icons/vue": "^2.2.1",
     "@vueuse/core": "^13.6.0",
     "axios": "^1.7.9",
@@ -23,7 +26,6 @@
     "es-toolkit": "^1.39.10",
     "js-yaml": "^4.1.0",
     "jwt-decode": "^4.0.0",
-    "material-design-icons-iconfont": "^6.7.0",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "vue-i18n": "^10.0.5",

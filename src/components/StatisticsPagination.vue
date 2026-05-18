@@ -67,16 +67,16 @@ const itemsPerPage = () => {
 
     <span class="subsection">
       <button @click="firstPage" :disabled="currentPageStart === 1">
-        <span class="material-icons">first_page</span>
+        <font-awesome-icon :icon="['fas', 'backward-step']" />
       </button>
       <button @click="prevPage" :disabled="currentPageStart === 1">
-        <span class="material-icons">chevron_left</span>
+        <font-awesome-icon :icon="['fas', 'backward']" />
       </button>
       <button @click="nextPage" :disabled="currentPageStart === totalPages">
-        <span class="material-icons">chevron_right</span>
+        <font-awesome-icon :icon="['fas', 'forward']" />
       </button>
       <button @click="lastPage" :disabled="currentPageStart === totalPages">
-        <span class="material-icons">last_page</span>
+        <font-awesome-icon :icon="['fas', 'forward-step']" />
       </button>
     </span>
 
@@ -97,5 +97,10 @@ const itemsPerPage = () => {
 }
 .subsection {
   margin-right: 0.5rem;
+}
+
+.subsection button {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 </style>

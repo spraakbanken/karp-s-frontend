@@ -399,7 +399,6 @@ const showImg = (img: string) => {
               <!-- show dataset name -->
               <tr>
                 <td colspan="100%" class="dataset-label">
-                  <!--<span class="material-icons icon-placement">square</span>-->
                   {{ lexicalStorage.datasetLabels[ds] }}
                   <button class="button" @click="clickResourceInfo(ds)">Info</button>
                   <span class="hits">
@@ -457,7 +456,7 @@ const showImg = (img: string) => {
                           </template>
                         </span>
                         <template v-if="currentCommonFields.find((obj) => obj.name === value.name)">
-                          <span class="header-sortable material-icons">
+                          <span class="header-sortable">
                             <span
                               @click="doSort(value.name, SORT_ORDER_ASCENDING)"
                               :class="{
@@ -466,7 +465,7 @@ const showImg = (img: string) => {
                                   lexicalStorage.tableSortField == value.name,
                               }"
                             >
-                              {{ 'keyboard_arrow_down' }}
+                              <font-awesome-icon :icon="['fas', 'chevron-down']" />
                             </span>
                             <span
                               @click="doSort(value.name, SORT_ORDER_DESCENDING)"
@@ -476,7 +475,7 @@ const showImg = (img: string) => {
                                   lexicalStorage.tableSortField == value.name,
                               }"
                             >
-                              {{ 'keyboard_arrow_up' }}
+                              <font-awesome-icon :icon="['fas', 'chevron-up']" />
                             </span>
                           </span>
                         </template>
@@ -506,17 +505,17 @@ const showImg = (img: string) => {
                               ?.vis
                           "
                         >
-                          <span>
+                          <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
                             <!--<span style="white-space: nowrap">-->
                             <span v-html="formatCell(value2.value)"></span>
                             <span v-if="isImage(value2.value)">
-                              &nbsp;<a
+                              <a
                                 :href="'/karplabb/img?img=' + value2.value"
-                                class="material-icons action-link"
+                                class="action-link"
                                 target="_blank"
                                 :title="t('table.imgbrowse')"
                               >
-                                open_in_browser
+                                <font-awesome-icon :icon="['fas', 'images']" />
                               </a>
                             </span>
                           </span>

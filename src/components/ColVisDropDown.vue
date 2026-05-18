@@ -57,7 +57,6 @@ onMounted(() => {
 <template>
   <div class="dropdown" ref="dropdownRef">
     <button class="dropdown-button" @click="toggleDropdown">
-      <!--      <span class="material-icons icon-placement">view_column</span>-->
       {{ $t('table.columnVis.select.button') }}
     </button>
     <div v-if="isOpen" class="dropdown-menu">

@@ -92,9 +92,13 @@ const checkImageExists = (url: string): Promise<boolean> => {
         {{ imgBrowserURL.split('/').pop() }}
       </div>
       <div class="imgbrowser-page">
-        <button class="imgbrowser-btn material-icons" @click="prevImg">navigate_before</button>
+        <button class="imgbrowser-btn" @click="prevImg">
+          <font-awesome-icon :icon="['fas', 'chevron-left']" />
+        </button>
         &nbsp;
-        <button class="imgbrowser-btn material-icons" @click="nextImg">navigate_next</button>
+        <button class="imgbrowser-btn" @click="nextImg">
+          <font-awesome-icon :icon="['fas', 'chevron-right']" />
+        </button>
         <span class="imgbrowser-pagenumber">
           <input
             type="number"

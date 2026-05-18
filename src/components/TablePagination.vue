@@ -67,22 +67,22 @@ const itemsPerPage = () => {
     </span>
     <span class="subsection">
       <button @click="firstPage" :disabled="currentPageRowStart === 0">
-        <span class="material-icons">first_page</span>
+        <font-awesome-icon :icon="['fas', 'backward-step']" />
       </button>
       <button @click="prevPage" :disabled="currentPageRowStart === 0">
-        <span class="material-icons">chevron_left</span>
+        <font-awesome-icon :icon="['fas', 'backward']" />
       </button>
       <button
         @click="nextPage"
         :disabled="currentPageRowStart + currentPageSize >= props.tableResultTotal - 1"
       >
-        <span class="material-icons">chevron_right</span>
+        <font-awesome-icon :icon="['fas', 'forward']" />
       </button>
       <button
         @click="lastPage"
         :disabled="currentPageRowStart + currentPageSize >= props.tableResultTotal - 1"
       >
-        <span class="material-icons">last_page</span>
+        <font-awesome-icon :icon="['fas', 'forward-step']" />
       </button>
     </span>
     <span class="subsection">
@@ -108,7 +108,13 @@ const itemsPerPage = () => {
 <style scoped>
 .pagination {
 }
+
 .subsection {
   margin-right: 0.5rem;
+}
+
+.subsection button {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 </style>

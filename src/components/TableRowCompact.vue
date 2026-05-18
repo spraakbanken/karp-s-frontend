@@ -39,24 +39,27 @@ const [expanded, toggleExpanded] = useToggle()
 <template>
   <tr :class="{ 'limited-height': !expanded && isTooTall() }">
     <template v-for="(value2, key) in value1.entry" :key="key">
-      <td v-if="thflag && key === 0" class="button-span material-icons" @click="toggleExpanded()">
-        {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
+      <td v-if="thflag && key === 0" class="button-span" @click="toggleExpanded()">
+        <font-awesome-icon
+          :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
+          class="fa-icon"
+        />
       </td>
       <td v-else-if="key === 0 && showCompact"></td>
       <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
         <div :class="{ 'mhr-div': !expanded && thflag, numeric: isNumber(value2.value) }">
-          <span>
+          <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
             <!--<span style="white-space: nowrap">-->
 
-            <span v-html="formatCell(value2.value)"> </span>
+            <span v-html="formatCell(value2.value)"></span>
             <span v-if="isImage(value2.value)">
               <a
                 :href="baseUrl + 'img?img=' + value2.value"
-                class="material-icons action-link"
+                class="action-link"
                 target="_blank"
                 :title="t('table.imgbrowse')"
               >
-                open_in_browser
+                <font-awesome-icon :icon="['fas', 'images']" />
               </a>
             </span>
           </span>
@@ -100,7 +103,6 @@ p:not(:last-of-type) {
   padding: 0;
   cursor: pointer;
   vertical-align: text-bottom;
-  font-size: 30px;
   border: none;
 }
 
@@ -117,7 +119,13 @@ p:not(:last-of-type) {
 
 .action-link {
   vertical-align: top;
-  font-size: 22px;
+  font-size: 1rem;
   text-decoration: none;
+}
+
+.fa-icon {
+  font-size: 1rem;
+  vertical-align: top;
+  margin-top: 0.25rem;
 }
 </style>

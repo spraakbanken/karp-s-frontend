@@ -422,16 +422,11 @@ watch(
           <div class="datasets-list">
             <div v-for="dataset in filteredDatasets" :key="dataset" class="dropdown-item">
               <div class="datasets-list-item">
-                <span class="datasets-icon material-icons" @click="datasetInfoFill(dataset)">
-                  {{ previousDataset === dataset ? 'arrow_drop_down' : 'arrow_right' }}
+                <span class="datasets-icon" @click="datasetInfoFill(dataset)">
+                  <font-awesome-icon
+                    :icon="['fas', dataset === previousDataset ? 'chevron-down' : 'chevron-right']"
+                  />
                 </span>
-                <!--
-                <img
-                  src="@/assets/sb_symbol_info.svg"
-                  @click="datasetInfoFill(dataset)"
-                  class="datasets-icon"
-                />
--->
                 <label>
                   <input
                     type="checkbox"
@@ -449,11 +444,13 @@ watch(
                   :title="$t('datasets.icon.limitedaccess')"
                   ><span
                     v-if="lexicalStorage.grantedDatasets.includes(dataset)"
-                    class="datasets-icon-status material-icons"
+                    class="datasets-icon-status"
                   >
-                    lock_open
+                    <font-awesome-icon :icon="['fas', 'lock-open']" />
                   </span>
-                  <span v-else class="datasets-icon-status material-icons">lock</span>
+                  <span v-else class="datasets-icon-status">
+                    <font-awesome-icon :icon="['fas', 'lock']" />
+                  </span>
                 </span>
                 <span
                   v-if="
@@ -462,7 +459,9 @@ watch(
                   "
                   :title="$t('datasets.icon.protectedmetadata')"
                 >
-                  <span class="datasets-icon-status material-icons">lock_person</span>
+                  <span class="datasets-icon-status">
+                    <font-awesome-icon :icon="['fas', 'user-lock']" />
+                  </span>
                 </span>
 
                 <div v-if="dataset !== '' && previousDataset === dataset">
@@ -745,7 +744,7 @@ watch(
 
 .datasets-icon-status {
   margin-left: 0.1rem;
-  font-size: 22px;
+  font-size: 16px;
   vertical-align: text-bottom;
   cursor: pointer;
 }

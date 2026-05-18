@@ -69,10 +69,10 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         <!--first column -->
         <td
           v-if="thflag && tableCol === 0 && showCompact"
-          class="button-span material-icons"
+          class="button-span"
           @click="toggleExpanded()"
         >
-          {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
+          <font-awesome-icon :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']" />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!-- show data as number-->
@@ -97,10 +97,10 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         <!--first column -->
         <td
           v-if="thflag && tableCol === 0 && showCompact"
-          class="button-span material-icons"
+          class="button-span"
           @click="toggleExpanded()"
         >
-          {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
+          <font-awesome-icon :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']" />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <td
@@ -118,10 +118,10 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         <!--first column -->
         <td
           v-if="thflag && tableCol === 0 && showCompact"
-          class="button-span material-icons"
+          class="button-span"
           @click="toggleExpanded()"
         >
-          {{ expanded ? 'arrow_drop_down' : 'arrow_right' }}
+          <font-awesome-icon :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']" />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!--show data -->

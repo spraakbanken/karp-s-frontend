@@ -157,10 +157,6 @@ tr:hover {
   background-color: var(--color-border-hover);
 }
 
-.material-icons {
-  color: var(--color-icon);
-  font-size: 20px;
-}
 */
 .arrow-down {
   border: solid var(--color-text);

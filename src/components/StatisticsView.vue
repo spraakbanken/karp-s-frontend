@@ -1087,7 +1087,7 @@ const refClick = (tRow: number, tCol: number) => {
                     <span v-else> {{ t('statistics.total') }} </span>
                   </template>
                   <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
-                    <span class="header-sortable material-icons">
+                    <span class="header-sortable">
                       <span
                         @click="doSort(index, key.columnField, SORT_ORDER_ASCENDING)"
                         :class="{
@@ -1096,7 +1096,7 @@ const refClick = (tRow: number, tCol: number) => {
                             lexicalStorage.statisticsSortField == key.columnField,
                         }"
                       >
-                        {{ 'keyboard_arrow_down' }}
+                        <font-awesome-icon :icon="['fas', 'chevron-down']" />
                       </span>
                       <span> </span>
                       <span
@@ -1107,7 +1107,7 @@ const refClick = (tRow: number, tCol: number) => {
                             lexicalStorage.statisticsSortField == key.columnField,
                         }"
                       >
-                        {{ 'keyboard_arrow_up' }}
+                        <font-awesome-icon :icon="['fas', 'chevron-up']" />
                       </span>
                     </span>
                   </template>
@@ -1143,38 +1143,6 @@ const refClick = (tRow: number, tCol: number) => {
       </div>
       <!-- pagination -->
       <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
-      <!--
-      <div v-if="statisticsResult.length" class="pagination">
-        <button @click="firstPage" :disabled="currentPageStart === 1">
-          <span class="material-icons">first_page</span>
-        </button>
-        <button @click="prevPage" :disabled="currentPageStart === 1">
-          <span class="material-icons">chevron_left</span>
-        </button>
-        <span style="color: var(--color-text)"
-          >{{ $t('table.footer.page') }}: {{ currentPageStart }} {{ $t('table.of') }}
-          {{ totalPages }}
-        </span>
-        <button @click="nextPage" :disabled="currentPageStart === totalPages">
-          <span class="material-icons">chevron_right</span>
-        </button>
-        <button @click="lastPage" :disabled="currentPageStart === totalPages">
-          <span class="material-icons">last_page</span>
-        </button>
-        <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label
-        >:
-        <select
-          @click="itemsPerPage"
-          id="itemsPerPage"
-          v-model="currentPageSize"
-          class="items-per-page"
-        >
-          <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
-      -->
     </div>
   </div>
 
@@ -1428,9 +1396,6 @@ input[type='checkbox'][disabled] + label {
 }
 
 /* misc */
-.material-icons {
-  font-size: 20px;
-}
 
 /* snackbar */
 /* snackbar, popup message that we have created a new tab for a ref table */

@@ -190,7 +190,9 @@ onMounted(async () => {
           <!-- show dataset name -->
           <tr>
             <td colspan="100%" class="dataset-label">
-              <span class="material-icons icon-placement">square</span>
+              <span class="icon-placement">
+                <font-awesome-icon :icon="['fas', 'square']" />
+              </span>
               {{ lexicalStorage.datasetLabels[key] }}:
               {{ tableResultGrpSorted[key].length }}
             </td>
@@ -228,17 +230,19 @@ onMounted(async () => {
           <!-- show dataset entries -->
           <template v-for="(cItem, cKey) in rItem" :key="cKey">
             <tr>
-              <td v-for="(value2, key) in cItem.entry" :key="key">
+              <td
+                v-for="(value2, key) in cItem.entry"
+                :key="key"
+                :style="isImage(value2.value) ? 'white-space: nowrap' : ''"
+              >
                 <span v-html="formatCell(value2.value)"></span>
-                &nbsp;
                 <span v-if="isImage(value2.value)">
                   <a
                     :href="'/karplabb/img?img=' + value2.value"
-                    class="material-icons action-link"
                     target="_blank"
                     :title="t('table.imgbrowse')"
                   >
-                    open_in_browser
+                    <font-awesome-icon :icon="['fas', 'images']" />
                   </a>
                 </span>
               </td>
@@ -252,10 +256,10 @@ onMounted(async () => {
     <div class="pagination">
       <!--<div v-if="props.data.length" class="pagination">-->
       <button @click="firstPage" :disabled="tablePageRowStart === 0">
-        <span class="material-icons">first_page</span>
+        <span> <font-awesome-icon :icon="['fas', 'backward-fast']" /> </span>
       </button>
       <button @click="prevPage" :disabled="tablePageRowStart === 0">
-        <span class="material-icons">chevron_left</span>
+        <span> <font-awesome-icon :icon="['fas', 'backward']" /> </span>
       </button>
       <span style="color: var(--color-text)"
         >{{ $t('table.footer.page') }}: {{ Math.floor(tablePageRowStart / tablePageSize) + 1 }}
@@ -273,7 +277,7 @@ onMounted(async () => {
           tablePageRowStart + tablePageSize >= lexicalStorage.tabRefSetup[props.id].tableTotal - 1
         "
       >
-        <span class="material-icons">chevron_right</span>
+        <span> <font-awesome-icon :icon="['fas', 'forward']" /> </span>
       </button>
       <button
         @click="lastPage"
@@ -281,7 +285,7 @@ onMounted(async () => {
           tablePageRowStart + tablePageSize >= lexicalStorage.tabRefSetup[props.id].tableTotal - 1
         "
       >
-        <span class="material-icons">last_page</span>
+        <span> <font-awesome-icon :icon="['fas', 'forward-fast']" /> </span>
       </button>
       <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }}</label
       >:
