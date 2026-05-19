@@ -126,9 +126,4 @@ p:not(:last-of-type) {
   font-size: 0.8rem;
   text-decoration: none;
 }
-
-.fa-icon {
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
-}
 </style>

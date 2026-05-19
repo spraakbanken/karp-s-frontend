@@ -72,7 +72,10 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
           class="button-span"
           @click="toggleExpanded()"
         >
-          <font-awesome-icon :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']" />
+          <font-awesome-icon
+            :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
+            class="fa-icon"
+          />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!-- show data as number-->
@@ -101,7 +104,10 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
           class="button-span"
           @click="toggleExpanded()"
         >
-          <font-awesome-icon :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']" />
+          <font-awesome-icon
+            :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
+            class="fa-icon"
+          />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <td
@@ -122,7 +128,10 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
           class="button-span"
           @click="toggleExpanded()"
         >
-          <font-awesome-icon :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']" />
+          <font-awesome-icon
+            :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
+            class="fa-icon"
+          />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!--show data -->
@@ -162,7 +171,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
   padding: 0;
   cursor: pointer;
   vertical-align: text-bottom;
-  font-size: 30px;
+  /*font-size: 30px;*/
   border: none;
 }
 

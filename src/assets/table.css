@@ -110,3 +110,10 @@ tr:hover {
 .pagination-controls label {
   margin-right: 0.5rem;
 }
+
+/* Font Awesome */
+.fa-icon {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  vertical-align: top;
+}
