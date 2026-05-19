@@ -35,7 +35,8 @@ const clickResourceInfo = (url: string) => {
 }
 
 .latest-row button {
-  margin-right: 0.5rem;
+  margin-right: 0.2rem;
+  margin-bottom: 0.5rem;
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   border-radius: 4px;

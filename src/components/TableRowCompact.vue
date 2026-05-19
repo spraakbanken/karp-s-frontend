@@ -46,7 +46,11 @@ const [expanded, toggleExpanded] = useToggle()
         />
       </td>
       <td v-else-if="key === 0 && showCompact"></td>
-      <td ref="tdRefs" v-if="props.fa.find((f) => f.columnField === value2.name)?.vis">
+      <td
+        ref="tdRefs"
+        v-if="props.fa.find((f) => f.columnField === value2.name)?.vis"
+        class="table-data"
+      >
         <div :class="{ 'mhr-div': !expanded && thflag, numeric: isNumber(value2.value) }">
           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
             <!--<span style="white-space: nowrap">-->
@@ -85,12 +89,12 @@ p:not(:last-of-type) {
 
 <style scoped>
 .limited-height {
-  max-height: 29px;
+  max-height: 26px;
   overflow: hidden;
 }
 
 .mhr-div {
-  max-height: 29px;
+  max-height: 26px;
   overflow: hidden;
 }
 
@@ -119,13 +123,12 @@ p:not(:last-of-type) {
 
 .action-link {
   vertical-align: top;
-  font-size: 1rem;
+  font-size: 0.8rem;
   text-decoration: none;
 }
 
 .fa-icon {
-  font-size: 1rem;
-  vertical-align: top;
+  font-size: 0.9rem;
   margin-top: 0.25rem;
 }
 </style>

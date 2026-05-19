@@ -51,6 +51,10 @@ tr:hover {
   background-color: var(--color-border-hover);
 }
 
+.table-data {
+  font-family: sans-serif;
+  font-size: 0.9rem;
+}
 /* pagination */
 
 .pagination {

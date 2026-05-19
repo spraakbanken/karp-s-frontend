@@ -504,6 +504,7 @@ const showImg = (img: string) => {
                             lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)
                               ?.vis
                           "
+                          class="table-data"
                         >
                           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
                             <!--<span style="white-space: nowrap">-->
@@ -811,12 +812,12 @@ const showImg = (img: string) => {
 .icon-placement {
   color: var(--sb-orange);
   vertical-align: top;
-  font-size: 22px;
+  font-size: 0.8rem;
 }
 
 .action-link {
   vertical-align: top;
-  font-size: 22px;
+  font-size: 0.8rem;
   text-decoration: none;
 }
 </style>

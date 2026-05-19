@@ -81,6 +81,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
             'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
             'total-null': value.count === 0,
           }"
+          class="table-data"
         >
           {{ value }}
         </td>
@@ -104,7 +105,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <td
-          class="numeric"
+          class="numeric table-data"
           :class="{
             'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
             'total-null': value.count === 0,
@@ -125,7 +126,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!--show data -->
-        <td ref="tdRefs">
+        <td ref="tdRefs" class="table-data">
           <div :class="{ 'mhr-div': !expanded && thflag }">
             <span
               v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"

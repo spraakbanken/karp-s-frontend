@@ -1122,7 +1122,7 @@ const refClick = (tRow: number, tCol: number) => {
               <td v-if="showCompact"></td>
               <template v-for="(item, index) in statisticsTotals" :key="index">
                 <td v-if="index == 0" class="total">&Sigma;</td>
-                <td v-else class="total numeric">
+                <td v-else class="total numeric table-data">
                   <span v-html="formatCell(item, '', true)"></span>
                 </td>
               </template>
@@ -1305,6 +1305,11 @@ svg g text {
 .header-total {
   background-color: var(--sb-grey-light);
   color: black;
+  text-align: right;
+}
+
+/* Totals */
+.total {
   text-align: right;
 }
 
