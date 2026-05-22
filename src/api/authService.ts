@@ -52,13 +52,20 @@ interface JwtPayload {
   levels: Levels
 }
 
+const setNotAuthenticated = (): void => {
+  const lexicalStorage = lexicalStore()
+
+  isAuthenticated.value = false
+  user.value = null
+  localStorage.removeItem('jwt')
+  lexicalStorage.grantedDatasets = []
+}
 /**
  * Sets the JWT token in localStorage and configures Axios with the token.
  * @param jwt - The JWT token to be stored and used for authentication.
  */
 const setJwtToken = (jwt: string): void => {
   console.log('setJwtToken() - start ')
-
   const lexicalStorage = lexicalStore()
 
   localStorage.setItem('jwt', jwt)
@@ -123,7 +130,9 @@ const checkJwtToken = (): void => {
  * @returns A promise that resolves to `true` if authenticated, `false` otherwise.
  */
 const testForLogin = async () => {
-  console.log('testForLogin() - start ')
+  console.log('testForLogin() - start.')
+  const lexicalStorage = lexicalStore()
+
   try {
     // https://sp.spraakbanken.gu.se/auth/jwt
 
@@ -134,23 +143,30 @@ const testForLogin = async () => {
     })
 
     if (response.data) {
+      console.log('testForLogin() - response.data.')
+
       setJwtToken(response.data)
       isAuthenticated.value = true
     } else {
+      console.log('testForLogin() - no response data')
+
       delete axios.defaults.headers.common['Authorization']
-      isAuthenticated.value = false
+      setNotAuthenticated()
     }
     console.log('testForLogin() - end', isAuthenticated.value)
 
     return isAuthenticated.value
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 403) {
-      isAuthenticated.value = false
-      console.log('testForLogin() - end ERROR', isAuthenticated.value)
+      setNotAuthenticated()
+
+      console.log('testForLogin() - end ERROR.')
 
       return false
     } else {
-      // console.error('Login error:', error)
+      console.error('testForLogin() - Login error.')
+      setNotAuthenticated()
+
       // throw error
     }
   }

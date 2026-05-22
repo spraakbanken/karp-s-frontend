@@ -171,7 +171,9 @@ const selectTags = (tag: string) => {
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
     if (hasSelectedTags(c.resourceId)) {
+      console.log('hasTags: ', tag, c.resourceId)
       if (c?.limitedAccess) {
+        console.log('hasTags limited access: ', tag, c.resourceId, lexicalStorage.grantedDatasets)
         if (lexicalStorage.grantedDatasets.includes(c.resourceId)) {
           selDS.push(c.resourceId)
         }
@@ -429,6 +431,10 @@ watch(
                 </span>
                 <label>
                   <input
+                    :disabled="
+                      lexicalStorage.getLimitedAccess(dataset) &&
+                      !lexicalStorage.grantedDatasets.includes(dataset)
+                    "
                     type="checkbox"
                     :value="dataset"
                     v-model="selectedDatasets"

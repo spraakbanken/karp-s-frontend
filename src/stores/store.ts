@@ -237,6 +237,8 @@ export const lexicalStore = defineStore('dataset', {
           if (c.hasOwnProperty('limitedAccess')) {
             if (!c.limitedAccess) {
               startDatasets.push(c.resourceId)
+            } else if (this.grantedDatasets.includes(c.resourceId)) {
+              startDatasets.push(c.resourceId)
             }
           } else {
             startDatasets.push(c.resourceId)
@@ -686,6 +688,14 @@ export const lexicalStore = defineStore('dataset', {
     },
     delTabRef(id: number) {
       delete this.tabRefSetup[id]
+    },
+    getLimitedAccess(resourceId: string): boolean {
+      const res = this.currentConfig.resources.find((item) => item.resourceId === resourceId)
+      if (res !== undefined) {
+        return res.limitedAccess ? true : false
+      } else {
+        return false
+      }
     },
   },
 })

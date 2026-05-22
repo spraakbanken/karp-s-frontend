@@ -1,5 +1,8 @@
 import type { ByLang } from '@/types/util.types'
 import { useI18n } from 'vue-i18n'
+
+import { i18n } from '@/i18n'
+
 import { clone } from 'es-toolkit'
 import {
   BE_STATISTICS_VALUES_ID,
@@ -59,6 +62,7 @@ export const camelify = (p: string): string => {
 }
 
 function getFilenameFromUrl(url: string): string | null {
+  /*
   try {
     const parsedUrl = new URL(url)
     const pathSegments = parsedUrl.pathname.split('/')
@@ -67,6 +71,8 @@ function getFilenameFromUrl(url: string): string | null {
     console.error('Invalid URL:', error)
     return null // Handle invalid URLs
   }
+  */
+  return i18n.global.t('table.link')
 }
 
 export const formatCell = (
@@ -118,6 +124,7 @@ export const formatCell = (
       }
     } else if (typeof x === 'string' && x.startsWith('https://')) {
       cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '</a>'
+      //console.log('formatCell: url detected: ', x, cell)
     } else {
       cell = String(x)
     }
