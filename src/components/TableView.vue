@@ -506,16 +506,6 @@ const showImg = (img: string) => {
                           "
                           class="table-data"
                         >
-                          {{
-                            console.log(
-                              'key:',
-                              key,
-                              'VALUE2:',
-                              value2.name,
-                              value2.value,
-                              isImage(value2.value),
-                            )
-                          }}
                           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
                             <!--<span style="white-space: nowrap">-->
                             <span v-html="formatCell(value2.value)"></span>

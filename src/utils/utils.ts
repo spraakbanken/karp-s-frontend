@@ -8,6 +8,8 @@ import {
   BE_STATISTICS_VALUES_ID,
   BE_STATISTICS_VALUE_ID,
   BE_STATISTICS_COUNT_ID,
+  DEFAULT_RESULT_TRUE,
+  DEFAULT_RESULT_FALSE,
 } from '@/utils/constants.ts'
 
 // Return propeer text according to locale
@@ -75,6 +77,15 @@ function getFilenameFromUrl(url: string): string | null {
   return i18n.global.t('table.link')
 }
 
+const detectConstant = (x: string): string => {
+  if (x === DEFAULT_RESULT_TRUE) {
+    x = i18n.global.t('result.true')
+  } else if (x === DEFAULT_RESULT_FALSE) {
+    x = i18n.global.t('result.false')
+  }
+  return String(x)
+}
+
 export const formatCell = (
   x: number | string | string[] | object,
   divider: string = '<br>',
@@ -88,7 +99,7 @@ export const formatCell = (
     if (Array.isArray(x)) {
       if (x.length > 0) {
         x.every((item) => {
-          cell = cell + (cell ? divider : '') + item
+          cell = cell + (cell ? divider : '') + detectConstant(item)
           return true
         })
       }
@@ -126,12 +137,11 @@ export const formatCell = (
       cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '</a>'
       //console.log('formatCell: url detected: ', x, cell)
     } else {
-      cell = String(x)
+      cell = detectConstant(String(x))
     }
   } else {
     cell = '-'
   }
-  // console.log('formatCell result: ', cell)
   return cell
 }
 

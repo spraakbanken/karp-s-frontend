@@ -45,6 +45,8 @@ export const DEFAULT_STATISTICS_PAGE_START: number = 1
 export const DEFAULT_STATISTICS_PAGE_SIZE: number = ROWS_PER_PAGE
 export const DEFAULT_STATISTICS_COMPILE: string[] = [entryWordField]
 export const DEFAULT_STATISTICS_COLUMNS: string[] = []
+export const DEFAULT_RESULT_TRUE: string = 'true'
+export const DEFAULT_RESULT_FALSE: string = 'false'
 
 // error messages
 

@@ -155,5 +155,7 @@
   "error.code.4": "API-nyckel felaktig eller utgången.",
   "message.loading": "Hämtar data...",
   "message.nodatasetselected": "Ingen datamängd vald",
-  "url.dataset.unknown": "Okänd datamängd i URL. Väljer standard datamängder."
+  "url.dataset.unknown": "Okänd datamängd i URL. Väljer standard datamängder.",
+  "result.true": "ja",
+  "result.false": "nej"
 }

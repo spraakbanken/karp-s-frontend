@@ -155,5 +155,7 @@
   "error.code.4": "API key malformed or expired.",
   "message.loading": "Loading...",
   "message.nodatasetselected": "No dataset selected",
-  "url.dataset.unknown": "Unknown dataset in URL. Selecting default datasets."
+  "url.dataset.unknown": "Unknown dataset in URL. Selecting default datasets.",
+  "result.true": "yes",
+  "result.false": "no"
 }
