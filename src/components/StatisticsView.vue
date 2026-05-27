@@ -1121,7 +1121,9 @@ const refClick = (tRow: number, tCol: number) => {
               <!-- empty cell for expand_more/less -->
               <td v-if="showCompact"></td>
               <template v-for="(item, index) in statisticsTotals" :key="index">
-                <td v-if="index == 0" class="total">&Sigma;</td>
+                <td v-if="index < lexicalStorage.selectedCompileFields.length" class="total-sum">
+                  &Sigma;
+                </td>
                 <td v-else class="total numeric table-data">
                   <span v-html="formatCell(item, '', true)"></span>
                 </td>
@@ -1311,6 +1313,10 @@ svg g text {
 /* Totals */
 .total {
   text-align: right;
+}
+
+.total-sum {
+  text-align: left;
 }
 
 /* info/settings */

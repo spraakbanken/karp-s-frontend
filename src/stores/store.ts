@@ -349,22 +349,29 @@ export const lexicalStore = defineStore('dataset', {
           let subQuery = ''
           let subQueryCount = 0
           for (const subItem of mainItem.selectedFieldsSub) {
-            if (subItem.isNot) {
-              const q =
-                'not(' +
-                subItem.position +
-                '|' +
-                subItem.name +
-                '|' +
-                escapeInnerQuotes(subItem.value) +
-                ')'
-              subQuery = subQuery === '' ? q : subQuery + '||' + q
+            // ignore empty string
+            if (subItem.value !== '') {
+              if (subItem.isNot) {
+                const q =
+                  'not(' +
+                  subItem.position +
+                  '|' +
+                  subItem.name +
+                  '|' +
+                  escapeInnerQuotes(subItem.value) +
+                  ')'
+                subQuery = subQuery === '' ? q : subQuery + '||' + q
+              } else {
+                let q = ''
+                if (subItem.value) {
+                  q = subItem.position + '|' + subItem.name + '|' + escapeInnerQuotes(subItem.value)
+                }
+                subQuery = subQuery === '' ? q : subQuery + '||' + q
+              }
+              subQueryCount++
             } else {
-              const q =
-                subItem.position + '|' + subItem.name + '|' + escapeInnerQuotes(subItem.value)
-              subQuery = subQuery === '' ? q : subQuery + '||' + q
+              subQuery = ''
             }
-            subQueryCount++
           }
           if (subQueryCount > 1) {
             subQuery = 'or(' + subQuery + ')'

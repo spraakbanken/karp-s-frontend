@@ -31,42 +31,53 @@ export const getLexicalConfig = async () => {
 
 // Escape inner quotes in a string, while preserving outer quotes if they exist
 export const escapeInnerQuotes = (str: string): string => {
-  const startsWithQuote: boolean = str.startsWith('"')
-  const endsWithQuote: boolean = str.endsWith('"')
+  if (str) {
+    const startsWithQuote: boolean = str.startsWith('"')
+    const endsWithQuote: boolean = str.endsWith('"')
 
-  if (startsWithQuote || endsWithQuote) {
-    // Has at least one outer quote — extract and escape inner content
-    let inner: string = str
+    if (startsWithQuote || endsWithQuote) {
+      // Has at least one outer quote — extract and escape inner content
+      let inner: string = str
 
-    // Remove outer quotes if they exist
-    if (startsWithQuote && endsWithQuote) {
-      inner = str.slice(1, -1)
-    } else if (startsWithQuote) {
-      inner = str.slice(1)
+      // Remove outer quotes if they exist
+      if (startsWithQuote && endsWithQuote) {
+        inner = str.slice(1, -1)
+      } else if (startsWithQuote) {
+        inner = str.slice(1)
+      } else {
+        // endsWithQuote only
+        inner = str.slice(0, -1)
+      }
+
+      // Escape inner quotes
+      const escaped: string = inner.replace(/"/g, '\\"')
+
+      // Rebuild with outer quotes preserved
+      let result: string = ''
+      if (startsWithQuote) {
+        result += '"'
+      }
+      result += escaped
+      if (endsWithQuote) {
+        result += '"'
+      }
+
+      return result
     } else {
-      // endsWithQuote only
-      inner = str.slice(0, -1)
+      // No outer quotes — escape all quotes
+      return str.replace(/"/g, '\\"') //.trim()
     }
-
-    // Escape inner quotes
-    const escaped: string = inner.replace(/"/g, '\\"')
-
-    // Rebuild with outer quotes preserved
-    let result: string = ''
-    if (startsWithQuote) {
-      result += '"'
-    }
-    result += escaped
-    if (endsWithQuote) {
-      result += '"'
-    }
-
-    return result
   } else {
-    // No outer quotes — escape all quotes
-    return str.replace(/"/g, '\\"') //.trim()
+    // possibly the string could be nonexistant if the user is not searching for anything
+    //return '\"\"'
+    return ''
   }
 }
+
+/*
+
+replaced with lexicalStorage.getQuery() in getTableData and getStatisticsData,
+but keeping this function for now if we want to revert back to the old query builder
 
 const createQuery = () => {
   const lexicalStorage = lexicalStore()
@@ -94,7 +105,10 @@ const createQuery = () => {
               ')'
             subQuery = subQuery === '' ? q : subQuery + '||' + q
           } else {
-            const q = subItem.position + '|' + subItem.name + '|' + escapeInnerQuotes(subItem.value)
+            let q = ''
+            if (subItem.value) {
+              q = subItem.position + '|' + subItem.name + '|' + escapeInnerQuotes(subItem.value)
+            }
             subQuery = subQuery === '' ? q : subQuery + '||' + q
           }
           subQueryCount++
@@ -115,10 +129,9 @@ const createQuery = () => {
     mainQuery = lexicalStorage.searchQuery
   }
 
-  //console.log('CreateQuery:', mainQuery)
-
   return mainQuery
 }
+*/
 
 export const getTableData = async (pageStart: number, pageSize: number) => {
   const lexicalStorage = lexicalStore()
@@ -133,7 +146,7 @@ export const getTableData = async (pageStart: number, pageSize: number) => {
     params['resources'] = resources
 
     // query/field parameters
-    params['q'] = createQuery()
+    params['q'] = lexicalStorage.getQuery() // createQuery()
     params['sort'] = lexicalStorage.tableSortField + '|' + lexicalStorage.tableSortOrder
     params['size'] = pageSize.toString()
     params['from'] = pageStart.toString()
@@ -184,7 +197,7 @@ export const getStatisticsData = async (
     params['resources'] = resources
 
     // query/field parameters
-    params['q'] = createQuery()
+    params['q'] = lexicalStorage.getQuery() // createQuery()
 
     // compile on
     if (compileParams.length > 0) {
