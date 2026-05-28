@@ -70,6 +70,8 @@ const sortField = ref(lexicalStorage.tableSortField)
 // always show expanded rows (no "View more" button)
 const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
 
+const tableContainerRef = ref<HTMLElement | null>(null)
+
 // pages
 
 const currentPageRowStart = computed({
@@ -392,7 +394,7 @@ const showImg = (img: string) => {
       <TablePagination :tableResultTotal="tableResult.total"></TablePagination>
 
       <!-- tables -->
-      <div class="table-container">
+      <div class="table-container" ref="tableContainerRef">
         <template v-for="(item, ds, index) in tableResultGrpSorted" :key="index">
           <table v-if="tableResult.total > 0" class="fancy-table">
             <tbody>
@@ -409,7 +411,7 @@ const showImg = (img: string) => {
                         : $t('table.total.hit')
                     }}
                   </span>
-                  <ColVisDropDown :resourceId="ds" />
+                  <ColVisDropDown :resourceId="ds" :table-container="tableContainerRef" />
                   <span v-for="(value, i) in item[0].entry" :key="i"> </span>
                 </td>
               </tr>
@@ -458,24 +460,27 @@ const showImg = (img: string) => {
                         <template v-if="currentCommonFields.find((obj) => obj.name === value.name)">
                           <span class="header-sortable">
                             <span
-                              @click="doSort(value.name, SORT_ORDER_ASCENDING)"
+                              @click="
+                                doSort(
+                                  value.name,
+                                  lexicalStorage.tableSortOrder === SORT_ORDER_ASCENDING
+                                    ? SORT_ORDER_DESCENDING
+                                    : SORT_ORDER_ASCENDING,
+                                )
+                              "
                               :class="{
                                 'header-sortable-selected':
-                                  lexicalStorage.tableSortOrder == SORT_ORDER_ASCENDING &&
                                   lexicalStorage.tableSortField == value.name,
                               }"
                             >
-                              <font-awesome-icon :icon="['fas', 'chevron-down']" />
-                            </span>
-                            <span
-                              @click="doSort(value.name, SORT_ORDER_DESCENDING)"
-                              :class="{
-                                'header-sortable-selected':
-                                  lexicalStorage.tableSortOrder == SORT_ORDER_DESCENDING &&
-                                  lexicalStorage.tableSortField == value.name,
-                              }"
-                            >
-                              <font-awesome-icon :icon="['fas', 'chevron-up']" />
+                              <font-awesome-icon
+                                :icon="[
+                                  'fas',
+                                  lexicalStorage.tableSortOrder == SORT_ORDER_DESCENDING
+                                    ? 'chevron-up'
+                                    : 'chevron-down',
+                                ]"
+                              />
                             </span>
                           </span>
                         </template>
@@ -547,6 +552,10 @@ const showImg = (img: string) => {
   margin-bottom: 0rem;
   overflow-x: scroll;
   width: 100%;
+}
+
+.table-container-dropdown-open {
+  overflow: visible;
 }
 
 .fancy-table {
@@ -767,6 +776,7 @@ const showImg = (img: string) => {
   cursor: pointer;
   margin-left: 0.5rem;
   color: var(--sb-grey-medium);
+  padding-top: 0.25rem;
 }
 
 .header-sortable-selected {

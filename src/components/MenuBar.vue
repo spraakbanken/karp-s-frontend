@@ -83,10 +83,10 @@ const loginLogout = async () => {
 
     <button id="theme-toggle" class="nav-button button-mode">
       <span v-if="themeCurrent === 'light'">
-        <font-awesome-icon :icon="['fas', 'sun']" />
+        <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
       </span>
       <span v-else>
-        <font-awesome-icon :icon="['fas', 'moon']" />
+        <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
       </span>
     </button>
     <div

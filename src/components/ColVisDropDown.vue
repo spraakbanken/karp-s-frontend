@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
+
+const tableContainerDropdownOpenClass = 'table-container-dropdown-open'
 
 const props = defineProps<{
   resourceId: string
+  tableContainer: HTMLElement | null
 }>()
 
 const lexicalStorage = lexicalStore()
 
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
+
+const updateTableContainerOverflow = (
+  container: HTMLElement | null,
+  isDropdownOpen: boolean,
+) => {
+  if (!container) {
+    return
+  }
+
+  container.classList.toggle(tableContainerDropdownOpenClass, isDropdownOpen)
+}
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value
@@ -49,13 +63,34 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
+const handleFocusOut = (event: FocusEvent) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.relatedTarget as Node | null)) {
+    isOpen.value = false
+  }
+}
+
 onMounted(() => {
   document.addEventListener('mousedown', handleClickOutside)
 })
+
+onUnmounted(() => {
+  document.removeEventListener('mousedown', handleClickOutside)
+  updateTableContainerOverflow(props.tableContainer, false)
+})
+
+watch(
+  [isOpen, () => props.tableContainer],
+  ([isDropdownOpen, tableContainer], [_wasDropdownOpen, previousTableContainer]) => {
+    if (previousTableContainer && previousTableContainer !== tableContainer) {
+      updateTableContainerOverflow(previousTableContainer, false)
+    }
+    updateTableContainerOverflow(tableContainer, isDropdownOpen)
+  },
+)
 </script>
 
 <template>
-  <div class="dropdown" ref="dropdownRef">
+  <div class="dropdown" ref="dropdownRef" @focusout="handleFocusOut">
     <button class="dropdown-button" @click="toggleDropdown">
       {{ $t('table.columnVis.select.button') }}
     </button>

@@ -41,10 +41,10 @@ export const secondsToDate = (seconds: string): string => {
   return date.toISOString().substring(0, 10)
 }
 
-export const formatNumber = (num: number, precision: number = 2): string => {
+export const formatNumber = (num: number): string => {
   const map = [
     { suffix: 'T', threshold: 1e12 },
-    { suffix: 'B', threshold: 1e9 },
+    { suffix: 'G', threshold: 1e9 },
     { suffix: 'M', threshold: 1e6 },
     { suffix: 'K', threshold: 1e3 },
     { suffix: '', threshold: 1 },
@@ -52,7 +52,7 @@ export const formatNumber = (num: number, precision: number = 2): string => {
 
   const found = map.find((x) => Math.abs(num) >= x.threshold)
   if (found) {
-    const formatted = (num / found.threshold).toFixed(precision) + found.suffix
+    const formatted = (num / found.threshold).toFixed(found.suffix === 'K' ? 1 : 0) + found.suffix
     return formatted
   }
 

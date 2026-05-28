@@ -1089,25 +1089,28 @@ const refClick = (tRow: number, tCol: number) => {
                   <template v-if="currentCommonFields.find((obj) => obj.name === key.columnField)">
                     <span class="header-sortable">
                       <span
-                        @click="doSort(index, key.columnField, SORT_ORDER_ASCENDING)"
+                        @click="
+                          doSort(
+                            index,
+                            key.columnField,
+                            lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING
+                              ? SORT_ORDER_DESCENDING
+                              : SORT_ORDER_ASCENDING,
+                          )
+                        "
                         :class="{
                           'header-sortable-selected':
-                            lexicalStorage.statisticsSortOrder == SORT_ORDER_ASCENDING &&
                             lexicalStorage.statisticsSortField == key.columnField,
                         }"
                       >
-                        <font-awesome-icon :icon="['fas', 'chevron-down']" />
-                      </span>
-                      <span> </span>
-                      <span
-                        @click="doSort(index, key.columnField, SORT_ORDER_DESCENDING)"
-                        :class="{
-                          'header-sortable-selected':
-                            lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING &&
-                            lexicalStorage.statisticsSortField == key.columnField,
-                        }"
-                      >
-                        <font-awesome-icon :icon="['fas', 'chevron-up']" />
+                        <font-awesome-icon
+                          :icon="[
+                            'fas',
+                            lexicalStorage.statisticsSortOrder == SORT_ORDER_DESCENDING
+                              ? 'chevron-up'
+                              : 'chevron-down',
+                          ]"
+                        />
                       </span>
                     </span>
                   </template>
@@ -1270,6 +1273,7 @@ svg g text {
   cursor: pointer;
   margin-left: 0.5rem;
   color: var(--sb-grey-medium);
+  padding-top: 0.25rem;
 }
 
 .header-sortable-selected {

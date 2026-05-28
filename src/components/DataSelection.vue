@@ -18,29 +18,6 @@ const selectedDatasets = computed({
   set: (value) => lexicalStorage.setSelectedDataset(value),
 })
 
-/*
-const selectedTags = computed({
-  get: () => lexicalStorage.selectedTags,
-  set: (value) => lexicalStorage.setSelectedTag(value),
-})
-  */
-/*
-const selectedFields = computed({
-  get: () => lexicalStorage.selectedFields,
-  set: (value) => lexicalStorage.setSelectedFields(value),
-})
-*/
-/*
-const selectedCompileParams = computed({
-  get: () => lexicalStorage.selectedCompileFields,
-  set: (value) => lexicalStorage.setSelectedCompileFields(value),
-})
-const selectedColumns = computed({
-  get: () => lexicalStorage.selectedColumns,
-  set: (value) => lexicalStorage.setSelectedColumns(value),
-})
-*/
-
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
 const filteredDatasets = ref<string[]>([])
@@ -325,9 +302,9 @@ watch(
             ? $t('dataselector.dataset.selected')
             : $t('dataselector.datasets.selected')
         }}
-        <br />({{ formatNumber(lexicalStorage.selectedDatasetsSize, 2) }}
+        <br />({{ formatNumber(lexicalStorage.selectedDatasetsSize) }}
         {{ $t('dataselector.entries.of') }}
-        {{ formatNumber(lexicalStorage.currentDatasetsSize, 2) }} {{ $t('dataselector.entries') }})
+        {{ formatNumber(lexicalStorage.currentDatasetsSize) }} {{ $t('dataselector.entries') }})
         <i class="arrow-down"></i>
       </div>
 
@@ -344,7 +321,7 @@ watch(
                 class="tags-button-action datasets-tooltip"
               >
                 {{ th(lexicalStorage.currentConfig.tags[tag].label) }}&nbsp; ({{
-                  formatNumber(lexicalStorage.tagEntriesCount[tag], 2)
+                  formatNumber(lexicalStorage.tagEntriesCount[tag])
                 }})
                 <span class="datasets-tooltiptext">{{
                   th(lexicalStorage.currentConfig.tags[tag].description)

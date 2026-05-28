@@ -669,7 +669,7 @@ input:focus {
   flex-wrap: wrap;
   flex-direction: column;
   background-color: var(--color-search-area);
-  width: 500px;
+  width: 480px;
 }
 
 .search-container-content {
@@ -932,11 +932,11 @@ input:focus {
 /* search-button */
 
 .search-advanced {
-  width: 450px;
+  width: 100%;
 }
 
 .search-advanced .search-input {
-  width: 100%;
+  width: 95%;
   margin-bottom: 1rem;
   margin-top: 1rem;
   margin-left: 0px;
