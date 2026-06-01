@@ -435,9 +435,9 @@ const showImg = (img: string) => {
                       :key="key"
                       :class="{
                         'header-list': lexicalStorage.isList(value.name),
+                        'header-compile': value.name == entryWordField,
                       }"
                     >
-                      <!--'header-compile': value.name == entryWordField, -->
                       <div class="header-content">
                         <span
                           :class="{
@@ -789,8 +789,7 @@ const showImg = (img: string) => {
 }
 
 .header-compile {
-  background-color: var(--sb-orange);
-  color: white;
+  background-color: var(--table-head-bg-entryword);
 }
 
 .dataset-label {
