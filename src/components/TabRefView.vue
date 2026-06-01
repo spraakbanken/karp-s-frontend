@@ -334,8 +334,7 @@ onMounted(async () => {
 }
 
 .header-compile {
-  background-color: var(--sb-orange);
-  color: white;
+  background-color: var(--table-head-bg-entryword);
 }
 
 .dataset-label {

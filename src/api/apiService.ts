@@ -297,7 +297,7 @@ export const getTabRefData = async (
     })
     return response.data
   } catch (error) {
-    console.log('Error catch:', error)
-    // TODO throw error
+    const errMsg = handleError(error)
+    throw new Error(errMsg ? errMsg : 'unknown')
   }
 }

@@ -10,7 +10,6 @@ import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
 import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
-//import type { SelectedFieldConfig } from '@/types/datasetConfig.ts'
 import * as d3 from 'd3'
 import { formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
@@ -22,9 +21,6 @@ const { t } = useI18n()
 
 const lexicalStorage = lexicalStore()
 
-//const statisticsHeaders = ref<CountHeadersColumn[]>([])
-//const statisticsResult = ref<Dataset[]>([])
-//const statisticsTotals = ref<number[]>([])
 const statisticsSortIndex = ref<number>(0)
 
 const statisticsHeaders = computed({
@@ -81,7 +77,6 @@ const toggleDropdownCompileFields = () => {
   }
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownCompileFields.value) {
-    console.log('toggleDropdownCompileFields - setIsSearch')
     lexicalStorage.setIsStatisticsSearch(true)
     isSearchChanged.value = false
   }
@@ -89,8 +84,6 @@ const toggleDropdownCompileFields = () => {
 
 const toggleDropdownColumns = () => {
   isDropdownColumns.value = !isDropdownColumns.value
-  //  isDropdownOpen.value = false
-  //  isDropdownParams.value = false
   isDropdownCompileFields.value = false
   // if closing
   if (!isDropdownColumns.value) {
@@ -100,7 +93,6 @@ const toggleDropdownColumns = () => {
   }
   // possibly trigger search if closing dropdown
   if (isSearchChanged.value && !isDropdownColumns.value) {
-    console.log('toggleDropdownColumns - setIsSearch')
     lexicalStorage.setIsStatisticsSearch(true)
     isSearchChanged.value = false
   }
@@ -108,7 +100,6 @@ const toggleDropdownColumns = () => {
 
 const handleClickOutsideS = (event: MouseEvent) => {
   if (dropdownContainerS.value && !dropdownContainerS.value.contains(event.target as Node)) {
-    //console.log('handleClickOutsideS')
     isDropdownColumns.value = false
     isDropdownCompileFields.value = false
     // make sure at least "Antal" is selected as column
@@ -117,7 +108,6 @@ const handleClickOutsideS = (event: MouseEvent) => {
     }
     // trigger search
     if (isSearchChanged.value) {
-      //console.log('handleClickOutsideS - setIsSearch')
       lexicalStorage.setIsStatisticsSearch(true)
       isSearchChanged.value = false
     }
@@ -141,9 +131,6 @@ const doSort = (index: number, field: string, order: string) => {
   statisticsSortIndex.value = index
   lexicalStorage.statisticsSortField = field
   lexicalStorage.statisticsSortOrder = order
-  // console.log('doSort()', field, order)
-  // TODO: not really necessary as we sort in FE
-  //fetchData()
   lexicalStorage.statisticsPageStart = 1
 }
 
@@ -154,7 +141,6 @@ const updateCompileParams = () => {
 
 // update state from URL
 const updateColumns = () => {
-  //updateShowHitsCheckbox.value = false
   lexicalStorage.setSelectedColumns(selectedColumns.value)
   showOverview.value = false
 }
@@ -320,21 +306,6 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(start, end)
 })
 
-/*
-const sortTable = (key: string) => {
-  console.log('sortTable, key:', key)
-  if (lexicalStorage.statisticsSortField === key) {
-    lexicalStorage.statisticsSortOrder =
-      lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING
-        ? SORT_ORDER_DESCENDING
-        : SORT_ORDER_ASCENDING
-  } else {
-    lexicalStorage.statisticsSortField = key
-    lexicalStorage.statisticsSortOrder = SORT_ORDER_ASCENDING
-  }
-}
-*/
-
 onMounted(() => {
   document.addEventListener('click', handleClickOutsideS)
 })
@@ -472,14 +443,6 @@ const graph_value_count = ref<number>(0)
 const graph_value_excluded = ref<number>(0)
 
 const drawChart = () => {
-  /*
-  console.log(
-    'drawChart() ',
-    statisticsResult.value.length,
-    statisticsResult.value,
-    lexicalStorage.statisticsResult.length,
-  )
-  */
   interface dict {
     [key: string]: string | number
   }
@@ -1294,8 +1257,7 @@ svg g text {
 */
 
 .header-compile {
-  background-color: var(--sb-orange);
-  color: white;
+  background-color: var(--table-head-bg-entryword);
 }
 
 .header-list {

@@ -148,9 +148,7 @@ const selectTags = (tag: string) => {
   const currentConfig = lexicalStorage.currentConfig
   for (const c of currentConfig.resources) {
     if (hasSelectedTags(c.resourceId)) {
-      console.log('hasTags: ', tag, c.resourceId)
       if (c?.limitedAccess) {
-        console.log('hasTags limited access: ', tag, c.resourceId, lexicalStorage.grantedDatasets)
         if (lexicalStorage.grantedDatasets.includes(c.resourceId)) {
           selDS.push(c.resourceId)
         }
@@ -263,30 +261,6 @@ watch(searchDatasets, () => {
 const selectAllFiltered = () => {
   lexicalStorage.setSelectedDataset(filteredDatasets.value)
 }
-
-// TODO doesnt trigger, change start of watch
-/*
-watch(
-  () => selectedDatasets,
-  (newDatasets, oldDatasets) => {
-    console.log('WATCH: DataSelection selectedDatasets', newDatasets)
-
-    if (oldDatasets.value.length === 0) {
-      // set "ingångsord" to default, also for statistics
-      lexicalStorage.setStartField()
-    }
-    //console.log('--DataSelection/watch 2', newDatasets, oldDatasets)
-    if (newDatasets.value.length === 0) {
-      fields.value = {}
-      //selectedFields.value = {}
-      lexicalStorage.setSelectedFieldsClear()
-      selectedColumns.value = []
-      selectedCompileParams.value = []
-      lexicalStorage.setIsSearch(true, true)
-    }
-  },
-)
-*/
 </script>
 
 <template>

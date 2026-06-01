@@ -26,12 +26,6 @@ function replacePageNumber(filename: string, newPageNumber: number) {
 const handleClick = async () => {
   if (pageNumber.value !== null) {
     // Use the numeric value here
-    console.log(
-      'Input value:',
-      pageNumber.value,
-      ', result:',
-      replacePageNumber(imgBrowserURL.value, pageNumber.value),
-    )
     const next = replacePageNumber(imgBrowserURL.value, pageNumber.value)
     if (await checkImageExists(next)) {
       imgBrowserURL.value = next

@@ -181,9 +181,6 @@ const groupData = () => {
     for (let i = 0; i < dataset_unsorted.length; i++) {
       // unsorted row
       const e0: Entry = dataset_unsorted[i].entry
-      //for (const key in e0) {
-      //  console.log('ORDERO: ', key, e0[key])
-      //}
       // fields in correct order
       const fieldsFromConfig: FieldConfig[] =
         lexicalStorage.fieldsInDatasets[dataset_unsorted[i].resourceId]
@@ -308,14 +305,6 @@ const picsbarFractionTotalClass = (ds: string) => {
     'picsbar-tooltiptext': fraction >= 0.25 && fraction <= 0.75,
   }
 }
-
-/*
-const showImg = (img: string) => {
-  console.log('SHowImg:', img, window.location.pathname)
-
-  window.location.pathname += 'img?img=' + img
-}
-*/
 </script>
 
 <template>

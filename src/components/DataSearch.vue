@@ -151,7 +151,7 @@ onBeforeUnmount(() => {
   //document.removeEventListener('click', handleClickOutside)
 })
 
-/* TODO move into lexicalStorage */
+// Set position based on positionInitial, positionMedial, positionFinal
 const fixPos = (mainIndex: number, subIndex: number) => {
   if (
     lexicalStorage.selectedFieldsMain[mainIndex].selectedFieldsSub[subIndex].positionInitial &&
@@ -184,7 +184,7 @@ const fixPos = (mainIndex: number, subIndex: number) => {
   }
 }
 
-/* TODO move into lexicalStorage */
+// Fix state of different position* checkboxes based on the other checkboxes
 const handlePos = (mainId: number, subId: number, pos: number) => {
   // lookup field with fid id
   const mainIndex = lexicalStorage.selectedFieldsMain.findIndex((f) => f.id === mainId)

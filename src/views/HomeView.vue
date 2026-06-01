@@ -73,9 +73,8 @@ onMounted(async () => {
     syncResult.value = syncStoreWithRouter(router)
     if (syncResult.value === SyncResult.SYNC_RESULT_SYNCED) {
       lexicalStorage.setIsStart(false)
-      //TODO lexicalStorage.setIsSearch(true)
     } else if (syncResult.value === SyncResult.SYNC_RESULT_DATASET_UNKNOWN) {
-      //lexicalStorage.setDefault(config)
+      // lexicalStorage.setDefault(config)
     } else {
       // have we a saved default table page size?
       const defaultTablePageSize: number = Number(localStorage.getItem('defaultTablePageSize'))
