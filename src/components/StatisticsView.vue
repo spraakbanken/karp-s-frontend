@@ -963,7 +963,10 @@ const refClick = (tRow: number, tCol: number) => {
       </p>
 
       <!-- pagination -->
-      <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
+      <StatisticsPagination
+        :statisticsResultTotal="statisticsResult.length"
+        :paginationId="'paginationTop'"
+      ></StatisticsPagination>
 
       <!-- table -->
       <div class="table-container">
@@ -983,7 +986,11 @@ const refClick = (tRow: number, tCol: number) => {
             <!-- show header row -->
             <tr>
               <!-- empty cell for expand_more/less -->
-              <th v-if="showCompact" class="header-compile"></th>
+              <th
+                v-if="showCompact"
+                class="header-compile"
+                :aria-label="$t('aria.expand.row')"
+              ></th>
               <th
                 v-for="(key, index) in statisticsHeaders"
                 :key="index"
@@ -1110,7 +1117,10 @@ const refClick = (tRow: number, tCol: number) => {
         </table>
       </div>
       <!-- pagination -->
-      <StatisticsPagination :statisticsResultTotal="statisticsResult.length"></StatisticsPagination>
+      <StatisticsPagination
+        :statisticsResultTotal="statisticsResult.length"
+        :paginationId="'paginationTop'"
+      ></StatisticsPagination>
     </div>
   </div>
 

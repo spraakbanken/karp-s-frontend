@@ -157,5 +157,12 @@
   "message.nodatasetselected": "Ingen datamängd vald",
   "url.dataset.unknown": "Okänd datamängd i URL. Väljer standard datamängder.",
   "result.true": "ja",
-  "result.false": "nej"
+  "result.false": "nej",
+  "aria.search.button": "Sök",
+  "aria.toggle.theme": "Byt tema",
+  "aria.first.page": "Första sidan",
+  "aria.previous.page": "Föregående sida",
+  "aria.next.page": "Nästa sida",
+  "aria.last.page": "Sista sidan",
+  "aria.expand.row": "Visa allt i raden"
 }

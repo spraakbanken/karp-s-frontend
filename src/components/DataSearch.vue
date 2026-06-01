@@ -506,6 +506,7 @@ watch(
                             ? $t('dataselector.parameters.placeholder')
                             : $t('dataselector.simplesearch.placeholder')
                       "
+                      :aria-label="$t('aria.search.button')"
                     />
                     <template v-if="fieldHasCategories(subExpression.name)">
                       <!-- <span class="search-input-message">{{ $t('search.input.list') }}</span>-->

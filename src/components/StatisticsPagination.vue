@@ -4,6 +4,7 @@ import { lexicalStore } from '@/stores/store'
 
 const props = defineProps<{
   statisticsResultTotal: number
+  paginationId: string
 }>()
 
 const lexicalStorage = lexicalStore()
@@ -66,23 +67,44 @@ const itemsPerPage = () => {
     </span>
 
     <span class="subsection">
-      <button @click="firstPage" :disabled="currentPageStart === 1">
+      <button
+        @click="firstPage"
+        :disabled="currentPageStart === 1"
+        :aria-label="$t('aria.first.page')"
+      >
         <font-awesome-icon :icon="['fas', 'backward-step']" />
       </button>
-      <button @click="prevPage" :disabled="currentPageStart === 1">
+      <button
+        @click="prevPage"
+        :disabled="currentPageStart === 1"
+        :aria-label="$t('aria.previous.page')"
+      >
         <font-awesome-icon :icon="['fas', 'backward']" />
       </button>
-      <button @click="nextPage" :disabled="currentPageStart === totalPages">
+      <button
+        @click="nextPage"
+        :disabled="currentPageStart === totalPages"
+        :aria-label="$t('aria.next.page')"
+      >
         <font-awesome-icon :icon="['fas', 'forward']" />
       </button>
-      <button @click="lastPage" :disabled="currentPageStart === totalPages">
+      <button
+        @click="lastPage"
+        :disabled="currentPageStart === totalPages"
+        :aria-label="$t('aria.last.page')"
+      >
         <font-awesome-icon :icon="['fas', 'forward-step']" />
       </button>
     </span>
 
     <span class="subsection">
-      <label for="itemsPerPage">{{ $t('table.footer.itemsperpage') }} </label>:
-      <select @click="itemsPerPage" id="itemsPerPage" v-model="currentPageSize">
+      <label :for="itemsPerPage + props.paginationId">{{ $t('table.footer.itemsperpage') }} </label
+      >:
+      <select
+        @click="itemsPerPage"
+        :id="itemsPerPage + props.paginationId"
+        v-model="currentPageSize"
+      >
         <option v-for="option in [10, 25, 50, 100, 1000]" :key="option" :value="option">
           {{ option }}
         </option>
@@ -95,6 +117,7 @@ const itemsPerPage = () => {
 <style scoped>
 .pagination {
 }
+
 .subsection {
   margin-right: 0.5rem;
 }

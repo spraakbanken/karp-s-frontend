@@ -157,5 +157,12 @@
   "message.nodatasetselected": "No dataset selected",
   "url.dataset.unknown": "Unknown dataset in URL. Selecting default datasets.",
   "result.true": "yes",
-  "result.false": "no"
+  "result.false": "no",
+  "aria.search.button": "Search",
+  "aria.toggle.theme": "Toggle theme",
+  "aria.first.page": "First page",
+  "aria.previous.page": "Previous page",
+  "aria.next.page": "Next page",
+  "aria.last.page": "Last page",
+  "aria.expand.row": "Expand row"
 }

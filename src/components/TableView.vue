@@ -380,7 +380,10 @@ const picsbarFractionTotalClass = (ds: string) => {
         </label>
         <ColVisGlobalDropDown />
       </div>
-      <TablePagination :tableResultTotal="tableResult.total"></TablePagination>
+      <TablePagination
+        :tableResultTotal="tableResult.total"
+        :paginationId="'paginationTop'"
+      ></TablePagination>
 
       <!-- tables -->
       <div class="table-container" ref="tableContainerRef">
@@ -415,7 +418,11 @@ const picsbarFractionTotalClass = (ds: string) => {
                 <!-- column names -->
                 <tr>
                   <!-- empty cell for expand_more/less -->
-                  <th v-if="showCompact" class="header-compile"></th>
+                  <th
+                    v-if="showCompact"
+                    class="header-compile"
+                    :aria-label="$t('aria.expand.row')"
+                  ></th>
                   <template v-for="(value, key) in item[0].entry">
                     <th
                       v-if="
@@ -525,7 +532,10 @@ const picsbarFractionTotalClass = (ds: string) => {
         </template>
       </div>
       <!-- pagination -->
-      <TablePagination :tableResultTotal="tableResult.total"></TablePagination>
+      <TablePagination
+        :tableResultTotal="tableResult.total"
+        :paginationId="'paginationBottom'"
+      ></TablePagination>
     </div>
   </div>
 </template>

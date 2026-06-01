@@ -81,7 +81,7 @@ const loginLogout = async () => {
       </span>
     </span>
 
-    <button id="theme-toggle" class="nav-button button-mode">
+    <button id="theme-toggle" class="nav-button button-mode" :aria-label="$t('aria.toggle.theme')">
       <span v-if="themeCurrent === 'light'">
         <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
       </span>
