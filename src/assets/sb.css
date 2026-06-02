@@ -12,9 +12,9 @@
   --sb-grey-dark: #333333;
   --sb-grey-darker: #111111;
 
-  --sb-error-background: #f8d7da;
-  --sb-error-text: #721c24;
-  --sb-message-background: #f8f5d7;
-  --sb-link: #4338ca;
-  --sb-link-inverted: #9991ff;
+  --sb-error-background: #d37b7d;
+  --sb-error-text: #000000;
+  --sb-message-background: #f6eabb;
+  --sb-link: #166f74;
+  --sb-link-inverted: #5bb3b9;
 }

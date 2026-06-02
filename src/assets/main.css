@@ -11,18 +11,27 @@
   font-weight: normal;
 }
 
-a,
-.green {
+a {
   color: var(--color-text);
-  transition: 0.4s;
   padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    /*background-color: grey;*/
-    color: var(--sb-orange);
-  }
+a:hover {
+  color: var(--sb-orange);
+}
+
+a.cell-clickable,
+.cell-clickable {
+  color: var(--text-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.cell-clickable:hover,
+.cell-clickable:hover {
+  color: var(--text-link-hover);
+  text-decoration: none;
+  cursor: pointer;
 }
 
 /* Info and error messages */

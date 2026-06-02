@@ -44,6 +44,7 @@
   --font-size: 15px;
   --font-size-hover: 17px;
   --text-link: var(--sb-link);
+  --text-link-hover: var(--sb-link-inverted);
 }
 
 /* Define dark mode variables */
@@ -83,6 +84,7 @@
   --font-size: 15px;
   --font-size-hover: 17px;
   --text-link: var(--sb-link-inverted);
+  --text-link-hover: var(--sb-link);
 }
 
 /* Define the light mode toggle */

@@ -134,8 +134,12 @@ export const formatCell = (
         }
       }
     } else if (typeof x === 'string' && x.startsWith('https://')) {
-      cell = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '</a>'
-      //console.log('formatCell: url detected: ', x, cell)
+      cell =
+        "<a class='cell-clickable' href='" +
+        x +
+        "' target=_blank >" +
+        getFilenameFromUrl(x) +
+        '</a>'
     } else {
       cell = detectConstant(String(x))
     }

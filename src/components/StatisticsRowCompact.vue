@@ -182,11 +182,6 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
   font-size: larger;
 }
 
-.cell-clickable {
-  color: var(--text-link);
-  cursor: pointer;
-}
-
 td.total-column {
   background-color: var(--sb-grey-light);
   color: black;
