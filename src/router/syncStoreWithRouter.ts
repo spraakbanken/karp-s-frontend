@@ -244,6 +244,31 @@ export function syncStoreWithRouter(router: Router): SyncResult {
 
     let syncResult: SyncResult = SyncResult.SYNC_RESULT_NOT_SYNCED
 
+    // handle requests to "old" Karp
+    if (query.has('mode')) {
+      const mode = query.get('mode')
+      if (mode === 'ao') {
+        lexicalStorage.setSelectedDataset(['ao'])
+        syncResult = SyncResult.SYNC_RESULT_SYNCED
+      } else if (mode === 'fulaord') {
+        lexicalStorage.setSelectedDataset(['fulaord'])
+        syncResult = SyncResult.SYNC_RESULT_SYNCED
+      } else if (mode === 'kelly') {
+        lexicalStorage.setSelectedDataset(['kelly'])
+        syncResult = SyncResult.SYNC_RESULT_SYNCED
+      } else if (mode === 'parolelexplus') {
+        lexicalStorage.setSelectedDataset(['parolelexplus-2-0', 'simpleplus-2-0'])
+        syncResult = SyncResult.SYNC_RESULT_SYNCED
+      } else if (mode === 'wordnet-saldo') {
+        lexicalStorage.setSelectedDataset(['wordnet-saldo-2-0'])
+        syncResult = SyncResult.SYNC_RESULT_SYNCED
+      } else {
+        syncResult = SyncResult.SYNC_RESULT_NOT_SYNCED
+        const newUrl = 'https://spraakbanken.gu.se/karp-red/?' + query.toString()
+        window.location.href = newUrl
+      }
+    }
+
     if (query.has('resources')) {
       const datasetsInURL: string[] = query.get('resources')!.split(',')
       // check that the dataset(s) in the URL exists

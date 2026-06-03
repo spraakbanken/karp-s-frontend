@@ -31,6 +31,7 @@ import { faLock } from '@fortawesome/free-solid-svg-icons/faLock'
 import { faLockOpen } from '@fortawesome/free-solid-svg-icons/faLockOpen'
 import { faSquare } from '@fortawesome/free-solid-svg-icons/faSquare'
 import { faUserLock } from '@fortawesome/free-solid-svg-icons/faUserLock'
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons/faCircleInfo'
 
 library.add(
   faBackward,
@@ -52,6 +53,7 @@ library.add(
   faLockOpen,
   faSquare,
   faUserLock,
+  faCircleInfo,
 )
 
 const app = createApp(App)

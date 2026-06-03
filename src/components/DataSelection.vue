@@ -130,7 +130,21 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-const selectDataset = () => {
+const selectDataset = (event: MouseEvent, dataset: string) => {
+  if ((event.target as HTMLInputElement).checked) {
+    // deselect all if ctrl key is pressed (cmd on Mac), then select the clicked one
+    if (event.ctrlKey || event.altKey) {
+      selectedDatasets.value = []
+    }
+    if (!selectedDatasets.value.includes(dataset)) {
+      selectedDatasets.value.push(dataset)
+    }
+  } else {
+    const index = selectedDatasets.value.indexOf(dataset)
+    if (index > -1) {
+      selectedDatasets.value.splice(index, 1)
+    }
+  }
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
 }
 
@@ -375,11 +389,6 @@ const selectAllFiltered = () => {
           <div class="datasets-list">
             <div v-for="dataset in filteredDatasets" :key="dataset" class="dropdown-item">
               <div class="datasets-list-item">
-                <span class="datasets-icon" @click="datasetInfoFill(dataset)">
-                  <font-awesome-icon
-                    :icon="['fas', dataset === previousDataset ? 'chevron-down' : 'chevron-right']"
-                  />
-                </span>
                 <label>
                   <input
                     :disabled="
@@ -389,7 +398,7 @@ const selectAllFiltered = () => {
                     type="checkbox"
                     :value="dataset"
                     v-model="selectedDatasets"
-                    @change="selectDataset"
+                    @click="selectDataset($event, dataset)"
                   />
                   {{ lexicalStorage.datasetLabels[dataset] }}
                 </label>
@@ -419,6 +428,11 @@ const selectAllFiltered = () => {
                   <span class="datasets-icon-status">
                     <font-awesome-icon :icon="['fas', 'user-lock']" />
                   </span>
+                </span>
+                <span class="datasets-icon" @click="datasetInfoFill(dataset)">
+                  <font-awesome-icon
+                    :icon="['fas', dataset === previousDataset ? 'circle-info' : 'circle-info']"
+                  />
                 </span>
 
                 <div v-if="dataset !== '' && previousDataset === dataset">
@@ -688,15 +702,11 @@ const selectAllFiltered = () => {
 }
 
 .datasets-icon {
-  /*
   float: right;
   margin-left: auto;
   display: block;
-  padding: 0.5rem;
-  width: 2rem;
-  */
-  vertical-align: bottom;
   cursor: pointer;
+  color: var(--sb-orange);
 }
 
 .datasets-icon-status {
