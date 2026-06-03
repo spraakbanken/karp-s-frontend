@@ -71,7 +71,7 @@ const loginLogout = async () => {
     <RouterLink to="/about">{{ $t('menu.about') }}</RouterLink>
     -->
     <span class="menu-item">
-      <a href="https://spraakbanken.gu.se/karp/">
+      <a href="https://spraakbanken.gu.se/karp-red/">
         {{ $t('menu.editmode') }}
       </a>
     </span>

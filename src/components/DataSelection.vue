@@ -140,9 +140,13 @@ const selectDataset = (event: MouseEvent, dataset: string) => {
       selectedDatasets.value.push(dataset)
     }
   } else {
-    const index = selectedDatasets.value.indexOf(dataset)
-    if (index > -1) {
-      selectedDatasets.value.splice(index, 1)
+    if (event.ctrlKey || event.altKey) {
+      selectedDatasets.value = [dataset]
+    } else {
+      const index = selectedDatasets.value.indexOf(dataset)
+      if (index > -1) {
+        selectedDatasets.value.splice(index, 1)
+      }
     }
   }
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
