@@ -81,7 +81,7 @@ const setJwtToken = (jwt: string): void => {
   } else {
     lexicalStorage.grantedDatasets = []
   }
-  console.log('Granted: ', lexicalStorage.grantedDatasets)
+  //console.log('Granted: ', lexicalStorage.grantedDatasets)
   console.log('setJwtToken() - end ')
 }
 
@@ -149,9 +149,9 @@ const testForLogin = async () => {
     }
 
     if (response.data) {
-      console.log('testForLogin() - response.data.', response.data)
+      //console.log('testForLogin() - response.data.', response.data)
 
-      console.log('testForLogin() - setting JWT token.', typeof response.data)
+      //console.log('testForLogin() - setting JWT token.', typeof response.data)
       setJwtToken(response.data)
       isAuthenticated.value = true
     } else {
