@@ -170,6 +170,8 @@ export const lexicalStore = defineStore('dataset', {
         label: this.datasetLabels[c.resourceId],
         updated: c.updated,
         resourceUrl: c.link,
+        limitedAccess: c.limitedAccess,
+        protectedMetadata: c.protectedMetadata,
       }))
       this.datasetDates.sort(function (a, b) {
         return parseInt(b.updated) - parseInt(a.updated)

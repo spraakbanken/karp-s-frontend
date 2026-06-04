@@ -104,6 +104,8 @@ export interface DatasetDates {
   label: string
   updated: string
   resourceUrl: string
+  limitedAccess: boolean
+  protectedMetadata: boolean
 }
 
 export type Entry = {

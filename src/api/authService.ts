@@ -74,10 +74,12 @@ const setJwtToken = (jwt: string): void => {
   // update list of restricted datasets the user has been granted access to
   const jwtd = jwtDecode<JwtPayload>(jwt)
   const jwt_lexica = jwtd.scope?.lexica
-  if (jwt_lexica !== null) {
+  if (jwt_lexica) {
     lexicalStorage.grantedDatasets = Object.entries(jwt_lexica)
       .filter(([, value]) => value > 0)
       .map(([key]) => key)
+  } else {
+    lexicalStorage.grantedDatasets = []
   }
   console.log('Granted: ', lexicalStorage.grantedDatasets)
   console.log('setJwtToken() - end ')
@@ -131,7 +133,7 @@ const checkJwtToken = (): void => {
  */
 const testForLogin = async () => {
   console.log('testForLogin() - start.')
-  const lexicalStorage = lexicalStore()
+  //const lexicalStorage = lexicalStore()
 
   try {
     // https://sp.spraakbanken.gu.se/auth/jwt
@@ -142,9 +144,14 @@ const testForLogin = async () => {
       timeout: 2_000,
     })
 
-    if (response.data) {
-      console.log('testForLogin() - response.data.')
+    if (!response) {
+      console.error('testForLogin() - Invalid response.')
+    }
 
+    if (response.data) {
+      console.log('testForLogin() - response.data.', response.data)
+
+      console.log('testForLogin() - setting JWT token.', typeof response.data)
       setJwtToken(response.data)
       isAuthenticated.value = true
     } else {
@@ -160,11 +167,11 @@ const testForLogin = async () => {
     if (axios.isAxiosError(error) && error.response?.status === 403) {
       setNotAuthenticated()
 
-      console.log('testForLogin() - end ERROR.')
+      console.log('testForLogin() - end ERROR.', error.message)
 
       return false
     } else {
-      console.error('testForLogin() - Login error.')
+      console.error('testForLogin() - Login error.', error)
       setNotAuthenticated()
 
       // throw error

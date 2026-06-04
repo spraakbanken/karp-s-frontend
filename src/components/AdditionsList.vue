@@ -17,7 +17,7 @@ const clickResourceInfo = (url: string) => {
 
 <template>
   <div v-for="(value, index) in lexicalStorage.datasetDates" :key="index" class="latest-box">
-    <div v-if="index < 5" class="latest-row">
+    <div v-if="index < 10" class="latest-row">
       <button class="button" @click="clickResourceInfo(value.resourceUrl)">
         {{ $t('additions.button.info') }}
       </button>
@@ -25,6 +25,23 @@ const clickResourceInfo = (url: string) => {
         {{ $t('additions.button.search') }}
       </button>
       <span class="latest-label">{{ value.label }}</span>
+      <!-- show locked status -->
+      <span v-if="value.limitedAccess" :title="$t('datasets.icon.limitedaccess')">
+        <span
+          v-if="lexicalStorage.grantedDatasets.includes(value.resourceId)"
+          class="datasets-icon-status"
+        >
+          <font-awesome-icon :icon="['fas', 'lock-open']" />
+        </span>
+        <span v-else class="datasets-icon-status">
+          <font-awesome-icon :icon="['fas', 'lock']" />
+        </span>
+      </span>
+      <!-- show protected metadata status (Mink private resources) -->
+      <span v-if="value.protectedMetadata" :title="$t('datasets.icon.protectedmetadata')">
+        <font-awesome-icon :icon="['fas', 'user-lock']" />
+      </span>
+
       <span class="latest-date">{{ secondsToDate(value.updated) }}</span>
     </div>
   </div>
