@@ -281,8 +281,8 @@ export function syncStoreWithRouter(router: Router): SyncResult {
     }
     if (syncResult === SyncResult.SYNC_RESULT_SYNCED) {
       // search tab
-      if (query.has('searchtab')) {
-        lexicalStorage.setActiveSearchTab(query.get('searchtab')!)
+      if (query.has('searchTab')) {
+        lexicalStorage.setActiveSearchTab(query.get('searchTab')!)
       } else {
         lexicalStorage.setActiveSearchTab(DEFAULT_TAB_SEARCH)
       }
