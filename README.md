@@ -12,7 +12,7 @@ Sharepoint > Språkbanken > Documents > Plattformar > karp-s > development.docx
 
 For SB-Auth to allow authentication requests, the frontend must be served under spraakbanken.gu.se (, and HTTPS must be enabled).
 
-- Point the hostname karplabb.spraakbanken.gu.se to localhost. On a Linux system, you can do this by editing /etc/hosts: `127.0.0.1	localhost	karplabb.spraakbanken.gu.se`
+- Point the hostname karp.spraakbanken.gu.se to localhost. On a Linux system, you can do this by editing /etc/hosts: `127.0.0.1	localhost	karp.spraakbanken.gu.se`
 - Create certificate files with `mkcert`: `mkcert "*.spraakbanken.gu.se"`
   - and refer to them in `.env.localdev`:
   ```
@@ -23,12 +23,12 @@ For SB-Auth to allow authentication requests, the frontend must be served under 
 - Add to `vite.config.ts`:
   ```
    server: {
-    allowedHosts: ['karplabb.spraakbanken.gu.se'],
+    allowedHosts: ['karp.spraakbanken.gu.se'],
   },
   ```
 - Optionally, configure `server https` and visit the app using `https://...`
 
-- access locally: `http://karplabb.spraakbanken.gu.se:5173/karplabb/`
+- access locally: `http://karp.spraakbanken.gu.se:5173/karp/`
 
 ## Tools/framework
 

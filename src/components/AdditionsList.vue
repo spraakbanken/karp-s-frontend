@@ -7,7 +7,7 @@ const lexicalStorage = lexicalStore()
 
 // open window at url link for given resourceId (ds)
 const clickResourceSearch = (ds: string) => {
-  const url = '/karplabb/?resources=' + ds
+  const url = '/karp/?resources=' + ds
   window.open(url, '_self')
 }
 const clickResourceInfo = (url: string) => {

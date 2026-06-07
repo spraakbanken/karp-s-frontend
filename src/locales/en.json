@@ -20,7 +20,7 @@
   "about.about.title": "Welcome to Karp's search mode",
   "about.about.text": "Karp is Språkbanken's lexicon platform. Here you can search structured linguistic data, such as word lists or other tabular data. Enter the <b>edit mode</b> by clicking the link at the top right.<br><br>If you want to get started and search in <b>Svenska Akademiens ordböcker</b>, please feel free to use any of our search examples.",
   "about.about.infotitle": "Information",
-  "about.about.info": "If you are using Karplabb in your work, please <a href='https://spraakbanken.gu.se/en/about/howtocite'>cite us</a>. For questions or comments, contact us at <a href='mailto:sb-info{'@'}svenska.gu.se'>sb-info{'@'}svenska.gu.se</a>.",
+  "about.about.info": "If you are using Karp in your work, please <a href='https://spraakbanken.gu.se/en/about/howtocite'>cite us</a>. For questions or comments, contact us at <a href='mailto:sb-info{'@'}svenska.gu.se'>sb-info{'@'}svenska.gu.se</a>.",
   "about.examples.title": "Search examples",
   "about.examples.ex1": "All words in 'Svenska Akademiens ordböcker' that begins with 'blom'",
   "about.examples.ex2": "Statistics for words in 'Svenska Akademiens ordböcker' that begins with 'blom'",

@@ -10,7 +10,7 @@ const logoKarpEn = ref('')
 function resetApp() {
   // console.log('Pathname ', window.location.pathname)
   // window.location.href = window.location.pathname
-  window.location.href = '/karplabb/'
+  window.location.href = '/karp/'
   //router.push('/')
 }
 
@@ -37,10 +37,10 @@ onMounted(() => {
     <div class="left-area">
       <div @click="resetApp()" class="logo-box pointer">
         <div v-if="$i18n.locale == 'sv'">
-          <img :src="logoKarp" alt="Karplabb logo" width="200" />
+          <img :src="logoKarp" alt="Karp logo" width="200" />
         </div>
         <div v-else>
-          <img :src="logoKarpEn" alt="Karplabb logo" width="200" />
+          <img :src="logoKarpEn" alt="Karp logo" width="200" />
         </div>
       </div>
     </div>

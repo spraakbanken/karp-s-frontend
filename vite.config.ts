@@ -22,15 +22,15 @@ export default defineConfig(async ({ mode }) => {
 
   return {
     plugins: [vue(), vueDevTools()],
-    base: '/karplabb/',
+    base: '/karp/',
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
     server: {
-      allowedHosts: ['karplabb.spraakbanken.gu.se'],
-      host: 'karplabb.spraakbanken.gu.se',
+      allowedHosts: ['karp.spraakbanken.gu.se'],
+      host: 'karp.spraakbanken.gu.se',
       https: await getHttpsOptions(),
       port: 5173,
     },

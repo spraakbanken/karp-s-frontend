@@ -238,7 +238,7 @@ onMounted(async () => {
                 <span v-html="formatCell(value2.value)"></span>
                 <span v-if="isImage(value2.value)">
                   <a
-                    :href="'/karplabb/img?img=' + value2.value"
+                    :href="'/karp/img?img=' + value2.value"
                     target="_blank"
                     :title="t('table.imgbrowse')"
                   >
