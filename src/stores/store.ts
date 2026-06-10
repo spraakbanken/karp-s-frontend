@@ -409,7 +409,6 @@ export const lexicalStore = defineStore('dataset', {
       this.activeResultTab = tab
     },
     setSelectedDataset(keys: string[]) {
-      //console.log('setSelectedDataset, keys:', keys)
       this.selectedDatasets = keys
       this.setUnionAndIntersectionFields(this.selectedDatasets)
 
@@ -497,13 +496,19 @@ export const lexicalStore = defineStore('dataset', {
       // are selected
       this.selectedTags = []
       for (const t of this.currentTags) {
-        //console.log('hasTags: ', t, rid)
         let includeTag = true
         for (const c of this.currentConfig.resources) {
           if (c.hasOwnProperty('tags')) {
             if (c.tags.includes(t)) {
               if (!this.selectedDatasets.includes(c.resourceId)) {
-                includeTag = false
+                // if the dataset is not selected, check if it is restricted and if we have access to it
+                if (c.hasOwnProperty('limitedAccess')) {
+                  if (this.grantedDatasets.includes(c.resourceId)) {
+                    includeTag = false
+                  }
+                } else {
+                  includeTag = false
+                }
               }
             }
           }

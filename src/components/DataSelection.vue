@@ -21,10 +21,8 @@ const selectedDatasets = computed({
 const currentDatasets = computed(() => lexicalStorage.currentDatasets)
 const currentTags = computed(() => lexicalStorage.currentTags)
 const filteredDatasets = ref<string[]>([])
-const selectedTags = computed({
-  get: () => lexicalStorage.selectedTags,
-  set: (value) => lexicalStorage.setSelectedTags(value),
-})
+
+// dataset info
 
 const datasetInfo = ref(<ResourceLocalized>{
   label: '',
@@ -96,6 +94,27 @@ const datasetInfoFill = (dataset: string) => {
   }
 }
 
+// tag selection functions
+
+const selectedTagsAdd = (tag: string) => {
+  if (!lexicalStorage.selectedTags.includes(tag)) {
+    lexicalStorage.selectedTags.push(tag)
+  }
+}
+
+const selectedTagsRemove = (tag: string) => {
+  const index = lexicalStorage.selectedTags.indexOf(tag)
+  if (index > -1) {
+    lexicalStorage.selectedTags.splice(index, 1)
+  }
+}
+
+const selectedTagsIncludes = (tag: string): boolean => {
+  return lexicalStorage.selectedTags.includes(tag)
+}
+
+// dropdown functions
+
 const searchDatasets = ref('')
 const isDropdownOpen = ref(false)
 const isDropdownParams = ref(false)
@@ -122,13 +141,7 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+// selection methods
 
 const selectDataset = (event: MouseEvent, dataset: string) => {
   if ((event.target as HTMLInputElement).checked) {
@@ -152,14 +165,11 @@ const selectDataset = (event: MouseEvent, dataset: string) => {
   lexicalStorage.setSelectedDataset(selectedDatasets.value)
 }
 
-// INFO: doesn't trigger the watch (because selectedDatasets is "computed")
 const selectTags = (tag: string) => {
-  const tagIndex = selectedTags.value.indexOf(tag)
-  if (tagIndex == -1) {
-    selectedTags.value.push(tag)
+  if (lexicalStorage.selectedTags.includes(tag)) {
+    selectedTagsRemove(tag)
   } else {
-    // remove it
-    selectedTags.value.splice(tagIndex, 1)
+    selectedTagsAdd(tag)
   }
 
   const selDS: string[] = []
@@ -179,12 +189,13 @@ const selectTags = (tag: string) => {
 }
 
 const unselectAll = () => {
-  selectedTags.value = []
+  //selectedTags.value = []
+  lexicalStorage.setSelectedTags([])
   selectedDatasets.value = []
 }
 
 const unselectTags = () => {
-  selectedTags.value = []
+  lexicalStorage.setSelectedTags([])
   searchDatasets.value = ''
   doFilterDatasets()
 }
@@ -193,7 +204,7 @@ const hasSelectedTags = (rid: string): boolean => {
   let includeRes = false
   for (const c of lexicalStorage.currentConfig.resources) {
     if (c.resourceId == rid) {
-      for (const t of selectedTags.value) {
+      for (const t of lexicalStorage.selectedTags) {
         //console.log('hasTags: ', t, rid)
         if ('tags' in c) {
           if (c.tags.includes(t)) {
@@ -204,6 +215,11 @@ const hasSelectedTags = (rid: string): boolean => {
     }
   }
   return includeRes
+}
+
+// select all datasets that we have filtered
+const selectAllFiltered = () => {
+  lexicalStorage.setSelectedDataset(filteredDatasets.value)
 }
 
 const doFilterDatasets = () => {
@@ -275,10 +291,15 @@ watch(searchDatasets, () => {
   doFilterDatasets()
 })
 
-// select all datasets that we have filtered
-const selectAllFiltered = () => {
-  lexicalStorage.setSelectedDataset(filteredDatasets.value)
-}
+// mounted
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -309,7 +330,7 @@ const selectAllFiltered = () => {
             <div v-for="tag in currentTags" :key="tag">
               <button
                 @click="selectTags(tag)"
-                :class="{ 'tags-button-selected': selectedTags.indexOf(tag) !== -1 }"
+                :class="{ 'tags-button-selected': selectedTagsIncludes(tag) }"
                 class="tags-button-action datasets-tooltip"
               >
                 {{ th(lexicalStorage.currentConfig.tags[tag].label) }}&nbsp; ({{
@@ -367,7 +388,7 @@ const selectAllFiltered = () => {
             @click="unselectTags()"
             class="tags-button-action"
             style="margin-left: 0.5rem"
-            :disabled="selectedTags.length == 0 && searchDatasets == ''"
+            :disabled="lexicalStorage.selectedTags.length == 0 && searchDatasets == ''"
           >
             {{ $t('dataselector.tags.reset') }}
           </button>

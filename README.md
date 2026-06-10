@@ -1,6 +1,6 @@
-# karplabb frontend
+# karpl search mode frontend
 
-Karplabb - Språkbankens datapubliceringsplattform
+Karp - Språkbankens lexikonplattform - sökläge
 
 ## Developer documentation
 
@@ -40,7 +40,7 @@ Customize configuration: See [Vite Configuration Reference](https://vite.dev/con
 
 ## Workflow
 
-### Build and deploy
+### Build and deploy; Type-Check, Compile and Minify for Production
 
 Increment version number in package.json.
 
@@ -51,7 +51,7 @@ npm run build:production
 Upload:
 
 ```sh
-rsync --delete --exclude ".htaccess" -r dist/ <user>@k2.spraakdata.gu.se:/var/www/html_sb/karplabb
+rsync --delete --exclude ".htaccess" -r dist/ fkkarp@k2.spraakdata.gu.se:/var/www/html_sb/karp
 ```
 
 ### Compile and Hot-Reload for Development
@@ -70,12 +70,6 @@ npm update
 
 ```sh
 npm install
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build:production
 ```
 
 ### Run Unit Tests with [Vitest](https://vitest.dev/)
