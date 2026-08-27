@@ -333,45 +333,53 @@ const picsbarFractionTotalClass = (ds: string) => {
     <!-- show table -->
     <div v-if="lexicalStorage.isTableData">
       <!-- picsbar -->
-      <table class="picsbar">
-        <tbody>
-          <tr>
-            <template v-for="(value, key) in tableResult.resourceOrder" :key="key">
-              <td
-                v-if="tableResult.resourceHits[value] > 0"
-                class="picsbar-tooltip"
-                :style="{
-                  width: 100 * (tableResult.resourceHits[value] / tableResult.total) + '%',
-                }"
-                @click="picsbar(value)"
-              >
-                <template v-if="Object.keys(tableResult.resourceOrder).length < 6">
-                  {{ lexicalStorage.datasetLabels[value] }}
+      <div class="picsbar-container">
+        <div class="picsbar-label">
+          <span>{{ $t('table.picsbar.label') }}:</span>
+        </div>
+        <div class="picsbar-wrapper">
+          <table class="picsbar">
+            <tbody>
+              <tr>
+                <template v-for="(value, key) in tableResult.resourceOrder" :key="key">
+                  <td
+                    v-if="tableResult.resourceHits[value] > 0"
+                    class="picsbar-tooltip"
+                    :style="{
+                      width: 100 * (tableResult.resourceHits[value] / tableResult.total) + '%',
+                    }"
+                    @click="picsbar(value)"
+                  >
+                    <template v-if="Object.keys(tableResult.resourceOrder).length < 6">
+                      {{ lexicalStorage.datasetLabels[value] }}
+                    </template>
+                    <span :class="picsbarFractionTotalClass(value)"
+                      >{{ lexicalStorage.datasetLabels[value] }}:
+                      {{ tableResult.resourceHits[value] }}</span
+                    >
+                  </td>
                 </template>
-                <span :class="picsbarFractionTotalClass(value)"
-                  >{{ lexicalStorage.datasetLabels[value] }}:
-                  {{ tableResult.resourceHits[value] }}</span
-                >
-              </td>
-            </template>
-          </tr>
-        </tbody>
-      </table>
-      <!-- picsbar position indicator -->
-      <table class="picsbar-pos">
-        <tbody>
-          <tr>
-            <td :style="{ width: 100 * (currentPageRowStart / tableResult.total) + '%' }"></td>
-            <td
-              :style="{
-                width: Math.max(0.25, 100 * (currentPageSize / tableResult.total)) + '%',
-              }"
-              style="background-color: var(--sb-orange)"
-            ></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+              </tr>
+            </tbody>
+          </table>
+          <!-- picsbar position indicator -->
+          <table class="picsbar-pos">
+            <tbody>
+              <tr>
+                <td :style="{ width: 100 * (currentPageRowStart / tableResult.total) + '%' }"></td>
+                <td
+                  :style="{
+                    width: Math.max(0.25, 100 * (currentPageSize / tableResult.total)) + '%',
+                  }"
+                  style="background-color: var(--sb-orange)"
+                ></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="info-control">
         <!-- show all cells expanded -->
         <label for="showCompact">
@@ -602,6 +610,18 @@ const picsbarFractionTotalClass = (ds: string) => {
 
 /* picsbar */
 
+.picsbar-container {
+  display: flex;
+  align-items: center;
+}
+
+.picsbar-label {
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+.picsbar-wrapper {
+  flex: 1;
+}
 .picsbar {
   table-layout: fixed;
   overflow-x: clip;

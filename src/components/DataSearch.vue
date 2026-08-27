@@ -577,7 +577,10 @@ watch(
               class="field-button-center"
               v-if="lexicalStorage.activeSearchTab == TAB_SEARCH_EXTENDED"
             >
-              <button class="action-button" @click="selectedFieldsAddSub(mainExpression.id)">
+              <button
+                class="action-button button-operator"
+                @click="selectedFieldsAddSub(mainExpression.id)"
+              >
                 +&nbsp;{{ $t('search.separator.or') }}
               </button>
             </div>
@@ -593,7 +596,7 @@ watch(
           class="field-button-center"
           v-if="lexicalStorage.activeSearchTab == TAB_SEARCH_EXTENDED"
         >
-          <button class="action-button" @click="selectedFieldsAddMain()">
+          <button class="action-button button-operator" @click="selectedFieldsAddMain()">
             +&nbsp;{{ $t('search.separator.and') }}
           </button>
         </div>
@@ -749,8 +752,14 @@ input:focus {
   width: 100%;
   text-align: center;
   margin-bottom: 0.5rem;
-  background-color: var(--color-search-area);
+  /*background-color: var(--color-search-area);*/
+  font-weight: bold;
+  text-transform: uppercase;
   border-radius: 0.5rem;
+}
+
+.button-operator {
+  text-transform: uppercase;
 }
 
 .dropdown-wrapper {

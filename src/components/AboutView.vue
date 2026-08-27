@@ -18,7 +18,7 @@ const ex2 = encodeURI(
 )
 
 const ex3 = encodeURI(
-  '/karp/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,saol6-faksimil,so2009-ord&resultTab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|NOUN))&searchtab=extended',
+  '/karp/?resources=saol9-faksimil,saol1-faksimil,saol10-faksimil,saol11-faksimil,saol12-faksimil,saol13-faksimil,saol14-faksimil,saol7-faksimil,saol8-faksimil,saol6-faksimil,so2009-ord&resultTab=table&q=and(or(startswith|entry_word|pest||startswith|entry_word|kolera)||not(equals|upos|NOUN))&searchTab=extended',
 )
 
 const ex4 = encodeURI('/karp/?resources=isof-nyord&q=endswith|entry_word|"+ekonomi"')
