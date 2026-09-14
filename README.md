@@ -28,7 +28,7 @@ For SB-Auth to allow authentication requests, the frontend must be served under 
   ```
 - Optionally, configure `server https` and visit the app using `https://...`
 
-- access locally: `http://karp.spraakbanken.gu.se:5173/karp/`
+- access locally: `https://karp.spraakbanken.gu.se:5173/karp/`
 
 ## Tools/framework
 

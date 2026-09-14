@@ -133,5 +133,6 @@ p {
   padding-left: 1rem;
   margin-top: 0;
   margin-bottom: 1rem;
+  font-family: sans-serif;
 }
 </style>

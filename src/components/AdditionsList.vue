@@ -69,9 +69,13 @@ const clickResourceInfo = (url: string) => {
 
 .latest-label {
   font-weight: normal;
+  font-family: sans-serif;
+  margin-left: 0.25rem;
 }
+
 .latest-date {
   float: right;
+  font-family: sans-serif;
 }
 
 .datasets-icon {
