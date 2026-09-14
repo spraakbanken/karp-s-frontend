@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import logoSBLight from '@/assets/sprakbanken_text_light_theme.svg'
-import logoSBDark from '@/assets/sprakbanken_text_light_theme.svg'
+import logoSBLight from '@/assets/sprakbanken_logo.svg'
+import logoSBDark from '@/assets/sprakbanken_logo.svg'
 import logoGUSvLight from '@/assets/gu_vert_sv.svg'
 import logoGUSvDark from '@/assets/gu_vert_sv_inv.svg'
 import logoGUEnLight from '@/assets/gu_vert_en.svg'
@@ -33,30 +33,30 @@ onMounted(() => {
       <a href="https://spraakbanken.gu.se"><img :src="logoSB" alt="Språkbanken Text logo" /></a>
       -->
       <div class="sb-box">
-        <a href="https://spraakbanken.gu.se/" target="_new">
-          <img :src="logoSB" alt="Språkbanken Text" />
+        <a href="https://sprakbanken.se/" target="_new">
+          <img :src="logoSB" alt="Språkbanken" />
         </a>
       </div>
       <template v-if="$i18n.locale == 'sv'">
         <div>
-          <a href="https://spraakbanken.gu.se/om">{{ $t('footer.aboutus') }}</a>
+          <a href="https://sprakbanken.se/om">{{ $t('footer.aboutus') }}</a>
         </div>
         <div>
-          <a href="https://spraakbanken.gu.se/aktuellt">{{ $t('footer.newsfromus') }}</a>
+          <a href="https://sprakbanken.se/aktuellt">{{ $t('footer.newsfromus') }}</a>
         </div>
         <div>
-          <a href="https://spraakbanken.gu.se/verktyg">{{ $t('footer.otherplatforms') }}</a>
+          <a href="https://sprakbanken.se/plattformar">{{ $t('footer.otherplatforms') }}</a>
         </div>
       </template>
       <template v-if="$i18n.locale == 'en'">
         <div>
-          <a href="https://spraakbanken.gu.se/en/about">{{ $t('footer.aboutus') }}</a>
+          <a href="https://sprakbanken.se/en/about">{{ $t('footer.aboutus') }}</a>
         </div>
         <div>
-          <a href="https://spraakbanken.gu.se/en/news-and-events">{{ $t('footer.newsfromus') }}</a>
+          <a href="https://sprakbanken.se/en/news-and-events">{{ $t('footer.newsfromus') }}</a>
         </div>
         <div>
-          <a href="https://spraakbanken.gu.se/en/tools">{{ $t('footer.otherplatforms') }}</a>
+          <a href="https://sprakbanken.se/en/platforms">{{ $t('footer.otherplatforms') }}</a>
         </div>
       </template>
     </div>
@@ -66,18 +66,18 @@ onMounted(() => {
       </div>
       <div>
         <template v-if="$i18n.locale == 'sv'">
-          <a href="https://spraakbanken.gu.se/kontakt">{{ $t('footer.help') }}</a>
+          <a href="https://sprakbanken.se/kontakt">{{ $t('footer.help') }}</a>
         </template>
         <template v-if="$i18n.locale == 'en'">
-          <a href="https://spraakbanken.gu.se/en/contact">{{ $t('footer.help') }}</a>
+          <a href="https://sprakbanken.se/en/contact">{{ $t('footer.help') }}</a>
         </template>
       </div>
       <div>
         <template v-if="$i18n.locale == 'sv'">
-          <a href="https://spraakbanken.gu.se/om/referera">{{ $t('footer.cite') }}</a>
+          <a href="https://sprakbanken.se/om/referera-till-oss">{{ $t('footer.cite') }}</a>
         </template>
         <template v-if="$i18n.locale == 'en'">
-          <a href="https://spraakbanken.gu.se/en/about/howtocite">{{ $t('footer.cite') }}</a>
+          <a href="https://sprakbanken.se/en/about/how-to-cite">{{ $t('footer.cite') }}</a>
         </template>
       </div>
     </div>
