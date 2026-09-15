@@ -9,7 +9,7 @@ export interface FieldConfig {
   collection: boolean
   label: Label | string
   categories: string[]
-  categoryLabel: Record<string, { swe: string; eng: string }>
+  categoryLabels: Record<string, { swe: string; eng: string }>
 }
 
 export interface Label {

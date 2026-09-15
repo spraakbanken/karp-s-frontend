@@ -29,9 +29,6 @@ onMounted(() => {
 <template>
   <div class="footer-area">
     <div class="footer-area-left">
-      <!--
-      <a href="https://spraakbanken.gu.se"><img :src="logoSB" alt="Språkbanken Text logo" /></a>
-      -->
       <div class="sb-box">
         <a href="https://sprakbanken.se/" target="_new">
           <img :src="logoSB" alt="Språkbanken" />

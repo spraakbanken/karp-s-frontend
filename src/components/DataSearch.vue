@@ -293,10 +293,15 @@ const selectedFieldAdd = (fieldName: string, mainId: number, subId: number) => {
 }
 
 const fieldHasCategories = (f: string): boolean => {
+  /*
   if (lexicalStorage.currentConfig.fields[f]) {
     return 'categories' in lexicalStorage.currentConfig.fields[f]
   }
   return false
+  */
+  const categories = lexicalStorage.currentConfig.fields[f]?.categories
+
+  return Array.isArray(categories) && categories.length > 0
 }
 
 watch(
@@ -516,6 +521,14 @@ watch(
                             .categories"
                           :key="x"
                           :value="x"
+                          :label="
+                            ((label) => (label != null ? `${x} - ${label}` : x))(
+                              lexicalStorage.currentConfig.fields[subExpression.name]
+                                .categoryLabels?.[x]?.[
+                                lexicalStorage.activeLocale === 'sv' ? 'swe' : 'eng'
+                              ],
+                            )
+                          "
                         ></option>
                       </datalist>
                     </template>

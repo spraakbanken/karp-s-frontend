@@ -423,7 +423,7 @@ export const lexicalStore = defineStore('dataset', {
             collection: false,
             label: { swe: 'ingångsord', eng: 'word' },
             categories: [],
-            categoryLabel: {},
+            categoryLabels: {},
           })
         }
         if (!this.currentCommonFields.some((field) => field.name === entryWordField)) {
@@ -433,7 +433,7 @@ export const lexicalStore = defineStore('dataset', {
             collection: false,
             label: { swe: 'ingångsord', eng: 'word' },
             categories: [],
-            categoryLabel: {},
+            categoryLabels: {},
           })
         }
       }
