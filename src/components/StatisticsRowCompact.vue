@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 //import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
 import { formatCell } from '@/utils/utils'
-import type { Dataset } from '@/types/datasetConfig'
+import type { CountHeadersColumn, Dataset } from '@/types/datasetConfig'
 import { ROW_MAX_HEIGHT, BE_STATISTICS_VALUES_ID } from '@/utils/constants'
 import { isNumber } from 'es-toolkit/compat'
 import { lexicalStore } from '@/stores/store'
@@ -11,6 +11,7 @@ import { lexicalStore } from '@/stores/store'
 const props = defineProps<{
   item: Dataset
   tableRow: number
+  columnHeads: CountHeadersColumn[]
   showCompact: boolean
   updateShowHitsCheckbox: boolean
   paginatedDataRow: Dataset
@@ -138,7 +139,15 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         <td ref="tdRefs" class="table-data">
           <div :class="{ 'mhr-div': !expanded && thflag }">
             <span
-              v-html="formatCell(value, undefined, undefined, updateShowHitsCheckbox)"
+              v-html="
+                formatCell(
+                  columnHeads[tableCol].columnField,
+                  value,
+                  undefined,
+                  undefined,
+                  updateShowHitsCheckbox,
+                )
+              "
               @click="refClick(Number(tableRow), Number(tableCol))"
               class="cell-clickable"
             ></span>

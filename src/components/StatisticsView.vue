@@ -379,7 +379,7 @@ const exportCSV = () => {
       csv += '"'
       if ('columnField' in statisticsHeaders.value[key_number]) {
         if (collectionColumn.includes(statisticsHeaders.value[key_number].columnField)) {
-          csv += '"' + formatCell(cell, '; ') + '\",'
+          csv += '"' + formatCell('', cell, '; ') + '\",'
         } else {
           if (statisticsHeaders.value[key_number].type === 'value') {
             //csv += cell.count
@@ -1098,7 +1098,7 @@ const refClick = (tRow: number, tCol: number) => {
                   &Sigma;
                 </td>
                 <td v-else class="total numeric table-data">
-                  <span v-html="formatCell(item, '', true)"></span>
+                  <span v-html="formatCell('', item, '', true)"></span>
                 </td>
               </template>
             </tr>
@@ -1106,6 +1106,7 @@ const refClick = (tRow: number, tCol: number) => {
             <template v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
               <StatisticsRowCompact
                 :item="item"
+                :columnHeads="statisticsHeaders"
                 :tableRow="tableRow"
                 :showCompact="showCompact"
                 :updateShowHitsCheckbox="updateShowHitsCheckbox"
@@ -1415,5 +1416,6 @@ input[type='checkbox'][disabled] + label {
 <style>
 .sum-right {
   float: right;
+  margin-left: 0.5rem;
 }
 </style>

@@ -517,7 +517,7 @@ const picsbarFractionTotalClass = (ds: string) => {
                         >
                           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
                             <!--<span style="white-space: nowrap">-->
-                            <span v-html="formatCell(value2.value)"></span>
+                            <span v-html="formatCell(value2.name, value2.value)"></span>
                             <span v-if="isImage(value2.value)">
                               <a
                                 :href="'/karp/img?img=' + value2.value"

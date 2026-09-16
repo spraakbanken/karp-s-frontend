@@ -55,7 +55,7 @@ const [expanded, toggleExpanded] = useToggle()
           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
             <!--<span style="white-space: nowrap">-->
 
-            <span v-html="formatCell(value2.value)"></span>
+            <span v-html="formatCell(value2.name, value2.value)"></span>
             <span v-if="isImage(value2.value)">
               <a
                 :href="baseUrl + 'img?img=' + value2.value"

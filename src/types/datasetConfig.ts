@@ -134,8 +134,27 @@ export type DatasetResultGrp = {
   hits: DatasetEntry[]
 }
 
-// OLD - are they used?
+// statistics - data
 
+export type StatisticsValue = {
+  value: string
+  count: number
+}
+
+export type StatisticsCell =
+  | string
+  | number
+  | string[]
+  | {
+      count: number
+      values?: StatisticsValue[]
+    }
+
+export type StatisticsDataset = StatisticsCell[]
+
+/*
+    retire this
+*/
 export type Dataset = {
   [key: string]: string
 }

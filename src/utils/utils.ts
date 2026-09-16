@@ -1,6 +1,8 @@
 import type { ByLang } from '@/types/util.types'
 import { useI18n } from 'vue-i18n'
 
+import { lexicalStore } from '@/stores/store'
+
 import { i18n } from '@/i18n'
 
 import { clone } from 'es-toolkit'
@@ -86,62 +88,104 @@ const detectConstant = (x: string): string => {
   return String(x)
 }
 
+// check if field has category labels, and if so, get the label for the value in the current language
+
+const checkForLabel = (fieldName: string, fieldValue: string): string => {
+  const lexicalStorage = lexicalStore()
+  const categoryLabels = lexicalStorage.currentConfig.fields[fieldName]?.categoryLabels
+  if (categoryLabels !== null && categoryLabels !== undefined) {
+    const language = lexicalStorage.activeLocale === 'sv' ? 'swe' : 'eng'
+    const label = categoryLabels[fieldValue]?.[language]
+    return ' - ' + label
+  } else {
+    return ''
+  }
+}
+
+// format a cell value for display in a table
+
 export const formatCell = (
-  x: number | string | string[] | object,
+  fieldName: string,
+  fieldValue: number | string | string[] | object,
   divider: string = '<br>',
   solo: boolean = false,
   showCount: boolean = true,
 ): string => {
   let cell: string = ''
-  //let count: number = 0
 
-  if (x !== null) {
-    if (Array.isArray(x)) {
-      if (x.length > 0) {
-        x.every((item) => {
+  if (fieldValue !== null) {
+    if (Array.isArray(fieldValue)) {
+      if (fieldValue.length > 0) {
+        fieldValue.every((item) => {
           cell = cell + (cell ? divider : '') + detectConstant(item)
           return true
         })
       }
-    } else if (typeof x === 'object' && x !== null) {
+    } else if (typeof fieldValue === 'object' && fieldValue !== null) {
       // value(s)
-      if (BE_STATISTICS_VALUES_ID in x) {
-        x.values.forEach((v) => {
-          if (typeof v === 'object') {
+      const statistics = fieldValue as Record<string, unknown>
+      const values = statistics[BE_STATISTICS_VALUES_ID]
+
+      if (Array.isArray(values)) {
+        values.forEach((v: unknown) => {
+          if (typeof v === 'object' && v !== null) {
+            const statistic = v as Record<string, unknown>
+
             let vvalue: string = ''
             let vcount: number = -1
             if (BE_STATISTICS_VALUE_ID in v) {
-              vvalue = v[BE_STATISTICS_VALUE_ID]
+              vvalue =
+                statistic[BE_STATISTICS_VALUE_ID] !== null
+                  ? String(statistic[BE_STATISTICS_VALUE_ID])
+                  : '<i>n/a</i>'
             }
-            if (BE_STATISTICS_COUNT_ID in v) {
-              vcount = v[BE_STATISTICS_COUNT_ID]
-            }
-            vvalue = vvalue !== null ? String(vvalue) : '<i>n/a</i>'
 
-            cell = cell + (cell ? ', ' : '') + vvalue + (showCount ? ': ' + String(vcount) : '')
+            if (typeof statistic[BE_STATISTICS_COUNT_ID] === 'number') {
+              vcount = statistic[BE_STATISTICS_COUNT_ID]
+            }
+
+            cell +=
+              (cell ? ', ' : '') +
+              vvalue +
+              checkForLabel(fieldName, vvalue) +
+              (showCount ? ': ' + String(vcount) : '')
           }
         })
       }
       // base count
       if (showCount) {
-        if (BE_STATISTICS_COUNT_ID in x) {
+        if (BE_STATISTICS_COUNT_ID in fieldValue) {
           cell =
             cell +
             '<span class="sum-right"><b>' +
             (!solo ? (cell ? ' ' : '') : '') +
-            String(x[BE_STATISTICS_COUNT_ID]) +
+            String(statistics[BE_STATISTICS_COUNT_ID]) +
             '</b></span>'
         }
       }
-    } else if (typeof x === 'string' && x.startsWith('https://')) {
+    } else if (typeof fieldValue === 'string' && fieldValue.startsWith('https://')) {
       cell =
         "<a class='cell-clickable' href='" +
-        x +
+        fieldValue +
         "' target=_blank >" +
-        getFilenameFromUrl(x) +
+        getFilenameFromUrl(fieldValue) +
         '</a>'
     } else {
-      cell = detectConstant(String(x))
+      // check if field has category labels, and if so, get the label for the value in the current language
+      /*
+      const lexicalStorage = lexicalStore()
+      const categoryLabels = lexicalStorage.currentConfig.fields[fieldName]?.categoryLabels
+      if (categoryLabels !== null && categoryLabels !== undefined) {
+        const language = lexicalStorage.activeLocale === 'sv' ? 'swe' : 'eng'
+        //const label = categoryLabels[fieldValue]?.[language]
+        const label = checkForLabel(fieldName, String(fieldValue))
+        cell = label != '' ? `${fieldValue}${label}` : String(fieldValue)
+      } else {
+        // return the value as a string, but check if it is a constant (true/false) and return the localized version
+        cell = detectConstant(String(fieldValue))
+      }
+      */
+      cell = detectConstant(String(fieldValue)) + checkForLabel(fieldName, String(fieldValue))
     }
   } else {
     cell = '-'
