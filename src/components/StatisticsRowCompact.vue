@@ -83,7 +83,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         <td
           :class="{
             'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
-            'total-null': value.count === 0,
+            'total-null': value === 0,
           }"
           class="table-data"
         >
