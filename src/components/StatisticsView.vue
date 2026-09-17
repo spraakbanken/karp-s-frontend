@@ -161,6 +161,7 @@ const updateShowHits = () => {
 
 // show overview switch
 const showOverview = ref(false)
+const showOverViewTotals = ref(false)
 
 // data
 
@@ -448,9 +449,56 @@ const drawChart = () => {
   graph_value_count.value = 0
   graph_value_excluded.value = 0
   // write data
-  //for (const row in currentResult.value) {
-  //  if (Object.keys(statisticsResult.value).length === 1) {
-  if (statisticsResult.value.length === 1) {
+  if (showOverViewTotals.value) {
+    console.log(
+      'drawChart() totals len=',
+      statisticsTotals.value.length,
+      statisticsHeaders.value.length,
+    )
+    statisticsTotals.value.forEach((total, index) => {
+      const header = statisticsHeaders.value[index]
+
+      // Skip the Σ cells and the overall-total column.
+      if (
+        !header ||
+        index < lexicalStorage.selectedCompileFields.length ||
+        !['value', 'count'].includes(header.type)
+      ) {
+        return
+      }
+
+      let value: number | null = null
+
+      if (typeof total === 'number') {
+        value = total
+      } else if (isStatisticsObjectCell(total)) {
+        value = total.count
+      } else if (
+        typeof total === 'string' &&
+        total.trim() !== '' &&
+        Number.isFinite(Number(total))
+      ) {
+        value = Number(total)
+      }
+
+      if (value === null || !Number.isFinite(value)) {
+        return
+      }
+
+      const category = lexicalStorage.datasetLabels[header.headerValue] ?? header.headerValue
+
+      if (
+        value >= graph_threshold_min.value &&
+        (graph_threshold_max.value === '' || value <= Number(graph_threshold_max.value))
+      ) {
+        dataObj[category] = value
+        graph_value_max.value = Math.max(graph_value_max.value, value)
+        graph_value_count.value++
+      } else {
+        graph_value_excluded.value++
+      }
+    })
+  } else if (statisticsResult.value.length === 1) {
     // one hit distributed on datasets
     const rowItems: StatisticsDataset = statisticsResult.value[0]
     for (const key in rowItems) {
@@ -739,7 +787,7 @@ const exportPNG = () => {
 }
 
 const updateOverview = () => {
-  if (showOverview.value) {
+  if (showOverview.value || showOverViewTotals.value) {
     if (graph_dots.value) {
       graph_barwidth.value = 0
     } else {
@@ -870,21 +918,29 @@ const refClick = (tRow: number, tCol: number) => {
         </button>
       </div>
       <div>
-        <input
-          type="checkbox"
-          id="showOverviewCheckbox"
-          v-model="showOverview"
-          v-bind:disabled="selectedColumns.length !== 0"
-          @change="updateOverview()"
-        />&nbsp;
-        <label for="showOverviewCheckbox" v-bind:disabled="selectedColumns.length !== 0">
+        <label>
+          <input
+            v-bind:disabled="selectedColumns.length !== 0 || showOverViewTotals"
+            type="checkbox"
+            v-model="showOverview"
+            @change="updateOverview()"
+          />
           {{ $t('statistics.showOverview') }}
+        </label>
+        <label>
+          <input
+            v-bind:disabled="showOverview"
+            type="checkbox"
+            v-model="showOverViewTotals"
+            @change="updateOverview()"
+          />
+          {{ $t('statistics.showOverviewTotals') }}
         </label>
       </div>
     </div>
 
     <!-- show overview/graph -->
-    <div v-if="showOverview" class="overview-wrapper">
+    <div v-if="showOverview || showOverViewTotals" class="overview-wrapper">
       <div class="overview-settings">
         <span class="overview-setting">
           {{ $t('graphs.threshold') }}
@@ -1311,6 +1367,11 @@ svg g text {
 
 .info-control input {
   accent-color: var(--sb-orange);
+  cursor: pointer;
+}
+
+.info-control label {
+  margin-right: 0.5rem;
   cursor: pointer;
 }
 
