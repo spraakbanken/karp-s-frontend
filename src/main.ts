@@ -7,7 +7,6 @@ import { i18n } from '@/i18n.ts'
 import App from './App.vue'
 import router from './router'
 // Provide a simple module declaration to satisfy TypeScript when no types are available
-declare module 'vue-matomo'
 import VueMatomo from 'vue-matomo'
 
 import { library } from '@fortawesome/fontawesome-svg-core'

@@ -10,9 +10,9 @@ export const GRAPH_BARWIDTH: number = 60 // default bar width of overview graph
 export const TABREFCOUNT_MAX: number = 10 // how many tabrefs can we create?
 
 // BE statistics data
-export const BE_STATISTICS_VALUES_ID: string = 'values' // and for value
-export const BE_STATISTICS_COUNT_ID: string = 'count' // what BE sends in statistics data for count value in object
-export const BE_STATISTICS_VALUE_ID: string = 'value' // and for value
+export const BE_STATISTICS_VALUES_ID = 'values' // and for value
+export const BE_STATISTICS_COUNT_ID = 'count' // what BE sends in statistics data for count value in object
+export const BE_STATISTICS_VALUE_ID = 'value' // and for value
 
 // position (search)
 export const POSITION_STARTSWITH: string = 'startswith'

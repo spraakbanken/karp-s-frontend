@@ -5,7 +5,8 @@ import {
   type FieldConfig,
   type Config,
   type CountHeadersColumn,
-  type Dataset,
+  type StatisticsCell,
+  type StatisticsDataset,
   type DatasetDates,
   type DatasetResult,
   type TabRefSetup,
@@ -49,15 +50,14 @@ interface SearchRedux {
   currentFields: FieldConfig[] // available fields in selected datasets (union)
   currentCommonFields: FieldConfig[] // intersection of fields in selected datasets (intersection)
   selectedFieldsMain: SelectedFieldsMain[] // fields we are searching in
-  //selectedFieldsCount: number
   selectedCompileFields: string[] // statistics, fields we compile on
   selectedColumns: string[] // statistics, field we show totals on
   searchQuery: string
   searchExtendedOp: boolean
   tableResult: DatasetResult
   statisticsHeaders: CountHeadersColumn[]
-  statisticsResult: Dataset[]
-  statisticsTotals: number[]
+  statisticsResult: StatisticsDataset[]
+  statisticsTotals: StatisticsCell[]
   tabRefSetup: Record<number, TabRefSetup>
   tabRefSetupCounter: number
   activeSearchTab: string
@@ -101,7 +101,6 @@ export const lexicalStore = defineStore('dataset', {
     currentFields: [],
     currentCommonFields: [],
     selectedFieldsMain: [{ id: randomId(), selectedFieldsSub: [], operator: 'and' }],
-    //selectedFieldsCount: 0,
     selectedCompileFields: DEFAULT_STATISTICS_COMPILE,
     selectedColumns: DEFAULT_STATISTICS_COLUMNS,
     searchQuery: '',
@@ -127,7 +126,6 @@ export const lexicalStore = defineStore('dataset', {
     statisticsPageStart: DEFAULT_STATISTICS_PAGE_START,
     statisticsPageSize: DEFAULT_STATISTICS_PAGE_SIZE,
     columnVis: {},
-    //listLimit: 5,
     isTableData: false,
     isStatisticsData: false,
     isTableSearch: false,
@@ -164,7 +162,6 @@ export const lexicalStore = defineStore('dataset', {
       this.currentTags = [
         ...new Set(config.resources.flatMap((c) => (c.tags == undefined ? [] : c.tags))),
       ]
-      //console.log('CurrentTags:', this.currentTags)
       this.datasetDates = config.resources.map((c) => ({
         resourceId: c.resourceId,
         label: this.datasetLabels[c.resourceId],
@@ -255,12 +252,6 @@ export const lexicalStore = defineStore('dataset', {
     setSearchQuery(query: string) {
       this.searchQuery = query
     },
-    /*
-    setSelectedFieldMain(sfc: SelectedFieldConfig) {
-      this.clearSelectedFieldMain()
-      this.addSelectedFieldMain(sfc)
-    },
-*/
     resetSelectedFieldsMain(sfc: SelectedFieldConfig) {
       // minimum one field
       this.selectedFieldsMain = [
@@ -586,7 +577,6 @@ export const lexicalStore = defineStore('dataset', {
     },
     setStartField(val: string = '') {
       // set "ingångsord" to default, also for statistics
-      //console.log('setStartField()')
       const sfc: SelectedFieldConfig = {
         id: randomId(),
         name: entryWordField,
@@ -696,7 +686,6 @@ export const lexicalStore = defineStore('dataset', {
           tablePageRowStart: 0,
           tablePageSize: ROWS_PER_PAGE,
           tableTotal: 0,
-          //tableResult: { hits: [], resourceHits: {}, resourceOrder: {}, total: 0 },
         }
       }
     },

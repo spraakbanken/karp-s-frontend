@@ -9,6 +9,7 @@ import {
   TAB_SEARCH_EXTENDED,
   TAB_SEARCH_SIMPLE,
 } from '@/utils/constants'
+import type { CountHeadersColumn, StatisticsCell, StatisticsDataset } from '@/types/datasetConfig'
 //import type { forEach } from 'es-toolkit/compat'
 
 export const apiUrl = import.meta.env.VITE_API_URL as string
@@ -184,7 +185,11 @@ export const getStatisticsData = async (
   compileParams: string[],
   columns: string[],
   columnCount: boolean,
-): Promise<{ headers: []; table: []; totals: [] }> => {
+): Promise<{
+  headers: CountHeadersColumn[]
+  table: StatisticsDataset[]
+  totals: StatisticsCell[]
+}> => {
   const lexicalStorage = lexicalStore()
 
   try {

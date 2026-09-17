@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, onMounted, onUpdated, ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
 import { formatCell, isImage } from '@/utils/utils'
@@ -20,41 +20,41 @@ const props = defineProps<{
   showCompact: boolean
 }>()
 
-const thflag = ref(false)
-const tdRefs = ref([])
-const isTooTall = () => {
-  if (tdRefs.value.length > 0) {
-    let h = 0
-    tdRefs.value.forEach((element) => (h = element.offsetHeight > h ? element.offsetHeight : h))
-    //console.log('tdrefs len:', tdRefs.value.length, h, props.value1.resourceId)
-    thflag.value = h > props.maxHeight
-    return h > props.maxHeight
-  } else {
-    return false
+/* handle compact and expanded view of rows */
+
+const tableHeightFlag = ref(false)
+const tdRefs = ref<HTMLTableCellElement[]>([])
+const measureHeight = () => {
+  const tooTall = tdRefs.value.some((element) => element.scrollHeight > props.maxHeight)
+
+  if (tableHeightFlag.value !== tooTall) {
+    tableHeightFlag.value = tooTall
   }
 }
+
+onMounted(() => nextTick(measureHeight))
+
+onUpdated(() => nextTick(measureHeight))
+
 const [expanded, toggleExpanded] = useToggle()
 </script>
 
 <template>
-  <tr :class="{ 'limited-height': !expanded && isTooTall() }">
+  <tr :class="{ 'limited-height': !expanded && tableHeightFlag }">
     <template v-for="(value2, key) in value1.entry" :key="key">
-      <td v-if="thflag && key === 0" class="button-span" @click="toggleExpanded()">
+      <td v-if="tableHeightFlag && key === 0" class="button-span" @click="toggleExpanded()">
         <font-awesome-icon
           :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
           class="fa-icon"
         />
       </td>
       <td v-else-if="key === 0 && showCompact"></td>
-      <td
-        ref="tdRefs"
-        v-if="props.fa.find((f) => f.columnField === value2.name)?.vis"
-        class="table-data"
-      >
-        <div :class="{ 'mhr-div': !expanded && thflag, numeric: isNumber(value2.value) }">
+      <td v-if="props.fa.find((f) => f.columnField === value2.name)?.vis" class="table-data">
+        <div
+          ref="tdRefs"
+          :class="{ 'mhr-div': !expanded && tableHeightFlag, numeric: isNumber(value2.value) }"
+        >
           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
-            <!--<span style="white-space: nowrap">-->
-
             <span v-html="formatCell(value2.name, value2.value)"></span>
             <span v-if="isImage(value2.value)">
               <a

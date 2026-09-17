@@ -70,12 +70,6 @@ export interface Tag {
   [key: string]: TagLabel
 }
 
-/*
-export interface FieldConfigArray {
-  [key: string]: FieldConfig
-}
-*/
-
 export type SelectedFieldConfig = {
   id: number
   name: string
@@ -141,23 +135,14 @@ export type StatisticsValue = {
   count: number
 }
 
-export type StatisticsCell =
-  | string
-  | number
-  | string[]
-  | {
-      count: number
-      values?: StatisticsValue[]
-    }
+export type StatisticsCellObject = {
+  count: number
+  values?: StatisticsValue[]
+}
+
+export type StatisticsCell = string | number | string[] | StatisticsCellObject
 
 export type StatisticsDataset = StatisticsCell[]
-
-/*
-    retire this
-*/
-export type Dataset = {
-  [key: string]: string
-}
 
 export type CountHeadersColumn = {
   type: string
@@ -166,20 +151,7 @@ export type CountHeadersColumn = {
   headerValue: string
 }
 
-/*
-export type Entry = {
-  entry: Dataset
-}
-
-export type DatasetConfig = {
-  hits: Entry[]
-  total: number
-}
-
-export type Datasets = {
-  [key: string]: DatasetConfig
-}
-*/
+/* help types */
 
 export type TableResultGrpSorted = Record<string, { entry: EntryS[]; resourceId: string }[]>
 
@@ -187,7 +159,6 @@ export type TabRefSetup = {
   resourceId: string[]
   columnField: string
   columnValue: string
-  /*  tableResult: DatasetResult */
   tableResultGrpSorted: TableResultGrpSorted
   isLoading: boolean
   tablePageRowStart: number
@@ -199,3 +170,6 @@ export type ColumnVisField = {
   columnField: string
   vis: boolean
 }
+
+export const isStatisticsObjectCell = (cell: StatisticsCell): cell is StatisticsCellObject =>
+  typeof cell === 'object' && cell !== null && !Array.isArray(cell)

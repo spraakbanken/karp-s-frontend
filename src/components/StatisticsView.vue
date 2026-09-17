@@ -8,7 +8,14 @@ import {
 } from '@/utils/constants'
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { lexicalStore } from '@/stores/store'
-import { entryWordField, entryWordFieldCamel, type Dataset } from '@/types/datasetConfig'
+import {
+  isStatisticsObjectCell,
+  entryWordField,
+  entryWordFieldCamel,
+  type StatisticsCellObject,
+  type StatisticsCell,
+  type StatisticsDataset,
+} from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import * as d3 from 'd3'
 import { formatCell } from '@/utils/utils'
@@ -38,10 +45,6 @@ const statisticsTotals = computed({
   set: (value) => (lexicalStorage.statisticsTotals = value),
 })
 
-// sort column
-//const sortField = ref(lexicalStorage.tableSortField)
-//const sortOrder = ref<typeof SORT_ORDER_ASCENDING | typeof SORT_ORDER_DESCENDING>(SORT_ORDER_ASCENDING)
-
 const currentTab = computed({
   get: () => lexicalStorage.activeResultTab,
   set: (value) => (lexicalStorage.activeResultTab = value),
@@ -66,8 +69,6 @@ const dropdownContainerS = ref<HTMLElement | null>(null)
 
 const toggleDropdownCompileFields = () => {
   isDropdownCompileFields.value = !isDropdownCompileFields.value
-  //  isDropdownOpen.value = false
-  //  isDropdownParams.value = false
   isDropdownColumns.value = false
   // if closing
   if (!isDropdownColumns.value) {
@@ -118,6 +119,7 @@ const selectedCompileFields = computed({
   get: () => lexicalStorage.selectedCompileFields,
   set: (value) => lexicalStorage.setSelectedCompileFields(value),
 })
+
 const selectedColumns = computed({
   get: () => lexicalStorage.selectedColumns,
   set: (value) => lexicalStorage.setSelectedColumns(value),
@@ -147,9 +149,9 @@ const updateColumns = () => {
 
 //const updateShowHitsCheckbox = ref(selectedColumns.value.length == 0)
 const updateShowHitsCheckbox = ref(true)
+
 // UI show hits choice in "Additonal columns" dropdown
 const updateShowHits = () => {
-  //console.log('CHKBOX:', updateShowHitsCheckbox.value)
   if (updateShowHitsCheckbox.value) {
     //selectedColumns.value = []
   } else {
@@ -181,7 +183,6 @@ const fetchData = async () => {
   const newColumns = lexicalStorage.selectedColumns
   lexicalStorage.setIsStatisticsData(false)
 
-  //console.log('fetchData', newParams, newCompileParams, newColumns)
   if (
     lexicalStorage.selectedCompileFields &&
     newCompileFields.length > 0 &&
@@ -207,7 +208,6 @@ const fetchData = async () => {
           statisticsHeaders.value[i].headerField = entryWordField
         }
       })
-      //console.log('statisticsResult', statisticsResult.value)
       statisticsResult.value = table
       if (statisticsResult.value.length > 0) {
         lexicalStorage.setIsStatisticsData(true)
@@ -255,7 +255,6 @@ watch(
 watch(
   () => lexicalStorage.selectedDatasets,
   (newDatasets, oldDatasets) => {
-    //console.log('WATCH: Stat - selectedDatasets', newDatasets.length, oldDatasets.length)
     if (newDatasets.length === 0) {
       statisticsResult.value = []
       lexicalStorage.setIsStatisticsData(false)
@@ -274,15 +273,12 @@ watch(
 )
 
 const sortedData = computed(() => {
-  // console.log('sortedData compute: ', lexicalStorage.statisticsSortField)
   const order = lexicalStorage.statisticsSortOrder === SORT_ORDER_ASCENDING ? 1 : -1
   if (!lexicalStorage.statisticsSortField) {
     return statisticsResult.value
   } else {
     // find statisticsSortField in statisticsHeader, array of objects (type, columnField ===)
     return [...statisticsResult.value].sort((a, b) => {
-      //const aValue = a[sortKey.value]
-      //const bValue = b[sortKey.value]
       // data is of format a[0] = "name", a[1] = number
       const aValue = a[statisticsSortIndex.value]
       const bValue = b[statisticsSortIndex.value]
@@ -371,7 +367,7 @@ const exportCSV = () => {
 
   // write data
   for (const row in statisticsResult.value) {
-    const rowItems: Dataset = statisticsResult.value[row]
+    const rowItems: StatisticsDataset = statisticsResult.value[row]
     // value could be array
     for (const key in rowItems) {
       const key_number = Number(key)
@@ -381,23 +377,22 @@ const exportCSV = () => {
         if (collectionColumn.includes(statisticsHeaders.value[key_number].columnField)) {
           csv += '"' + formatCell('', cell, '; ') + '\",'
         } else {
-          if (statisticsHeaders.value[key_number].type === 'value') {
-            //csv += cell.count
-            // does if have a .values[] with .count and .value?
-            let cell_values = ''
-            if (BE_STATISTICS_VALUES_ID in cell && cell[BE_STATISTICS_VALUES_ID].length > 0) {
-              cell[BE_STATISTICS_VALUES_ID].forEach((v) => {
-                cell_values +=
-                  cell_values != ''
-                    ? ', ' + v.value + '\/' + cell.count
-                    : v.value + '\/' + cell.count
-              })
-            }
-            csv += cell_values
-          } else if (statisticsHeaders.value[key_number].type === 'count') {
+          if (
+            statisticsHeaders.value[key_number].type === 'value' &&
+            isStatisticsObjectCell(cell)
+          ) {
+            const cellValues = (cell.values ?? [])
+              .map((value) => `${value.value}/${cell.count}`)
+              .join(', ')
+
+            csv += cellValues
+          } else if (
+            statisticsHeaders.value[key_number].type === 'count' &&
+            isStatisticsObjectCell(cell)
+          ) {
             csv += cell.count
           } else {
-            csv += cell
+            csv += Array.isArray(cell) ? cell.join(', ') : String(cell)
           }
         }
       } else {
@@ -413,7 +408,9 @@ const exportCSV = () => {
     csv += '\"' + t('statistics.total') + '\",'
     csv += '\"' + statisticsTotals.value[1] + '\",'
     for (let i: number = 2; i < statisticsTotals.value.length; i++) {
-      csv += '\"' + statisticsTotals.value[i].count + '\",'
+      const total = statisticsTotals.value[i]
+      const totalValue = isStatisticsObjectCell(total) ? total.count : total
+      csv += '\"' + totalValue + '\",'
     }
     csv += '\n'
   }
@@ -455,7 +452,7 @@ const drawChart = () => {
   //  if (Object.keys(statisticsResult.value).length === 1) {
   if (statisticsResult.value.length === 1) {
     // one hit distributed on datasets
-    const rowItems: Dataset = statisticsResult.value[0]
+    const rowItems: StatisticsDataset = statisticsResult.value[0]
     for (const key in rowItems) {
       const key_number = Number(key)
       //console.log('OVERVIEW :', tableHeaders.value[key_number])
@@ -467,7 +464,11 @@ const drawChart = () => {
         const category: string =
           lexicalStorage.datasetLabels[statisticsHeaders.value[key_number].headerValue]
         //const category: string = tableHeaders.value[key_number].headerValue
-        const value: number = Number(rowItems[key].count)
+        const cell = rowItems[key_number]
+        if (!isStatisticsObjectCell(cell)) {
+          continue
+        }
+        const value = cell.count
         //console.log('row=', row, 'category=', category, 'value=', value)
         if (
           value >= graph_threshold_min.value &&
@@ -1110,7 +1111,6 @@ const refClick = (tRow: number, tCol: number) => {
                 :tableRow="tableRow"
                 :showCompact="showCompact"
                 :updateShowHitsCheckbox="updateShowHitsCheckbox"
-                :paginatedDataRow="paginatedData[tableRow]"
               >
               </StatisticsRowCompact>
             </template>

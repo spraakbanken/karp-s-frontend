@@ -1,20 +1,23 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, onMounted, onUpdated, ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 //import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
 import { formatCell } from '@/utils/utils'
-import type { CountHeadersColumn, Dataset } from '@/types/datasetConfig'
+import {
+  isStatisticsObjectCell,
+  type CountHeadersColumn,
+  type StatisticsDataset,
+} from '@/types/datasetConfig'
 import { ROW_MAX_HEIGHT, BE_STATISTICS_VALUES_ID } from '@/utils/constants'
 import { isNumber } from 'es-toolkit/compat'
 import { lexicalStore } from '@/stores/store'
 
 const props = defineProps<{
-  item: Dataset
+  item: StatisticsDataset
   tableRow: number
   columnHeads: CountHeadersColumn[]
   showCompact: boolean
   updateShowHitsCheckbox: boolean
-  paginatedDataRow: Dataset
 }>()
 
 const lexicalStorage = lexicalStore()
@@ -30,46 +33,59 @@ function showSnackbar() {
   }
 }
 
-const refClick = (tRow: number, tCol: number) => {
+const refClick = (tCol: number) => {
+  const cell = props.item[tCol]
+  const header = lexicalStorage.statisticsHeaders[tCol]
+  if (cell === undefined || header === undefined) {
+    return
+  }
+
   showSnackbar()
   if (tCol < lexicalStorage.selectedCompileFields.length) {
-    const xValue = props.paginatedDataRow[tCol]
-    const xField = lexicalStorage.statisticsHeaders[tCol].columnField
-    const xTables = lexicalStorage.selectedDatasets
-    //console.log('CLICK0: ', xValue, xField, xTables)
-    lexicalStorage.addTabRef(xTables, xField, xValue)
+    // addTabRef requires a string
+    if (typeof cell !== 'string') {
+      return
+    }
+    showSnackbar()
+    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, header.columnField, cell)
   } else {
-    const xValue = props.paginatedDataRow[tCol].values[0].value
-    const xField = lexicalStorage.statisticsHeaders[tCol].columnField
-    const xTables = lexicalStorage.statisticsHeaders[tCol].headerValue
-    //console.log('CLICK: ', tRow, tCol, xValue, xField, xTables)
-    lexicalStorage.addTabRef([xTables], xField, xValue)
+    // Only object cells can contain `values`
+    if (!isStatisticsObjectCell(cell) || !cell.values?.length) {
+      return
+    }
+    showSnackbar()
+    lexicalStorage.addTabRef([header.headerValue], header.columnField, cell.values[0].value)
   }
 }
-const thflag = ref(false)
-const tdRefs = ref([])
-const isTooTall = () => {
-  if (tdRefs.value.length > 0) {
-    let h = 0
-    tdRefs.value.forEach((element) => (h = element.offsetHeight > h ? element.offsetHeight : h))
-    //console.log('tdrefs len:', tdRefs.value.length, h, props.item.resourceId)
-    thflag.value = h > ROW_MAX_HEIGHT
-    return h > ROW_MAX_HEIGHT
-  } else {
-    return false
+
+/* handle compact and expanded view of rows */
+
+const tableHeightFlag = ref(false)
+const tdRefs = ref<HTMLTableCellElement[]>([])
+
+const measureHeight = () => {
+  const tooTall = tdRefs.value.some((element) => element.scrollHeight > ROW_MAX_HEIGHT)
+
+  if (tableHeightFlag.value !== tooTall) {
+    tableHeightFlag.value = tooTall
   }
 }
+
+onMounted(() => nextTick(measureHeight))
+
+onUpdated(() => nextTick(measureHeight))
+
 const [expanded, toggleExpanded] = useToggle(!props.showCompact)
 </script>
 
 <template>
-  <tr :class="{ 'limited-height': !expanded && isTooTall() }">
+  <tr :class="{ 'limited-height': !expanded && tableHeightFlag }">
     <template v-for="(value, tableCol) in item" :key="tableCol">
       <!-- is value just a number? -->
       <template v-if="isNumber(value)">
         <!--first column -->
         <td
-          v-if="thflag && tableCol === 0 && showCompact"
+          v-if="tableHeightFlag && tableCol === 0 && showCompact"
           class="button-span"
           @click="toggleExpanded()"
         >
@@ -95,13 +111,13 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         v-else-if="
           typeof value === 'object' &&
           value !== null &&
-          ((BE_STATISTICS_VALUES_ID in value && value[BE_STATISTICS_VALUES_ID].length === 0) ||
-            !(BE_STATISTICS_VALUES_ID in value))
+          !Array.isArray(value) &&
+          (value.values?.length ?? 0) === 0
         "
       >
         <!--first column -->
         <td
-          v-if="thflag && tableCol === 0 && showCompact"
+          v-if="tableHeightFlag && tableCol === 0 && showCompact"
           class="button-span"
           @click="toggleExpanded()"
         >
@@ -125,7 +141,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
       <template v-else>
         <!--first column -->
         <td
-          v-if="thflag && tableCol === 0 && showCompact"
+          v-if="tableHeightFlag && tableCol === 0 && showCompact"
           class="button-span"
           @click="toggleExpanded()"
         >
@@ -136,8 +152,8 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!--show data -->
-        <td ref="tdRefs" class="table-data">
-          <div :class="{ 'mhr-div': !expanded && thflag }">
+        <td class="table-data">
+          <div ref="tdRefs" :class="{ 'mhr-div': !expanded && tableHeightFlag }">
             <span
               v-html="
                 formatCell(
@@ -148,7 +164,7 @@ const [expanded, toggleExpanded] = useToggle(!props.showCompact)
                   updateShowHitsCheckbox,
                 )
               "
-              @click="refClick(Number(tableRow), Number(tableCol))"
+              @click="refClick(Number(tableCol))"
               class="cell-clickable"
             ></span>
           </div>
