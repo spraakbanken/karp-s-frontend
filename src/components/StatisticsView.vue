@@ -23,6 +23,7 @@ import { useI18n } from 'vue-i18n'
 import StatisticsRowCompact from './StatisticsRowCompact.vue'
 import StatisticsPagination from './StatisticsPagination.vue'
 import { checkJwtToken } from '@/api/authService'
+import { isNumber } from 'es-toolkit/compat'
 
 const { t } = useI18n()
 
@@ -54,12 +55,6 @@ const columnCount = ref(false)
 // compact
 
 const showCompact = ref(ROW_SHOW_COMPACT_DEFAULT)
-
-watch(
-  () => showCompact.value,
-  () => {},
-  { immediate: true },
-)
 
 // UI
 
@@ -798,23 +793,39 @@ const updateOverview = () => {
     drawChart()
   }
 }
-/*
-const refClick = (tRow: number, tCol: number) => {
-  if (tCol === 0) {
-    const xValue = paginatedData.value[tRow][tCol]
-    const xField = statisticsHeaders.value[tCol].columnField
-    const xTables = lexicalStorage.selectedDatasets
-    //console.log('CLICK0: ', xValue, xField, xTables)
-    lexicalStorage.addTabRef(xTables, xField, xValue)
-  } else {
-    const xValue = paginatedData.value[tRow][tCol].values[0].value
-    const xField = statisticsHeaders.value[tCol].columnField
-    const xTables = statisticsHeaders.value[tCol].headerValue
-    //console.log('CLICK: ', tRow, tCol, xValue, xField, xTables)
-    lexicalStorage.addTabRef([xTables], xField, xValue)
+
+/* Show "popup" message that we have added a ref table */
+function showSnackbar() {
+  const snackbar = document.getElementById('snackbar')
+  if (snackbar !== null) {
+    snackbar.className = 'show'
+    setTimeout(() => {
+      snackbar.className = snackbar.className.replace('show', '')
+    }, 3000)
   }
 }
-*/
+
+const refClick = (item: StatisticsDataset, tableCol: number) => {
+  const cell = item[tableCol]
+  const header = statisticsHeaders.value[tableCol]
+  if (cell === undefined || header === undefined) {
+    return
+  }
+
+  if (tableCol < lexicalStorage.selectedCompileFields.length) {
+    if (typeof cell !== 'string') {
+      return
+    }
+    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, header.columnField, cell)
+  } else {
+    if (!isStatisticsObjectCell(cell) || !cell.values?.length) {
+      return
+    }
+    lexicalStorage.addTabRef([header.headerValue], header.columnField, cell.values[0].value)
+  }
+
+  showSnackbar()
+}
 </script>
 
 <template>
@@ -1161,7 +1172,9 @@ const refClick = (tRow: number, tCol: number) => {
             </tr>
             <!-- show data -->
             <template v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
+              <!-- show compact row -->
               <StatisticsRowCompact
+                v-if="showCompact"
                 :item="item"
                 :columnHeads="statisticsHeaders"
                 :tableRow="tableRow"
@@ -1169,6 +1182,51 @@ const refClick = (tRow: number, tCol: number) => {
                 :updateShowHitsCheckbox="updateShowHitsCheckbox"
               >
               </StatisticsRowCompact>
+              <!-- show full row -->
+              <tr v-else>
+                <template v-for="(value, tableCol) in item" :key="tableCol">
+                  <td
+                    v-if="isNumber(value)"
+                    class="table-data"
+                    :class="{
+                      'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
+                      'total-null': value === 0,
+                    }"
+                  >
+                    {{ value }}
+                  </td>
+                  <td
+                    v-else-if="
+                      typeof value === 'object' &&
+                      value !== null &&
+                      !Array.isArray(value) &&
+                      (value.values?.length ?? 0) === 0
+                    "
+                    class="numeric table-data"
+                    :class="{
+                      'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
+                      'total-null': value.count === 0,
+                    }"
+                  >
+                    {{ value.count }}
+                  </td>
+                  <td v-else class="table-data">
+                    <span
+                      v-html="
+                        formatCell(
+                          statisticsHeaders[tableCol].columnField,
+                          value,
+                          undefined,
+                          undefined,
+                          updateShowHitsCheckbox,
+                        )
+                      "
+                      class="cell-clickable"
+                      @click="refClick(item, Number(tableCol))"
+                    ></span>
+                  </td>
+                </template>
+              </tr>
             </template>
           </tbody>
         </table>
@@ -1350,6 +1408,26 @@ svg g text {
 
 .total-sum {
   text-align: left;
+}
+
+td.total-column {
+  background-color: var(--sb-grey-light);
+  color: black;
+  font-weight: bold;
+  text-align: right;
+}
+
+td.total-null {
+  color: var(--sb-grey-light);
+  text-align: right;
+}
+
+tr:nth-child(odd) td.total-null {
+  color: #c0c0c0;
+}
+
+.numeric {
+  text-align: right;
 }
 
 /* info/settings */

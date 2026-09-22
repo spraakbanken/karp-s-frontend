@@ -75,7 +75,7 @@ onMounted(() => nextTick(measureHeight))
 
 onUpdated(() => nextTick(measureHeight))
 
-const [expanded, toggleExpanded] = useToggle(!props.showCompact)
+const [expanded, toggleExpanded] = useToggle()
 </script>
 
 <template>
