@@ -59,7 +59,7 @@ const [expanded, toggleExpanded] = useToggle()
             <span v-if="isImage(value2.value)">
               <a
                 :href="baseUrl + 'img?img=' + value2.value"
-                class="action-link"
+                class="action-link img-browse-button"
                 target="_blank"
                 :title="t('table.imgbrowse')"
               >
@@ -125,5 +125,9 @@ p:not(:last-of-type) {
   vertical-align: top;
   font-size: 0.8rem;
   text-decoration: none;
+}
+
+.img-browse-button {
+  margin-left: 0.25rem;
 }
 </style>

@@ -17,6 +17,7 @@
   text-align: left;
   width: fit-content;
   table-layout: auto;
+  font-variant-numeric: tabular-nums;
 }
 
 th,

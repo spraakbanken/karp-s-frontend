@@ -521,7 +521,7 @@ const picsbarFractionTotalClass = (ds: string) => {
                             <span v-if="isImage(value2.value)">
                               <a
                                 :href="'/karp/img?img=' + value2.value"
-                                class="action-link"
+                                class="action-link img-browse-button"
                                 target="_blank"
                                 :title="t('table.imgbrowse')"
                               >
@@ -847,5 +847,9 @@ const picsbarFractionTotalClass = (ds: string) => {
   vertical-align: top;
   font-size: 0.8rem;
   text-decoration: none;
+}
+
+.img-browse-button {
+  margin-left: 0.25rem;
 }
 </style>
