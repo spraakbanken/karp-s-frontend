@@ -509,6 +509,7 @@ const picsbarFractionTotalClass = (ds: string) => {
                     <tr>
                       <template v-for="(value2, key) in value1.entry" :key="key">
                         <td
+                          dir="auto"
                           v-if="
                             lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)
                               ?.vis

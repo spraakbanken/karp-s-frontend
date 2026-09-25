@@ -36,6 +36,10 @@ th {
   vertical-align: top;
 }
 
+td {
+  text-align: start;
+}
+
 tr {
   vertical-align: top;
 }

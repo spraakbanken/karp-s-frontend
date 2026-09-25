@@ -49,7 +49,11 @@ const [expanded, toggleExpanded] = useToggle()
         />
       </td>
       <td v-else-if="key === 0 && showCompact"></td>
-      <td v-if="props.fa.find((f) => f.columnField === value2.name)?.vis" class="table-data">
+      <td
+        dir="auto"
+        v-if="props.fa.find((f) => f.columnField === value2.name)?.vis"
+        class="table-data"
+      >
         <div
           ref="tdRefs"
           :class="{ 'mhr-div': !expanded && tableHeightFlag, numeric: isNumber(value2.value) }"

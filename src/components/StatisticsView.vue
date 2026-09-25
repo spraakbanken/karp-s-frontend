@@ -1247,7 +1247,7 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
                   >
                     {{ value.count }}
                   </td>
-                  <td v-else class="table-data">
+                  <td dir="auto" v-else class="table-data">
                     <span
                       v-html="
                         formatCell(

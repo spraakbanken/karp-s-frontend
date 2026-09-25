@@ -229,6 +229,7 @@ onMounted(async () => {
           <template v-for="(cItem, cKey) in rItem" :key="cKey">
             <tr>
               <td
+                dir="auto"
                 v-for="(value2, key) in cItem.entry"
                 :key="key"
                 :style="isImage(value2.value) ? 'white-space: nowrap' : ''"

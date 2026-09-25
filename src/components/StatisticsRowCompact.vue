@@ -183,7 +183,7 @@ const [expanded, toggleExpanded] = useToggle()
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!--show data -->
-        <td class="table-data">
+        <td dir="auto" class="table-data">
           <div ref="tdRefs" :class="{ 'mhr-div': !expanded && tableHeightFlag }">
             <span
               v-html="
