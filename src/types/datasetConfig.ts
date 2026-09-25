@@ -157,8 +157,8 @@ export type TableResultGrpSorted = Record<string, { entry: EntryS[]; resourceId:
 
 export type TabRefSetup = {
   resourceId: string[]
-  columnField: string
-  columnValue: string
+  label: string
+  query: string
   tableResultGrpSorted: TableResultGrpSorted
   isLoading: boolean
   tablePageRowStart: number

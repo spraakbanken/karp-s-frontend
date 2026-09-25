@@ -2,7 +2,7 @@
 import { nextTick, onMounted, onUpdated, ref } from 'vue'
 import { useToggle } from '@vueuse/core'
 //import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
-import { formatCell } from '@/utils/utils'
+import { buildEqualsQuery, compileRowSearch, formatCell } from '@/utils/utils'
 import {
   isStatisticsObjectCell,
   type CountHeadersColumn,
@@ -40,22 +40,39 @@ const refClick = (tCol: number) => {
     return
   }
 
-  showSnackbar()
-  if (tCol < lexicalStorage.selectedCompileFields.length) {
+  if (tCol === lexicalStorage.selectedCompileFields.length) {
+    const search = compileRowSearch(
+      props.item,
+      props.columnHeads,
+      lexicalStorage.selectedCompileFields.length,
+    )
+    if (!search) {
+      return
+    }
+    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, search.label, search.query)
+  } else if (tCol < lexicalStorage.selectedCompileFields.length) {
     // addTabRef requires a string
     if (typeof cell !== 'string') {
       return
     }
-    showSnackbar()
-    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, header.columnField, cell)
+    lexicalStorage.addTabRef(
+      lexicalStorage.selectedDatasets,
+      cell,
+      buildEqualsQuery(header.columnField, cell),
+    )
   } else {
     // Only object cells can contain `values`
     if (!isStatisticsObjectCell(cell) || !cell.values?.length) {
       return
     }
-    showSnackbar()
-    lexicalStorage.addTabRef([header.headerValue], header.columnField, cell.values[0].value)
+    const value = cell.values[0].value
+    lexicalStorage.addTabRef(
+      [header.headerValue],
+      value,
+      buildEqualsQuery(header.columnField, value),
+    )
   }
+  showSnackbar()
 }
 
 /* handle compact and expanded view of rows */
@@ -81,8 +98,34 @@ const [expanded, toggleExpanded] = useToggle()
 <template>
   <tr :class="{ 'limited-height': !expanded && tableHeightFlag }">
     <template v-for="(value, tableCol) in item" :key="tableCol">
+      <!-- the total column always opens a reference search for this row's compile values -->
+      <template v-if="tableCol === lexicalStorage.selectedCompileFields.length">
+        <td
+          class="numeric table-data total-column"
+          :class="{
+            'total-null':
+              (isNumber(value) && value === 0) ||
+              (isStatisticsObjectCell(value) && value.count === 0),
+          }"
+        >
+          <a
+            href="#"
+            class="cell-clickable"
+            @click.prevent="refClick(Number(tableCol))"
+            v-html="
+              formatCell(
+                columnHeads[tableCol].columnField,
+                value,
+                undefined,
+                undefined,
+                updateShowHitsCheckbox,
+              )
+            "
+          ></a>
+        </td>
+      </template>
       <!-- is value just a number? -->
-      <template v-if="isNumber(value)">
+      <template v-else-if="isNumber(value)">
         <!--first column -->
         <td
           v-if="tableHeightFlag && tableCol === 0 && showCompact"
@@ -96,13 +139,7 @@ const [expanded, toggleExpanded] = useToggle()
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
         <!-- show data as number-->
-        <td
-          :class="{
-            'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
-            'total-null': value === 0,
-          }"
-          class="table-data"
-        >
+        <td :class="{ 'total-null': value === 0 }" class="table-data">
           {{ value }}
         </td>
       </template>
@@ -127,13 +164,7 @@ const [expanded, toggleExpanded] = useToggle()
           />
         </td>
         <td v-else-if="tableCol === 0 && showCompact"></td>
-        <td
-          class="numeric table-data"
-          :class="{
-            'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
-            'total-null': value.count === 0,
-          }"
-        >
+        <td class="numeric table-data" :class="{ 'total-null': value.count === 0 }">
           {{ value.count }}
         </td>
       </template>

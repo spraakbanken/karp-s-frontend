@@ -674,13 +674,13 @@ export const lexicalStore = defineStore('dataset', {
     areDatasetsInConfig(keys: string[]): boolean {
       return keys.every((k) => this.currentDatasets.includes(k))
     },
-    addTabRef(aResourceId: string[], aColumnField: string, aColumnValue: string) {
+    addTabRef(resourceId: string[], label: string, query: string) {
       if (this.tabRefSetupCounter < TABREFCOUNT_MAX) {
         this.tabRefSetupCounter++
         this.tabRefSetup[this.tabRefSetupCounter] = {
-          resourceId: aResourceId,
-          columnField: aColumnField,
-          columnValue: aColumnValue,
+          resourceId,
+          label,
+          query,
           tableResultGrpSorted: {},
           isLoading: false,
           tablePageRowStart: 0,

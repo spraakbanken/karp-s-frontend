@@ -280,8 +280,7 @@ const handleError = (error: unknown): string => {
 // pageStart starts at 0 in this function
 export const getTabRefData = async (
   resourceId: string[],
-  columnField: string,
-  columnValue: string,
+  query: string,
   pageStart: number,
   pageSize: number,
 ) => {
@@ -291,8 +290,8 @@ export const getTabRefData = async (
     // datasets
     params['resources'] = resourceId.join(',')
 
-    // query/field parameters
-    params['q'] = 'equals|' + columnField + '|"' + columnValue.replace(/"/g, '\\"') + '"'
+    // query parameters
+    params['q'] = query
 
     params['from'] = pageStart.toString()
     params['size'] = pageSize.toString()

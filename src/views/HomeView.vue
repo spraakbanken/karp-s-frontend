@@ -35,7 +35,7 @@ const syncResult = ref<SyncResult>(SyncResult.SYNC_RESULT_NOT_SYNCED)
 // reference tabs
 const tabRefSetup = reactive(lexicalStorage.tabRefSetup)
 const limit_tabref = (t: string) => {
-  return t.length > 15 ? t.substring(0, 15) + '...' : t
+  return t.length > 20 ? t.substring(0, 17) + '...' : t
 }
 
 // newsitems
@@ -174,12 +174,12 @@ const tabRefClose = (id: number) => {
             </button>
             <template v-for="(tabRef, key) in tabRefSetup" :key="key">
               <button :class="{ active: activeResultTab === TAB_RESULT_REF + key }">
-                <span @click="setActiveResultTab(TAB_RESULT_REF + key)">
-                  <span> <font-awesome-icon :icon="['fas', 'chevron-right']" /> </span
-                  >{{ limit_tabref(tabRef.columnValue) }}</span
-                >
-                <span @click="tabRefClose(Number(key))" style="margin-left: 0.5rem">
+                <span @click="tabRefClose(Number(key))">
                   <font-awesome-icon :icon="['fas', 'close']" />
+                </span>
+                <span @click="setActiveResultTab(TAB_RESULT_REF + key)">
+                  <!--<span> <font-awesome-icon :icon="['fas', 'chevron-right']" /> </span>-->
+                  {{ limit_tabref(tabRef.label) }}
                 </span>
               </button>
             </template>
@@ -194,8 +194,7 @@ const tabRefClose = (id: number) => {
               v-if="activeResultTab === TAB_RESULT_REF + key"
               :id="Number(key)"
               :resourceId="tabRef.resourceId"
-              :columnField="tabRef.columnField"
-              :columnValue="tabRef.columnValue"
+              :query="tabRef.query"
             />
           </div>
           <AboutView v-if="lexicalStorage.isStart" />

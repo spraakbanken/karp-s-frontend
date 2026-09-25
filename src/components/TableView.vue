@@ -842,14 +842,4 @@ const picsbarFractionTotalClass = (ds: string) => {
   vertical-align: top;
   font-size: 0.8rem;
 }
-
-.action-link {
-  vertical-align: top;
-  font-size: 0.8rem;
-  text-decoration: none;
-}
-
-.img-browse-button {
-  margin-left: 0.25rem;
-}
 </style>

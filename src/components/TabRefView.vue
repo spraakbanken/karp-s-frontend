@@ -21,8 +21,7 @@ import { checkJwtToken } from '@/api/authService'
 const props = defineProps<{
   id: number
   resourceId: string[]
-  columnField: string
-  columnValue: string
+  query: string
 }>()
 
 const { t } = useI18n()
@@ -54,8 +53,7 @@ const fetchData = async () => {
   lexicalStorage.tabRefSetup[props.id].isLoading = true
   const data = await getTabRefData(
     props.resourceId,
-    props.columnField,
-    props.columnValue,
+    props.query,
     tablePageRowStart.value,
     tablePageSize.value,
   )
@@ -239,6 +237,7 @@ onMounted(async () => {
                 <span v-if="isImage(value2.value)">
                   <a
                     :href="'/karp/img?img=' + value2.value"
+                    class="action-link img-browse-button"
                     target="_blank"
                     :title="t('table.imgbrowse')"
                   >
@@ -348,11 +347,5 @@ onMounted(async () => {
   color: var(--sb-orange);
   vertical-align: top;
   font-size: 18px;
-}
-
-.action-link {
-  vertical-align: top;
-  font-size: 22px;
-  text-decoration: none;
 }
 </style>

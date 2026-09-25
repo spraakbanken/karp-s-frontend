@@ -18,7 +18,7 @@ import {
 } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import * as d3 from 'd3'
-import { formatCell } from '@/utils/utils'
+import { buildEqualsQuery, compileRowSearch, formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
 import StatisticsRowCompact from './StatisticsRowCompact.vue'
 import StatisticsPagination from './StatisticsPagination.vue'
@@ -812,16 +812,35 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
     return
   }
 
-  if (tableCol < lexicalStorage.selectedCompileFields.length) {
+  if (tableCol === lexicalStorage.selectedCompileFields.length) {
+    const search = compileRowSearch(
+      item,
+      statisticsHeaders.value,
+      lexicalStorage.selectedCompileFields.length,
+    )
+    if (!search) {
+      return
+    }
+    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, search.label, search.query)
+  } else if (tableCol < lexicalStorage.selectedCompileFields.length) {
     if (typeof cell !== 'string') {
       return
     }
-    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, header.columnField, cell)
+    lexicalStorage.addTabRef(
+      lexicalStorage.selectedDatasets,
+      cell,
+      buildEqualsQuery(header.columnField, cell),
+    )
   } else {
     if (!isStatisticsObjectCell(cell) || !cell.values?.length) {
       return
     }
-    lexicalStorage.addTabRef([header.headerValue], header.columnField, cell.values[0].value)
+    const value = cell.values[0].value
+    lexicalStorage.addTabRef(
+      [header.headerValue],
+      value,
+      buildEqualsQuery(header.columnField, value),
+    )
   }
 
   showSnackbar()
@@ -1186,12 +1205,33 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
               <tr v-else>
                 <template v-for="(value, tableCol) in item" :key="tableCol">
                   <td
-                    v-if="isNumber(value)"
-                    class="table-data"
+                    v-if="tableCol === lexicalStorage.selectedCompileFields.length"
+                    class="numeric table-data total-column"
                     :class="{
-                      'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
-                      'total-null': value === 0,
+                      'total-null':
+                        (isNumber(value) && value === 0) ||
+                        (isStatisticsObjectCell(value) && value.count === 0),
                     }"
+                  >
+                    <a
+                      href="#"
+                      class="cell-clickable"
+                      @click.prevent="refClick(item, Number(tableCol))"
+                      v-html="
+                        formatCell(
+                          statisticsHeaders[tableCol].columnField,
+                          value,
+                          undefined,
+                          undefined,
+                          updateShowHitsCheckbox,
+                        )
+                      "
+                    ></a>
+                  </td>
+                  <td
+                    v-else-if="isNumber(value)"
+                    class="table-data"
+                    :class="{ 'total-null': value === 0 }"
                   >
                     {{ value }}
                   </td>
@@ -1203,10 +1243,7 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
                       (value.values?.length ?? 0) === 0
                     "
                     class="numeric table-data"
-                    :class="{
-                      'total-column': tableCol == lexicalStorage.selectedCompileFields.length,
-                      'total-null': value.count === 0,
-                    }"
+                    :class="{ 'total-null': value.count === 0 }"
                   >
                     {{ value.count }}
                   </td>

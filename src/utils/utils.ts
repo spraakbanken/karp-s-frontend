@@ -13,6 +13,41 @@ import {
   DEFAULT_RESULT_TRUE,
   DEFAULT_RESULT_FALSE,
 } from '@/utils/constants.ts'
+import type { CountHeadersColumn, StatisticsDataset } from '@/types/datasetConfig.ts'
+
+export const buildEqualsQuery = (field: string, value: string | number): string =>
+  `equals|${field}|"${String(value).replace(/"/g, '\\"')}"`
+
+export const compileRowSearch = (
+  row: StatisticsDataset,
+  headers: CountHeadersColumn[],
+  compileColumnCount: number,
+): { label: string; query: string } | undefined => {
+  const clauses: string[] = []
+  const labels: string[] = []
+
+  for (let index = 0; index < compileColumnCount; index++) {
+    const header = headers[index]
+    const value = row[index]
+
+    if (!header || (typeof value !== 'string' && typeof value !== 'number')) {
+      return undefined
+    }
+
+    const stringValue = String(value)
+    clauses.push(buildEqualsQuery(header.columnField, stringValue))
+    labels.push(stringValue)
+  }
+
+  if (clauses.length === 0) {
+    return undefined
+  }
+
+  return {
+    label: labels.join(' & '),
+    query: clauses.length === 1 ? clauses[0] : `and(${clauses.join('||')})`,
+  }
+}
 
 // Return propeer text according to locale
 export const th = (x?: ByLang | string): string | undefined => {
