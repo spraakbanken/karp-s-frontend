@@ -662,6 +662,7 @@ export const lexicalStore = defineStore('dataset', {
       return label
     },
     isList(p: string): boolean {
+      /*
       let value = false
       this.currentFields.every((item) => {
         if (p === item.name) {
@@ -673,6 +674,8 @@ export const lexicalStore = defineStore('dataset', {
       })
 
       return value
+      */
+      return this.currentFields.find((item) => item.name === p)?.collection ?? false
     },
     isHtml(p: string): boolean {
       return this.currentFields.some((item) => item.name === p && item.kind === FIELD_KIND_HTML)
