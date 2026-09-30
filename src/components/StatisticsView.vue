@@ -1224,6 +1224,7 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
                           undefined,
                           undefined,
                           updateShowHitsCheckbox,
+                          lexicalStorage.isHtml(statisticsHeaders[tableCol].columnField),
                         )
                       "
                     ></a>
@@ -1256,10 +1257,11 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
                           undefined,
                           undefined,
                           updateShowHitsCheckbox,
+                          lexicalStorage.isHtml(statisticsHeaders[tableCol].columnField),
                         )
                       "
-                      class="cell-clickable"
                       @click="refClick(item, Number(tableCol))"
+                      class="cell-clickable"
                     ></span>
                   </td>
                 </template>

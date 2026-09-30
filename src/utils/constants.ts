@@ -48,6 +48,9 @@ export const DEFAULT_STATISTICS_COLUMNS: string[] = []
 export const DEFAULT_RESULT_TRUE: string = 'true'
 export const DEFAULT_RESULT_FALSE: string = 'false'
 
+// fieldconfig - kind
+export const FIELD_KIND_HTML: string = 'html'
+
 // error messages
 
 export enum BEErrorCode {

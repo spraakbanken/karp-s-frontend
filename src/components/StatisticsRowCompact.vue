@@ -193,6 +193,7 @@ const [expanded, toggleExpanded] = useToggle()
                   undefined,
                   undefined,
                   updateShowHitsCheckbox,
+                  lexicalStorage.isHtml(columnHeads[tableCol].columnField),
                 )
               "
               @click="refClick(Number(tableCol))"

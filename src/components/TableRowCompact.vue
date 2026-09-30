@@ -5,6 +5,7 @@ import type { ColumnVisField, EntryS } from '@/types/datasetConfig'
 import { formatCell, isImage } from '@/utils/utils'
 import { isNumber } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
+import { lexicalStore } from '@/stores/store'
 
 const { t } = useI18n()
 const baseUrl = import.meta.env.BASE_URL
@@ -19,6 +20,8 @@ const props = defineProps<{
   fa: ColumnVisField[]
   showCompact: boolean
 }>()
+
+const lexicalStorage = lexicalStore()
 
 /* handle compact and expanded view of rows */
 
@@ -59,7 +62,18 @@ const [expanded, toggleExpanded] = useToggle()
           :class="{ 'mhr-div': !expanded && tableHeightFlag, numeric: isNumber(value2.value) }"
         >
           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
-            <span v-html="formatCell(value2.name, value2.value)"></span>
+            <span
+              v-html="
+                formatCell(
+                  value2.name,
+                  value2.value,
+                  undefined,
+                  undefined,
+                  undefined,
+                  lexicalStorage.isHtml(value2.name),
+                )
+              "
+            ></span>
             <span v-if="isImage(value2.value)">
               <a
                 :href="baseUrl + 'img?img=' + value2.value"

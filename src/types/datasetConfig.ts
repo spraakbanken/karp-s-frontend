@@ -6,6 +6,7 @@ export const entryWordDescriptionProperty = 'entryWordDescription'
 export interface FieldConfig {
   name: string
   type: string
+  kind: string
   collection: boolean
   label: Label | string
   categories: string[]

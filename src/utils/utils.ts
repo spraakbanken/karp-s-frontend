@@ -145,14 +145,32 @@ export const formatCell = (
   divider: string = '<br>',
   solo: boolean = false,
   showCount: boolean = true,
+  renderHtml: boolean = false,
 ): string => {
   let cell: string = ''
+  // function to escape HTML special characters so the HTML doesn't get rendered
+  const escapeHtml = (value: string): string =>
+    value.replace(/[&<>"']/g, (character) => {
+      switch (character) {
+        case '&':
+          return '&amp;'
+        case '<':
+          return '&lt;'
+        case '>':
+          return '&gt;'
+        case '"':
+          return '&quot;'
+        default:
+          return '&#39;'
+      }
+    })
+  const formatValue = (value: string): string => (renderHtml ? value : escapeHtml(value))
 
   if (fieldValue !== null) {
     if (Array.isArray(fieldValue)) {
       if (fieldValue.length > 0) {
         fieldValue.every((item) => {
-          cell = cell + (cell ? divider : '') + detectConstant(item)
+          cell = cell + (cell ? divider : '') + formatValue(detectConstant(item))
           return true
         })
       }
@@ -167,12 +185,15 @@ export const formatCell = (
             const statistic = v as Record<string, unknown>
 
             let vvalue: string = ''
+            let displayValue: string = ''
             let vcount: number = -1
             if (BE_STATISTICS_VALUE_ID in v) {
               vvalue =
                 statistic[BE_STATISTICS_VALUE_ID] !== null
                   ? String(statistic[BE_STATISTICS_VALUE_ID])
                   : '<i>n/a</i>'
+              displayValue =
+                statistic[BE_STATISTICS_VALUE_ID] !== null ? formatValue(vvalue) : vvalue
             }
 
             if (typeof statistic[BE_STATISTICS_COUNT_ID] === 'number') {
@@ -181,8 +202,8 @@ export const formatCell = (
 
             cell +=
               (cell ? ', ' : '') +
-              vvalue +
-              checkForLabel(fieldName, vvalue) +
+              displayValue +
+              formatValue(checkForLabel(fieldName, vvalue)) +
               (showCount ? ': ' + String(vcount) : '')
           }
         })
@@ -194,16 +215,16 @@ export const formatCell = (
             cell +
             '<span class="sum-right"><b>' +
             (!solo ? (cell ? ' ' : '') : '') +
-            String(statistics[BE_STATISTICS_COUNT_ID]) +
+            formatValue(String(statistics[BE_STATISTICS_COUNT_ID])) +
             '</b></span>'
         }
       }
     } else if (typeof fieldValue === 'string' && fieldValue.startsWith('https://')) {
       cell =
         "<a class='cell-clickable' href='" +
-        fieldValue +
+        escapeHtml(fieldValue) +
         "' target=_blank >" +
-        getFilenameFromUrl(fieldValue) +
+        formatValue(getFilenameFromUrl(fieldValue) ?? '') +
         '</a>'
     } else {
       // check if field has category labels, and if so, get the label for the value in the current language
@@ -220,7 +241,9 @@ export const formatCell = (
         cell = detectConstant(String(fieldValue))
       }
       */
-      cell = detectConstant(String(fieldValue)) + checkForLabel(fieldName, String(fieldValue))
+      cell =
+        formatValue(detectConstant(String(fieldValue))) +
+        formatValue(checkForLabel(fieldName, String(fieldValue)))
     }
   } else {
     cell = '-'
@@ -239,48 +262,6 @@ export const isImage = (x: unknown): boolean => {
   }
   return retval
 }
-
-/*
-export const formatCell = (x: string | string[], divider: string = '<br>'): string => {
-  let value = ''
-  if (typeof x === 'object' && x !== null) {
-    if ('values' in x) {
-      Object.entries(x.values).forEach(([k, v]) => {
-        if (typeof v === 'object') {
-          Object.entries(v).forEach(([k2, v2]) => {
-            if (k2 === BE_STATISTICS_COUNT_ID) {
-              value = value + (value ? '/' : '') + v2
-            } else {
-              value = value + (value ? ', ' : '') + v2
-            }
-          })
-        } else {
-          value = value + (value ? divider : '') + v
-        }
-        return true
-      })
-    } else {
-      Object.entries(x).forEach(([k2, v2]) => {
-        if (k2 === BE_STATISTICS_COUNT_ID) {
-          value = value + (value ? '/' : '') + v2
-        } else {
-          value = value + (value ? ', ' : '') + v2
-        }
-      })
-    }
-  } else if (Array.isArray(x)) {
-    x.every((item) => {
-      value = value + (value ? divider : '') + item
-      return true
-    })
-  } else if (typeof x === 'string' && x.startsWith('https://')) {
-    value = "<a href='" + x + "' target=_blank >" + getFilenameFromUrl(x) + '<a>'
-  } else {
-    value = x
-  }
-  return value
-}
-*/
 
 /** The number of milliseconds in a full day. */
 const DAY_MS = 24 * 60 * 60 * 1000

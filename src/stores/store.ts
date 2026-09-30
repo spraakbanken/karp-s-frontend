@@ -25,6 +25,7 @@ import {
   DEFAULT_TAB_SEARCH,
   DEFAULT_TABLE_PAGE_ROW_START,
   DEFAULT_TABLE_PAGE_SIZE,
+  FIELD_KIND_HTML,
   POSITION_EQUALS,
   ROWS_PER_PAGE,
   SORT_ORDER_ASCENDING,
@@ -411,6 +412,7 @@ export const lexicalStore = defineStore('dataset', {
           this.currentFields.unshift({
             name: entryWordField,
             type: 'text',
+            kind: '',
             collection: false,
             label: { swe: 'ingångsord', eng: 'word' },
             categories: [],
@@ -421,6 +423,7 @@ export const lexicalStore = defineStore('dataset', {
           this.currentCommonFields.unshift({
             name: entryWordField,
             type: 'text',
+            kind: '',
             collection: false,
             label: { swe: 'ingångsord', eng: 'word' },
             categories: [],
@@ -671,15 +674,22 @@ export const lexicalStore = defineStore('dataset', {
 
       return value
     },
+    isHtml(p: string): boolean {
+      return this.currentFields.some((item) => item.name === p && item.kind === FIELD_KIND_HTML)
+    },
     areDatasetsInConfig(keys: string[]): boolean {
       return keys.every((k) => this.currentDatasets.includes(k))
     },
     addTabRef(resourceId: string[], label: string, query: string) {
       if (this.tabRefSetupCounter < TABREFCOUNT_MAX) {
+        // the label could contain HTML, so strip it
+        const plainLabel =
+          new DOMParser().parseFromString(label, 'text/html').body.textContent?.trim() ?? ''
+        // add reference table
         this.tabRefSetupCounter++
         this.tabRefSetup[this.tabRefSetupCounter] = {
           resourceId,
-          label,
+          label: plainLabel,
           query,
           tableResultGrpSorted: {},
           isLoading: false,
