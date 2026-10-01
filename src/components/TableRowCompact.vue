@@ -6,13 +6,13 @@ import { formatCell, isImage } from '@/utils/utils'
 import { isNumber } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
 import { lexicalStore } from '@/stores/store'
+import { ROW_MAX_HEIGHT } from '@/utils/constants'
 
 const { t } = useI18n()
 const baseUrl = import.meta.env.BASE_URL
 
 const props = defineProps<{
   /** Maximum height (px). */
-  maxHeight: number
   value1: {
     entry: EntryS[]
     resourceId: string
@@ -26,9 +26,9 @@ const lexicalStorage = lexicalStore()
 /* handle compact and expanded view of rows */
 
 const tableHeightFlag = ref(false)
-const tdRefs = ref<HTMLTableCellElement[]>([])
+const tdRefs = ref<HTMLDivElement[]>([])
 const measureHeight = () => {
-  const tooTall = tdRefs.value.some((element) => element.scrollHeight > props.maxHeight)
+  const tooTall = tdRefs.value.some((element) => element.scrollHeight > ROW_MAX_HEIGHT)
 
   if (tableHeightFlag.value !== tooTall) {
     tableHeightFlag.value = tooTall
@@ -43,9 +43,16 @@ const [expanded, toggleExpanded] = useToggle()
 </script>
 
 <template>
-  <tr :class="{ 'limited-height': !expanded && tableHeightFlag }">
+  <tr
+    :class="{ 'limited-height': showCompact && !expanded && tableHeightFlag }"
+    :style="{ '--row-max-height': `${ROW_MAX_HEIGHT - 5}px` }"
+  >
     <template v-for="(value2, key) in value1.entry" :key="key">
-      <td v-if="tableHeightFlag && key === 0" class="button-span" @click="toggleExpanded()">
+      <td
+        v-if="showCompact && tableHeightFlag && key === 0"
+        class="button-span"
+        @click="toggleExpanded()"
+      >
         <font-awesome-icon
           :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
           class="fa-icon"
@@ -59,7 +66,10 @@ const [expanded, toggleExpanded] = useToggle()
       >
         <div
           ref="tdRefs"
-          :class="{ 'mhr-div': !expanded && tableHeightFlag, numeric: isNumber(value2.value) }"
+          :class="{
+            'mhr-div': showCompact && !expanded && tableHeightFlag,
+            numeric: isNumber(value2.value),
+          }"
         >
           <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
             <span
@@ -107,12 +117,12 @@ p:not(:last-of-type) {
 
 <style scoped>
 .limited-height {
-  max-height: 26px;
+  max-height: var(--row-max-height);
   overflow: hidden;
 }
 
 .mhr-div {
-  max-height: 26px;
+  max-height: var(--row-max-height);
   overflow: hidden;
 }
 

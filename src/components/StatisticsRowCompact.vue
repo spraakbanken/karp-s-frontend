@@ -8,14 +8,14 @@ import {
   type CountHeadersColumn,
   type StatisticsDataset,
 } from '@/types/datasetConfig'
-import { ROW_MAX_HEIGHT, BE_STATISTICS_VALUES_ID } from '@/utils/constants'
+import { ROW_MAX_HEIGHT } from '@/utils/constants'
 import { isNumber } from 'es-toolkit/compat'
 import { lexicalStore } from '@/stores/store'
 
 const props = defineProps<{
   item: StatisticsDataset
-  tableRow: number
   columnHeads: CountHeadersColumn[]
+
   showCompact: boolean
   updateShowHitsCheckbox: boolean
 }>()
@@ -35,7 +35,7 @@ function showSnackbar() {
 
 const refClick = (tCol: number) => {
   const cell = props.item[tCol]
-  const header = lexicalStorage.statisticsHeaders[tCol]
+  const header = props.columnHeads[tCol]
   if (cell === undefined || header === undefined) {
     return
   }
@@ -78,7 +78,7 @@ const refClick = (tCol: number) => {
 /* handle compact and expanded view of rows */
 
 const tableHeightFlag = ref(false)
-const tdRefs = ref<HTMLTableCellElement[]>([])
+const tdRefs = ref<HTMLDivElement[]>([])
 
 const measureHeight = () => {
   const tooTall = tdRefs.value.some((element) => element.scrollHeight > ROW_MAX_HEIGHT)
@@ -96,7 +96,17 @@ const [expanded, toggleExpanded] = useToggle()
 </script>
 
 <template>
-  <tr :class="{ 'limited-height': !expanded && tableHeightFlag }">
+  <tr
+    :class="{ 'limited-height': showCompact && !expanded && tableHeightFlag }"
+    :style="{ '--row-max-height': `${ROW_MAX_HEIGHT - 5}px` }"
+  >
+    <td v-if="showCompact && tableHeightFlag" class="button-span" @click="toggleExpanded()">
+      <font-awesome-icon
+        :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
+        class="fa-icon"
+      />
+    </td>
+    <td v-else-if="showCompact"></td>
     <template v-for="(value, tableCol) in item" :key="tableCol">
       <!-- the total column always opens a reference search for this row's compile values -->
       <template v-if="tableCol === lexicalStorage.selectedCompileFields.length">
@@ -119,6 +129,7 @@ const [expanded, toggleExpanded] = useToggle()
                 undefined,
                 undefined,
                 updateShowHitsCheckbox,
+                lexicalStorage.isHtml(columnHeads[tableCol].columnField),
               )
             "
           ></a>
@@ -126,18 +137,6 @@ const [expanded, toggleExpanded] = useToggle()
       </template>
       <!-- is value just a number? -->
       <template v-else-if="isNumber(value)">
-        <!--first column -->
-        <td
-          v-if="tableHeightFlag && tableCol === 0 && showCompact"
-          class="button-span"
-          @click="toggleExpanded()"
-        >
-          <font-awesome-icon
-            :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
-            class="fa-icon"
-          />
-        </td>
-        <td v-else-if="tableCol === 0 && showCompact"></td>
         <!-- show data as number-->
         <td :class="{ 'total-null': value === 0 }" class="table-data">
           {{ value }}
@@ -152,39 +151,15 @@ const [expanded, toggleExpanded] = useToggle()
           (value.values?.length ?? 0) === 0
         "
       >
-        <!--first column -->
-        <td
-          v-if="tableHeightFlag && tableCol === 0 && showCompact"
-          class="button-span"
-          @click="toggleExpanded()"
-        >
-          <font-awesome-icon
-            :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
-            class="fa-icon"
-          />
-        </td>
-        <td v-else-if="tableCol === 0 && showCompact"></td>
         <td class="numeric table-data" :class="{ 'total-null': value.count === 0 }">
           {{ value.count }}
         </td>
       </template>
       <!-- other -->
       <template v-else>
-        <!--first column -->
-        <td
-          v-if="tableHeightFlag && tableCol === 0 && showCompact"
-          class="button-span"
-          @click="toggleExpanded()"
-        >
-          <font-awesome-icon
-            :icon="['fas', expanded ? 'chevron-down' : 'chevron-right']"
-            class="fa-icon"
-          />
-        </td>
-        <td v-else-if="tableCol === 0 && showCompact"></td>
         <!--show data -->
         <td dir="auto" class="table-data">
-          <div ref="tdRefs" :class="{ 'mhr-div': !expanded && tableHeightFlag }">
+          <div ref="tdRefs" :class="{ 'mhr-div': showCompact && !expanded && tableHeightFlag }">
             <span
               v-html="
                 formatCell(
@@ -210,12 +185,12 @@ const [expanded, toggleExpanded] = useToggle()
 
 <style scoped>
 .limited-height {
-  max-height: 33px;
+  max-height: var(--row-max-height);
   overflow: hidden;
 }
 
 .mhr-div {
-  max-height: 29px;
+  max-height: var(--row-max-height);
   overflow: hidden;
 }
 

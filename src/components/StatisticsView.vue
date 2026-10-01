@@ -2,7 +2,6 @@
 import {
   ROW_SHOW_COMPACT_DEFAULT,
   GRAPH_BARWIDTH,
-  BE_STATISTICS_VALUES_ID,
   SORT_ORDER_ASCENDING,
   SORT_ORDER_DESCENDING,
 } from '@/utils/constants'
@@ -12,18 +11,15 @@ import {
   isStatisticsObjectCell,
   entryWordField,
   entryWordFieldCamel,
-  type StatisticsCellObject,
-  type StatisticsCell,
   type StatisticsDataset,
 } from '@/types/datasetConfig'
 import { getStatisticsData } from '@/api/apiService'
 import * as d3 from 'd3'
-import { buildEqualsQuery, compileRowSearch, formatCell } from '@/utils/utils'
+import { formatCell } from '@/utils/utils'
 import { useI18n } from 'vue-i18n'
 import StatisticsRowCompact from './StatisticsRowCompact.vue'
 import StatisticsPagination from './StatisticsPagination.vue'
 import { checkJwtToken } from '@/api/authService'
-import { isNumber } from 'es-toolkit/compat'
 
 const { t } = useI18n()
 
@@ -793,58 +789,6 @@ const updateOverview = () => {
     drawChart()
   }
 }
-
-/* Show "popup" message that we have added a ref table */
-function showSnackbar() {
-  const snackbar = document.getElementById('snackbar')
-  if (snackbar !== null) {
-    snackbar.className = 'show'
-    setTimeout(() => {
-      snackbar.className = snackbar.className.replace('show', '')
-    }, 3000)
-  }
-}
-
-const refClick = (item: StatisticsDataset, tableCol: number) => {
-  const cell = item[tableCol]
-  const header = statisticsHeaders.value[tableCol]
-  if (cell === undefined || header === undefined) {
-    return
-  }
-
-  if (tableCol === lexicalStorage.selectedCompileFields.length) {
-    const search = compileRowSearch(
-      item,
-      statisticsHeaders.value,
-      lexicalStorage.selectedCompileFields.length,
-    )
-    if (!search) {
-      return
-    }
-    lexicalStorage.addTabRef(lexicalStorage.selectedDatasets, search.label, search.query)
-  } else if (tableCol < lexicalStorage.selectedCompileFields.length) {
-    if (typeof cell !== 'string') {
-      return
-    }
-    lexicalStorage.addTabRef(
-      lexicalStorage.selectedDatasets,
-      cell,
-      buildEqualsQuery(header.columnField, cell),
-    )
-  } else {
-    if (!isStatisticsObjectCell(cell) || !cell.values?.length) {
-      return
-    }
-    const value = cell.values[0].value
-    lexicalStorage.addTabRef(
-      [header.headerValue],
-      value,
-      buildEqualsQuery(header.columnField, value),
-    )
-  }
-
-  showSnackbar()
-}
 </script>
 
 <template>
@@ -1190,83 +1134,14 @@ const refClick = (item: StatisticsDataset, tableCol: number) => {
               </template>
             </tr>
             <!-- show data -->
-            <template v-for="(item, tableRow) in paginatedData" :key="item + '-' + tableRow">
-              <!-- show compact row -->
-              <StatisticsRowCompact
-                v-if="showCompact"
-                :item="item"
-                :columnHeads="statisticsHeaders"
-                :tableRow="tableRow"
-                :showCompact="showCompact"
-                :updateShowHitsCheckbox="updateShowHitsCheckbox"
-              >
-              </StatisticsRowCompact>
-              <!-- show full row -->
-              <tr v-else>
-                <template v-for="(value, tableCol) in item" :key="tableCol">
-                  <td
-                    v-if="tableCol === lexicalStorage.selectedCompileFields.length"
-                    class="numeric table-data total-column"
-                    :class="{
-                      'total-null':
-                        (isNumber(value) && value === 0) ||
-                        (isStatisticsObjectCell(value) && value.count === 0),
-                    }"
-                  >
-                    <a
-                      href="#"
-                      class="cell-clickable"
-                      @click.prevent="refClick(item, Number(tableCol))"
-                      v-html="
-                        formatCell(
-                          statisticsHeaders[tableCol].columnField,
-                          value,
-                          undefined,
-                          undefined,
-                          updateShowHitsCheckbox,
-                          lexicalStorage.isHtml(statisticsHeaders[tableCol].columnField),
-                        )
-                      "
-                    ></a>
-                  </td>
-                  <td
-                    v-else-if="isNumber(value)"
-                    class="table-data"
-                    :class="{ 'total-null': value === 0 }"
-                  >
-                    {{ value }}
-                  </td>
-                  <td
-                    v-else-if="
-                      typeof value === 'object' &&
-                      value !== null &&
-                      !Array.isArray(value) &&
-                      (value.values?.length ?? 0) === 0
-                    "
-                    class="numeric table-data"
-                    :class="{ 'total-null': value.count === 0 }"
-                  >
-                    {{ value.count }}
-                  </td>
-                  <td dir="auto" v-else class="table-data">
-                    <span
-                      v-html="
-                        formatCell(
-                          statisticsHeaders[tableCol].columnField,
-                          value,
-                          undefined,
-                          undefined,
-                          updateShowHitsCheckbox,
-                          lexicalStorage.isHtml(statisticsHeaders[tableCol].columnField),
-                        )
-                      "
-                      @click="refClick(item, Number(tableCol))"
-                      class="cell-clickable"
-                    ></span>
-                  </td>
-                </template>
-              </tr>
-            </template>
+            <StatisticsRowCompact
+              v-for="(item, tableRow) in paginatedData"
+              :key="item + '-' + tableRow"
+              :item="item"
+              :column-heads="statisticsHeaders"
+              :show-compact="showCompact"
+              :update-show-hits-checkbox="updateShowHitsCheckbox"
+            />
           </tbody>
         </table>
       </div>

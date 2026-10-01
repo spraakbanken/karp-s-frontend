@@ -20,8 +20,6 @@ import {
   entryWordField,
 } from '@/types/datasetConfig'
 import { getTableData } from '@/api/apiService'
-import { formatCell, isImage } from '@/utils/utils'
-
 import TableRowCompact from '@/components/TableRowCompact.vue'
 import ColVisDropDown from './ColVisDropDown.vue'
 import ColVisGlobalDropDown from './ColVisGlobalDropDown.vue'
@@ -494,58 +492,13 @@ const picsbarFractionTotalClass = (ds: string) => {
                 </tr>
 
                 <!-- show dataset entries -->
-                <template v-for="(value1, key) in item" :key="key">
-                  <template v-if="showCompact">
-                    <TableRowCompact
-                      :maxHeight="33"
-                      :value1="value1"
-                      :fa="lexicalStorage.columnVis[ds]"
-                      :showCompact="showCompact"
-                    >
-                    </TableRowCompact>
-                  </template>
-
-                  <template v-else>
-                    <tr>
-                      <template v-for="(value2, key) in value1.entry" :key="key">
-                        <td
-                          dir="auto"
-                          v-if="
-                            lexicalStorage.columnVis[ds].find((f) => f.columnField === value2.name)
-                              ?.vis
-                          "
-                          class="table-data"
-                        >
-                          <span :style="isImage(value2.value) ? 'white-space: nowrap' : ''">
-                            <!--<span style="white-space: nowrap">-->
-                            <span
-                              v-html="
-                                formatCell(
-                                  value2.name,
-                                  value2.value,
-                                  undefined,
-                                  undefined,
-                                  undefined,
-                                  lexicalStorage.isHtml(value2.name),
-                                )
-                              "
-                            ></span>
-                            <span v-if="isImage(value2.value)">
-                              <a
-                                :href="'/karp/img?img=' + value2.value"
-                                class="action-link img-browse-button"
-                                target="_blank"
-                                :title="t('table.imgbrowse')"
-                              >
-                                <font-awesome-icon :icon="['fas', 'images']" />
-                              </a>
-                            </span>
-                          </span>
-                        </td>
-                      </template>
-                    </tr>
-                  </template>
-                </template>
+                <TableRowCompact
+                  v-for="(value1, key) in item"
+                  :key="key"
+                  :value1="value1"
+                  :fa="lexicalStorage.columnVis[ds]"
+                  :show-compact="showCompact"
+                />
               </template>
             </tbody>
           </table>
