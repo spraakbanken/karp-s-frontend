@@ -81,16 +81,9 @@ const loginLogout = async () => {
       </span>
     </span>
 
-    <button id="theme-toggle" class="nav-button button-mode" :aria-label="$t('aria.toggle.theme')">
-      <span v-if="themeCurrent === 'light'">
-        <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
-      </span>
-      <span v-else>
-        <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
-      </span>
-    </button>
+    <!-- language selection dropdown -->
     <div
-      class="dropdown nav-button"
+      class="dropdown nav-button menu-item"
       ref="dropDownLanguageContainer"
       :class="{ 'dropdown-open': isDropDownLanguage }"
     >
@@ -114,6 +107,20 @@ const loginLogout = async () => {
         </a>
       </div>
     </div>
+
+    <!-- theme toggle -->
+    <button
+      id="theme-toggle"
+      class="nav-button button-mode menu-item"
+      :aria-label="$t('aria.toggle.theme')"
+    >
+      <span v-if="themeCurrent === 'light'">
+        <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
+      </span>
+      <span v-else>
+        <font-awesome-icon :icon="['fas', 'circle-half-stroke']" />
+      </span>
+    </button>
   </nav>
 </template>
 
@@ -143,6 +150,10 @@ nav a,
   cursor: pointer;
 }
 
+.menu-item {
+  margin-right: 1rem;
+}
+
 nav a.router-link-exact-active,
 nav button.nav-button-active {
   color: var(--sb-orange);
@@ -167,7 +178,6 @@ nav a:first-of-type {
 
 nav .menu-item {
   white-space: nowrap;
-  padding: 0 1rem 0 0;
 }
 /* language selection dropdown */
 
@@ -178,7 +188,6 @@ nav .menu-item {
 .dropdown-toggle {
   display: flex;
   align-items: baseline;
-  padding-left: 1rem;
   cursor: pointer;
 }
 

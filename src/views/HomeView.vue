@@ -177,7 +177,7 @@ const tabRefClose = (id: number) => {
                 <span @click="tabRefClose(Number(key))">
                   <font-awesome-icon :icon="['fas', 'close']" />
                 </span>
-                <span @click="setActiveResultTab(TAB_RESULT_REF + key)">
+                <span @click="setActiveResultTab(TAB_RESULT_REF + key)" class="cell-clickable">
                   <!--<span> <font-awesome-icon :icon="['fas', 'chevron-right']" /> </span>-->
                   {{ limit_tabref(tabRef.label) }}
                 </span>
@@ -208,6 +208,10 @@ const tabRefClose = (id: number) => {
 </template>
 
 <style scoped>
+header {
+  background-color: var(--color-background-alt2);
+}
+
 .container {
   padding: 0;
 }
@@ -228,6 +232,7 @@ const tabRefClose = (id: number) => {
   gap: 0.5rem;
   align-items: center;
   justify-content: flex-start;
+  background-color: var(--color-background-alt2);
 }
 
 .column-left {
@@ -262,7 +267,8 @@ const tabRefClose = (id: number) => {
   padding-left: 1rem;
   padding-top: 0.5rem;
   height: 2.5rem;
-  background-color: var(--color-background);
+  background-color: var(--color-background-alt2);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .searchTabs button,
@@ -281,15 +287,21 @@ const tabRefClose = (id: number) => {
   border-left-style: solid;
   border-right-style: solid;
   font-size: var(--font-size);
-  font-weight: bold;
+  font-weight: normal;
   margin-right: 0.25rem;
   overflow: hidden;
+  margin-bottom: -1px;
+  border: 1px solid var(--color-border);
 }
 
 .searchTabs button.active,
 .tabs button.active {
   font-weight: bold;
-  background-color: var(--color-background-alt);
+  background-color: var(--color-background);
+  border-bottom: 0px solid var(--color-background);
+}
+
+.table-wrapper {
 }
 
 .icon-placement {

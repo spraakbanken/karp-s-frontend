@@ -1168,7 +1168,7 @@ svg g text {
 <style scoped>
 .statistics-wrapper {
   color: var(--color-text);
-  background-color: var(--color-background-alt);
+  background-color: var(--color-background);
 }
 
 .statistics {
@@ -1209,7 +1209,7 @@ svg g text {
   cursor: pointer;
   background-color: var(--color-background-alt2);
   color: var(--color-text);
-  border: 1px solid var(--button-border);
+  border: 1px solid var(--color-border);
 }
 
 .statistics-dropdown-menu {
@@ -1218,7 +1218,7 @@ svg g text {
   left: 0;
   right: 0;
   background-color: var(--color-background);
-  border: 1px solid var(--button-border);
+  border: 1px solid var(--color-border);
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
@@ -1374,7 +1374,7 @@ tr:nth-child(odd) td.total-null {
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   font-weight: bold;
-  border: 1px solid var(--sb-orange);
+  border: none;
   border-radius: 4px;
 }
 
@@ -1415,6 +1415,12 @@ input[type='checkbox'][disabled] + label {
   margin-top: 1rem;
 }
 
+.overview-settings input {
+  accent-color: var(--sb-orange);
+  cursor: pointer;
+}
+
+/*
 .overview-settings .export-button {
   background-color: var(--color-infocontrol-button-bg);
   color: var(--color-infocontrol-button-text);
@@ -1423,6 +1429,7 @@ input[type='checkbox'][disabled] + label {
   border-radius: 4px;
   border: 0;
 }
+*/
 
 /* table */
 .table-container {

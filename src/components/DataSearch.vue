@@ -33,6 +33,10 @@ const setActiveSearchTab = (tab: string) => {
     }
     lexicalStorage.resetSelectedFieldsMain(sfc)
   }
+  if (tab == TAB_SEARCH_ADVANCED) {
+    console.log('query:', lexicalStorage.getQuery())
+    searchQuery.value = lexicalStorage.searchQuery
+  }
   lexicalStorage.setActiveSearchTab(tab)
 }
 
@@ -320,8 +324,8 @@ watch(
 <template>
   <div class="search-component">
     <!-- search tabs -->
-    <div>
-      <div class="searchTabs">
+    <div class="search-tabs-wrapper">
+      <div class="search-tabs">
         <button
           :class="{ active: lexicalStorage.activeSearchTab === TAB_SEARCH_SIMPLE }"
           @click="setActiveSearchTab(TAB_SEARCH_SIMPLE)"
@@ -680,12 +684,14 @@ input:focus {
 .search-container {
   align-items: center;
   padding: 0.5rem;
-  border-radius: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
   margin-top: 0rem;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  background-color: var(--color-search-area);
+  background-color: var(--color-background);
   width: 480px;
 }
 
@@ -715,27 +721,38 @@ input:focus {
 
 /* simple and advanced search */
 
-.searchTabs {
+.search-tabs-wrapper {
+  width: 100%;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.search-tabs {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   border-radius: 0;
   padding-left: 1rem;
 }
 
-.searchTabs button {
+.search-tabs button {
   color: var(--color-text);
   background-color: var(--color-background-alt2);
   padding: 0.5rem 1rem;
   margin-right: 0.25rem;
-  border: none;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  /*
+  border-color: var(--color-border);
+  border-style: solid;
+  */
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
   cursor: pointer;
+  margin-bottom: -1px;
+  border: 1px solid var(--color-border);
 }
 
-.searchTabs button.active {
-  background-color: var(--color-background-alt);
+.search-tabs button.active {
+  background-color: var(--color-background);
   font-weight: bold;
+  border-bottom: 0px solid var(--color-background);
 }
 
 .search-advanced-label {
@@ -787,9 +804,9 @@ input:focus {
   padding: 0.25rem;
   position: relative;
   color: var(--color-text);
-  background-color: var(--color-background-alt2);
+  background-color: var(--color-background);
   border-radius: 0.5rem;
-  border: 1px solid var(--button-border);
+  border: 1px solid var(--color-border);
 }
 
 .dropdown-open {
@@ -821,7 +838,7 @@ input:focus {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: var(--color-background-alt2);
+  background-color: var(--color-background);
   border: 1px solid var(--color-border);
   max-height: 400px;
   overflow-y: auto;
@@ -830,7 +847,7 @@ input:focus {
 }
 
 .dropdown-open .dropdown-menu {
-  border-color: var(--color-border-open);
+  border-color: var(--color-border);
 }
 
 .dropdown-item {
@@ -912,7 +929,7 @@ input:focus {
 
 .search-input {
   padding: 0.5rem;
-  border: none;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   width: 260px;
   @media (width < 640px) {
@@ -1032,9 +1049,8 @@ input:focus {
   color: var(--button-action-text-color);
   border: 0;
   */
-  border: 1px solid;
-  border-color: var(--sb-orange);
-  color: black;
+  border: none;
+  color: white;
   margin-right: 0.5rem;
   padding: 0.5;
   border-radius: 4px;

@@ -12,15 +12,21 @@ const logoGUSv = ref('')
 const logoGUEn = ref('')
 
 const updateTheme = async () => {
+  /*
   const theme = document.documentElement.getAttribute('data-theme')
   const isDarkMode = theme === 'dark'
   logoSB.value = isDarkMode ? logoSBLight : logoSBDark
   logoGUSv.value = isDarkMode ? logoGUSvDark : logoGUSvLight
   logoGUEn.value = isDarkMode ? logoGUEnDark : logoGUEnLight
+  */
+  logoSB.value = logoSBDark
+  logoGUSv.value = logoGUSvDark
+  logoGUEn.value = logoGUEnDark
 }
 
 onMounted(() => {
   updateTheme()
+
   const observer = new MutationObserver(updateTheme)
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
 })
@@ -100,18 +106,17 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
   padding-right: 2rem;
   padding-left: 2rem;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 1rem;
-  color: var(--color-text);
-  background-color: var(--color-bg);
+  color: var(--color-inverted-text);
+  background-color: var(--color-inverted);
   box-sizing: border-box;
   width: 100%;
-  border-top: 1px solid var(--color-background-alt2);
 }
 
 .footer-area-left {
@@ -147,6 +152,7 @@ onMounted(() => {
 
 .footer-area a {
   text-decoration: underline;
+  color: var(--color-inverted-text);
 }
 
 .footer-area .contact {

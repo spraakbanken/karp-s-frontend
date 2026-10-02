@@ -14,10 +14,7 @@ const lexicalStorage = lexicalStore()
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 
-const updateTableContainerOverflow = (
-  container: HTMLElement | null,
-  isDropdownOpen: boolean,
-) => {
+const updateTableContainerOverflow = (container: HTMLElement | null, isDropdownOpen: boolean) => {
   if (!container) {
     return
   }
@@ -143,7 +140,7 @@ watch(
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   font-weight: bold;
-  border: 1px solid var(--sb-orange);
+  border: none;
   border-radius: 4px;
 }
 

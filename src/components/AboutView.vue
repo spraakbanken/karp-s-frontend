@@ -36,7 +36,7 @@ onMounted(async () => {
       <!-- About -->
       <div>
         <h2>{{ $t('about.about.title') }}</h2>
-        <p v-html="$t('about.about.text')"></p>
+        <p class="text-copy" v-html="$t('about.about.text')"></p>
       </div>
     </div>
     <div class="row">
@@ -44,7 +44,7 @@ onMounted(async () => {
         <!-- About -->
         <div>
           <h2>{{ $t('about.about.infotitle') }}</h2>
-          <p v-html="$t('about.about.info')"></p>
+          <p class="text-copy" v-html="$t('about.about.info')"></p>
           <p><b>Front-end:</b> {{ packageJson.version }}</p>
           <p><b>Back-end:</b> {{ apiUrl }}</p>
         </div>
@@ -53,7 +53,7 @@ onMounted(async () => {
         <!-- Examples -->
         <div class="examples">
           <h2>{{ $t('about.examples.title') }}</h2>
-          <ul>
+          <ul class="text-copy">
             <li>
               <a :href="ex2">{{ $t('about.examples.ex2') }}</a>
             </li>
@@ -101,7 +101,7 @@ onMounted(async () => {
   padding: 2rem;
   width: 800px;
   border-radius: 0.5rem;
-  background-color: var(--color-background-alt2);
+  /* background-color: var(--color-background-alt2); */
   @media (width < 800px) {
     width: 100%;
     flex-direction: column;
@@ -115,6 +115,7 @@ onMounted(async () => {
   @media (width < 800px) {
     flex-direction: column;
   }
+  margin-bottom: 1rem;
 }
 
 .col {
@@ -122,7 +123,7 @@ onMounted(async () => {
   flex-direction: column;
   flex: 1;
   margin-right: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 p {
@@ -133,6 +134,9 @@ p {
   padding-left: 1rem;
   margin-top: 0;
   margin-bottom: 1rem;
-  font-family: sans-serif;
+}
+
+.examples li {
+  margin-bottom: 0.25rem;
 }
 </style>

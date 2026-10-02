@@ -5,7 +5,7 @@
   padding-right: 0.5rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  background-color: var(--color-background-alt);
+  background-color: var(--color-background);
 }
 
 .fancy-table {
@@ -57,7 +57,7 @@ tr:hover {
 }
 
 .table-data {
-  font-family: sans-serif;
+  font-family: 'Noto Sans Variable', 'Noto Sans Hebrew Variable', sans-serif;
   font-size: 0.9rem;
 }
 

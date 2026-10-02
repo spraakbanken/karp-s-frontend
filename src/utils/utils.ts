@@ -79,6 +79,32 @@ export const secondsToDate = (seconds: string): string => {
 }
 
 export const formatNumber = (num: number): string => {
+  const { t } = useI18n()
+
+  const map = [
+    { suffix1: t('number.trillion'), suffix: t('number.trillions'), threshold: 1e12 },
+    { suffix1: t('number.billion'), suffix: t('number.billions'), threshold: 1e9 },
+    { suffix1: t('number.million'), suffix: t('number.millions'), threshold: 1e6 },
+    { suffix1: t('number.thousand'), suffix: t('number.thousands'), threshold: 1e3 },
+    { suffix1: '', suffix: '', threshold: 1 },
+  ]
+
+  const found = map.find((x) => Math.abs(num) >= x.threshold)
+  if (found) {
+    const formattedNumber: number = num / found?.threshold
+    const factionDigits = found?.threshold === 1e3 && formattedNumber < 10 ? 1 : 0
+    const formatted =
+      formattedNumber.toFixed(factionDigits) +
+      ' ' +
+      (formattedNumber < 1.5 ? found.suffix1 : found.suffix)
+    return formatted
+  }
+
+  return num.toString()
+}
+
+/*
+export const formatNumber = (num: number): string => {
   const map = [
     { suffix: 'T', threshold: 1e12 },
     { suffix: 'G', threshold: 1e9 },
@@ -95,6 +121,7 @@ export const formatNumber = (num: number): string => {
 
   return num.toString()
 }
+*/
 
 export const camelify = (p: string): string => {
   return p.toLowerCase().replace(/(_\w)/g, (m) => m.toUpperCase().substring(1))

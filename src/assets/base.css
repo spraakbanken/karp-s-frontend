@@ -19,14 +19,14 @@
   --color-infocontrol-input-bg: white;
   --color-infocontrol-input-text: black;
   --color-text: black;
-  --color-border: var(--sb-orange);
+  --color-border: var(--sb-grey-light);
   --color-border-open: var(--sb-orange);
   --color-border-hover: #ccc;
   --color-heading: #333;
   --color-icon: #302d2d;
   --color-icon-light: var(--sb-orange-light);
   --color-icon-dark: #ffffff;
-  --table-head-bg: var(--sb-orange-light);
+  --table-head-bg: var(--sb-grey-light);
   --table-head-bg-entryword: white;
   --table-row-even-bg: #f9f9f9;
   --table-row-odd-bg: #e9e9e9;
@@ -34,9 +34,9 @@
   --button-active-text-color: black;
   --button-inactive-bg-color: var(--sb-orange-light);
   --button-inactive-text-color: black;
-  --button-action-bg-color: var(--sb-orange-light);
+  --button-action-bg-color: var(--sb-link);
   --button-action-bg-hover-color: var(--sb-grey-light);
-  --button-action-text-color: black;
+  --button-action-text-color: white;
   --button-action-text-hover-color: black;
   --button-border: var(--sb-orange);
   --color-search-area: var(--sb-orange-light);
@@ -45,6 +45,8 @@
   --font-size-hover: 17px;
   --text-link: var(--sb-link);
   --text-link-hover: var(--sb-link-inverted);
+  --color-inverted: var(--sb-grey-dark);
+  --color-inverted-text: var(--sb-grey-lighter);
 }
 
 /* Define dark mode variables */
@@ -74,9 +76,9 @@
   --button-active-text-color: #ffffff;
   --button-inactive-bg-color: var(--sb-grey-medium);
   --button-inactive-text-color: #ffffff;
-  --button-action-bg-color: var(--sb-grey-medium);
+  --button-action-bg-color: var(--sb-link);
   --button-action-bg-hover-color: var(--sb-grey-light);
-  --button-action-text-color: black;
+  --button-action-text-color: white;
   --button-action-text-hover-color: black;
   --button-border: var(--sb-orange);
   --color-search-area: var(--sb-grey-dark);
@@ -85,6 +87,8 @@
   --font-size-hover: 17px;
   --text-link: var(--sb-link-inverted);
   --text-link-hover: var(--sb-link);
+  --color-inverted: var(--sb-grey-dark);
+  --color-inverted-text: var(--sb-grey-light);
 }
 
 /* Define the light mode toggle */
@@ -112,7 +116,8 @@ body {
     color 0.5s,
     background-color 0.5s;
   line-height: 1.6;
-  font-family: 'Jost', sans-serif;
+  font-family: 'Jost Variable', sans-serif;
+  font-weight: 100;
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -135,13 +140,25 @@ body {
 h2 {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
+  font-weight: normal;
+  font-size: 1.5rem;
 }
 
 h3 {
   margin-top: 0.25rem;
   margin-bottom: 0rem;
+  font-weight: normal;
+  font-size: 1.25rem;
 }
 
 p {
-  font-family: sans-serif;
+  font-family: 'Noto Sans Variable', 'Noto Sans Hebrew Variable', sans-serif;
+}
+
+.text-table {
+  font-family: 'Noto Sans Variable', 'Noto Sans Hebrew Variable', sans-serif;
+}
+
+.text-copy {
+  font-family: 'Noto Serif Variable', 'Noto Serif Hebrew Variable', serif;
 }

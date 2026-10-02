@@ -26,7 +26,7 @@ onMounted(async () => {
           {{ getDate(item.created) }}
         </time>
       </header>
-      <div class="newsbody" v-html="th(item.body)"></div>
+      <div class="text-copy" v-html="th(item.body)"></div>
     </article>
   </div>
 </template>
@@ -42,9 +42,5 @@ onMounted(async () => {
 
 .newsdate {
   font-style: italic;
-}
-
-.newsbody {
-  font-family: sans-serif;
 }
 </style>

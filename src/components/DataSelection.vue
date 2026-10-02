@@ -464,13 +464,13 @@ onBeforeUnmount(() => {
                   <div class="datasets-info" v-if="datasetInfo['label'] !== ''">
                     <div class="datasets-info-label">{{ datasetInfo.label }}</div>
                     <!-- 'description' can contain HTML -->
-                    <div class="" v-html="datasetInfo.description"></div>
+                    <div class="text-copy" v-html="datasetInfo.description"></div>
                     <div class="datasets-info-label">{{ $t('dataset.updated') }}</div>
-                    <div class="">{{ datasetInfo.updated }}</div>
+                    <div class="text-table">{{ datasetInfo.updated }}</div>
                     <div class="datasets-info-label">{{ $t('dataset.size') }}</div>
-                    <div class="">{{ datasetInfo.size }}</div>
+                    <div class="text-table">{{ datasetInfo.size }}</div>
                     <div class="datasets-info-label">{{ $t('dataset.limitedAccess') }}</div>
-                    <div class="">
+                    <div class="text-copy">
                       {{
                         datasetInfo.limitedAccess
                           ? $t('dataset.limitedAccess.true')
@@ -478,7 +478,7 @@ onBeforeUnmount(() => {
                       }}
                     </div>
                     <div class="datasets-info-label">{{ $t('dataset.protectedMetadata') }}</div>
-                    <div class="">
+                    <div class="text-copy">
                       {{
                         datasetInfo.protectedMetadata
                           ? $t('dataset.protectedMetadata.true')
@@ -486,16 +486,16 @@ onBeforeUnmount(() => {
                       }}
                     </div>
                     <div class="datasets-info-label">{{ $t('dataset.link') }}</div>
-                    <div class="">
+                    <div class="text-table">
                       <a :href="datasetInfo.link" target="_blank">{{ datasetInfo.link }}</a>
                     </div>
                     <div class="datasets-info-label">{{ $t('dataset.word') }}</div>
-                    <div class="">{{ datasetInfo[entryWordProperty] }}</div>
+                    <div class="text-table">{{ datasetInfo[entryWordProperty] }}</div>
                     <div class="datasets-info-description">
                       {{ datasetInfo[entryWordDescriptionProperty] }}
                     </div>
                     <div class="datasets-info-label">{{ $t('dataset.fields') }}</div>
-                    <div class="">
+                    <div class="text-table">
                       <div v-for="item in datasetInfo.fields" :key="item.name">
                         {{ lexicalStorage.localizeField(item.name) }}
                       </div>
@@ -519,19 +519,20 @@ onBeforeUnmount(() => {
 
 .dropdown {
   border-radius: 0.5rem;
-  background-color: var(--color-search-area);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
   margin-bottom: 0rem;
   position: relative;
   color: var(--color-text);
 }
 
 .dropdown-open {
-  border-color: var(--sb-orange);
+  border-color: var(--color-border);
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .dropdown-group {
-  background-color: var(--color-background-alt);
+  background-color: var(--color-background-alt2);
   color: var(--color-text);
   padding-left: 0.5rem;
   margin-bottom: 0.25rem;
@@ -562,7 +563,7 @@ onBeforeUnmount(() => {
   top: 100%;
   left: 0rem;
   right: 0rem;
-  background-color: var(--color-background-alt2);
+  background-color: var(--color-background);
   border: 1px solid var(--color-border);
   max-height: 600px;
   overflow-y: visible;
@@ -573,7 +574,6 @@ onBeforeUnmount(() => {
 }
 
 .dropdown-open .dropdown-menu {
-  border-color: var(--color-border-open);
 }
 
 .dropdown-item {
@@ -642,6 +642,7 @@ onBeforeUnmount(() => {
   margin-bottom: 0.5rem;
   cursor: pointer;
   border-radius: 4px;
+  border: none;
   font-weight: bold;
 }
 
@@ -651,7 +652,8 @@ onBeforeUnmount(() => {
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   border-radius: 4px;
-  border: 1px solid var(--sb-orange);
+  /* border: 1px solid var(--sb-orange); */
+  border: none;
   font-weight: bold;
 }
 
@@ -748,7 +750,7 @@ onBeforeUnmount(() => {
   white-space: pre-line;
   overflow-y: auto;
   */
-  background-color: var(--color-background-alt);
+  background-color: var(--color-background-alt2);
   margin: 0 1.5rem 1rem 1.5rem;
   padding: 0.5rem;
 }

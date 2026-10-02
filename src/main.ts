@@ -9,6 +9,12 @@ import router from './router'
 // Provide a simple module declaration to satisfy TypeScript when no types are available
 import VueMatomo from 'vue-matomo'
 
+import '@fontsource-variable/jost'
+import '@fontsource-variable/noto-sans'
+import '@fontsource-variable/noto-serif'
+import '@fontsource-variable/noto-sans-hebrew'
+import '@fontsource-variable/noto-serif-hebrew'
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBackward } from '@fortawesome/free-solid-svg-icons/faBackward'

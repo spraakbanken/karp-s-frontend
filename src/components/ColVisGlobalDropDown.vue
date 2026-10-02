@@ -168,7 +168,7 @@ onMounted(() => {
   background-color: var(--button-action-bg-color);
   color: var(--button-action-text-color);
   border-radius: 4px;
-  border: 1px solid var(--sb-orange);
+  border: none;
   font-weight: bold;
 }
 
